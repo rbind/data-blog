@@ -1,6 +1,7 @@
 baseurl = "/"
 languageCode = "en-us"
-title = "A Hugo website"
+title = "Applied Data Science"
+copyright = "Matthias Doering"
 theme = "hugo-lithium"
 googleAnalytics = ""
 disqusShortname = ""
