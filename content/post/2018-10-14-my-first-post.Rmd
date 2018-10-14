@@ -13,7 +13,7 @@ tags:
 ---
 This is the first post to my new weblog. Let's see whether RMarkdown support works:
 
-```
+```{r plot_points, fig.show='hold', fig.width=7, fig.height=7, message = FALSE}
 df <- data.frame(X = 1:5, Y = 1:5)
 plot(df$X, df$Y)
 ```
