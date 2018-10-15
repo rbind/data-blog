@@ -11,7 +11,11 @@ tags:
   - R Markdown
   - regression
 ---
-This is the first post to my new weblog. Let's see whether RMarkdown support works:
+
+This is the FIRST post to my new weblog. Let's see whether RMarkdown support works ...
+<!--more-->
+
+## Heading
 
 ```{r plot_points, fig.show='hold', fig.width=7, fig.height=7, message = FALSE}
 df <- data.frame(X = 1:5, Y = 1:5)
