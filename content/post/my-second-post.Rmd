@@ -1,0 +1,23 @@
+---
+title: My second post
+author: Matthias
+date: '2018-10-15'
+thumbnail: "img/placeholder.png"
+slug: my-second-post
+categories:
+  - model
+  - test
+tags:
+  - plot
+  - R Markdown
+  - regression
+---
+
+This is the SECOND post to my new weblog. Let's see whether RMarkdown support works ...
+<!--more-->
+## Heading
+This is some further text. And here's some code:
+```{r plot_points, fig.show='hold', fig.width=7, fig.height=7, message = FALSE}
+df <- data.frame(X = 1:5, Y = 1:5)
+plot(df$X, df$Y)
+```
