@@ -1,5 +1,5 @@
 baseurl = "/"
-title = "Applied Data Science"
+title = "Data Science with R"
 languageCode = "en-us"
 paginate = "10" # Number of posts per page
 theme = "Mainroad"
@@ -9,12 +9,12 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [Author]
   name = "Matthias Döring"
-  bio = "Maybe he is a successful blogger or writer. Nobody knows it."
-  avatar = "img/avatar.png"
+  bio = "I've obtained a BSc and MSc in Bioinformatics from Saarland University. Currently, I am pursuing a PhD at the Max Planck Institute for Informatics where I'm researching computational methods for improving treatment and prevention of viral infections."
+  avatar = "img/matthias_doering.jpg"
 
 [Params]
-  subtitle = "Just another site" # Subtitle of your site
-  description = "John Doe's Personal blog about everything" # Description of your site
+  subtitle = "Understand. Implement. Succeed." # Subtitle of your site
+  description = "A blog about data science applications with R. " # Description of your site
   opengraph = true
   twitter_cards = false
   readmore = false # Show "Read more" button in list if true

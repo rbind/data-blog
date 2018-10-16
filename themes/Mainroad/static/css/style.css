@@ -1218,3 +1218,8 @@ textarea {
 		font-size: .6875rem;
 	}
 }
+.right {
+    float: right;
+    width: 300px;
+    padding: 0px;
+}

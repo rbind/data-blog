@@ -11,9 +11,12 @@
 			{{- end }}
 		</header>
 		{{- if .Params.thumbnail }}
-		<figure class="post__thumbnail">
-			<img src="{{ .Params.thumbnail | relURL }}" alt="{{ .Title }}">
-		</figure>
+            {{ $avatar := findRE "_avatar" .Params.thumbnail }}
+            {{ if ge (len $avatar) 1 }}
+		    <figure class="post__thumbnail">
+			    <img src="{{ .Params.thumbnail | relURL }}" alt="{{ .Title }}">
+		    </figure>
+            {{ end}}
 		{{- end }}
 		{{- partial "post_toc.html" . -}}
 		<div class="content post__content clearfix">
