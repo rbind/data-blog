@@ -1,0 +1,87 @@
+---
+title: Signed Wilcoxon Rank Test
+author: Matthias
+date: '2018-10-16'
+thumbnail: "post/statistical_test/signed_wilcox_rank_test_cover.png"
+categories:
+  - statistical test
+tags:
+  - Wilcoxon
+  - non-parametric
+  - statistical test
+  - box plot
+  - one-tailed
+  - paired test
+---
+In this post, we will investigate the use of the signed Wilcoxon rank test. This is a non-parametric test that is appropriate for comparing continuous measurements from two groups. Using the test, it is possible to determine whether the observations have a distinct ordering that depends on the observed grouping.
+<!--more-->
+## The sleep data set
+
+Let's consider the sleep data set. The data set contrasts the effect of two soporific drugs (aka sleeping pills) by providing the change in the number of hours slept after taking the drug compared to a baseline:
+
+```{r}
+data(sleep) # load the sleep data set
+print(sleep)
+```
+
+*extra* indicates the increase/decrease (positive/negative values) in sleep compared to the baseline measurement, *group* denotes the drug, and *ID* gives the patient ID. To make this clearer, I'll rename *group* to *drug*:
+
+```{r}
+colnames(sleep)[which(colnames(sleep) == "group")] <- "drug"
+```
+
+## What are we testing for?
+Assume we are working in a pharmaceutical company and these are the data that were just obtained from a clinical trial. Now, we must decide which of the two drugs you should go forward with for market release. A reasonable way of selecting the drug would be to identify the drug that performs better. More specifically, the question is the following: is one of the drugs associated with greater values of *extra* than the other drug?
+
+To get an intuition about the effectiveness of the two drugs, let's plot their corresponding values:
+
+```{r echo = FALSE}
+library(ggplot2)
+ggplot(sleep, aes(x = drug, y = extra)) + geom_boxplot()
+```
+
+The plot shows that the median increase in sleep time of drug 1 is close to 0, while the median increase for drug 2 is close to 2 hours. So, based on these data it seems that drug 2 is more effective than drug 1. However, we still need to determine whether our finding is statistically significant. 
+
+#### The null hypothesis
+The null hypothesis of the test is that there isn't any difference in the extra sleep time between the two drugs. Since we want to find out whether drug 2 outperforms drug 1, we do not need a two-tailed test (testing whether any of the drugs has superior performance), but a one-tailed test. Thus, the alternative of the null hypothesis is that drug 2 is associated with greater values of *extra* than drug 1.
+
+## Specifying the test
+Since we have two measurements for every patient, we need a **paired test**. In this case, the test is called *signed Wilcoxon rank test* because it uses the sum of the signed ranks as the test statistic. Since *wilcox.test* does not consider pairs by default, we have to explicitly set the *paired* argument to perform the test. To specify the one-tailed test, we set the *alternative* argument to *greater*. In this way, the alternative of the test is whether drug 2 is associated with larger increases in sleep duration than drug 1.
+
+```{r}
+x <- sleep$extra[sleep$drug == 2]
+y <- sleep$extra[sleep$drug == 1]
+res <- wilcox.test(x, y, paired = TRUE, 
+                   alternative = "greater")
+```
+
+## Investigating the warnings
+Before getting to the results, we should investigate the two warnings that resulted from performing the test.
+
+#### Warning 1: ties
+The first warning arises because the test ranks differences in the `extra` values of pairs. If two pairs share the same difference, ties arise during ranking. We can verify this by computing the difference between the pairs
+```{r}
+x - y
+```
+and finding that pairs 3 and 4 both share the same difference of 1.3. Why are ties a problem? The rank assigned to ties is based on the average of the ranks they span. Thus, if there are many ties, this reduces the expressiveness of the test statistic rendering the Wilcoxon test inappropriate. Since we only have a single tie here, this is not a problem. 
+
+#### Warning 2: zero values
+The second warning relates to pairs where the difference is 0. In the sleep data set, this is the case for the pair from the 5th patient (see above). Why are zeros a problem? Remember that the null hypothesis is that the differences of the pairs are centered around 0. However, observing differences where the value is exactly 0 do not give us any information for the rejection of the null. Therefore, these pairs are discarded when computing the test statistic. If this is the case for many of the pairs, the statistical power of the test would drop considerably. Again, this is not a problem for us as only a single zero value is present.
+
+## Investigating the results
+The main result of the test, is its p-value, which can be obtained via:
+
+```{r}
+res$p.value
+```
+
+Since the p-value is less than the 5% significance level, this means we can reject the null hypothesis. Thus, we would be inclined to accept the alternative hypothesis, which states that drug 2 outperforms drug 1.
+
+# Potential mistakes
+
+What kind of mistakes could have happened during this analysis? 
+
+* Using an unpaired test: Given paired data, it is crucial that this information is reflected by the test to ensure statistical power.
+In case of the sleep data set, pairs are corresponding to measurements for the same patient. In this way, patient-specific effects can be considered. For example, a patient with severe sleep disorder likely receives smaller benefits from treatment than other patients. Even if the benefit is small, we may still see a considerable difference in the effects of the drugs. Thus, the measurements for this patient may still result in a high rank that considerably impacts the test statistic. In an unpaired test, on the other hand, the measurements from such a patient would have a low rank and a correspondingly smaller impact on the test statistic.
+* Not specifying the appropriate alternative: Remember to always adjust the alternative hypothesis according to the effect that you would like to demonstrate. For example, if I had performed a two-sided test here, a significant result would merely have shown that the drugs perform differently but not which drug seems to perform better, for which a one-tailed test was necessary. 
+
