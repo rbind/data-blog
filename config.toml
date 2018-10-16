@@ -10,7 +10,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 [Author]
   name = "Matthias Döring"
   bio = "I've obtained a BSc and MSc in Bioinformatics from Saarland University. Currently, I am pursuing a PhD at the Max Planck Institute for Informatics where I'm researching computational methods for improving treatment and prevention of viral infections."
-  avatar = "img/matthias_doering.jpg"
+  avatar = "img/avatar.png"
 
 [Params]
   subtitle = "Understand. Implement. Succeed." # Subtitle of your site
