@@ -1,0 +1,184 @@
+---
+title: "Testing Independence on Contingency Tables: Chi-Squared vs Fisher's Exact Test"
+author: Matthias
+date: '2018-10-17'
+thumbnail: "post/statistical_test/contingency_table_tests_cover.png"
+categories:
+  - statistical test
+tags:
+  - Chi-squared test
+  - Fisher's exact test
+  - statistical test
+  - unpaired test
+  - multiple testing
+  - non-parametric test
+  - box plot
+  - one-tailed
+---
+
+
+
+<p>One of the most common areas of statistical testing is testing for independence in contingency tables. In this post, I will show how contingency tables can be computed and I will introduce two popular tests on contingency tables: the chi-squared test and Fisher’s exact test.</p>
+<!--more-->
+<div id="what-are-contingency-tables" class="section level2">
+<h2>What are contingency tables?</h2>
+<p>Contingency tables provide the integer counts for measurements with respect to two categorical variables. The simplest contingency table is a <span class="math inline">\(2 \times 2\)</span> frequency table, which results from two variables with two levels each:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Group/Observation</th>
+<th>Observation 1</th>
+<th>Observation 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Group 1</td>
+<td><span class="math inline">\(n_{1,1}\)</span></td>
+<td><span class="math inline">\(n_{1,2}\)</span></td>
+</tr>
+<tr class="even">
+<td>Group 2</td>
+<td><span class="math inline">\(n_{2,1}\)</span></td>
+<td><span class="math inline">\(n_{2,2}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Given such a table, the question would be whether <em>Group 1</em> exhibits frequencies with respect to the observations than <em>Group 2</em>. The groups represents the dependent variable because they depend on the observation of the independent variable. Note that it is a common misconception that contingency tables must be <span class="math inline">\(2 \times 2\)</span>; they can have an arbitrary number of dimensions, depending on the number of levels exhibited by the variables. Still, performing statistical tests on contingency tables with many dimensions should be avoided because, among other reasons, interpreting the results would be challenging.</p>
+</div>
+<div id="the-warpbreaks-data-set" class="section level2">
+<h2>The warpbreaks data set</h2>
+<p>To study tests on contingency tables, we will use the <em>warpbreaks</em> data set:</p>
+<pre class="r"><code>data(warpbreaks)
+head(warpbreaks)</code></pre>
+<pre><code>##   breaks wool tension
+## 1     26    A       L
+## 2     30    A       L
+## 3     54    A       L
+## 4     25    A       L
+## 5     70    A       L
+## 6     52    A       L</code></pre>
+<p>This is a data set with three variables originating from the textile industry: <em>breaks</em> describes the number of times there was a break in a <a href="https://en.wikipedia.org/wiki/Warp_and_weft">warp thread</a>, <span class="math inline">\(\text{wool} \in \{A, B\}\)</span> describes the type of wool that was tested, and <span class="math inline">\(\text{tension} \in \{L, M, H\}\)</span> gives the tension that was applied to the thread (either low, medium, or high). Each row in the data set indicates the measurements for a single loom. To account for the variability of different looms, 9 measurements were performed for each combination of <em>wool</em> and <em>tension</em>, the data set contains a total of <span class="math inline">\(9 \cdot 2 \cdot 3 = 54\)</span> observations.</p>
+</div>
+<div id="goal-of-the-analysis" class="section level2">
+<h2>Goal of the analysis</h2>
+<p>We would like to identify whether one type of wool outperforms the other for different levels of tensions. To investigate whether we can find some evidence for differences, let’s take a look at the data:</p>
+<p>To investigate the differences in the number of strand breaks, let’s visualize the data:</p>
+<pre class="r"><code>library(ggplot2)
+ggplot(warpbreaks, aes(x = tension, y = breaks)) + facet_wrap(. ~ wool) + geom_boxplot()</code></pre>
+<p><img src="/post/statistical_test/contingency_table_tests_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>From the plot, we can see that, overall, wool B is associated with fewer breaks. Wool A seems to be particularly inferior for low tensions.</p>
+</div>
+<div id="transformation-to-contingency-table" class="section level2">
+<h2>Transformation to contingency table</h2>
+<p>To obtain a contingency table, we first need to summarize the breaks across different looms for the two types of wool and the three types of tension.</p>
+<pre class="r"><code>library(plyr)
+df &lt;- ddply(warpbreaks, .(wool,tension), summarize, breaks = sum(breaks))
+print(df)</code></pre>
+<pre><code>##   wool tension breaks
+## 1    A       L    401
+## 2    A       M    216
+## 3    A       H    221
+## 4    B       L    254
+## 5    B       M    259
+## 6    B       H    169</code></pre>
+<p>We then use the <code>xtabs</code> function to generate the contingency table:</p>
+<pre class="r"><code>df &lt;- xtabs(breaks~wool+tension, data = df)
+print(df)</code></pre>
+<pre><code>##     tension
+## wool   L   M   H
+##    A 401 216 221
+##    B 254 259 169</code></pre>
+<p>Now, <code>df</code> has the structure we need for applying statistical tests.</p>
+</div>
+<div id="statistical-testing" class="section level2">
+<h2>Statistical testing</h2>
+<p>The two most common tests for determining whether different groups are subject to different distributions are the chi-squared test (<span class="math inline">\(\chi^2\)</span> test) and Fisher’s exact test.</p>
+<div id="pearsons-chi-squared-test" class="section level3">
+<h3>Pearson’s chi-squared test</h3>
+<p>The <span class="math inline">\(\chi^2\)</span> test is a non-parametric test that can be applied to contingency tables with various dimensions. The name of the test originates from the <span class="math inline">\(\chi^2\)</span> distribution, which is the distribution for the squares of independent standard normal variables. This is the distribution of the test statistic of the <span class="math inline">\(\chi^2\)</span> test, which is defined by the sum of chi-square values <span class="math inline">\(\chi_{i,j}^2\)</span> for all pairs of cells <span class="math inline">\(i,j\)</span> arising from the difference between a cell’s observed value <span class="math inline">\(O_{i,j}\)</span> and the expected value <span class="math inline">\(E_{i,j}\)</span>, normalized by <span class="math inline">\(E_{i,j}\)</span>:</p>
+<p><span class="math display">\[\sum \chi_{i,j}^2 \quad \text{where} \quad \chi_{i,j}^2 = \frac{(O_{i,j}−E_{i,j})^2}{E_{i,j}}\]</span></p>
+<p>The intuition here is that <span class="math inline">\(\sum \chi_{i,j}^2\)</span> will be large if the observed values considerably deviate from the expected values, while <span class="math inline">\(\sum \chi_{i,j}^2\)</span> will be close to zero if the observed values agree well with the expected values. Performing the test via</p>
+<pre class="r"><code>chi.result &lt;- chisq.test(df)
+print(chi.result$p.value)</code></pre>
+<pre><code>## [1] 7.900708e-07</code></pre>
+<p>Since the p-value is less than 0.05, we can reject the null hypothesis of the test (the frequency of breaks is independent of the wool) at the 5% significance level. Based on the entries of <code>df</code> one could then claim that wool B is significantly better (with respect to warp breaks) than wool A.</p>
+<div id="investigating-the-pearson-residuals" class="section level4">
+<h4>Investigating the Pearson residuals</h4>
+<p>Another way would be to consider the chi-square values of the test. The <code>chisq.test</code> function, provides the Pearson residuals (roots) of the chi-square values, that is, <span class="math inline">\(\chi_{i,j}\)</span>. In contrast to the chi-square values, which result from squared differences, the residuals are not squared. Thus, residuals reflect the extent to which an observed value exceeded the expected value (positive value) or fell short of the expected value (negative value). In our data set, positive values indicate more strand breaks than expected, while negative values indicate less breaks:</p>
+<pre class="r"><code>print(chi.result$residuals)</code></pre>
+<pre><code>##     tension
+## wool          L          M          H
+##    A  2.0990516 -2.8348433  0.4082867
+##    B -2.3267672  3.1423813 -0.4525797</code></pre>
+<p>The residuals show that, compared with wool A, wool B had less breaks for low and high tensions than expected. For, medium tension, however, wool B had more breaks than expected. Again, we find that, overall wool B is superior to wool A. The values of the residuals also indicate that wool B performs best for low tensions (residual of 2.1), well for high tensions (0.41) and badly for medium tensions (-2.8). The residuals, however, helped us in identifying a problem with wool B: it does not perform well for medium tension. How would this inform further development? In order to obtain a wool that performs well for all tension levels, we would need to focus on improving wool B for medium tension. For this purpose, we could consider the properties that make wool A perform better at medium tension.</p>
+</div>
+</div>
+<div id="fishers-exact-test" class="section level3">
+<h3>Fisher’s exact test</h3>
+<p>Fisher’s exact test is a non-parametric test for testing independence that is typically used only for <span class="math inline">\(2 \times 2\)</span> contingency table. As an exact significance test, Fisher’s test meets all the assumptions on which basis the distribution of the test statistic is defined. In practice, this means that the false rejection rate equals the significance level of the test, which is not necessarily true for approximate tests such as the <span class="math inline">\(\chi^2\)</span> test. In short, Fisher’s exact test relies on computing the p-value according to the hypergeometric distribution using binomial coefficients, namely via</p>
+<p><span class="math display">\[p = \frac{\binom{n_{1,1} + n_{1,2}}{n_{1,1}} \binom{n_{2,1} + n_{2,2}}{n_{2,1}}}{\binom{n_{1,1} + n_{1,2} + n_{2,1} + n_{2,2}}{n_{1,1} + n_{2,1}}}\]</span></p>
+<p>Since the computed factorials can become very large, Fisher’s exact test may not work for large sample sizes.</p>
+<p>Note that it is not possible to specify the alternative of the test for <code>df</code> since the odds ratio, which indicates the effect size, is only defined for <span class="math inline">\(2 \times 2\)</span> matrices:</p>
+<p><span class="math display">\[OR = {\frac{n_{1,1}}{n_{1,2}}}/{\frac{n_{2,1}}{n_{2,2}}}\]</span></p>
+<p>We can still perform Fisher’s exact test to obtain a p-value:</p>
+<pre class="r"><code>fisher.result &lt;- fisher.test(df)
+print(fisher.result$p.value)</code></pre>
+<pre><code>## [1] 8.162421e-07</code></pre>
+<p>The resulting p-value is similar to the one obtained from the <span class="math inline">\(\chi^2\)</span> test and we arrive at the same conclusion: we can reject the null hypothesis that the type of wool is independent of the number of breaks observed for different levels of stress.</p>
+<div id="conversion-to-2-by-2-matrices" class="section level4">
+<h4>Conversion to 2 by 2 matrices</h4>
+<p>To specify the alternative hypothesis and obtain the odds ratio, we could compute the test for the three <span class="math inline">\(2 \times 2\)</span> matrices that can be constructed from <code>df</code>:</p>
+<pre class="r"><code>p.values &lt;- rep(NA, 3)
+for (i in seq(ncol(df))) {
+    # compute strand breaks for tested stress vs other types of stress
+    test.df &lt;- cbind(df[, i], apply(df[,-i], 1, sum))
+    tested.stress &lt;- colnames(df)[i]
+    colnames(test.df) &lt;- c(tested.stress, &quot;other&quot;) # for clarity
+    test.res &lt;- fisher.test(test.df, alternative = &quot;greater&quot;)
+    p.values[i] &lt;- test.res$p.value
+    names(p.values)[i] &lt;- paste0(tested.stress, &quot; vs others&quot;)
+}</code></pre>
+<p>Since the alternative is set to <em>greater</em>, this means that we are performing a one-tailed test where the alternative hypothesis is that wool A is associated with a greater number of breaks than wool B (i.e. we expect <span class="math inline">\(OR &gt; 1\)</span>). By performing tests on <span class="math inline">\(2 \times 2\)</span> tables, we also gain interpretability: we can now distinguish the specific conditions under which the wools are different. Before interpreting the p-values, however, we need to correct for multiple hypothesis testing. In this case, we have performed three tests. Here, we’ll simply adjust the initial significance level of 0.05 to <span class="math inline">\(\frac{0.05}{3} = 0.01\overline{6}\)</span> according to the Bonferroni method. Based on the adjusted threshold, the following tests were significant:</p>
+<pre class="r"><code>print(names(p.values)[which(p.values &lt; 0.05/3)])</code></pre>
+<pre><code>## [1] &quot;L vs others&quot;</code></pre>
+<p>This finding indicates that wool B is only significantly superior to wool A if the stress is light. Note that we could have also the approach of constructing <span class="math inline">\(2 \times 2\)</span> matrices for the <span class="math inline">\(\chi^2\)</span> test. With the <span class="math inline">\(\chi^2\)</span> test, however, this wasn’t necessary because we based our analysis on residuals.</p>
+</div>
+<div id="summary-chi-squared-vs-fishers-exact-test" class="section level4">
+<h4>Summary: chi-squared vs Fisher’s exact test</h4>
+<p>Here is a summary of the properties of the two tests:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Criterion</th>
+<th>Chi-squared test</th>
+<th>Fisher’s exact test</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Minimal sample size</td>
+<td>Large</td>
+<td>Small</td>
+</tr>
+<tr class="even">
+<td>Accuracy</td>
+<td>Approximate</td>
+<td>Exact</td>
+</tr>
+<tr class="odd">
+<td>Contingency table</td>
+<td>Arbitrary dimension</td>
+<td>Usually 2x2</td>
+</tr>
+<tr class="even">
+<td>Interpretation</td>
+<td>Pearson residuals</td>
+<td>Odds ratio</td>
+</tr>
+</tbody>
+</table>
+<p>Generally, Fisher’s exact test is preferable to the chi-squared test because it is an exact test. The chi-squared test should be particularly avoided if there are few observations (e.g. less than 10) for individual cells. Since Fisher’s exact test may be computationally infeasible for large sample sizes and the accuracy of the <span class="math inline">\(\chi^2\)</span> test increases with larger number of samples, the <span class="math inline">\(\chi^2\)</span> test is a suitable replacement in this case. Another advantage of the <span class="math inline">\(\chi^2\)</span> test is that it is more suitable for contingency tables whose dimensionality exceeds <span class="math inline">\(2 \times 2\)</span>.</p>
+</div>
+</div>
+</div>
