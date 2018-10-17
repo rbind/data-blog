@@ -14,7 +14,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [Params]
   subtitle = "Understand. Implement. Succeed." # Subtitle of your site
-  description = "A blog about data science applications with R. " # Description of your site
+  description = "A blog about data science applications with R." # Description of your site
   opengraph = true
   twitter_cards = false
   readmore = false # Show "Read more" button in list if true

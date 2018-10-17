@@ -15,6 +15,7 @@ tags:
 ---
 In this post, we will investigate the use of the signed Wilcoxon rank test. This is a non-parametric test that is appropriate for comparing continuous measurements from two groups. Using the test, it is possible to determine whether the observations have a distinct ordering that depends on the observed grouping.
 <!--more-->
+
 ## The sleep data set
 
 Let's consider the sleep data set. The data set contrasts the effect of two soporific drugs (aka sleeping pills) by providing the change in the number of hours slept after taking the drug compared to a baseline:

@@ -16,9 +16,9 @@ tags:
 
 
 
-<p>In this post, we will investigate the use of the signed Wilcoxon rank test. This is a non-parametric test that is appropriate for comparing continuous measurements from two groups. Using the test, it is possible to determine whether the observations have a distinct ordering that depends on the observed grouping.
-<!--more-->
-## The sleep data set</p>
+<p>In this post, we will investigate the use of the signed Wilcoxon rank test. This is a non-parametric test that is appropriate for comparing continuous measurements from two groups. Using the test, it is possible to determine whether the observations have a distinct ordering that depends on the observed grouping. <!--more--></p>
+<div id="the-sleep-data-set" class="section level2">
+<h2>The sleep data set</h2>
 <p>Let’s consider the sleep data set. The data set contrasts the effect of two soporific drugs (aka sleeping pills) by providing the change in the number of hours slept after taking the drug compared to a baseline:</p>
 <pre class="r"><code>data(sleep) # load the sleep data set
 print(sleep)</code></pre>
@@ -45,6 +45,7 @@ print(sleep)</code></pre>
 ## 20   3.4     2 10</code></pre>
 <p><em>extra</em> indicates the increase/decrease (positive/negative values) in sleep compared to the baseline measurement, <em>group</em> denotes the drug, and <em>ID</em> gives the patient ID. To make this clearer, I’ll rename <em>group</em> to <em>drug</em>:</p>
 <pre class="r"><code>colnames(sleep)[which(colnames(sleep) == &quot;group&quot;)] &lt;- &quot;drug&quot;</code></pre>
+</div>
 <div id="what-are-we-testing-for" class="section level2">
 <h2>What are we testing for?</h2>
 <p>Assume we are working in a pharmaceutical company and these are the data that were just obtained from a clinical trial. Now, we must decide which of the two drugs you should go forward with for market release. A reasonable way of selecting the drug would be to identify the drug that performs better. More specifically, the question is the following: is one of the drugs associated with greater values of <em>extra</em> than the other drug?</p>
@@ -94,8 +95,7 @@ res &lt;- wilcox.test(x, y, paired = TRUE,
 <h1>Potential mistakes</h1>
 <p>What kind of mistakes could have happened during this analysis?</p>
 <ul>
-<li>Using an unpaired test: Given paired data, it is crucial that this information is reflected by the test to ensure statistical power.
-In case of the sleep data set, pairs are corresponding to measurements for the same patient. In this way, patient-specific effects can be considered. For example, a patient with severe sleep disorder likely receives smaller benefits from treatment than other patients. Even if the benefit is small, we may still see a considerable difference in the effects of the drugs. Thus, the measurements for this patient may still result in a high rank that considerably impacts the test statistic. In an unpaired test, on the other hand, the measurements from such a patient would have a low rank and a correspondingly smaller impact on the test statistic.</li>
+<li>Using an unpaired test: Given paired data, it is crucial that this information is reflected by the test to ensure statistical power. In case of the sleep data set, pairs are corresponding to measurements for the same patient. In this way, patient-specific effects can be considered. For example, a patient with severe sleep disorder likely receives smaller benefits from treatment than other patients. Even if the benefit is small, we may still see a considerable difference in the effects of the drugs. Thus, the measurements for this patient may still result in a high rank that considerably impacts the test statistic. In an unpaired test, on the other hand, the measurements from such a patient would have a low rank and a correspondingly smaller impact on the test statistic.</li>
 <li>Not specifying the appropriate alternative: Remember to always adjust the alternative hypothesis according to the effect that you would like to demonstrate. For example, if I had performed a two-sided test here, a significant result would merely have shown that the drugs perform differently but not which drug seems to perform better, for which a one-tailed test was necessary.</li>
 </ul>
 </div>
