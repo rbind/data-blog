@@ -21,6 +21,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
   authorbox = true
   post_navigation = true
   postSections = ["post"]
+  mathjax = true # Enable MathJax
 
 [Params.sidebar]
   home = "right"   # Configure layout for home page
