@@ -1,5 +1,5 @@
 ---
-title: Signed Wilcoxon Rank Test
+title: "Comparing Two Groups of Paired Quantitative Data: Wilcoxon Signed Rank Test vs Paired Student's t-test"
 author: Matthias Döring
 date: '2018-10-16'
 thumbnail: "post/statistical_test/signed_wilcox_rank_test_cover.png"
@@ -16,7 +16,7 @@ tags:
 
 
 
-<p>In this post, we will investigate the use of the signed Wilcoxon rank test. This is a non-parametric test that is appropriate for comparing continuous measurements from two groups. Using the test, it is possible to determine whether the observations have a distinct ordering that depends on the observed grouping. <!--more--></p>
+<p>In this post, we will explore tests for comparing two groups of dependent (i.e. paired) quantitative data: the Wilcoxon signed rank test and the paired Student’s t-test. The critical difference between these tests is that the test from Wilcoxon is a non-parametric test, while the t-test is a parametric test. In the following, we will explore the ramifications of this difference. <!--more--></p>
 <div id="the-sleep-data-set" class="section level2">
 <h2>The sleep data set</h2>
 <p>Let’s consider the sleep data set. The data set contrasts the effect of two soporific drugs (aka sleeping pills) by providing the change in the number of hours slept after taking the drug compared to a baseline:</p>
@@ -45,6 +45,7 @@ print(sleep)</code></pre>
 ## 20   3.4     2 10</code></pre>
 <p><em>extra</em> indicates the increase/decrease (positive/negative values) in sleep compared to the baseline measurement, <em>group</em> denotes the drug, and <em>ID</em> gives the patient ID. To make this clearer, I’ll rename <em>group</em> to <em>drug</em>:</p>
 <pre class="r"><code>colnames(sleep)[which(colnames(sleep) == &quot;group&quot;)] &lt;- &quot;drug&quot;</code></pre>
+<p>Note that the sleep data set contains two measurements for every patient. Thus, it is appropriate for showcasing paired tests such as the ones we are dealing with.</p>
 </div>
 <div id="what-are-we-testing-for" class="section level2">
 <h2>What are we testing for?</h2>
@@ -57,9 +58,10 @@ print(sleep)</code></pre>
 <p>The null hypothesis of the test is that there isn’t any difference in the extra sleep time between the two drugs. Since we want to find out whether drug 2 outperforms drug 1, we do not need a two-tailed test (testing whether any of the drugs has superior performance), but a one-tailed test. Thus, the alternative of the null hypothesis is that drug 2 is associated with greater values of <em>extra</em> than drug 1.</p>
 </div>
 </div>
-<div id="specifying-the-test" class="section level2">
-<h2>Specifying the test</h2>
-<p>Since we have two measurements for every patient, we need a <strong>paired test</strong>. In this case, the test is called <em>signed Wilcoxon rank test</em> because it uses the sum of the signed ranks as the test statistic. Since <em>wilcox.test</em> does not consider pairs by default, we have to explicitly set the <em>paired</em> argument to perform the test. To specify the one-tailed test, we set the <em>alternative</em> argument to <em>greater</em>. In this way, the alternative of the test is whether drug 2 is associated with larger increases in sleep duration than drug 1.</p>
+<div id="wilcoxon-signed-rank-test" class="section level2">
+<h2>Wilcoxon Signed Rank Test</h2>
+<p>The Wilcoxon signed rank test uses the sum of the signed ranks as the test statistic <span class="math inline">\(W\)</span>: <span class="math display">\[W=\sum _{{i=1}}^{{N}}[\operatorname{sgn}(x_{{2,i}}-x_{{1,i}})\cdot R_{i}]\]</span> Here, the <span class="math inline">\(i\)</span>-th of <span class="math inline">\(N\)</span> measurement pairs is indicated by <span class="math inline">\(x_i = (x_{1,i}, x_{2,i})\)</span> and <span class="math inline">\(R_{i}\)</span> denotes the rank of the pair. The rank simply represents the position of an observation in an ordered list of <span class="math inline">\(|x_{2,i} - x_{1,i}|\)</span>. The inuition of the test statistic is that pairs with large absolute differences will have large ranks <span class="math inline">\(R_{i}\)</span>. Thus, these pairs are the determining factors of <span class="math inline">\(W\)</span>, while pairs exhibiting small absolute differences have a low <span class="math inline">\(R_{i}\)</span> and therefore little influence on the outcome of the test. Since the test statistic is based on ranks rather than the measurements themselves, the Wilcoxon signed rank test can be thought of as testing for shifts in median values between two groups.</p>
+<p>To perform the test in R, we can use the <code>wilcox.test</code> function. However, we have to explicitly set the <em>paired</em> argument to indicate that we are dealing with matched observations. To specify the one-tailed test, we set the <em>alternative</em> argument to <em>greater</em>. In this way, the alternative of the test is whether drug 2 is associated with larger increases in sleep duration than drug 1.</p>
 <pre class="r"><code>x &lt;- sleep$extra[sleep$drug == 2]
 y &lt;- sleep$extra[sleep$drug == 1]
 res &lt;- wilcox.test(x, y, paired = TRUE, 
@@ -68,9 +70,8 @@ res &lt;- wilcox.test(x, y, paired = TRUE,
 ## &quot;greater&quot;): cannot compute exact p-value with ties</code></pre>
 <pre><code>## Warning in wilcox.test.default(x, y, paired = TRUE, alternative =
 ## &quot;greater&quot;): cannot compute exact p-value with zeroes</code></pre>
-</div>
-<div id="investigating-the-warnings" class="section level2">
-<h2>Investigating the warnings</h2>
+<div id="investigating-the-warnings" class="section level3">
+<h3>Investigating the warnings</h3>
 <p>Before getting to the results, we should investigate the two warnings that resulted from performing the test.</p>
 <div id="warning-1-ties" class="section level4">
 <h4>Warning 1: ties</h4>
@@ -84,15 +85,52 @@ res &lt;- wilcox.test(x, y, paired = TRUE,
 <p>The second warning relates to pairs where the difference is 0. In the sleep data set, this is the case for the pair from the 5th patient (see above). Why are zeros a problem? Remember that the null hypothesis is that the differences of the pairs are centered around 0. However, observing differences where the value is exactly 0 do not give us any information for the rejection of the null. Therefore, these pairs are discarded when computing the test statistic. If this is the case for many of the pairs, the statistical power of the test would drop considerably. Again, this is not a problem for us as only a single zero value is present.</p>
 </div>
 </div>
-<div id="investigating-the-results" class="section level2">
-<h2>Investigating the results</h2>
+<div id="investigating-the-results" class="section level3">
+<h3>Investigating the results</h3>
 <p>The main result of the test, is its p-value, which can be obtained via:</p>
 <pre class="r"><code>res$p.value</code></pre>
 <pre><code>## [1] 0.004545349</code></pre>
 <p>Since the p-value is less than the 5% significance level, this means we can reject the null hypothesis. Thus, we would be inclined to accept the alternative hypothesis, which states that drug 2 outperforms drug 1.</p>
 </div>
-<div id="potential-mistakes" class="section level1">
-<h1>Potential mistakes</h1>
+</div>
+<div id="paired-students-t-test" class="section level2">
+<h2>Paired Student’s t-test</h2>
+<p>The paired Student’s t-test is a parametric test on the means of paired quantitative measurements from two groups. Here, parametric means that the t-test assumes that the mean difference between samples is normally distributed. The test relies on identifying whether the mean difference of measurements from the two groups, <span class="math inline">\(\bar{X}_{D}\)</span> is larger than <span class="math inline">\(\mu_D\)</span>, where <span class="math inline">\(\mu_D\)</span> is typically set to 0 in order to find if there is any difference. The test-statistic,</p>
+<p><span class="math display">\[\displaystyle t={\frac {{\bar {X}}_{D}-\mu _{0}}{\frac {s_{D}}{\sqrt {n}}}},\]</span></p>
+<p>is normalized using the standard deviation of differences, <span class="math inline">\(s_D\)</span>, and the number of pairs <span class="math inline">\(n\)</span>. By normalizing according to <span class="math inline">\(\frac{s_D}{\sqrt{n}}\)</span>, the test statistic regulates the value of the test statistic according to the number of samples (<span class="math inline">\(|t|\)</span> increases with more samples) and the standard deviation of differences (<span class="math inline">\(|t|\)</span> decreases if the deviation increases).</p>
+<p>In R, we can perform the paired t-test with the <code>t.test</code> function. Note that <code>t.test</code> assumes that population variances are inequal. In this case, the test is also called <em>Welch’s t-test</em>. To obtain the original t-test, which assumes that the population variances are equal, we can just set the <code>equal.var</code> parameter to <code>TRUE</code>. Here, we will just use with the default setting:</p>
+<pre class="r"><code>t.result &lt;- t.test(x,y, paired = TRUE, alternative = &quot;greater&quot;)
+print(t.result$p.value)</code></pre>
+<pre><code>## [1] 0.001416445</code></pre>
+<p>Again, the p-value is less than 0.05. Thus, we would be inclined to accept the alternative hypothesis: drug 2 is associated with a greater increase in mean sleep duration than drug 1.</p>
+<div id="checking-the-assumptions-of-students-t-test" class="section level3">
+<h3>Checking the assumptions of Student’s t-test</h3>
+<p>The t-test requires that the sample means are normally distributed. By the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">central limit theorem</a>, means of samples from a population approach a normal distribution for a sufficient number of samples. Therefore, the assumption of the t-test is met even for non-normal measurements as long as there are is a sufficient number of samples. Since the sleep data contains only 10 paired measurements, there should be reason for concern. Thus, we should check whether the diffeerences between measurements are normally distributed in order to verify whether the t-test is valid:</p>
+<pre class="r"><code>diff.df &lt;- data.frame(diff = sleep$extra[sleep$drug == 1] - sleep$extra[sleep$drug == 2])
+ggplot(diff.df, aes(x = diff)) + geom_histogram()</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/statistical_test/signed_wilcox_rank_test_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Looking at the histogram, the data seem rather uniformly than normally distributed. To take a closer look, we compare the differences to the values that would be expected from a normal distribution using a <a href="https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot">Q-Q (quantile-quantile) plot</a>:</p>
+<pre class="r"><code>require(car) # load car package to use &#39;qqp&#39; rather than native &#39;qqplot&#39; function</code></pre>
+<pre><code>## Loading required package: car</code></pre>
+<pre class="r"><code>qqp(diff.df$diff)</code></pre>
+<p><img src="/post/statistical_test/signed_wilcox_rank_test_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>The Q-Q plot shows that the differences fit the normal model quite well, except for the heavy tails. From this, we could conclude that the assumption of the t-test is sufficiently met. Still, we’re left with a feeling of uncertainty about whether the t-test was the most appropriate choice for these data.</p>
+</div>
+</div>
+<div id="summary-wilcoxon-signed-rank-test-vs-paired-students-t-test" class="section level2">
+<h2>Summary: Wilcoxon signed rank test vs paired Student’s t-test</h2>
+<p>In this analysis, both Wilcoxon signed rank test and paired Student’s t-test led to the rejection of the null hypothesis. In general, however, which test is more appropriate? The answer is, it depends on several criteria:</p>
+<ul>
+<li><strong>Hypothesis:</strong> Student’s t-test is a test comparing means, while Wilcoxon’s tests the ordering of the data. For example, if you are analyzing data with many outliers, for example, the wealth of individuals (where few billionaires can greatly influence the result), Wilcoxon’s test may be more appropriate.</li>
+<li><strong>Interpretation:</strong> Although confidence intervals can also be computed for Wilcoxon’s test, it may seem more natural to argue about the confidence interval of the mean in the t-test than the pseudomedian for Wilcoxon’s test.</li>
+<li><strong>Fulfillment of assumptions:</strong> The assumptions of Student’s t-test may not be met for small sample sizes. In this case, it is often safer to select a parametric test. However, if the assumptions of the t-test are met, it has greater <a href="https://en.wikipedia.org/wiki/Power_(statistics)">statistical power</a> than Wilcoxon’s test.</li>
+</ul>
+<p>Due to the small sample size of the sleep data set, I’d prefer the test from Wilcoxon for these data.</p>
+<p>Which test would you use? In general, would you prefer one test over the other?</p>
+</div>
+<div id="potential-mistakes" class="section level2">
+<h2>Potential mistakes</h2>
 <p>What kind of mistakes could have happened during this analysis?</p>
 <ul>
 <li>Using an unpaired test: Given paired data, it is crucial that this information is reflected by the test to ensure statistical power. In case of the sleep data set, pairs are corresponding to measurements for the same patient. In this way, patient-specific effects can be considered. For example, a patient with severe sleep disorder likely receives smaller benefits from treatment than other patients. Even if the benefit is small, we may still see a considerable difference in the effects of the drugs. Thus, the measurements for this patient may still result in a high rank that considerably impacts the test statistic. In an unpaired test, on the other hand, the measurements from such a patient would have a low rank and a correspondingly smaller impact on the test statistic.</li>
