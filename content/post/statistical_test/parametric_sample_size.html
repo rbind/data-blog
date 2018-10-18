@@ -1,0 +1,93 @@
+---
+title: "Parametric Testing: How Many Samples Do I Need?"
+author: Matthias Döring
+date: '2018-10-17'
+thumbnail: "post/statistical_test/parametric_sample_size_cover.png"
+categories:
+  - statistical test
+tags:
+  - parametric test
+  - sample size
+  - kurtosis
+  - infinite variance
+  - assumptions
+  - t-test
+  - central limit theorem
+---
+
+
+
+<p>Parametric tests are subject to assumptions about the properties of the data. For example, Student’s t-test is a well-known parametric test that assumes that sample means have a normal distribution. Due to the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">central limit theorem</a>, the test can be also applied to measurements that are not normally distributed if the sample size is sufficient. Here, we will investigate the approximate number of samples that are necessary for the t-test to be valid.</p>
+<!--more-->
+<div id="fitting-normal-distributions-to-sampled-means" class="section level2">
+<h2>Fitting normal distributions to sampled means</h2>
+<p>To investigate the number of samples that are necessary to satisfy the requirements for Student’s t-test, we iterate over various sample sizes. For each sample size, we draw samples from several distributions. Then, the means of the samples are calculated and a normal distribution is fitted to the distribution of the means. In each iteration, we record the log-likelihood describing how well the normal distribution fits the sampled means. We’ll consider sampled means to have approached the normal distribution when the log likelihood becomes positive.</p>
+<pre class="r"><code>require(MASS)
+require(reshape2)
+require(ggplot2)
+nbr.samples &lt;- 500
+sample.sizes &lt;- c(5, 10, 15, 20, 50, 100, 1000, 5000)
+result &lt;- NULL
+initial.means &lt;- NULL
+norm.means &lt;- list()
+for (i in seq_along(sample.sizes)) {
+    sample.size &lt;- sample.sizes[i]
+    beta.data &lt;- sapply(rep(sample.size, nbr.samples), rbeta, 1,5)
+    norm.data &lt;- sapply(rep(sample.size,nbr.samples),rnorm)
+    chi.data &lt;- sapply(rep(sample.size,nbr.samples),rchisq,df=1)
+    pois.data &lt;- sapply(rep(sample.size,nbr.samples),rpois, lambda = 5)
+    student.data &lt;- sapply(rep(sample.size, nbr.samples), rt, df = 1)
+    all.data &lt;- list(&quot;Beta&quot; = beta.data, &quot;Normal&quot; = norm.data, &quot;Chi&quot; = chi.data, &quot;Poisson&quot; = pois.data, &quot;Student&quot; = student.data)
+    means &lt;- lapply(all.data, colMeans)
+    # store initial mean distribution for visualization
+    if (i == 1) {
+        initial.means &lt;- means
+    }
+    logliks &lt;- lapply(means, function(x) fitdistr(x, densfun = &quot;normal&quot;)$loglik)
+    positive.lik &lt;- names(logliks)[which(logliks &gt; 0)]
+    positive.lik &lt;- positive.lik[!positive.lik  %in% names(norm.means)]
+    # store as first normal distribution for visualization
+    norm.means[positive.lik] &lt;- means[positive.lik]
+    result &lt;- rbind(result, data.frame(&quot;Sample_Size&quot; = sample.size, logliks))
+}</code></pre>
+</div>
+<div id="log-likelihoods-of-fits" class="section level2">
+<h2>Log likelihoods of fits</h2>
+<p>Investigating the results, we can see that some distributions seem to approach the normal distribution faster than others:</p>
+<pre class="r"><code>print(result)</code></pre>
+<pre><code>##   Sample_Size      Beta     Normal       Chi    Poisson   Student
+## 1           5  647.5375 -269.99162 -471.7371 -736.99568 -1921.338
+## 2          10  850.1139 -120.40042 -301.6046 -544.04132 -2754.611
+## 3          15  922.2060  -12.16931 -198.8982 -429.00496 -2829.940
+## 4          20 1040.3833   44.02058 -150.2861 -363.56115 -2055.590
+## 5          50 1240.5191  257.26619  118.3098 -127.04694 -3061.472
+## 6         100 1407.4652  432.84558  276.6635   31.36075 -2519.351
+## 7        1000 1999.4069 1024.90360  846.1744  631.85507 -2057.755
+## 8        5000 2395.5023 1452.94737 1226.5630 1018.96964 -2739.120</code></pre>
+<p>According to positive log likelihoods, the beta distribution yields normally distributed means already at a sample size of 5. Normal, chi-squared, and Poisson distributions yield normally distributed means at sample sizes of 20, 50, and 100, respectively. Finally, the means of Student’s distribution never become normal since the distribution with one degree of freedom has infinite kurtosis such that the central limit theorem does not hold.</p>
+</div>
+<div id="verifying-the-log-likelihood-criterion" class="section level2">
+<h2>Verifying the log-likelihood criterion</h2>
+<p>As verification of the results, let’s plot the histograms at the sample size of 5 and at the sample size where the mean distribution became normal:</p>
+<pre class="r"><code>plot.means &lt;- function(means) {
+    mean.df &lt;- as.data.frame(means)
+    mean.df &lt;- melt(mean.df, id.vars = NULL)
+    ggplot(mean.df, aes(x = value)) + geom_histogram(bins = 100) + facet_wrap(.~variable, scales = &quot;free_x&quot;)
+}
+plot.means(initial.means)</code></pre>
+<p><img src="/post/statistical_test/parametric_sample_size_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>plot.means(norm.means)</code></pre>
+<p><img src="/post/statistical_test/parametric_sample_size_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<p>These results indicate that the log-likelihood criterion is a sufficient proxy for normality. Note, however, that from visual inspection, the initial beta distribution of means does not seem <em>more normal</em> than the one arising from the normal distribution. So this result may be taken with a grain of salt. Looking at Student’s t-distribution, we can see why it its means are not normally distributed:</p>
+<pre class="r"><code>round(quantile(means$Student), 2)</code></pre>
+<pre><code>##      0%     25%     50%     75%    100% 
+##  -90.03   -0.89    0.07    1.01 1262.60</code></pre>
+<p>For some of the samples, the mean distribution has extreme outliers at both tails of the distribution.</p>
+</div>
+<div id="conclusions" class="section level2">
+<h2>Conclusions</h2>
+<p>The results of these experiments indicate that Student’s t-test should definitely be avoided for sample sizes smaller than 20. The assumptions of the test seem to be met for most distribution when the sample size is at least 100. So, it turns out I was correct in having a bad feeling when <a href="http://127.0.0.1:4321/post/statistical_test/signed_wilcox_rank_test/">I recently applied the t-test on only 10 samples</a>.</p>
+<p>To conclude, it is particularly advisable to check the distribution of the measurements for sample sizes below 100. Since the central limit theorem does not hold for distributions with infinite variance, it is also reasonable to verify the distribution of measurements for large sample sizes in order to exclude the possibility of such a distribution. As we have seen here, measurements distributed according to the t-distribution with one degree of freedom did not fulfill the assumption of the test even at a sample size of 5000.</p>
+<p>So, at what sample size do you feel confident using parametric tests such as Student’s t-test? When do you investigate the distribution of the data?</p>
+<p>This post was inspired by <a href="https://stats.stackexchange.com/questions/9573/t-test-for-non-normal-when-n50">this discussion at Stack Exchange</a>. A further discussion of infinite variance can be found <a href="https://stats.stackexchange.com/questions/94402/what-is-the-difference-between-finite-and-infinite-variance">in another Stack Exchange thread</a>.</p>
+</div>

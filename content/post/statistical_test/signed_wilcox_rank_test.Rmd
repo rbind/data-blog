@@ -8,10 +8,12 @@ categories:
 tags:
   - Wilcoxon
   - non-parametric test
+  - parametric test
   - statistical test
   - box plot
   - one-tailed
   - paired test
+  - Q-Q plot
 ---
 In this post, we will explore tests for comparing two groups of dependent (i.e.\ paired) quantitative data: the Wilcoxon signed rank test and the paired Student's t-test. The critical difference between these tests is that the test from Wilcoxon is a non-parametric test, while the t-test is a parametric test. In the following, we will explore the ramifications of this difference.
 <!--more-->
@@ -128,12 +130,3 @@ In this analysis, both Wilcoxon signed rank test and paired Student's t-test led
 Due to the small sample size of the sleep data set, I'd prefer the test from Wilcoxon for these data. 
 
 Which test would you use? In general, would you prefer one test over the other?
-
-## Potential mistakes
-
-What kind of mistakes could have happened during this analysis? 
-
-* Using an unpaired test: Given paired data, it is crucial that this information is reflected by the test to ensure statistical power.
-In case of the sleep data set, pairs are corresponding to measurements for the same patient. In this way, patient-specific effects can be considered. For example, a patient with severe sleep disorder likely receives smaller benefits from treatment than other patients. Even if the benefit is small, we may still see a considerable difference in the effects of the drugs. Thus, the measurements for this patient may still result in a high rank that considerably impacts the test statistic. In an unpaired test, on the other hand, the measurements from such a patient would have a low rank and a correspondingly smaller impact on the test statistic.
-* Not specifying the appropriate alternative: Remember to always adjust the alternative hypothesis according to the effect that you would like to demonstrate. For example, if I had performed a two-sided test here, a significant result would merely have shown that the drugs perform differently but not which drug seems to perform better, for which a one-tailed test was necessary. 
-
