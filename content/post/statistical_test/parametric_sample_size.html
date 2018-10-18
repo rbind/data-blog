@@ -25,6 +25,8 @@ tags:
 <pre class="r"><code>require(MASS)
 require(reshape2)
 require(ggplot2)
+# set seed to ensure that results are reproducible
+set.seed(5)
 nbr.samples &lt;- 500
 sample.sizes &lt;- c(5, 10, 15, 20, 50, 100, 1000, 5000)
 result &lt;- NULL
@@ -55,15 +57,15 @@ for (i in seq_along(sample.sizes)) {
 <h2>Log likelihoods of fits</h2>
 <p>Investigating the results, we can see that some distributions seem to approach the normal distribution faster than others:</p>
 <pre class="r"><code>print(result)</code></pre>
-<pre><code>##   Sample_Size      Beta     Normal       Chi    Poisson   Student
-## 1           5  647.5375 -269.99162 -471.7371 -736.99568 -1921.338
-## 2          10  850.1139 -120.40042 -301.6046 -544.04132 -2754.611
-## 3          15  922.2060  -12.16931 -198.8982 -429.00496 -2829.940
-## 4          20 1040.3833   44.02058 -150.2861 -363.56115 -2055.590
-## 5          50 1240.5191  257.26619  118.3098 -127.04694 -3061.472
-## 6         100 1407.4652  432.84558  276.6635   31.36075 -2519.351
-## 7        1000 1999.4069 1024.90360  846.1744  631.85507 -2057.755
-## 8        5000 2395.5023 1452.94737 1226.5630 1018.96964 -2739.120</code></pre>
+<pre><code>##   Sample_Size      Beta     Normal        Chi    Poisson   Student
+## 1           5  694.9139 -299.81161 -496.33474 -702.94076 -1971.203
+## 2          10  823.0384 -126.68806 -297.08253 -515.18702 -3806.447
+## 3          15  909.4417  -30.63266 -199.77525 -455.64737 -2119.944
+## 4          20 1045.1414   46.45709 -136.21868 -375.75690 -2263.025
+## 5          50 1235.7655  278.66189   84.44694 -117.56140 -3427.721
+## 6         100 1397.7265  443.81523  281.68706   47.87537 -2178.871
+## 7        1000 1996.2198 1019.70692  845.26837  619.25871 -3636.674
+## 8        5000 2398.4267 1402.41433 1260.47873 1018.24454 -3231.983</code></pre>
 <p>According to positive log likelihoods, the beta distribution yields normally distributed means already at a sample size of 5. Normal, chi-squared, and Poisson distributions yield normally distributed means at sample sizes of 20, 50, and 100, respectively. Finally, the means of Student’s distribution never become normal since the distribution with one degree of freedom has infinite kurtosis such that the central limit theorem does not hold.</p>
 </div>
 <div id="verifying-the-log-likelihood-criterion" class="section level2">
@@ -81,7 +83,7 @@ plot.means(initial.means)</code></pre>
 <p>These results indicate that the log-likelihood criterion is a sufficient proxy for normality. Note, however, that from visual inspection, the initial beta distribution of means does not seem <em>more normal</em> than the one arising from the normal distribution. So this result may be taken with a grain of salt. Looking at Student’s t-distribution, we can see why it its means are not normally distributed:</p>
 <pre class="r"><code>round(quantile(means$Student), 2)</code></pre>
 <pre><code>##      0%     25%     50%     75%    100% 
-##  -90.03   -0.89    0.07    1.01 1262.60</code></pre>
+## -495.61   -0.95    0.00    0.98 3422.66</code></pre>
 <p>For some of the samples, the mean distribution has extreme outliers at both tails of the distribution.</p>
 </div>
 <div id="conclusions" class="section level2">

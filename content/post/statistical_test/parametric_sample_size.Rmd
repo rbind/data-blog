@@ -26,6 +26,8 @@ To investigate the number of samples that are necessary to satisfy the requireme
 require(MASS)
 require(reshape2)
 require(ggplot2)
+# set seed to ensure that results are reproducible
+set.seed(5)
 nbr.samples <- 500
 sample.sizes <- c(5, 10, 15, 20, 50, 100, 1000, 5000)
 result <- NULL
