@@ -1,6 +1,6 @@
 ---
 title: "Testing Independence on Contingency Tables: Chi-Squared vs Fisher's Exact Test"
-author: Matthias
+author: Matthias Döring
 date: '2018-10-17'
 thumbnail: "post/statistical_test/contingency_table_tests_cover.png"
 categories:
@@ -144,8 +144,10 @@ for (i in seq(ncol(df))) {
 <pre><code>## [1] &quot;L vs others&quot;</code></pre>
 <p>This finding indicates that wool B is only significantly superior to wool A if the stress is light. Note that we could have also the approach of constructing <span class="math inline">\(2 \times 2\)</span> matrices for the <span class="math inline">\(\chi^2\)</span> test. With the <span class="math inline">\(\chi^2\)</span> test, however, this wasn’t necessary because we based our analysis on residuals.</p>
 </div>
-<div id="summary-chi-squared-vs-fishers-exact-test" class="section level4">
-<h4>Summary: chi-squared vs Fisher’s exact test</h4>
+</div>
+</div>
+<div id="summary-chi-squared-vs-fishers-exact-test" class="section level2">
+<h2>Summary: chi-squared vs Fisher’s exact test</h2>
 <p>Here is a summary of the properties of the two tests:</p>
 <table>
 <thead>
@@ -180,5 +182,10 @@ for (i in seq(ncol(df))) {
 </table>
 <p>Generally, Fisher’s exact test is preferable to the chi-squared test because it is an exact test. The chi-squared test should be particularly avoided if there are few observations (e.g. less than 10) for individual cells. Since Fisher’s exact test may be computationally infeasible for large sample sizes and the accuracy of the <span class="math inline">\(\chi^2\)</span> test increases with larger number of samples, the <span class="math inline">\(\chi^2\)</span> test is a suitable replacement in this case. Another advantage of the <span class="math inline">\(\chi^2\)</span> test is that it is more suitable for contingency tables whose dimensionality exceeds <span class="math inline">\(2 \times 2\)</span>.</p>
 </div>
-</div>
+<div id="further-reading" class="section level2">
+<h2>Further reading</h2>
+<ul>
+<li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3900058/">The Chi-square test of independence</a></li>
+<li><a href="https://www.stat.berkeley.edu/~mgoldman/Section0402.pdf">Overview of multiple hypothesis testing</a></li>
+</ul>
 </div>

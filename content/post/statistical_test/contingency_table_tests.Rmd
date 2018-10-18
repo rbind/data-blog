@@ -1,6 +1,6 @@
 ---
 title: "Testing Independence on Contingency Tables: Chi-Squared vs Fisher's Exact Test"
-author: Matthias
+author: Matthias Döring
 date: '2018-10-17'
 thumbnail: "post/statistical_test/contingency_table_tests_cover.png"
 categories:
@@ -138,7 +138,7 @@ print(names(p.values)[which(p.values < 0.05/3)])
 
 This finding indicates that wool B is only significantly superior to wool A if the stress is light. Note that we could have also the approach of constructing $2 \times 2$ matrices for the $\chi^2$ test. With the $\chi^2$ test, however, this wasn't necessary because we based our analysis on residuals.
 
-#### Summary: chi-squared vs Fisher's exact test
+## Summary: chi-squared vs Fisher's exact test
 
 Here is a summary of the properties of the two tests:
 
@@ -151,3 +151,8 @@ Here is a summary of the properties of the two tests:
 
 
 Generally, Fisher's exact test is preferable to the chi-squared test because it is an exact test. The chi-squared test should be particularly avoided if there are few observations (e.g. less than 10) for individual cells. Since Fisher's exact test may be computationally infeasible for large sample sizes and the accuracy of the $\chi^2$ test increases with larger number of samples, the $\chi^2$ test is a suitable replacement in this case. Another advantage of the $\chi^2$ test is that it is more suitable for contingency tables whose dimensionality exceeds $2 \times 2$.
+
+## Further reading
+* [The Chi-square test of independence](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3900058/)
+* [Overview of multiple hypothesis testing](https://www.stat.berkeley.edu/~mgoldman/Section0402.pdf)
+

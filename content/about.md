@@ -1,7 +1,7 @@
 ---
 title: About
 date: 2018-10-16
-authorbox: false
+authorbox: true
 sidebar: true
 menu: main
 disable_comments: true
