@@ -49,7 +49,7 @@ colnames(sleep)[which(colnames(sleep) == "group")] <- "drug"
 
 It is important to note that every person is different. Thus, the efficacy of the same drug may vary greatly from one person to another. Let's see if this is also the case in this data set:
 
-```{r}
+```{r message = FALSE}
 library(ggplot2)
 ggplot(sleep, aes(x = ID, y = extra)) + geom_boxplot()
 ```
