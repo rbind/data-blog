@@ -89,7 +89,7 @@ For some of the samples, the mean distribution has extreme outliers at both tail
 
 ## Conclusions
 
-The results of these experiments indicate that Student's t-test should definitely be avoided for sample sizes smaller than 20. The assumptions of the test seem to be met for most distribution when the sample size is at least 100. So, it turns out I was correct in having a bad feeling when [I recently applied the t-test on only 10 samples](http://127.0.0.1:4321/post/statistical_test/signed_wilcox_rank_test/). 
+The results of these experiments indicate that Student's t-test should definitely be avoided for sample sizes smaller than 20. The assumptions of the test seem to be met for most distribution when the sample size is at least 100. So, it turns out I was correct in having a bad feeling when [I recently applied the t-test on only 10 samples](/post/statistical_test/signed_wilcox_rank_test/). 
 
 To conclude, it is particularly advisable to check the distribution of the measurements for sample sizes below 100. Since the central limit theorem does not hold for distributions with infinite variance, it is also reasonable to verify the distribution of measurements for large sample sizes in order to exclude the possibility of such a distribution. As we have seen here, measurements distributed according to the t-distribution with one degree of freedom did not fulfill the assumption of the test even at a sample size of 5000.
 
