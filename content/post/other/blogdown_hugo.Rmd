@@ -1,0 +1,55 @@
+---
+title: "5 Steps to Create a Blog with Hugo and R"
+author: Matthias Döring
+date: '2018-10-19'
+thumbnail: "post/other/blogdown_hugo_avatar.png"
+thumbnailsrc: "Figure: https://learn.netlify.com/en/shortcodes/attachments/" 
+categories:
+  - other
+tags:
+  - Hugo
+  - blogdown
+---
+
+Static blogs are a great alternative to dynamic blogs that are based on content management systems such as [WordPress](https://wordpress.com/). While both approaches have their [up- and downsides](https://weblog.masukomi.org/2015/10/18/static-vs-dynamic-blogging/), I chose the static approach for this blog because it's the easiest way to bring R code to the web. In the following, I will show how you can create a static blog in only five steps. 
+
+<!--more-->
+
+## 1. Install blogdown and Hugo
+
+Create a folder for the blog, enter it, and start an R session. The first thing we need to do is to download the [blogdown package](https://bookdown.org/yihui/blogdown/), which acts as an interface between R and [Hugo, a generator for static web pages](https://gohugo.io/):
+
+```{r, eval = FALSE}
+require(blogdown) # load blogdown
+install_hugo() # install Hugo framework
+```
+
+## 2. Customize your blog
+Once all the files have been downloaded, you may want to select [a theme for your blog](https://themes.gohugo.io/). For example, this blog uses [Mainroad](https://themes.gohugo.io/Mainroad/). If you are looking for a personal page, the [Academic theme](https://themes.gohugo.io/academic/) is very popular. Once you've found a theme you like, you can pass the theme as an argument to the `new_site` function:
+
+```{r, eval = FALSE}
+new_site(theme = "Vimux/mainroad")
+```
+
+Note that the theme argument is based on the location of the theme's GitHub repository (e.g. https://github.com/Vimux/mainroad for Mainroad).
+Upon executing `blogdown::serve_site()`, a local server offering a preview of your blogdown will be started. As long as the R session is running, the daemon will automatically update the blog when you make local changes to the blog.
+
+Next, configure your [blog's config file](https://gohugo.io/getting-started/configuration/) (e.g. *config.toml*) in order to set parameters such as your name, the title of your blog, and so on.
+
+## 3. Post something
+
+All the posts are stored in the `content/post` folder. Posts can be stored in [Markdown format](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet), or, if you want to include R code, in [RMarkdown format](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf). Each post can be configured using by adjusting the [Hugo front matter configuration](https://gohugo.io/content-management/front-matter/). 
+
+## 4. Create a GitHub repository
+
+Initialize a new GitHub repository for your blog and [push the files of your working folder there](https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/).
+
+## 5. Deploy the blog 
+
+To host the blog, you can select from free providers such as as [Netlify](https://www.netlify.com/) or [GitHub Pages](https://pages.github.com/). I'm currently using Netlify and its extremely convenient. This is how it works:
+
+* Register at Netlify
+* Associate Netlify with the blog's GitHub repository
+* Netlify will automatically build and deploy your blog every time you push to the blog's GitHub repository
+
+That's it already! I hope you are having fun with your new blog. If you encounter any problems, you should consider [this comprehensive blogdown tutorial](https://notes.peter-baumgartner.net/tutorial/blogdown-tutorial-part-1/). If you don't find the answer there, don't hesitate to write a comment!

@@ -1,0 +1,48 @@
+---
+title: "5 Steps to Create a Blog with Hugo and R"
+author: Matthias Döring
+date: '2018-10-19'
+thumbnail: "post/other/blogdown_hugo_avatar.png"
+thumbnailsrc: "Figure: https://learn.netlify.com/en/shortcodes/attachments/" 
+categories:
+  - other
+tags:
+  - Hugo
+  - blogdown
+---
+
+
+
+<p>Static blogs are a great alternative to dynamic blogs that are based on content management systems such as <a href="https://wordpress.com/">WordPress</a>. While both approaches have their <a href="https://weblog.masukomi.org/2015/10/18/static-vs-dynamic-blogging/">up- and downsides</a>, I chose the static approach for this blog because it’s the easiest way to bring R code to the web. In the following, I will show how you can create a static blog in only five steps.</p>
+<!--more-->
+<div id="install-blogdown-and-hugo" class="section level2">
+<h2>1. Install blogdown and Hugo</h2>
+<p>Create a folder for the blog, enter it, and start an R session. The first thing we need to do is to download the <a href="https://bookdown.org/yihui/blogdown/">blogdown package</a>, which acts as an interface between R and <a href="https://gohugo.io/">Hugo, a generator for static web pages</a>:</p>
+<pre class="r"><code>require(blogdown) # load blogdown
+install_hugo() # install Hugo framework</code></pre>
+</div>
+<div id="customize-your-blog" class="section level2">
+<h2>2. Customize your blog</h2>
+<p>Once all the files have been downloaded, you may want to select <a href="https://themes.gohugo.io/">a theme for your blog</a>. For example, this blog uses <a href="https://themes.gohugo.io/Mainroad/">Mainroad</a>. If you are looking for a personal page, the <a href="https://themes.gohugo.io/academic/">Academic theme</a> is very popular. Once you’ve found a theme you like, you can pass the theme as an argument to the <code>new_site</code> function:</p>
+<pre class="r"><code>new_site(theme = &quot;Vimux/mainroad&quot;)</code></pre>
+<p>Note that the theme argument is based on the location of the theme’s GitHub repository (e.g. <a href="https://github.com/Vimux/mainroad" class="uri">https://github.com/Vimux/mainroad</a> for Mainroad). Upon executing <code>blogdown::serve_site()</code>, a local server offering a preview of your blogdown will be started. As long as the R session is running, the daemon will automatically update the blog when you make local changes to the blog.</p>
+<p>Next, configure your <a href="https://gohugo.io/getting-started/configuration/">blog’s config file</a> (e.g. <em>config.toml</em>) in order to set parameters such as your name, the title of your blog, and so on.</p>
+</div>
+<div id="post-something" class="section level2">
+<h2>3. Post something</h2>
+<p>All the posts are stored in the <code>content/post</code> folder. Posts can be stored in <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown format</a>, or, if you want to include R code, in <a href="https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf">RMarkdown format</a>. Each post can be configured using by adjusting the <a href="https://gohugo.io/content-management/front-matter/">Hugo front matter configuration</a>.</p>
+</div>
+<div id="create-a-github-repository" class="section level2">
+<h2>4. Create a GitHub repository</h2>
+<p>Initialize a new GitHub repository for your blog and <a href="https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/">push the files of your working folder there</a>.</p>
+</div>
+<div id="deploy-the-blog" class="section level2">
+<h2>5. Deploy the blog</h2>
+<p>To host the blog, you can select from free providers such as as <a href="https://www.netlify.com/">Netlify</a> or <a href="https://pages.github.com/">GitHub Pages</a>. I’m currently using Netlify and its extremely convenient. This is how it works:</p>
+<ul>
+<li>Register at Netlify</li>
+<li>Associate Netlify with the blog’s GitHub repository</li>
+<li>Netlify will automatically build and deploy your blog every time you push to the blog’s GitHub repository</li>
+</ul>
+<p>That’s it already! I hope you are having fun with your new blog. If you encounter any problems, you should consider <a href="https://notes.peter-baumgartner.net/tutorial/blogdown-tutorial-part-1/">this comprehensive blogdown tutorial</a>. If you don’t find the answer there, don’t hesitate to write a comment!</p>
+</div>

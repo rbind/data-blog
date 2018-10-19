@@ -15,6 +15,11 @@
             {{ if ge (len $avatar) 1 }}
 		    <figure class="post__thumbnail">
 			    <img src="{{ .Params.thumbnail | relURL }}" alt="{{ .Title }}">
+                {{ if .Params.thumbnailsrc}}
+                    <figcaption>
+                        <span>{{.Params.thumbnailsrc}}</span>
+                    </figcaption>
+                 {{ end }}
 		    </figure>
             {{ end}}
 		{{- end }}
