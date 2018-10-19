@@ -25,7 +25,7 @@
 		{{ partial "post_tags.html" . }}
 	</article>
 </main>
-{{/* partial "authorbox.html" . */}}
+{{ partial "authorbox.html" . }}
 {{ if isset .Params "author" }}
     {{print "Author: " .Params.author}}
 {{ end }}

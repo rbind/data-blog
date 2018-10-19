@@ -1,9 +1,10 @@
 ---
-title: About
+title: About Data Science With R
+slug: "about-data-science-with-R"
+linktitle: About
 date: 2018-10-16
 authorbox: true
 sidebar: true
-menu: main
 disable_comments: true
 ---
 This blog is intended for everyone that is interested in working with data, particularly those that use [R](https://www.r-project.org/) to do so. The idea of this project is to give an overview of the most relevant methods for practicing data science, spanning areas such as statistical testing, machine learning, and data visualization. Since the site focuses on applications, every method is applied to an appropriate data set and the results are critically discussed.

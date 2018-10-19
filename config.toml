@@ -6,6 +6,7 @@ theme = "Mainroad"
 disqusShortname = "datascienceblog-net" # Enable comments by entering your Disqus shortname
 googleAnalytics = "" # Enable Google Analytics by entering your tracking id
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+rssLimit = 20 # max nbr of entries shown in rss feed
 
 [Author]
   name = "Matthias Döring"
@@ -33,3 +34,28 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 [Params.widgets]
   recent_num = 5 # Set the number of articles in the "Recent articles" widget
   tags_counter = false # Enable counter for each tag in "Tags" widget (disabled by default)
+
+[menu]
+    [[menu.main]]
+    name = "Posts"
+    identifier = "posts"
+    url = "/post/"
+    weight = 1
+
+    [[menu.main]]
+    name = "About"
+    identifier = "about"
+    url = "/about-data-science-with-R/"
+    weight = 100
+
+    [[menu.main]]
+    name = "Resources"
+    identifier = "blogroll"
+    url = "/recommended-resources-data-science-and-R/"
+    weight = 99
+
+    [[menu.main]]
+    name = "RSS Feed"
+    identifier = "RSS"
+    url = "/post/index.xml"
+    weight = 101

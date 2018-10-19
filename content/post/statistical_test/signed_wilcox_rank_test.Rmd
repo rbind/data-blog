@@ -46,7 +46,7 @@ ggplot(sleep, aes(x = drug, y = extra)) + geom_boxplot()
 
 The plot shows that the median increase in sleep time of drug 1 is close to 0, while the median increase for drug 2 is close to 2 hours. So, based on these data it seems that drug 2 is more effective than drug 1. However, we still need to determine whether our finding is statistically significant. 
 
-#### The null hypothesis
+### The null hypothesis
 The null hypothesis of the test is that there isn't any difference in the extra sleep time between the two drugs. Since we want to find out whether drug 2 outperforms drug 1, we do not need a two-tailed test (testing whether any of the drugs has superior performance), but a one-tailed test. Thus, the alternative of the null hypothesis is that drug 2 is associated with greater values of *extra* than drug 1.
 
 ## Wilcoxon Signed Rank Test
