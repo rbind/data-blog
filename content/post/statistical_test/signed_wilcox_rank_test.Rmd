@@ -123,9 +123,9 @@ The Q-Q plot shows that the differences fit the normal model quite well, except 
 
 In this analysis, both Wilcoxon signed rank test and paired Student's t-test led to the rejection of the null hypothesis. In general, however, which test is more appropriate? The answer is, it depends on several criteria:
 
-* **Hypothesis:** Student's t-test is a test comparing means, while Wilcoxon's tests the ordering of the data. For example, if you are analyzing data with many outliers, for example, the wealth of individuals (where few billionaires can greatly influence the result), Wilcoxon's test may be more appropriate.
+* **Hypothesis:** Student's t-test is a test comparing means, while Wilcoxon's tests the ordering of the data. For example, if you are analyzing data with many outliers such as individual wealth (where few billionaires can greatly influence the result), Wilcoxon's test may be more appropriate.
 * **Interpretation:** Although confidence intervals can also be computed for Wilcoxon's test, it may seem more natural to argue about the confidence interval of the mean in the t-test than the pseudomedian for Wilcoxon's test.
-* **Fulfillment of assumptions:** The assumptions of Student's t-test may not be met for small sample sizes. In this case, it is often safer to select a parametric test. However, if the assumptions of the t-test are met, it has greater [statistical power](https://en.wikipedia.org/wiki/Power_(statistics)) than Wilcoxon's test.
+* **Fulfillment of assumptions:** The assumptions of Student's t-test may not be met [for small sample sizes](/post/statistical_test/parametric_sample_size/). In this case, it is often safer to select a parametric test. However, if the assumptions of the t-test are met, it has greater [statistical power](https://en.wikipedia.org/wiki/Power_(statistics)) than Wilcoxon's test.
 
 Due to the small sample size of the sleep data set, I'd prefer the test from Wilcoxon for these data. 
 

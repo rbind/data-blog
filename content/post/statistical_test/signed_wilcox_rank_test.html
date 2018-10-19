@@ -124,9 +124,9 @@ ggplot(diff.df, aes(x = diff)) + geom_histogram()</code></pre>
 <h2>Summary: Wilcoxon signed rank test vs paired Student’s t-test</h2>
 <p>In this analysis, both Wilcoxon signed rank test and paired Student’s t-test led to the rejection of the null hypothesis. In general, however, which test is more appropriate? The answer is, it depends on several criteria:</p>
 <ul>
-<li><strong>Hypothesis:</strong> Student’s t-test is a test comparing means, while Wilcoxon’s tests the ordering of the data. For example, if you are analyzing data with many outliers, for example, the wealth of individuals (where few billionaires can greatly influence the result), Wilcoxon’s test may be more appropriate.</li>
+<li><strong>Hypothesis:</strong> Student’s t-test is a test comparing means, while Wilcoxon’s tests the ordering of the data. For example, if you are analyzing data with many outliers such as individual wealth (where few billionaires can greatly influence the result), Wilcoxon’s test may be more appropriate.</li>
 <li><strong>Interpretation:</strong> Although confidence intervals can also be computed for Wilcoxon’s test, it may seem more natural to argue about the confidence interval of the mean in the t-test than the pseudomedian for Wilcoxon’s test.</li>
-<li><strong>Fulfillment of assumptions:</strong> The assumptions of Student’s t-test may not be met for small sample sizes. In this case, it is often safer to select a parametric test. However, if the assumptions of the t-test are met, it has greater <a href="https://en.wikipedia.org/wiki/Power_(statistics)">statistical power</a> than Wilcoxon’s test.</li>
+<li><strong>Fulfillment of assumptions:</strong> The assumptions of Student’s t-test may not be met <a href="/post/statistical_test/parametric_sample_size/">for small sample sizes</a>. In this case, it is often safer to select a parametric test. However, if the assumptions of the t-test are met, it has greater <a href="https://en.wikipedia.org/wiki/Power_(statistics)">statistical power</a> than Wilcoxon’s test.</li>
 </ul>
 <p>Due to the small sample size of the sleep data set, I’d prefer the test from Wilcoxon for these data.</p>
 <p>Which test would you use? In general, would you prefer one test over the other?</p>
