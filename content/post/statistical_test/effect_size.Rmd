@@ -22,19 +22,21 @@ Third, a significant test does not necessarily make a statement about the magnit
 
 To exemplify the difference between statistical significance and effect size, let's assume that we are conducting a study investigating two groups, $G_1$ and $G_2$, with respect to two outcomes, $Y_1$ and $Y_1$. 
 
-### Smallest sample size, largest effect
+### Generation of artificial data
 
-Assume that we didn't have enough funds, so we ended up with only 40 measurements that are equally split between groups 1 and 2. We are first going to define a function that builds contingency tables with the following properties:
+To explore how significance depends on both sample size and effect size, we are going to define a function that builds contingency tables with the following properties:
 
 * The number of samples is `sample.size`
 * Each group contains 50% of the measurements
 * The relative difference between the frequencies of the two groups is `diff`
 
+This is the function:
 
 ```{r}
 build.contingency.table <- function(sample.size, diff) {
     g.size <- sample.size / 2 # group size
-    data <- matrix(c(g.size/2 - (diff * g.size/2), g.size/2 + (diff * g.size/2), 
+    data <- matrix(c(g.size/2 - (diff * g.size/2), 
+                     g.size/2 + (diff * g.size/2), 
                    g.size/2, g.size/2),
                    nrow = 2, byrow = TRUE,
                    dimnames = list(c("G1", "G2"), c("Y1", "Y2")))
@@ -42,7 +44,10 @@ build.contingency.table <- function(sample.size, diff) {
 }
 ```
 
-Let's assume the difference between the populations is 60%. This means that $0.6 \cdot 20 = 12$ samples in $G_1$ will have a different outcome than in $G_2$. Under this assumption, we obtain the following contingency table and test whether the frequencies are independent of the groups using the $\chi^2$ test:
+### Smallest sample size, largest effect
+
+Assume that we didn't have enough funds for a large study. Thus we ended up with only 40 measurements. 
+Let's assume the difference between the populations is 60%. This means that $0.6 \cdot 20 = 12$ samples in $G_1$ will have a different outcome than in $G_2$. Under this assumption, we obtain the following contingency table and significance result when testing whether the observed frequencies are independent of the groups using the $\chi^2$ test:
 
 ```{r}
 data.L <- build.contingency.table(40, 0.6)
@@ -68,7 +73,7 @@ Indeed, the p-value of `r round(chi.result.M$p.value, 4)` is sufficiently small 
 
 ### Largest sample size, smallest effect
 
-To illustrate this point, let's generate a data set with an even larger sample size and a smaller difference between the groups. We'll take a sample of 1 million and artificially enforce a difference between the groups of only $1\%$:
+To illustrate what can happen at a very large sample size, let's generate a data set with an even larger sample size and a smaller difference between the groups. We'll take a sample of 1 million and artificially enforce a difference between the groups of only $1\%$:
 
 ```{r}
 data.S <- build.contingency.table(1000000, 0.01)
