@@ -1,0 +1,34 @@
+---
+title: "SEO for Hugo sites: noindex for taxonomies (tags/categories)" 
+author: Matthias Döring
+date: '2018-10-20'
+thumbnail: "post/other/blogdown_hugo_avatar.png"
+thumbnailsrc: "Figure: https://learn.netlify.com/en/shortcodes/attachments/"
+categories:
+  - other
+tags:
+  - Hugo
+  - SEO
+---
+
+Taxonomies in Hugo are a great way to structure information provided by a blog. For search engine optimization (SEO) purposes, however, the existence of duplicate content on a site can be a problem. Therefore, I'd recommend setting the *noindex* meta tag for all of the taxonomy sites that do not provide unique content. This post shows you how to get it done. 
+
+<!--more-->
+
+## Adjust your theme's *baseof.html* file
+
+The file *baseof.html* defines the basic structure of your website. You can find it under *layouts/\_default* of your theme's folder. For example, my *baseof.html* is located under *themes/Mainroad/layouts/\_default/baseof.htm*. Simply add this code within the head tag:
+
+```
+{{ if .Data.Singular }}
+    <meta name="robots" content="noindex">
+{{ end }}
+```
+
+This should instruct all indexers not to index the taxonomy pages. To make sure that it worked you can contrast the HTML meta tags that are generated for regular posts and taxonomy pages.
+
+## Why does it work?
+
+According to the [taxonomy variable documentation](https://gohugo.io/variables/taxonomy/#example-usage-of-site-taxonomies), there are some special variables that are only available for taxomy pages. I've just picked one of the taxonomy variables (i.e. *.Data.Singular*) but I could also have used any of the other taxonomy variables (e.g. *.Data.Terms*). By requiring the existence of these variables, the *noindex* tag is only set for the taxonomy pages.
+
+I hope this solution also works for you! Enjoy!
