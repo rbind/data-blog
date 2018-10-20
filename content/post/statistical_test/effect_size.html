@@ -78,14 +78,14 @@ print(chi.result.S$p.value)</code></pre>
 </div>
 <div id="determining-the-effect-size-with-cramers-v" class="section level2">
 <h2>Determining the effect size with Cramer’s V</h2>
-<p>The effect size of the <span class="math inline">\(\chi^2\)</span> test can be determined using Cramer’s V. Cramer’s V is simply a normalized version of the <span class="math inline">\(\chi^2\)</span> test statistic:</p>
-<p><span class="math display">\[V = \sqrt{\frac{\chi^2}{n \cdot (c - 1)} \]</span></p>
-<p>where <span class="math inline">\(n\)</span> is the sample size and <span class="math inline">\(c = \min(m,n)\)</span> is the minimum of the number of rows <span class="math inline">\(m\)</span> and columns <span class="math inline">\(n\)</span> in the contingency table. Since <span class="math inline">\(V \in [0,1]\)</span> it is easy to interpret. For large effects, <span class="math inline">\(V\)</span> will approach 1 but if there’s no effect <span class="math inline">\(V\)</span> will be close to 0.</p>
+<p>The effect size of the <span class="math inline">\(\chi^2\)</span> test can be determined using Cramer’s V. Cramer’s V is a normalized version of the <span class="math inline">\(\chi^2\)</span> test statistic. It is defined by
+<span class="math display">\[V = \sqrt{\frac{\chi^2}{n \cdot (c - 1)}}\]</span>
+where <span class="math inline">\(n\)</span> is the sample size and <span class="math inline">\(c = \min(m,n)\)</span> is the minimum of the number of rows <span class="math inline">\(m\)</span> and columns <span class="math inline">\(n\)</span> in the contingency table. Interpretation of Cramer’s V is easy due to <span class="math inline">\(V \in [0,1]\)</span>. For large effects, <span class="math inline">\(V\)</span> will approach 1 but if there’s no effect <span class="math inline">\(V\)</span> will be close to 0.</p>
 <div id="function-for-computing-cramers-v" class="section level3">
 <h3>Function for computing Cramer’s V</h3>
 <p>Since there’s no function to compute Cramer’s V in base R, we’ll implement it ourselves as follows:</p>
 <pre class="r"><code>cramer.v &lt;- function(contingency.tab) {
-    chi =  chisq.test(contingency.tab, correct = FALSE)$statistic
+    chi &lt;-  chisq.test(contingency.tab, correct = FALSE)$statistic
     n &lt;- sum(contingency.tab)
     c &lt;- min(nrow(contingency.tab), ncol(contingency.tab))
     V &lt;- sqrt(chi / (n * (c-1)))

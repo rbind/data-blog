@@ -83,11 +83,9 @@ How can these results be explained? We have to remember that the p-value indicat
 
 ## Determining the effect size with Cramer's V
 
-The effect size of the $\chi^2$ test can be determined using Cramer's V. Cramer's V is simply a normalized version of the $\chi^2$ test statistic:
-
-\[V = \sqrt{\frac{\chi^2}{n \cdot (c - 1)} \]
-
-where $n$ is the sample size and $c =  \min(m,n)$ is the minimum of the number of rows $m$ and columns $n$ in the contingency table. Since $V \in [0,1]$ it is easy to interpret. For large effects, $V$ will approach 1 but if there's no effect $V$ will be close to 0.
+The effect size of the $\chi^2$ test can be determined using Cramer's V. Cramer's V is a normalized version of the $\chi^2$ test statistic. It is defined by
+\[V = \sqrt{\frac{\chi^2}{n \cdot (c - 1)}}\]
+where $n$ is the sample size and $c =  \min(m,n)$ is the minimum of the number of rows $m$ and columns $n$ in the contingency table. Interpretation of Cramer's V is easy due to $V \in [0,1]$. For large effects, $V$ will approach 1 but if there's no effect $V$ will be close to 0.
 
 ### Function for computing Cramer's V
 
@@ -95,7 +93,7 @@ Since there's no function to compute Cramer's V in base R, we'll implement it ou
 
 ```{r}
 cramer.v <- function(contingency.tab) {
-    chi =  chisq.test(contingency.tab, correct = FALSE)$statistic
+    chi <-  chisq.test(contingency.tab, correct = FALSE)$statistic
     n <- sum(contingency.tab)
     c <- min(nrow(contingency.tab), ncol(contingency.tab))
     V <- sqrt(chi / (n * (c-1)))
