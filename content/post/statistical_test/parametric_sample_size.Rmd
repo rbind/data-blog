@@ -15,7 +15,6 @@ tags:
   - central limit theorem
 ---
 Parametric tests are subject to assumptions about the properties of the data. For example, Student's t-test is a well-known parametric test that assumes that sample means have a normal distribution. Due to the [central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem), the test can be also applied to measurements that are not normally distributed if the sample size is sufficient. Here, we will investigate the approximate number of samples that are necessary for the t-test to be valid.
-
 <!--more-->
 
 ## Fitting normal distributions to sampled means

@@ -13,8 +13,8 @@ tags:
 
 
 
-<p>Static blogs are a great alternative to dynamic blogs that are based on content management systems such as <a href="https://wordpress.com/">WordPress</a>. While both approaches have their <a href="https://weblog.masukomi.org/2015/10/18/static-vs-dynamic-blogging/">up- and downsides</a>, I chose the static approach for this blog because it’s the easiest way to bring R code to the web. In the following, I will show how you can create a static blog in only five steps.</p>
-<!--more-->
+<p>Static blogs are a great alternative to dynamic blogs that are based on content management systems such as <a href="https://wordpress.com/">WordPress</a>. While both approaches have their <a href="https://weblog.masukomi.org/2015/10/18/static-vs-dynamic-blogging/">up- and downsides</a>, I chose the static approach for this blog because it’s the easiest way to bring R code to the web. In the following, I will show how you can create a static blog in only five steps.
+<!--more--></p>
 <div id="install-blogdown-and-hugo" class="section level2">
 <h2>1. Install blogdown and Hugo</h2>
 <p>Create a folder for the blog, enter it, and start an R session. The first thing we need to do is to download the <a href="https://bookdown.org/yihui/blogdown/">blogdown package</a>, which acts as an interface between R and <a href="https://gohugo.io/">Hugo, a generator for static web pages</a>:</p>
@@ -25,7 +25,8 @@ install_hugo() # install Hugo framework</code></pre>
 <h2>2. Customize your blog</h2>
 <p>Once all the files have been downloaded, you may want to select <a href="https://themes.gohugo.io/">a theme for your blog</a>. For example, this blog uses <a href="https://themes.gohugo.io/Mainroad/">Mainroad</a>. If you are looking for a personal page, the <a href="https://themes.gohugo.io/academic/">Academic theme</a> is very popular. Once you’ve found a theme you like, you can pass the theme as an argument to the <code>new_site</code> function:</p>
 <pre class="r"><code>new_site(theme = &quot;Vimux/mainroad&quot;)</code></pre>
-<p>Note that the theme argument is based on the location of the theme’s GitHub repository (e.g. <a href="https://github.com/Vimux/mainroad" class="uri">https://github.com/Vimux/mainroad</a> for Mainroad). Upon executing <code>blogdown::serve_site()</code>, a local server offering a preview of your blogdown will be started. As long as the R session is running, the daemon will automatically update the blog when you make local changes to the blog.</p>
+<p>Note that the theme argument is based on the location of the theme’s GitHub repository (e.g. <a href="https://github.com/Vimux/mainroad" class="uri">https://github.com/Vimux/mainroad</a> for Mainroad).
+Upon executing <code>blogdown::serve_site()</code>, a local server offering a preview of your blogdown will be started. As long as the R session is running, the daemon will automatically update the blog when you make local changes to the blog.</p>
 <p>Next, configure your <a href="https://gohugo.io/getting-started/configuration/">blog’s config file</a> (e.g. <em>config.toml</em>) in order to set parameters such as your name, the title of your blog, and so on.</p>
 </div>
 <div id="post-something" class="section level2">

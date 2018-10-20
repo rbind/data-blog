@@ -12,7 +12,6 @@ tags:
 ---
 
 Taxonomies in Hugo are a great way to structure information provided by a blog. For search engine optimization (SEO) purposes, however, the existence of duplicate content on a site can be a problem. Therefore, I'd recommend setting the *noindex* meta tag for all of the taxonomy sites that do not provide unique content. This post shows you how to get it done. 
-
 <!--more-->
 
 ## Adjust your theme's *baseof.html* file
