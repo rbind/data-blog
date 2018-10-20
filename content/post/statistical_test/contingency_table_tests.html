@@ -82,7 +82,7 @@ print(df)</code></pre>
 ## 4    B       L    254
 ## 5    B       M    259
 ## 6    B       H    169</code></pre>
-<p>We then use the <code>xtabs</code> function to generate the contingency table:</p>
+<p>We then use the <code>xtabs</code> (pronounced as <em>crosstabs</em>) function to generate the contingency table:</p>
 <pre class="r"><code>df &lt;- xtabs(breaks~wool+tension, data = df)
 print(df)</code></pre>
 <pre><code>##     tension
@@ -93,7 +93,7 @@ print(df)</code></pre>
 </div>
 <div id="statistical-testing" class="section level2">
 <h2>Statistical testing</h2>
-<p>The two most common tests for determining whether different groups are subject to different distributions are the chi-squared test (<span class="math inline">\(\chi^2\)</span> test) and Fisher’s exact test.</p>
+<p>The two most common tests for determining whether measurements from different groups are independent are the chi-squared test (<span class="math inline">\(\chi^2\)</span> test) and Fisher’s exact test. Note that you should use <a href="/post/statistical_test/mcnemars_test">McNemar’s test</a> if the measurements were paired (e.g. individual looms could be identified).</p>
 <div id="pearsons-chi-squared-test" class="section level3">
 <h3>Pearson’s chi-squared test</h3>
 <p>The <span class="math inline">\(\chi^2\)</span> test is a non-parametric test that can be applied to contingency tables with various dimensions. The name of the test originates from the <span class="math inline">\(\chi^2\)</span> distribution, which is the distribution for the squares of independent standard normal variables. This is the distribution of the test statistic of the <span class="math inline">\(\chi^2\)</span> test, which is defined by the sum of chi-square values <span class="math inline">\(\chi_{i,j}^2\)</span> for all pairs of cells <span class="math inline">\(i,j\)</span> arising from the difference between a cell’s observed value <span class="math inline">\(O_{i,j}\)</span> and the expected value <span class="math inline">\(E_{i,j}\)</span>, normalized by <span class="math inline">\(E_{i,j}\)</span>:</p>

@@ -57,7 +57,7 @@ df <- ddply(warpbreaks, .(wool,tension), summarize, breaks = sum(breaks))
 print(df)
 ```
 
-We then use the `xtabs` function to generate the contingency table:
+We then use the `xtabs` (pronounced as *crosstabs*) function to generate the contingency table:
 ```{r}
 df <- xtabs(breaks~wool+tension, data = df)
 print(df)
@@ -67,7 +67,7 @@ Now, `df` has the structure we need for applying statistical tests.
 
 ## Statistical testing
 
-The two most common tests for determining whether different groups are subject to different distributions are the chi-squared test ($\chi^2$ test) and Fisher's exact test.
+The two most common tests for determining whether measurements from different groups are independent are the chi-squared test ($\chi^2$ test) and Fisher's exact test. Note that you should use [McNemar's test](/post/statistical_test/mcnemars_test) if the measurements were paired (e.g. individual looms could be identified).
 
 ### Pearson's chi-squared test
 

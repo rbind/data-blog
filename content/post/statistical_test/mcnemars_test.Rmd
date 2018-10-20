@@ -1,0 +1,75 @@
+---
+title: "Testing Symmetry on Contingency Tables from Paired Measurements: McNemar's Test"
+author: Matthias Döring
+date: '2018-10-20'
+categories:
+  - statistical test
+tags:
+  - McNemar's test
+  - Chi-squared test
+  - contingency table
+  - symmetry
+---
+
+McNemar's test is a test for contingency tables that arise from paired measurements. In contrast to the $\chi^2$ test, which is a test for independence, McNemar's test is a test for symmetry (also called marginal homogeneity). Still, McNemar's test is related to the chi-squared test because its test static also follows a $\chi^2$ distribution.
+
+<!--more-->
+
+## Paired categorical data from two classifiers
+
+A typical example for paired categorical measurements arises when one wants to identify whether two classifiers yield similar predictions for identical sets of observations. In this case, the predictions relate to the same measurements and are therefore paired. Assume there are two class labels, 0 and 1. 
+
+```{r}
+y_hat1 <- c(rep(0, 10), rep(1,5), rep(0,5))
+y_hat2 <- c(rep(0, 7), rep(1,3), rep(rep(1,5)), rep(1,5))
+df <- data.frame(Y_Hat1 = y_hat1, Y_Hat2 = y_hat2)
+print(df)
+```
+
+## Construction of contingency table
+
+To construct the contingency table, we have to find the number of agreements and disagreements between the classifiers. There are four possibilities for this: 
+
+* Both classifiers output class 0 (0/0)
+* Classifier 1 outputs class 0 and classifier 2 outputs class 1 (0/1)
+* Classifier 1 outputs class 1 and classifier 2 outputs class 0 (1/0)
+* Both classifiers output class 1 (1/1)
+
+```{r}
+tab <- xtabs(data = df)
+print(tab)
+```
+
+The contingency table shows that there is a deviation between the classifiers. When the first classifier predicts class 0, the second classifier often predicts class 1 (`r tab[3]` times).
+
+## McNemar's test
+
+Since McNemar's test assumes marginal homogeneity, it is concerned only with differences between those dichotomous outcomes where there is a disagreement. For our classifier example, this means that the test considers only the frequencies in the cells were they don't agree (0/1 and 1/0).
+
+To formalize this, assume a contingency table of the following form:
+
+|       | Second Classifier: 0 | Second classifier: 1 | Marginal |
+--------|----------------------|----------------------|----------|
+| First Classifier: 0 | a | b  | a + b |
+| First classifier: 1 | c | d | c + d |
+| Marginal | a + c | b + d |  |
+
+Further, let $p_a$, $p_b$, $p_c$, and $p_c$ indicate the probabilities for the individual cells. The assumption of marginal homogeneity means that $p_a + p_c = p_a + p_b$ and $p_b + p_d = p_c + p_d$. Thus, $p_a$ and $p_d$ don't provide any information and the null hypothesis is $p_b = p_c$, while the alternative is $p_b \neq p_c$. 
+
+The test statistic is
+
+\[\chi^2 =\frac{(b - c)^2}{b+c}\,.\]
+
+Since the test statistic has a $\chi^2$ distribution with 1 degree of freedom, McNemar's test should only be applied if $b +c$ is sufficiently large (e.g. $b + c > 25$). Otherwise, an [exact version of McNemar's test](https://cran.r-project.org/web/packages/exact2x2/index.html) should be considered.
+
+### Performing McNemar's test in R
+
+McNemar's test can be performed by providing the contingency table as an argument to `mcnemar.test`:
+
+```{r}
+mc.result <- mcnemar.test(tab)
+print(mc.result$p.value)
+```
+
+Here, the p-value indicates a significant result at the 5% level. Thus, we reject the null hypothesis and can conclude that the two classifiers make considerable different predictions.
+
