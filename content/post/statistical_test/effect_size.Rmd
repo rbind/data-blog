@@ -1,0 +1,129 @@
+---
+title: "Effect Sizes: Why Significance Alone is Not Enough"
+author: Matthias Döring
+date: '2018-10-20'
+thumbnail: "post/statistical_test/effect_size_cover.png"
+categories:
+  - statistical test
+tags:
+  - effect size
+  - significance
+  - Cramer's V
+  - chi-squared test
+---
+
+So, you performed a test for significance and you obtained a positive result. That's great but it's not yet time to celebrate. You may ask: *Why? Isn't a significant test sufficient to show the existence of an effect?*. This, however, is only true to some extent. First, a significant result never proves the existence of an effect. For example, at a significance level of 5%, an exact test will yield a false positive result in 5% of the cases. Second, a significance test may
+fail to detect an effect if the sample size is too small; this means that the test is not sufficiently powered to detect the effect.
+Third, a significant test does not necessarily make a statement about the magnitude of an effect. In this post, we'll investigate the difference between statistical significance and effect size.
+
+<!--more-->
+
+## Significance depends on sample size and effect size
+
+To exemplify the difference between statistical significance and effect size, let's assume that we are conducting a study investigating two groups, $G_1$ and $G_2$, with respect to two outcomes, $Y_1$ and $Y_1$. 
+
+### Smallest sample size, largest effect
+
+Assume that we didn't have enough funds, so we ended up with only 40 measurements that are equally split between groups 1 and 2. We are first going to define a function that builds contingency tables with the following properties:
+
+* The number of samples is `sample.size`
+* Each group contains 50% of the measurements
+* The relative difference between the frequencies of the two groups is `diff`
+
+
+```{r}
+build.contingency.table <- function(sample.size, diff) {
+    g.size <- sample.size / 2 # group size
+    data <- matrix(c(g.size/2 - (diff * g.size/2), g.size/2 + (diff * g.size/2), 
+                   g.size/2, g.size/2),
+                   nrow = 2, byrow = TRUE,
+                   dimnames = list(c("G1", "G2"), c("Y1", "Y2")))
+    return(data.frame(data))
+}
+```
+
+Let's assume the difference between the populations is 60%. This means that $0.6 \cdot 20 = 12$ samples in $G_1$ will have a different outcome than in $G_2$. Under this assumption, we obtain the following contingency table and test whether the frequencies are independent of the groups using the $\chi^2$ test:
+
+```{r}
+data.L <- build.contingency.table(40, 0.6)
+print(data.L)
+chi.result.L <- chisq.test(data.L)
+print(chi.result.L$p.value)
+```
+
+Interestingly, the p-value of `r round(chi.result.L$p.value, 4)` is not significant at the 5% despite the large difference between the two groups.
+
+### Medium sample size, medium effect
+
+Let's now assume that we've collected a greater number of samples than in the first study, namely a total of $10\,000$ samples. This time, however, the effect size is smaller: the difference between the two groups is only $\frac{200}{5000} = 4\%$. If we are testing whether the outcome is independent of the grouping, what do you think, will a $\chi^2$ test on the corresponding contingency table be insignificant? Let's see the result:
+
+```{r}
+data.M <- build.contingency.table(10000, 0.04)
+print(data.M)
+chi.result.M <- chisq.test(data.M)
+print(chi.result.M$p.value)
+```
+
+Indeed, the p-value of `r round(chi.result.M$p.value, 4)` is sufficiently small for a significant result at the 5% level. This could come as a surprise considering that the outcomes were more similarly split across both groups than in the first experiment.
+
+### Largest sample size, smallest effect
+
+To illustrate this point, let's generate a data set with an even larger sample size and a smaller difference between the groups. We'll take a sample of 1 million and artificially enforce a difference between the groups of only $1\%$:
+
+```{r}
+data.S <- build.contingency.table(1000000, 0.01)
+print(data.S)
+chi.result.S <- chisq.test(data.S)
+print(chi.result.S$p.value)
+```
+
+In this case, the p-value is even smaller than for the previous data set although the difference between the two groups has been reduced from 4% to 1%. 
+
+How can these results be explained? We have to remember that the p-value indicates how likely it is to obtain a test result that is at least as extreme by chance. Since chance is reduced with greater sample sizes, it becomes easier to show differences between groups (i.e. the statistical power increases). Therefore, at large sample sizes, even small effects can become significant, while for small sample sizes, even large effects may not be significant.
+
+## Determining the effect size with Cramer's V
+
+The effect size of the $\chi^2$ test can be determined using Cramer's V. Cramer's V is simply a normalized version of the $\chi^2$ test statistic:
+
+\[V = \sqrt{\frac{\chi^2}{n \cdot (c - 1)} \]
+
+where $n$ is the sample size and $c =  \min(m,n)$ is the minimum of the number of rows $m$ and columns $n$ in the contingency table. Since $V \in [0,1]$ it is easy to interpret. For large effects, $V$ will approach 1 but if there's no effect $V$ will be close to 0.
+
+### Function for computing Cramer's V
+
+Since there's no function to compute Cramer's V in base R, we'll implement it ourselves as follows:
+
+```{r}
+cramer.v <- function(contingency.tab) {
+    chi =  chisq.test(contingency.tab, correct = FALSE)$statistic
+    n <- sum(contingency.tab)
+    c <- min(nrow(contingency.tab), ncol(contingency.tab))
+    V <- sqrt(chi / (n * (c-1)))
+    return(as.numeric(V))
+}
+```
+
+### Cramer's V for the three data sets
+We will determine Cramer's V for the three data sets `data.L`, `data.M`, and `data.S`, which exhibit large, medium, and small effect sizes, respectively.
+
+```{r}
+data <- list("Largest_Effect" = data.L, 
+             "Medium_Effect" = data.M, 
+             "Smallest_Effect" = data.S)
+Vs <- sapply(data, cramer.v)
+print(Vs)
+```
+
+The obtained values for Cramer's V agrees well with with the expectation. To interpret Cramer's V, the following approach is often used:
+
+* $V \in [0.1, 0.3]$: weak association
+* $V \in [0.4, 0.5]$: medium association
+* $V > 0.5$: strong association 
+
+Thus, for the three data sets we analyzed, only the first data set exhibited a weak association, while the other two data sets, albeit significant, exhibited no association according to this interpretation of Cramer's V.
+
+## Conclusions
+
+If you are reporting the significance of a test, it is similarly important to report the effect size in order to document the magnitude of the effect. The available measures for the effect size depend on the significance test. For example, for the $\chi^2$ test, the effect size can be determined using Cramer's V.
+
+What importance do you assign to effect sizes? Do you think that they are often overlooked?
