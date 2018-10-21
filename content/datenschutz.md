@@ -1,5 +1,6 @@
 ---
 title: Datenschutzerklärung
+no_sitemap: true
 date: 2018-10-16
 authorbox: false
 sidebar: false
