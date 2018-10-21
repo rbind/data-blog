@@ -14,4 +14,4 @@ User-agent: EmailCollector
 User-agent: penthesilea
 Disallow: /
 
-Sitemap: http://www.datascienceblog.net/sitemap.xml
+Sitemap: https://www.datascienceblog.net/sitemap.xml
