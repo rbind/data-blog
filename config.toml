@@ -1,5 +1,5 @@
 baseurl = "https://www.datascienceblog.net"
-title = "Data Science with R"
+title = "datascienceblog.net: R for Data Science "
 languageCode = "en-us"
 paginate = "10" # Number of posts per page
 theme = "Mainroad"
@@ -15,7 +15,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
 
 [Params]
   subtitle = "Understand. Implement. Succeed." # Subtitle of your site
-  description = "A blog about data science applications with R." # Description of your site
+  description = "Interested in data science? Profit from this blog's comprehensive applications of statistical testing, machine learning, and visualization in R!"
   opengraph = true
   twitter_cards = false
   readmore = false # Show "Read more" button in list if true
