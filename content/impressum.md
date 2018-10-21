@@ -5,6 +5,7 @@ date: 2018-10-16
 authorbox: false
 sidebar: false
 disable_comments: true
+no_index: true
 ---
 <h2>Angaben gem&auml;&szlig; &sect; 5 TMG</h2>
 <p>Matthias D&ouml;ring<br />

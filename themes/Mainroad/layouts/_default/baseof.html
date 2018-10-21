@@ -9,6 +9,9 @@
     {{ if .Data.Singular }}
     <meta name="robots" content="noindex">
     {{ end }}
+    {{ if .Params.no_index }}
+    <meta name="robots" content="noindex">
+    {{ end }}
 	{{ .Hugo.Generator }}
 	{{ if .Site.Params.opengraph }}{{ template "_internal/opengraph.html" . }}{{ end }}
 	{{ if .Site.Params.twitter_cards }}{{ template "_internal/twitter_cards.html" . }}{{ end }}
