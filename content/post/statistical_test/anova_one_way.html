@@ -1,0 +1,140 @@
+---
+title: "Comparing Measurements Across Several Groups: ANOVA"
+author: Matthias Döring
+date: '2018-10-22'
+thumbnail: "post/statistical_test/anova_one_way_cover.png"
+categories:
+  - statistical test
+tags:
+  - ANOVA
+  - Kruskal-Wallis
+  - parametric 
+  - non-parametric
+---
+
+
+
+<p>The means of quantitative measurements from two groups can be compared using Student’s t-test. To compare the means of measurements for more than two levels of a categorical variable, one-way ANOVA has to be used. Here, we’ll explore the parametric, one-way ANOVA test as well as the non-parametric version of the test, which is also called Kruskal-Wallis test.
+<!--more--></p>
+<div id="parametric-testing-with-the-one-way-anova-test" class="section level2">
+<h2>Parametric testing with the one-way ANOVA test</h2>
+<p><em>ANOVA</em> stands for analysis of variance and indicates that test analyzes the within-group and between-group variance to determine whether there is a difference in group means.</p>
+<p>The ANOVA test has three assumptions:</p>
+<ol style="list-style-type: decimal">
+<li>The quantitative measurements are independent</li>
+<li>The ANOVA residuals are normally distributed</li>
+<li>The variance of the group measurements should be homogeneous (homoscedastic)</li>
+</ol>
+<p>The most important assumption of ANOVA is the assumption of homoscedasticity, which should always be checked.</p>
+</div>
+<div id="the-insectsprays-data-set" class="section level2">
+<h2>The <em>InsectSprays</em> data set</h2>
+<p>The <em>InsectSprays</em> data set compares the number of insects in agricultural units in which 6 different insect sprays were used. The data set has only two features: <em>count</em> indicates the insect count, while <em>spray</em> is a categorical variable indicating the used insect spray. For each of the insect sprays, the insect count was determined for 12 agricultural units.</p>
+<p>To show how the test statistic is computed, we’ll transform the data set from long to wide format. For this purpose, we’ll add an ID column to indicate which entries belong into one row (note that this pairing of measurements is arbitrary and not relevant for the test):</p>
+<pre class="r"><code>df &lt;- cbind(InsectSprays, ID = 1:12)
+library(reshape2)
+df &lt;- dcast(df, ID ~ spray, value.var = &quot;count&quot;)
+df &lt;- df[,-1] # remove ID column
+print(df)</code></pre>
+<pre><code>##     A  B C  D E  F
+## 1  10 11 0  3 3 11
+## 2   7 17 1  5 5  9
+## 3  20 21 7 12 3 15
+## 4  14 11 2  6 5 22
+## 5  14 16 3  4 3 15
+## 6  12 14 1  3 6 16
+## 7  10 17 2  5 1 13
+## 8  23 17 1  5 1 10
+## 9  17 19 3  5 3 26
+## 10 20 21 0  5 2 26
+## 11 14  7 1  2 6 24
+## 12 13 13 4  4 4 13</code></pre>
+<p>The entries of <code>df</code> constitute a matrix <span class="math inline">\(X \in \mathbb{N}^{n \times p}\)</span> with <span class="math inline">\(n\)</span> rows and <span class="math inline">\(p\)</span> columns (groups). The observation in row <span class="math inline">\(i\)</span> and column <span class="math inline">\(j\)</span> is denoted by <span class="math inline">\(x_{ij}\)</span>. The measurements for group <span class="math inline">\(i\)</span> are indicated by <span class="math inline">\(X_i\)</span>, where <span class="math inline">\(\overline{X}_i\)</span> indicates the mean of the measurements for group <span class="math inline">\(i\)</span> and <span class="math inline">\(\overline{X}\)</span> indicates the overall mean. Let <span class="math inline">\(n_j\)</span> indicate the number of measurements for group <span class="math inline">\(j \in \{1, \ldots, p\}\)</span>. Note that the sample sizes do not have to be same
+across groups for one-way ANOVA. This would only be a problem for factorial ANOVA (ANOVA with at least two independent variables) due to confounding.</p>
+</div>
+<div id="computing-the-anova-test-statistic" class="section level2">
+<h2>Computing the ANOVA test statistic</h2>
+<p>The ANOVA test statistic is based on the between-group and the within-group mean-squared value.</p>
+<div id="between-group-mean-squared-value" class="section level4">
+<h4>Between-group mean-squared value</h4>
+<p>The sum of squared differences between the groups is:</p>
+<p><span class="math display">\[SS_B = \sum_{j = 1}^p n_j(\overline{X}_j - \overline{X})\]</span></p>
+<p>The value of <span class="math inline">\(SS_B\)</span> indicates how much the group means deviate from the overall mean. To obtain the between-group mean-squared value, we divide by the between-group degrees of freedom, <span class="math inline">\(p-1\)</span>:</p>
+<p><span class="math display">\[MS_B = \frac{SS_B}{p-1}\]</span></p>
+</div>
+<div id="within-group-mean-squared-value" class="section level4">
+<h4>Within-group mean-squared value</h4>
+<p>The within-group sum of squares is defined as</p>
+<p><span class="math display">\[SS_W = \sum_{j = 1}^p \sum_{i = 1}^{n_j} (x_{ij} - \overline{X}_j)^2\,.\]</span></p>
+<p>The value of <span class="math inline">\(SS_W\)</span> can be understood as the squared sum of the column entries after centering them using <span class="math inline">\(\overline{X}_j\)</span>. Its value indicates the variance of measurements within the groups. The within-group mean-squared value is obtained by dividing <span class="math inline">\(SS_W\)</span> by the within-group degrees of freedom, <span class="math inline">\(\sum_{j=1}^p n_j - 1\)</span>:</p>
+<p><span class="math display">\[MS_W = \frac{SS_W}{\sum_{j=1}^p n_j - 1}\]</span></p>
+</div>
+<div id="the-f-statistic" class="section level4">
+<h4>The F-statistic</h4>
+<p>The F-statistic is the test statistic of the ANOVA test. It is defined as the ratio of the between-group and the within-group mean squared value:</p>
+<p><span class="math display">\[F = \frac{MS_B}{MS_{W}}\]</span></p>
+<p>The null hypothesis (groups have equal means) can be rejected if <span class="math inline">\(F\)</span> is sufficiently large. In this case, <span class="math inline">\(MS_B\)</span> is considerably larger than <span class="math inline">\(MS_W\)</span>. In this case, there are large differences between the means of the groups at a low variance within the groups.</p>
+</div>
+</div>
+<div id="performing-the-anova-test-in-r" class="section level2">
+<h2>Performing the ANOVA test in R</h2>
+<p>Before performing an ANOVA test, one should first confirm whether group variances are homogeneous. After running the test, it should be confirmed that the test residuals are normal.</p>
+<div id="checking-for-homogeneous-variance" class="section level3">
+<h3>Checking for homogeneous variance</h3>
+<p>To verify whether the variances are homogeneous across groups, we’ll generate a box plot of the insect counts:</p>
+<pre class="r"><code>data(InsectSprays)
+library(ggplot2)
+ggplot(InsectSprays, aes(x = spray, y = count)) + geom_boxplot() +
+        xlab(&quot;Insect spray&quot;) + ylab(&quot;Insect count&quot;)</code></pre>
+<p><img src="/post/statistical_test/anova_one_way_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>What we find is that sprays A, B, and F outperform sprays C, D, and E. Moreover the counts for A, B, and F have much higher variance than for the other sprays (the measurements are heteroscedastic). Thus, we will use the square-root transformation on the insect counts, which is a suitable variance-stabilizing transformation for count data. You can see the effect of the transformation here:</p>
+<pre class="r"><code>ggplot(InsectSprays, aes(x = spray, y = sqrt(count))) + geom_boxplot() +
+        xlab(&quot;Insect spray&quot;) + ylab(&quot;Squared insect count&quot;)</code></pre>
+<p><img src="/post/statistical_test/anova_one_way_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="running-the-anova-test" class="section level3">
+<h3>Running the ANOVA test</h3>
+<p>We can create the ANOVA model using the <code>aov</code> function by specifying a formula that indicates the variables and a corresponding data set:</p>
+<pre class="r"><code># use sqrt to stabilize variance
+spray.model &lt;- aov(sqrt(count) ~ spray, data = InsectSprays)</code></pre>
+</div>
+<div id="verifying-whether-residuals-are-normal" class="section level3">
+<h3>Verifying whether residuals are normal</h3>
+<p>Based on <code>spray.model</code>, we can use the <code>plot</code> function to verify whether the residuals are normally distributed:</p>
+<pre class="r"><code># check whether residuals are normally distributed:
+plot(spray.model, which = 2)</code></pre>
+<p><img src="/post/statistical_test/anova_one_way_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>The linear trend in the measurements indicate that the residuals are normally distributed, so we can continue with retrieving the test results:</p>
+<pre class="r"><code>summary(spray.model)</code></pre>
+<pre><code>##             Df Sum Sq Mean Sq F value Pr(&gt;F)    
+## spray        5  88.44  17.688    44.8 &lt;2e-16 ***
+## Residuals   66  26.06   0.395                   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The low p-value indicates that there is a significant different in the means of insect counts for different insect sprays.</p>
+</div>
+</div>
+<div id="non-parametric-testing-with-the-kruskal-wallis-test" class="section level2">
+<h2>Non-parametric testing with the Kruskal-Wallis test</h2>
+<p>If the assumptions of the ANOVA test do not hold, one can use a non-parametric ANOVA test, the Kruskal-Wallis test. In contrast to the parametric version of the test, Kruskal-Wallis test compares the medians of the groups rather than the means. Since the test is an extension of the Wilcoxon rank-sum test, their test statistics are computed in a similar manner. After ranking all
+observations, the test statistic can be obtained as:</p>
+<p><span class="math display">\[H = (n − 1) \frac{\sum_{j = 1}^{p} n_j (\overline{r}_j - \overline{r})^2}
+                {\sum_{j = 1}^p \sum_{i = 1}^{n_j} (r_{ij} − \overline{r})^2}\]</span></p>
+<p>Here, <span class="math inline">\(\overline{r}_j = \frac{1}{n_j} \sum_{i = 1}^{n_j} r_{ij}\)</span> is the average rank of all observations in group <span class="math inline">\(j\)</span>, <span class="math inline">\(r_ij\)</span> is the rank of the <span class="math inline">\(i\)</span>-th measurement in group <span class="math inline">\(j\)</span>, and <span class="math inline">\(\overline{r}\)</span> is the average of all <span class="math inline">\(r_{ij}\)</span>. The interpretation of the test statistic is similar as for the parametric ANOVA: the enumerator indicates the between-group variance of ranks, which corresponds to the within-group sum of squared differences.</p>
+<div id="applying-the-kruskal-wallis-test-in-r" class="section level3">
+<h3>Applying the Kruskal-Wallis test in R</h3>
+<p>The Kruskal-Wallis test can be applied in the following way:</p>
+<pre class="r"><code>k.result &lt;- kruskal.test(InsectSprays$count, InsectSprays$spray)
+print(k.result)</code></pre>
+<pre><code>## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  InsectSprays$count and InsectSprays$spray
+## Kruskal-Wallis chi-squared = 54.691, df = 5, p-value = 1.511e-10</code></pre>
+<p>Again, the p-value indicates significance at a significance level of 5%. This time, however, the test result indicates that there is a difference in the median insect count across the groups rather than their means.</p>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>ANOVA is used to compare the mean/median of measurements across several groups. If you fulfill the assumptions of the parametric test, you can use the one-way ANOVA. Otherwise, you should use the non-parametric version of ANOVA, the Kruskal-Wallis test.</p>
+</div>
