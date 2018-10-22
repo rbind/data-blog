@@ -62,7 +62,7 @@ Investigating the results, we can see that some distributions seem to approach t
 print(result)
 ```
 
-According to positive log likelihoods, the beta distribution yields normally distributed means already at a sample size of 5. Normal, chi-squared, and Poisson distributions yield normally distributed means at sample sizes of 20, 50, and 100, respectively. Finally, the means of Student's distribution never become normal since the distribution with one degree of freedom has infinite kurtosis such that the central limit theorem does not hold.
+According to positive log likelihoods, the beta distribution yields normally distributed means already at a sample size of 5. Normal, chi-squared, and Poisson distributions yield normally distributed means at sample sizes of 20, 50, and 100, respectively. Finally, the means of Student's distribution never become normal since the distribution with one degree of freedom has infinite kurtosis (very heavy tails) such that the central limit theorem does not hold.
 
 ## Verifying the log-likelihood criterion
 

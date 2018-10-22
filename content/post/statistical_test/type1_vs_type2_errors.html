@@ -1,0 +1,143 @@
+---
+title: "Type 1 vs type 2 errors: significance vs power"
+author: Matthias Döring
+date: '2018-10-22'
+thumbnail: "post/statistical_test/type1_vs_type2_cover.png"
+categories:
+  - statistical test
+tags:
+  - type 1 error
+  - type 2 error
+  - null hypothesis
+  - power
+---
+
+
+
+<p>When planning statistical tests, it is important to think about the consequenes of type 1 and type 2 errors. Typically, type 1 errors are considered to be the worse type of error. While the rate of type 1 errors is limited by the significance level, the rate of type 2 errors depends on the statistical power of the test. Here, we discuss how the null hypothesis should be chosen and how the two types of errors are related.
+<!--more--></p>
+<div id="type-1-vs-type-2-error" class="section level2">
+<h2>Type 1 vs type 2 error</h2>
+<p>Type 1 and type 2 errors are defined in the following way for a null hypothesis <span class="math inline">\(H_0\)</span>:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Decision/Truth</th>
+<th><span class="math inline">\(H_0\)</span> true</th>
+<th><span class="math inline">\(H_0\)</span> false</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(H_0\)</span> rejected</td>
+<td>Type 1 error (<span class="math inline">\(\alpha\)</span>)</td>
+<td>Correctly rejected (Power, <span class="math inline">\(1-\beta\)</span>)</td>
+</tr>
+<tr class="even">
+<td>Failed to reject <span class="math inline">\(H_0\)</span></td>
+<td>Correctly not rejected</td>
+<td>Type 2 error (<span class="math inline">\(\beta\)</span>)</td>
+</tr>
+</tbody>
+</table>
+<p>Type 1 and type 2 error rates are denoted by <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span>, respectively. The power of a statistical test is defined by <span class="math inline">\(1 - \beta\)</span>. These rates depend on several factors:</p>
+<ul>
+<li><strong>Effect size:</strong> error rates are smaller for larger effect sizes</li>
+<li><strong>Sample size:</strong> tests need to be sufficiently powered to be able to correctly reject the null hypothesis</li>
+<li><strong>Significance level:</strong> power decreases with increasing stringency of significance levels</li>
+</ul>
+<p>Traditionally, the type 1 error rate is limited using a significance level of 5%. Experiments are often designed for a power of 80%.</p>
+</div>
+<div id="choice-of-the-null-hypothesis" class="section level2">
+<h2>Choice of the null hypothesis</h2>
+<p>Since the type 1 error rate is typically more stringently controlled than the type 2 error rate (i.e. <span class="math inline">\(\alpha &lt; \beta\)</span>), the alternative hypothesis often corresponds to the effect you would like to demonstrate. In this way, if the null hypothesis is rejected, it is unlikely that the rejection is a type 1 error. When statistical testing is used to inform decision making, the null hypothesis whose type 1 error would have the worse consequence should be selected. Let’s consider two examples for choosing the null hypothesis in this manner.</p>
+<div id="example-1-introduction-of-a-new-drug" class="section level3">
+<h3>Example 1: introduction of a new drug</h3>
+<p>Let’s assume there’s a well-tried, FDA-approved drug that is effective against cancer. Having developed a new drug, your company wants to decide whether it should supplant the old drug with the new drug. Here, you definitely want to use a directional test in order to show that one drug is superior over the other. However, given effectivity measures A and B for the old and the new drug, respectively, how should the null hypothesis be formulated? Take a look at the consequences of the
+choice:</p>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="12%" />
+<col width="78%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Null hypothesis</th>
+<th>Type 1 error</th>
+<th>Impact of type 1 error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(A \geq B\)</span></td>
+<td>Incorrectly reject <span class="math inline">\(A \geq B\)</span></td>
+<td>You falsely conclude that drug B is superior to drug A. Thus, you introduce B to the market, thereby risking the life of patients where B was favored over A.</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(A \leq B\)</span></td>
+<td>Incorrectly reject <span class="math inline">\(A \leq B\)</span></td>
+<td>You falsely conclude that drug A is superior to drug B. Thus, albeit actually superior to A, B is never released and resources have been wasted.</td>
+</tr>
+</tbody>
+</table>
+<p>Evidently, having <span class="math inline">\(H_0: A \geq B\)</span> is the more appropriate null hypothesis because its type 1 error is more detrimental (lives are endangered) than that of the other null hypothesis (patients do not receive access to a better drug).</p>
+</div>
+<div id="example-2-change-in-taxation" class="section level3">
+<h3>Example 2: change in taxation</h3>
+<p>The government thinks about simplifying the taxation system. Let A be the amount of tax income with the old, complicated system and let B be the income with the new, simplified system.</p>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="12%" />
+<col width="78%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Null hypothesis</th>
+<th>Type 1 error</th>
+<th>Impact of type 1 error</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(A \geq B\)</span></td>
+<td>Incorrectly reject <span class="math inline">\(A \geq B\)</span></td>
+<td>Incorrectly conclude that the new system leads to greater income. So, after changing to the simplified taxation system, you realize that you actually acquire fewer taxes.</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(A \leq B\)</span></td>
+<td>Incorrectly reject <span class="math inline">\(A \leq B\)</span></td>
+<td>Incorrectly conclude that the old system was better. You don’t introduce the simplified approach and miss out on additional taxation income.</td>
+</tr>
+</tbody>
+</table>
+<p>In this case, assuming that the new system leads to less income from taxation, that is, <span class="math inline">\(H_0: A \geq B\)</span> is clearly the better option (if you are optimizing with regard to tax income). In this case, a type 1 error means that the taxation system doesn’t have to be changed. Using the other null hypothesis, a type 1 error would mean that the system would have to be changed (this is costly!) and that the state would receive fewer income from taxes.</p>
+<p>The two examples suggest the following motto for significance testing: <em>Never change a running system</em>. When comparing a new system with a well-tried system, always set the null hypothesis to the assumption that the new system is worse than the old one. Then, if the null hypothesis is rejected, we can be quite sure that it’s worth to replace the old system with the new one because a type 1 error is unlikely.</p>
+</div>
+</div>
+<div id="how-to-select-the-significance-level" class="section level2">
+<h2>How to select the significance level?</h2>
+<p>Typically the significance level is set to 5%. If you are thinking about lowering the significance level, you should make sure that the test you are about to perform has sufficient statistical power. Particularly for small sample sizes, lowering the significance level can critically increase the type 2 error.</p>
+<p>Assume we want to use a t-test on the null hypothesis that drug B has less or equal mean effectivity than drug A. Then we can use the <code>power.t.test</code> function from the <code>pwr</code> package. Assume that drug B exhibits a mean increase in effectivity larger than 0.5 (<code>delta</code> parameter) and that the standard deviation of the measurements is 1. Since we really want to avoid type 1 errors here, we require a low significance level of 1% (<code>sig.level</code> parameter). Let’s see how power changes with the sample size:</p>
+<pre class="r"><code>library(pwr)
+sample.size &lt;- c(10,20,30, 40, 50, 75, 100, 125, 150, 175, 200)
+power &lt;- rep(NA, length(sample.size))
+for (i in seq_along(sample.size)) {
+    n &lt;- sample.size[i]
+    t &lt;- power.t.test(n = n, delta = 0.5, sd = 1, 
+                      sig.level = 0.01, alternative = &quot;one.sided&quot;)
+    power[i] &lt;- t$power
+}
+power.df &lt;- data.frame(&quot;N&quot; = sample.size, &quot;Power&quot; = power)
+library(ggplot2)
+ggplot(power.df, aes(x = N, y = Power)) + geom_point() + geom_line()</code></pre>
+<p><img src="/post/statistical_test/type1_vs_type2_errors_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>What do the results mean? For only 50 measurements per group and a 1% significance level, the power would merely be 55.5%. So, if B were actually better than A, we would fail to reject the null hypothesis in 44.5% of cases. This type 2 error rate is way too high and thus a significance level of 1% should not be selected. On the other hand, with 150 samples per group we wouldn’t have any problems because we would have a type 2 error rate of 2.4% at the 1% significance level.</p>
+<p>So, what should we do if the sample size is only 50 per group? In this case, we would be inclined to use a less stringent significance level. How lenient should it be? We can find out by requiring a power of 80%:</p>
+<pre class="r"><code>t &lt;- power.t.test(n = 50, delta = 0.5, sd = 1, power = 0.8, 
+                  sig.level = NULL, alternative = &quot;one.sided&quot;)
+print(t$sig.level)</code></pre>
+<pre><code>## [1] 0.05038546</code></pre>
+<p>Thus, for 50 samples per group, adequate power would be obtained if the significance level is set to 5%.</p>
+</div>
