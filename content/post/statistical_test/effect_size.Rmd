@@ -91,7 +91,7 @@ print(chi.result.S$p.value)
 In this case, the p-value is even smaller than for the previous data set although the difference between the two groups has been reduced from 4% to 1%. 
 
 ### Discussion
-How can these results be explained? We have to remember that the p-value indicates how likely it is to obtain a test result that is at least as extreme by chance. Since chance is reduced with greater sample sizes, it becomes easier to show differences between groups (i.e. the statistical power increases). Therefore, at large sample sizes, even small effects can become significant, while for small sample sizes, even large effects may not be significant.
+How can these results be explained? We have to remember that the p-value indicates how likely it is to obtain a test result that is at least as extreme by chance. Since chance is reduced with greater sample sizes, it becomes easier to show differences between groups (i.e. the [statistical power](/post/statistical_test/type1_vs_type2_errors/)) increases). Therefore, at large sample sizes, even small effects can become significant, while for small sample sizes, even large effects may not be significant.
 
 ## Determining the effect size with Cramer's V
 

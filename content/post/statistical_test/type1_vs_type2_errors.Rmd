@@ -23,13 +23,19 @@ Type 1 and type 2 errors are defined in the following way for a null hypothesis 
 | $H_0$ rejected         | Type 1 error ($\alpha$) | Correctly rejected (Power, $1-\beta$) |
 | Failed to reject $H_0$ | Correctly not rejected           | Type 2 error ($\beta$)|
 
-Type 1 and type 2 error rates are denoted by $\alpha$ and $\beta$, respectively. The power of a statistical test is defined by $1 - \beta$. These rates depend on several factors:
+Type 1 and type 2 error rates are denoted by $\alpha$ and $\beta$, respectively. The power of a statistical test is defined by $1 - \beta$. In summary:
 
-* **Effect size:** error rates are smaller for larger effect sizes
-* **Sample size:** tests need to be sufficiently powered to be able to correctly reject the null hypothesis
-* **Significance level:** power decreases with increasing stringency of significance levels
+* The significance level answers the following question: If there is no effect, what is the likelihood of falsely detecting an effect? Thus, significance is a measure of specificity.
+* The power answers the following question: If there is an effect, what is the likelihood of detecting it? Thus, power is a measure of sensitivity.
 
-Traditionally, the type 1 error rate is limited using a significance level of 5%. Experiments are often designed for a power of 80%. 
+The power of a test depends on the following factors:
+
+* **Effect size:** power increases with increasing effect sizes
+* **Sample size:** power increases with increasing number of samples
+* **Significance level:** power increases with increasing significance levels
+* **The test itself:** some tests have greater power than others for a given data set
+
+Traditionally, the type 1 error rate is limited using a significance level of 5%. Experiments are often designed for a power of 80% using power analysis. Note that it depends on the test whether it's possible to determine the statistical power. For example, power is determined more readily available for parametric than for non-parametric tests.
 
 ## Choice of the null hypothesis
 

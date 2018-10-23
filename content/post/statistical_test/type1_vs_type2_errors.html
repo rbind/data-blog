@@ -40,13 +40,19 @@ tags:
 </tr>
 </tbody>
 </table>
-<p>Type 1 and type 2 error rates are denoted by <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span>, respectively. The power of a statistical test is defined by <span class="math inline">\(1 - \beta\)</span>. These rates depend on several factors:</p>
+<p>Type 1 and type 2 error rates are denoted by <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span>, respectively. The power of a statistical test is defined by <span class="math inline">\(1 - \beta\)</span>. In summary:</p>
 <ul>
-<li><strong>Effect size:</strong> error rates are smaller for larger effect sizes</li>
-<li><strong>Sample size:</strong> tests need to be sufficiently powered to be able to correctly reject the null hypothesis</li>
-<li><strong>Significance level:</strong> power decreases with increasing stringency of significance levels</li>
+<li>The significance level answers the following question: If there is no effect, what is the likelihood of falsely detecting an effect? Thus, significance is a measure of specificity.</li>
+<li>The power answers the following question: If there is an effect, what is the likelihood of detecting it? Thus, power is a measure of sensitivity.</li>
 </ul>
-<p>Traditionally, the type 1 error rate is limited using a significance level of 5%. Experiments are often designed for a power of 80%.</p>
+<p>The power of a test depends on the following factors:</p>
+<ul>
+<li><strong>Effect size:</strong> power increases with increasing effect sizes</li>
+<li><strong>Sample size:</strong> power increases with increasing number of samples</li>
+<li><strong>Significance level:</strong> power increases with increasing significance levels</li>
+<li><strong>The test itself:</strong> some tests have greater power than others for a given data set</li>
+</ul>
+<p>Traditionally, the type 1 error rate is limited using a significance level of 5%. Experiments are often designed for a power of 80% using power analysis. Note that it depends on the test whether it’s possible to determine the statistical power. For example, power is determined more readily available for parametric than for non-parametric tests.</p>
 </div>
 <div id="choice-of-the-null-hypothesis" class="section level2">
 <h2>Choice of the null hypothesis</h2>
