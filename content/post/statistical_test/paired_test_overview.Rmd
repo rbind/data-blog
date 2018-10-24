@@ -1,0 +1,20 @@
+---
+title: "Significance tests for paired measurements - an overview"
+author: Matthias Döring
+date: '2018-10-24'
+categories:
+  - statistical test
+tags:
+  - paired test
+  - overview
+---
+
+Which tests are available if there are paired measurements of the dependent variable for two groups? You can find an overview of significance tests for paired measurements here:
+<!--more-->
+
+| Type of dependent variable   | Tests
+|---------------------|------------------|
+| [Quantitative](/post/statistical_test/signed_wilcox_rank_test/) | Paired t-test, Wilcoxon signed rank test |
+| [Categorical](/post/statistical_test/mcnemars_test/)         | McNemar's test      |
+
+Click on a variable type in the table to obtain more information on how to use the corresponding significance tests in R.

@@ -1,0 +1,51 @@
+---
+title: "Comparing Multiple Variables Across Groups: MANOVA"
+author: Matthias Döring
+date: '2018-10-23'
+draft: true
+categories:
+  - statistical test
+tags:
+  - MANOVA
+---
+Analysis of variance (ANOVA) can be used to compare a single dependent variable across several groups. If there is more than one dependent variable, multivariate ANOVA (MANOVA) should be used. MANOVA determines whether there is a significant difference in the multivariate sample means.
+<!--more-->
+
+## Why use MANOVA?
+
+Since MANOVA is an extension of ANOVA you may argue that you could also use multiple ANOVA tests instead. However, in the same way that it is better to use ANOVA rather than multiple t-tests, it is better to use MANOVA over multiple ANOVA tests for the following reason. If you are conducting a series of $k$ tests at a significance level $\alpha = 0.05$, then the type 1 error rate can be as high as $1 - (1 - .05)^k$ due to multiple testing. 
+
+Only once the MANOVA test has returned a significant result should ANOVA be used to identify for which dependent variables there is an effect.
+
+## The *iris* data set
+
+The *iris* data set has the following structure:
+
+```{r}
+print(iris[sample(seq_len(nrow(iris)), 10), ])
+```
+
+*Species* is the independent nominal variabe indicating three [iris](https://en.wikipedia.org/wiki/Iris_(plant)) species. There are four dependent, quantitative variables measuring properties of [sepals](https://en.wikipedia.org/wiki/Sepal) and petals:
+
+* *Sepal.length*: the sepal length
+* *Sepal.width*: the sepal width
+* *Petal.length*: the petal length
+* *Petal.width*: the petal width
+
+## Using MANOVA in R
+
+The interface to R's manova function is special in that it requires that the left side of the formula specifying the independent variables to be a data frame. Thus, to enter the variables to consider in the model, you should use `cbind`. For the *iris* data set, this is done in the following way:
+
+```{r}
+data(iris)
+m <- manova(cbind(Sepal.Length,Sepal.Width,Petal.Length,Petal.Width) ~ Species, iris)
+print(summary(m))
+```
+
+The results suggest that there is a significant difference in the means. 
+
+<!--
+## Investigating significance per dependent variable
+
+To investigate the significance for individual dependent variables, we can use the `summary.aov` function. 
+manova is a type of glm-->
