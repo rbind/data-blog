@@ -11,7 +11,7 @@ tags:
   - SEO
 ---
 
-Taxonomies in Hugo are a great way to structure information provided by a blog. For search engine optimization (SEO) purposes, however, the existence of duplicate content on a site can be a problem. Therefore, I'd recommend setting the *noindex* meta tag for all of the taxonomy sites that do not provide unique content. This post shows you how to get it done. 
+Taxonomies in Hugo are a great way to structure information provided by a blog. For search engine optimization (SEO) purposes, however, the existence of duplicate content on a site can be a problem. If you think this is the case for your site, then you can use the *noindex* meta tag for all of the taxonomy sites that do not provide unique content. This post shows you how to get it done. 
 <!--more-->
 
 ## Adjust your theme's *baseof.html* file
@@ -30,4 +30,10 @@ This should instruct all indexers not to index the taxonomy pages. To make sure 
 
 According to the [taxonomy variable documentation](https://gohugo.io/variables/taxonomy/#example-usage-of-site-taxonomies), there are some special variables that are only available for taxomy pages. I've just picked one of the taxonomy variables (i.e. *.Data.Singular*) but I could also have used any of the other taxonomy variables (e.g. *.Data.Terms*). By requiring the existence of these variables, the *noindex* tag is only set for the taxonomy pages.
 
-I hope this solution also works for you! Enjoy!
+## Keeping *noindex* and the sitemap concordant
+
+If you are setting a site to *noindex* it also makes sense to remove it from the sitemap. To do this, you can customize the [default Hugo template](https://gohugo.io/templates/sitemap-template/) template by including the same if-condition as for the *noindex* tag.
+
+## Is *noindex* really the way to go?
+
+While *noindex* is [viable in some situations](https://www.searchenginejournal.com/noindex-category-other-listing-pages/255811/), I'm currently not using *noindex* for the taxonmy pages on this blog because they are [attracting a lot of search traffic](https://yoast.com/ask-yoast-noindexing-tags-categories-foodblog/). You should think about the taxonomy pages as landing pages to your blog. So, it makes sense to improve upon the most important taxonomy pages rather than blocking them.

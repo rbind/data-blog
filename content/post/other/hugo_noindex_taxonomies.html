@@ -13,7 +13,7 @@ tags:
 
 
 
-<p>Taxonomies in Hugo are a great way to structure information provided by a blog. For search engine optimization (SEO) purposes, however, the existence of duplicate content on a site can be a problem. Therefore, I’d recommend setting the <em>noindex</em> meta tag for all of the taxonomy sites that do not provide unique content. This post shows you how to get it done.
+<p>Taxonomies in Hugo are a great way to structure information provided by a blog. For search engine optimization (SEO) purposes, however, the existence of duplicate content on a site can be a problem. If you think this is the case for your site, then you can use the <em>noindex</em> meta tag for all of the taxonomy sites that do not provide unique content. This post shows you how to get it done.
 <!--more--></p>
 <div id="adjust-your-themes-baseof.html-file" class="section level2">
 <h2>Adjust your theme’s <em>baseof.html</em> file</h2>
@@ -26,5 +26,12 @@ tags:
 <div id="why-does-it-work" class="section level2">
 <h2>Why does it work?</h2>
 <p>According to the <a href="https://gohugo.io/variables/taxonomy/#example-usage-of-site-taxonomies">taxonomy variable documentation</a>, there are some special variables that are only available for taxomy pages. I’ve just picked one of the taxonomy variables (i.e. <em>.Data.Singular</em>) but I could also have used any of the other taxonomy variables (e.g. <em>.Data.Terms</em>). By requiring the existence of these variables, the <em>noindex</em> tag is only set for the taxonomy pages.</p>
-<p>I hope this solution also works for you! Enjoy!</p>
+</div>
+<div id="keeping-noindex-and-the-sitemap-concordant" class="section level2">
+<h2>Keeping <em>noindex</em> and the sitemap concordant</h2>
+<p>If you are setting a site to <em>noindex</em> it also makes sense to remove it from the sitemap. To do this, you can customize the <a href="https://gohugo.io/templates/sitemap-template/">default Hugo template</a> template by including the same if-condition as for the <em>noindex</em> tag.</p>
+</div>
+<div id="is-noindex-really-the-way-to-go" class="section level2">
+<h2>Is <em>noindex</em> really the way to go?</h2>
+<p>While <em>noindex</em> is <a href="https://www.searchenginejournal.com/noindex-category-other-listing-pages/255811/">viable in some situations</a>, I’m currently not using <em>noindex</em> for the taxonmy pages on this blog because they are <a href="https://yoast.com/ask-yoast-noindexing-tags-categories-foodblog/">attracting a lot of search traffic</a>. You should think about the taxonomy pages as landing pages to your blog. So, it makes sense to improve upon the most important taxonomy pages rather than blocking them.</p>
 </div>

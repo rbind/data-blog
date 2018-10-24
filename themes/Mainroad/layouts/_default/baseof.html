@@ -6,9 +6,6 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>{{ block "title" . }}{{ .Title }}{{ end }}</title>
 	<meta name="description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{else}}{{ .Params.Description }}{{end}}">
-    {{ if .Data.Singular }}
-    <meta name="robots" content="noindex">
-    {{ end }}
     {{ if .Params.no_index }}
     <meta name="robots" content="noindex">
     {{ end }}
