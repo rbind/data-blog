@@ -16,7 +16,7 @@ To find an appropriate statistical test, the structure of the data should be con
 
 * How many dependent/independent variables are there?
 * What are the types of the variables?
-* Are the measurements in some way associated (e.g. [paired](/post/statistical_test/paired_test_overview/))?
+* Are the measurements in some way associated (i.e. [matched](/tags/matched-data/))?
 
 ## What is there besides significance?
 
