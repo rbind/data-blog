@@ -9,10 +9,9 @@ tags:
   - Wilcoxon
   - non-parametric test
   - parametric test
-  - statistical test
   - box plot
   - one-tailed
-  - paired test
+  - matched data
   - Q-Q plot
 ---
 In this post, we will explore tests for comparing two groups of dependent (i.e.\ paired) quantitative data: the Wilcoxon signed rank test and the paired Student's t-test. The critical difference between these tests is that the test from Wilcoxon is a non-parametric test, while the t-test is a parametric test. In the following, we will explore the ramifications of this difference.

@@ -8,7 +8,6 @@ categories:
 tags:
   - Chi-squared test
   - Fisher's exact test
-  - statistical test
   - unpaired test
   - multiple testing
   - non-parametric test

@@ -6,7 +6,7 @@ thumbnail: "post/statistical_test/paired_vs_unpaired_tests_cover.png"
 categories:
   - statistical test
 tags:
-  - paired test
+  - matched data
   - unpaired test 
   - Wilcoxon rank-sum test
   - Wilcoxon signed rank test

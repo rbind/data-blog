@@ -1,0 +1,28 @@
+---
+title: "Handling matched data"
+thumbnail: "tags/statistical-test/matched-data/black-and-white-connect-hand-164531.jpg"
+---
+<img src="black-and-white-connect-hand-164531.jpg">
+
+In contrast to independent measurements, matched data consist of measurements that should be considered together. For example, matching can be used in clinical studies. Here, patients that exhibit similar characteristics are paired in order to remove confounding effects. Matched data can also arise naturally when multiple measurements are performed on the same entity. For example, matched data can arise when a clinical marker is measured once before and once after a
+treatment intervention. Irrespective of how the matched data were generated, their structure should be taken into account through the use of appropriate statistical tests.
+<!--more-->
+
+## Paired data
+
+The most common type of matched data are paired measurements, which consist of two data points. For this type of data, the following significance tests are available:
+
+| Type of dependent variable   | Tests
+|---------------------|------------------|
+| [Quantitative](/post/statistical_test/signed_wilcox_rank_test/) | Paired t-test, Wilcoxon signed rank test |
+| [Categorical](/post/statistical_test/mcnemars_test/)         | McNemar's test      |
+
+Click on a variable type in the table to obtain more information on how to use the corresponding significance tests in R.
+
+## Repeated-measures data
+
+If you have more than two matched measurements, then you are dealing with repeated-measures data. An example of a significance test that handles such data is [repeated-measures one-way ANOVA](https://www.graphpad.com/guides/prism/7/statistics/index.htm?stat_checklist_1wayanova_rm.htm).
+
+## Posts that deal with matched data
+
+In the following posts, you can find more specific information on how you can handle matched data.
