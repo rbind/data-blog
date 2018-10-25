@@ -7,7 +7,6 @@ categories:
   - statistical test
 tags:
   - matched data
-  - unpaired test 
   - Wilcoxon test
 ---
 
