@@ -6,11 +6,10 @@ thumbnail: "post/statistical_test/signed_wilcox_rank_test_cover.png"
 categories:
   - statistical test
 tags:
-  - Wilcoxon
+  - Wilcoxon test
   - non-parametric test
   - parametric test
   - box plot
-  - one-tailed
   - matched data
   - Q-Q plot
 ---
