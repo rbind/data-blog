@@ -5,7 +5,9 @@
 	{{- end }}
 	{{- with .Site.Author.avatar }}
 	<figure class="authorbox__avatar">
+        <a href="{{ $.Site.Author.url }}">
 		<img alt="{{ $.Site.Author.name }} avatar" src="{{ $.Site.Author.avatar | relURL }}" class="avatar" height="90" width="90">
+        </a>
 	</figure>
 	{{- end }}
 	{{- with .Site.Author.name }}

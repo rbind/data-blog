@@ -12,6 +12,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   name = "Matthias Döring"
   bio = "I've obtained a BSc and MSc in Bioinformatics from Saarland University. Currently, I am pursuing a PhD at the Max Planck Institute for Informatics where I'm researching computational methods for improving treatment and prevention of viral infections."
   avatar = "img/matthias_doering.jpg"
+  url = "https://matthias-doering.netlify.com/"
 
 [Params]
   subtitle = "Understand. Implement. Succeed." # Subtitle of your site
@@ -59,7 +60,15 @@ rssLimit = 20 # max nbr of entries shown in rss feed
     weight = 99
 
     [[menu.main]]
+    name = "Contribute!"
+    identifier = "contribute"
+    url = "/contribute-to-datascienceblog/"
+    weight = 102
+
+    [[menu.main]]
     name = "RSS Feed"
     identifier = "RSS"
     url = "/post/index.xml"
     weight = 101
+
+
