@@ -12,6 +12,7 @@ disable_comments: false
 
 * [The Stats Geek](http://thestatsgeek.com/): a blog on statistics
 * [Cross Validated](https://stats.stackexchange.com): probably the largest forum for discussing anything related to statistics and machine learning
+* [Data Camp](https://www.datacamp.com): a great resource for training in data science
 
 
 ## R

@@ -1,0 +1,85 @@
+---
+title: "Mean vs Median: When to Use Which Measure?"
+author: Matthias Döring
+thumbnail: "/post/basic-statistics/mean_vs_median_avatar.jpg"
+date: '2018-10-26'
+categories:
+  - basic-statistics
+tags:
+- average
+---
+
+
+
+<p>Two of the most commonly used statistical measures are the mean and the median. Both measures indicate the central value of a distribution, that is, the value at which one would expect the majority of data points to lie. In many applications, however, it is useful to think about which of the two measures is more appropriate given the data at hand. In this post, we’ll investigate the differences between both quantities and give recommendations when one should be
+preferred over the other.
+<!--more--></p>
+<div id="the-mean" class="section level2">
+<h2>The mean</h2>
+<p>The arithmetic mean is what most people simply know as <em>the average</em>. To be exact, however, we have to note that the mean is just one type of average. Before getting lost in the intricacies of these terms, let’s move on to the definition of the mean</p>
+<p>Given a vector <span class="math inline">\(x\)</span> with <span class="math inline">\(n\)</span> entries, the mean is defined as</p>
+<p><span class="math display">\[\overline{x} = \frac{1}{n} \sum_{i = 1}^n x_i\]</span></p>
+<p>Assume we have <span class="math inline">\(x = (30, 25, 40, 41, 30, 41, 50, 33, 40, 1000)\)</span>, what would be the mean? We can compute it in the following ways:</p>
+<pre class="r"><code>x &lt;- c(30, 25, 40, 41, 30, 41, 50, 33, 40, 1000)
+# the way of the beginner (don&#39;t do this!):
+x.mean &lt;- 0
+for (xi in x) {
+    x.mean &lt;- x.mean + xi
+}
+x.mean &lt;- x.mean / length(x)
+print(x.mean)</code></pre>
+<pre><code>## [1] 133</code></pre>
+<pre class="r"><code># a better way:  
+x.mean &lt;- sum(x) / length(x)
+print(x.mean)</code></pre>
+<pre><code>## [1] 133</code></pre>
+<pre class="r"><code># the right way:
+x.mean &lt;- mean(x)
+print(x.mean)</code></pre>
+<pre><code>## [1] 133</code></pre>
+<p>As you can see, you can simply use the <code>mean</code> function rather than having to implement the mean by yourself.</p>
+</div>
+<div id="the-median" class="section level2">
+<h2>The median</h2>
+<p>The median refers to the most central value in a list of numbers. While simple to explain, the median is harder to compute than the mean. This is because in order to find the median, it is necessary to sort the numbers in the list. Moreover, we have to differentiate two cases. If the list has an odd number of elements, then the median is the most central member in the list. However, if the list has an even number of elements, we need to determine the arithmetic mean of the two most central numbers.</p>
+<p>We can formalize this in the following way. Let <span class="math inline">\(x\)</span> be a sorted vector of numbers. Then the median is</p>
+<p><span class="math display">\[\text{median}(x) = 
+\begin{cases}
+x_{1 + \lfloor n/2 \rfloor} &amp; \text {if $n$ is odd} \\
+\frac{1}{2} \cdot (x_{n/2} + x_{1 + n/2}) &amp; \text {if $n$ is even} \\
+\end{cases}
+\]</span></p>
+<p>where <span class="math inline">\(\lfloor . \rfloor\)</span> is the floor function.</p>
+<p>Let’s see how we can obtain the median in R.</p>
+<pre class="r"><code># the hard way (don&#39;t do it like that)
+mymedian &lt;- function(x) {
+    x &lt;- sort(x)
+    n &lt;- length(x)
+    median &lt;- NULL
+    if (n %% 2 == 0) {
+        # length is even
+        median &lt;- mean(c(x[n/2], x[n/2 + 1]))
+    } else {
+        # length is odd
+        median &lt;- x[floor(n/2)]
+    }
+    return(median)
+}
+x.median &lt;- mymedian(x)
+print(x.median)</code></pre>
+<pre><code>## [1] 40</code></pre>
+<pre class="r"><code># the easy way:
+x.median &lt;- median(x)
+print(x.median)</code></pre>
+<pre><code>## [1] 40</code></pre>
+</div>
+<div id="comparison-of-mean-and-median" class="section level2">
+<h2>Comparison of mean and median</h2>
+<p>Having defined both types of averages, we can now look into the difference between the two. While the arithmetic mean considers <strong>all</strong> the values in a vector, the median value only considers a <strong>subset</strong> of values. This is because the median basically discards all vector elements except for the most central value(s). This feature of the median can make a big difference. As we have seen in our example, the mean of <span class="math inline">\(x\)</span> (133) was much larger than its median (40).
+In this case, this is because the median discards the value 1000 in <span class="math inline">\(x\)</span>, while the arithmetic mean considers it.</p>
+<p>This brings us to the question we wanted to answer: when to use the mean and when to use the median? The answer is simple. If your data contains outliers such as the 1000 in our example, then you would typically rather use the median because otherwise the value of the mean would be dominated by the outliers rather than the typical values. In conclusion, if you are considering the mean, check your data for outliers. A simple way to do this is to plot a histogram of the data.</p>
+<pre class="r"><code>hist(x)</code></pre>
+<p><img src="/post/basic-statistics/mean_vs_median_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>For our data, the histogram clearly shows the outlier with a value of 1000 and we conclude that the median would be more appropriate than the mean.</p>
+<p>Can you think of other situations when you would rather use the median than the mean? Let me know in the comments!</p>
+</div>
