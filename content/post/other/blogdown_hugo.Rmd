@@ -8,7 +8,6 @@ categories:
   - other
 tags:
   - Hugo
-  - blogdown
 ---
 
 Static blogs are a great alternative to dynamic blogs that are based on content management systems such as [WordPress](https://wordpress.com/). While both approaches have their [up- and downsides](https://weblog.masukomi.org/2015/10/18/static-vs-dynamic-blogging/), I chose the static approach for this blog because it's the easiest way to bring R code to the web. In the following, I will show how you can create a static blog in only five steps. 

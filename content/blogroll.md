@@ -21,7 +21,7 @@ disable_comments: false
 develOverflow
 * [Bioconductor](https://bioconductor.org): the repository for R packages relating to bioinformatics
 * [R-bloggers](https://www.r-bloggers.com): an aggregator blog for anything related to R
-
+* [Tidyverse](https://www.tidyverse.org/): a highly useful collection of R package designed for data science of which ggplot2 and dplyr are probably the most notable members
 
 ## Machine Learning
 
