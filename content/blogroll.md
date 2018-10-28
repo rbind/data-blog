@@ -7,6 +7,7 @@ authorbox: false
 sidebar: true
 disable_comments: false
 --- 
+<img src="/img/resources.jpg">
 
 ## Data science
 

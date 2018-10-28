@@ -1,0 +1,15 @@
+---
+title: "Data Visualization"
+thumbnail: "/categories/data-visualization/abstract-curves-led-1944.jpg"
+---
+<img src="abstract-curves-led-1944.jpg">
+
+Humans are visual creatures. Thus, visualization is one of the most important tools for conveying information and data scientists should be adapt at selecting appropriate visualizations. 
+
+## Which plot is appropriate?
+
+A common problem is that of choosing an appropriate plot for certain type of measurements. To learn which types of plots are available and how they are used, just [click here](/tags/plot/).
+
+## Posts about data visualization
+
+The following posts deal with topics from data visualization.

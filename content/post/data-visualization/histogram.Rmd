@@ -5,7 +5,7 @@ date: '2018-10-28'
 categories:
   - data-visualization
 tags:
-  - histogram
+  - plot
 thumbnail: "post/data-visualization/histogram_cover.png"
 
 ---
