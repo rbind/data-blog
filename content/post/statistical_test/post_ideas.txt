@@ -1,0 +1,47 @@
+-----------------
+Confidence intervals
+----------
+title: Going beyond significance: confidence intervals
+content: 
+- How is confidence interval defined?
+    o Example for CI with 95% and other value
+- Why is it useful?
+    o Measures the likely size of an effect
+    o More useful than p-value (doesn't give effect size)
+    o More interpretable than effect size (concrete value)
+- Where/how to obtain CIs?
+    o Which tests provide CIs?
+
+-----------------
+MAGIC Criteria
+----------
+title: 5 Criteria to Watch Out for In A Test
+https://en.wikipedia.org/wiki/MAGIC_criteria
+-> just summarize this
+
+----------------
+Generalized linear models
+------------------------
+- How to use GLMs for data analys/statistical testing
+- Source: https://www.r-bloggers.com/do-not-log-transform-count-data-bitches/
+
+-> use multcomp package
+-> quesiton: use glm rather than ANOVA? 
+
+------------
+Power analysis
+--------------
+- title: Study design using power analysis
+
+- Why bother with power?
+    o Need to know beforehand how many samples are necessary to have chance of showing effect
+- What is power analysis? How does it work?
+- How can I do it in R, for several tests?
+    o e.g. t.test (see previous post on type 1 vs type 2 error)
+
+source: 
+http://www.math.usu.edu/jrstevens/stat5570/Power_4up.pdf
+
+-----------------
+New post ideas:
+- Paper on p-value: why significance is less than expected (see emails to find paper)

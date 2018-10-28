@@ -1,0 +1,73 @@
+---
+title: "Determining the distribution of data using histograms"
+author: Matthias Döring
+date: '2018-10-28'
+categories:
+  - data-visualization
+tags:
+  - histogram
+thumbnail: "post/data-visualization/histogram_cover.png"
+
+---
+It is always useful to spend some time exploring a new data set before processing it further and analyzing it. One of the most convenient ways to get a feel for the data is plotting a histogram. The histogram is a tool for visualizing the frequency of measurements in terms of a bar plot. Here we'll take a closer look at how the histogram can be used in R.
+<!--more-->
+
+## Plotting a histogram in native R
+
+The basic histogram fun is `hist`. It is very easy to use because you only need to provide a numeric vector. For example:
+
+```{r}
+# fix seed for reproducibility
+set.seed(1)
+# draw n samples from the uniform distribution in the range [0,1]
+n <- 100
+x <- runif(n)
+hist(x)
+```
+
+If you need a higher resolution, you can increase the number of bins using the `breaks` argument:
+
+```{r}
+hist(x, breaks = 20)
+```
+
+These results indicate that although the samples were drawn from the uniform distribution, there are still some values that are over- and underrepresented.
+
+## Plotting a histogram using ggplot
+
+If you want to have more control over your plots, then you should use the ggplot2 library, which is part of the [tidyverse suite](https://www.tidyverse.org/). Since the plotting function expects a data frame, we'll have to construct one first:
+
+```{r, message = FALSE}
+library(ggplot2)
+df <- data.frame(x = x)
+# map data frame values in column x to x-axis and plot
+ggplot(df, aes(x = x)) + geom_histogram()
+```
+
+### Plotting a histogram for several groups
+
+To exemplify why ggplot is great, let's assume we have more than one vector we'd like to plot. This can be done in the following way:
+
+```{r, message = FALSE}
+# normally distributed data
+y <- rnorm(n)
+df <- data.frame(Category = c(rep("Uniform", n), rep("Normal", n)), 
+                x = c(x, y))
+# fill bars according to 'Category'
+ggplot(df, aes(x = x, fill = Category)) + geom_histogram()
+```
+
+As an alternative to plotting the data within a single plot, one can also use a faceted plot:
+
+```{r, message = FALSE}
+ggplot(df, aes(x = x)) + geom_histogram() + facet_wrap(vars(Category))
+```
+
+One problem with the facet problem is that the scales may be different for the two axes. For example, the data from the normal distribution have a smaller maximum frequency than those from the uniform distribution. Thus, values from the normal distribution are not clearly visible. Moreover, the uniform data are in a smaller value range than the normal data. To fix this problem, we can provide an additional argument that makes both the x-axis and the y-axis flexible:
+
+```{r, message = FALSE}
+ggplot(df, aes(x = x)) + geom_histogram() + 
+        facet_wrap(vars(Category), scales = "free")
+```
+
+Now, the difference between the two distributions is much more easily visible than before.
