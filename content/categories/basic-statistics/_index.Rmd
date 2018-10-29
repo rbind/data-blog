@@ -1,0 +1,35 @@
+---
+title: "Statistical Significance Tests"
+thumbnail: "/categories/basic-statistics/book-calculate-calculator-5775.jpg"
+---
+<img src="book-calculate-calculator-5775.jpg"/>
+
+As a data scientist, it is important to have a deep understanding of statistics. Here, I'll introduce basic statistical concepts and quantities.
+
+## Types of measurements and variables
+
+Important statistical concepts include the following:
+
+* Types of measurement scales
+* Nomenclature for variables: dependent vs independent variables
+
+## Statistical quantities
+
+You should definitely know about the following, frequently used statistical quantities:
+
+* Centrality measures: [mean and median](/post/basic-statistics/mean_vs_median/), mode
+* Measure of dispersion: standard deviation, variance, covariance, interquartile-range
+* Interval estimates: confidence intervals
+
+## Probability distributions
+
+Commonly occuring probability distributions are:
+
+* Uniform distribution: all values are equally likely
+* Normal distribution: a bell-shaped curve, typical for many population characteristics (e.g. IQs, heights)
+* Poisson distribution: an integer distribution that is ideal for count data
+* Exponential distribution: a heavy-tailed distribution
+
+## Posts on basic statistics
+
+You can find eplanations of basic statistical concepts and their use in R in the following posts.

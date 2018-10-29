@@ -1,0 +1,61 @@
+---
+title: "Visualizing individual data points using scatter plots"
+author: Matthias Döring
+date: '2018-10-29'
+categories:
+  - data-visualization
+tags:
+  - plot
+thumbnail: "/post/data-visualization/scatterplot_cover.png"
+
+---
+
+
+
+<p>The scatter plot is probably the most simple type of plot that is available because it doesn’t do anything more than to show individual measurements as points in a plot. The scatter plot is particularly useful for investigating whether two variables are associated. <!--more--></p>
+<div id="artificial-data-for-the-scatter-plot" class="section level2">
+<h2>Artificial data for the scatter plot</h2>
+<p>A typical application of scatter plots is for visualizing the correlation between two variables. For this purpose, we’ll create a function that generates correlated measurements.</p>
+<pre class="r"><code>set.seed(1)
+generator &lt;- function(n = 1000) {
+    x &lt;- rnorm(n)
+    # add some noise to x
+    noise &lt;- rnorm(n, 0, sd = 0.5)
+    y &lt;- x + noise
+    df &lt;- data.frame(x = x, y = y)
+    return(df)
+}
+df &lt;- generator(1000)</code></pre>
+</div>
+<div id="scatter-plots-in-native-r" class="section level2">
+<h2>Scatter plots in native R</h2>
+<p>In native R, you can create a simple scatter plot in this way:</p>
+<pre class="r"><code>plot(df$x, df$y)
+# show diagonal line indicating perfect correlation
+dg &lt;- par(&quot;usr&quot;) 
+segments(dg[1],dg[3],dg[2],dg[4], col=&#39;red&#39;) </code></pre>
+<p><img src="/post/data-visualization/scatterplot_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>As we can see, the two variables are strongly correlated (correlation of 0.89).</p>
+<p>If you want to visualize the correlation of several variables simultaneously, you can use the <code>pairs</code> function in order to create a scatter plot matrix. This matrix represents the correlation for all pairs of variables in a data frame that are selected by the <em>formula</em> argument.</p>
+<pre class="r"><code>data(mtcars)
+pairs(~wt+hp+qsec, data = mtcars)</code></pre>
+<p><img src="/post/data-visualization/scatterplot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>In this case, you would find that there is some correlation between the features <em>wt</em> and <em>hp</em>.</p>
+</div>
+<div id="scatter-plots-with-ggplot" class="section level2">
+<h2>Scatter plots with ggplot</h2>
+<p>If you prefer using ggplot, then you can create a scatter plot using <code>geom_point</code>. To give the plot more of a nice touch, you can also include the correlation.</p>
+<pre class="r"><code>library(ggplot2)
+cor.val &lt;- round(cor(df$x, df$y), 2)
+cor.label &lt;- paste0(&quot;Correlation: &quot;, cor.val)
+ggplot(df, aes(x = x, y = y)) + geom_point() + 
+    geom_abline(color = &quot;red&quot;, slope = 1) + 
+    annotate(x = -2.25, y = 3.5,  geom = &quot;text&quot;, 
+            label = cor.label, size = 5)</code></pre>
+<p><img src="/post/data-visualization/scatterplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>To show the distribution of the data in more detail, you can also draw a 2D density.</p>
+<pre class="r"><code>ggplot(df, aes(x = x, y = y)) + geom_point() + 
+    geom_density_2d()</code></pre>
+<p><img src="/post/data-visualization/scatterplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>The ellipses of the density indicate where the values are concentrated and allow you to whether a sufficient range of values has been sampled. In this case, the values span the possible range of values well and there are few outliers, so we can be confident about the identified correlation.</p>
+</div>
