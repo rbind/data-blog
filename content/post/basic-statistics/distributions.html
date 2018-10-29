@@ -1,0 +1,113 @@
+---
+title: "Using probability distributions in R: dnorm, pnorm, qnorm, and rnorm"
+author: Matthias Döring
+thumbnail: "/post/basic-statistics/distributions_cover.png"
+date: '2018-10-29'
+categories:
+  - basic-statistics
+tags:
+- distribution
+---
+
+
+
+<p>R is a great tool for working with distributions. However, one has to know which specific function is the right wrong. Here, I’ll discuss which functions are available for dealing with the normal distribution: dnorm, pnorm, qnorm, and rnorm. <!--more--></p>
+<div id="distribution-functions-in-r" class="section level2">
+<h2>Distribution functions in R</h2>
+<p>Every distribution has four associated functions whose prefix indicates the type of function and the suffix indicates the distribution. To exemplify the use of these functions, I will limit myself to the normal (Gaussian) distribution. The four normal distribution functions are:</p>
+<ul>
+<li><strong>d</strong>norm: <strong>density function</strong> of the normal distribution</li>
+<li><strong>p</strong>norm: <strong>cumulative density function</strong> of the normal distribution</li>
+<li><strong>q</strong>norm: <strong>quantile function</strong> of the normal distribution</li>
+<li><strong>r</strong>norm: <strong>random sampling</strong> from the normal distribution</li>
+</ul>
+</div>
+<div id="the-probability-density-function-dnorm" class="section level2">
+<h2>The probability density function: dnorm</h2>
+<p>The probability density function (PDF, in short: density) indicates the probability of observing a measurement with a specific value and thus the integral over the density is always 1. For a value <span class="math inline">\(x\)</span>, the normal density is defined as <span class="math display">\[{\displaystyle f(x\mid \mu ,\sigma ^{2})={\frac {1}{\sqrt {2\pi \sigma ^{2}}}}\text{exp}\left(-{\frac {(x-\mu )^{2}}{2\sigma ^{2}}}\right)}\]</span> where <span class="math inline">\(\mu\)</span> is the mean, <span class="math inline">\(\sigma\)</span> is the standard deviation, and <span class="math inline">\(\sigma^2\)</span> is the variance.</p>
+<p>Using the density, it is possible to determine the probabilities of events. For example, you may wonder: <em>What is the likelihood that a person has an IQ of exactly 140?</em>. In this case, you would need to retrieve the density of the IQ distribution at value 140. The IQ distribution can be modeled with a mean of 100 and a standard deviation of 15. The corresponding density is:</p>
+<pre class="r"><code>sample.range &lt;- 50:150
+iq.mean &lt;- 100
+iq.sd &lt;- 15
+iq.dist &lt;- dnorm(sample.range, mean = iq.mean, sd = iq.sd)
+iq.df &lt;- data.frame(&quot;IQ&quot; = sample.range, &quot;Density&quot; = iq.dist)
+library(ggplot2)
+ggplot(iq.df, aes(x = IQ, y = Density)) + geom_point()</code></pre>
+<p><img src="/post/basic-statistics/distributions_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>From these data, we can now answer the initial question as well as additional questions:</p>
+<pre class="r"><code>pp &lt;- function(x) {
+    print(paste0(round(x * 100, 3), &quot;%&quot;))
+}
+# likelihood of IQ == 140?
+pp(iq.df$Density[iq.df$IQ == 140])</code></pre>
+<pre><code>## [1] &quot;0.076%&quot;</code></pre>
+<pre class="r"><code># likelihood of IQ &gt;= 140?
+pp(sum(iq.df$Density[iq.df$IQ &gt;= 140]))</code></pre>
+<pre><code>## [1] &quot;0.384%&quot;</code></pre>
+<pre class="r"><code># likelihood of 50 &lt; IQ &lt;= 90?
+pp(sum(iq.df$Density[iq.df$IQ &lt;= 90]))</code></pre>
+<pre><code>## [1] &quot;26.284%&quot;</code></pre>
+</div>
+<div id="the-cumulative-density-function-pnorm" class="section level2">
+<h2>The cumulative density function: pnorm</h2>
+<p>The cumulative density (CDF) function is a monotonically increasing function as it integrates over densities via <span class="math display">\[f(x | \mu, \sigma) = \displaystyle {\frac {1}{2}}\left[1+\operatorname {erf} \left({\frac {x-\mu }{\sigma {\sqrt {2}}}}\right)\right]\]</span> where <span class="math inline">\(\text{erf}(x) = \frac {1}{\sqrt {\pi }}\int _{-x}^{x}e^{-t^{2}}\,dt\)</span> is the error function.</p>
+<p>To get an intuition of the CDF, let’s create a plot for the IQ data:</p>
+<pre class="r"><code>cdf &lt;- pnorm(sample.range, iq.mean, iq.sd)
+iq.df &lt;- cbind(iq.df, &quot;CDF_LowerTail&quot; = cdf)
+ggplot(iq.df, aes(x = IQ, y = CDF_LowerTail)) + geom_point()</code></pre>
+<p><img src="/post/basic-statistics/distributions_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>As we can see, the depicted CDF shows the probability of having an IQ less or equal to a given value. This is because <code>pnorm</code> computes the lower tail by default, i.e. <span class="math inline">\(P[X &lt;= x]\)</span>. Using this knowledge, we can obtain answers to some of our previous questions in a slightly different manner:</p>
+<pre class="r"><code># likelihood of 50 &lt; IQ &lt;= 90?
+pp(iq.df$CDF_LowerTail[iq.df$IQ == 90])</code></pre>
+<pre><code>## [1] &quot;25.249%&quot;</code></pre>
+<pre class="r"><code># set lower.tail to FALSE to obtain P[X &gt;= x]
+cdf &lt;- pnorm(sample.range, iq.mean, iq.sd, lower.tail = FALSE)
+iq.df &lt;- cbind(iq.df, &quot;CDF_UpperTail&quot; = cdf)
+# Probability for IQ &gt;= 140? same value as before using dnorm!
+pp(iq.df$CDF_UpperTail[iq.df$IQ == 140])</code></pre>
+<pre><code>## [1] &quot;0.383%&quot;</code></pre>
+<p>Note that the results from <em>pnorm</em> are the same as those obtained from manually summing up the probabilities obtained via <em>dnorm</em>. Moreover, by setting <code>lower.tail = FALSE</code>, <code>dnorm</code> can be used to directly compute p-values, which measure how the likelihood of an observation that is at least as extreme as the obtained one.</p>
+<p>To remember that <code>pnorm</code> does not provide the PDF but the CDF, just imagine that the function carries a <em>p</em> in its name such that <em>pnorm</em> is lexicographically close to <em>qnorm</em>, which provides the inverse of the CDF.</p>
+</div>
+<div id="the-quantile-function-qnorm" class="section level2">
+<h2>The quantile function: qnorm</h2>
+<p>The quantile function is simply the inverse of the cumulative density function (iCDF). Thus, the quantile function maps from probabilities to values. Let’s take a look at the quantile function for <span class="math inline">\(P[X &lt;= x]\)</span>:</p>
+<pre class="r"><code># input to qnorm is a vector of probabilities
+prob.range &lt;- seq(0, 1, 0.001)
+icdf.df &lt;- data.frame(&quot;Probability&quot; = prob.range, &quot;IQ&quot; = qnorm(prob.range, iq.mean, iq.sd))
+ggplot(icdf.df, aes(x = Probability, y = IQ)) + geom_point()</code></pre>
+<p><img src="/post/basic-statistics/distributions_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Using the quantile function, we can answer quantile-related questions:</p>
+<pre class="r"><code># what is the 25th IQ percentile?
+print(icdf.df$IQ[icdf.df$Probability == 0.25])</code></pre>
+<pre><code>## [1] 89.88265</code></pre>
+<pre class="r"><code># what is the 75 IQ percentile?
+print(icdf.df$IQ[icdf.df$Probability == 0.75])</code></pre>
+<pre><code>## [1] 110.1173</code></pre>
+<pre class="r"><code># note: this is the same results as from the quantile function
+quantile(icdf.df$IQ)</code></pre>
+<pre><code>##        0%       25%       50%       75%      100% 
+##      -Inf  89.88265 100.00000 110.11735       Inf</code></pre>
+</div>
+<div id="the-random-sampling-function-rnorm" class="section level2">
+<h2>The random sampling function: rnorm</h2>
+<p>When you want to draw random samples from the normal distribution, you can use <code>rnorm</code>. For example, we could use <code>rnorm</code> to simulate random samples from the IQ distribution.</p>
+<pre class="r"><code># fix random seed for reproducibility
+set.seed(1)
+# law of large numbers: mean will approach expected value for large N
+n.samples &lt;- c(100, 1000, 10000)
+my.df &lt;- do.call(rbind, lapply(n.samples, function(x) data.frame(&quot;SampleSize&quot; = x, &quot;IQ&quot; = rnorm(x, iq.mean, iq.sd))))
+# show one facet per random sample of a given size
+ggplot() + geom_histogram(data = my.df, aes(x = IQ)) + facet_wrap(.~SampleSize, scales = &quot;free_y&quot;)</code></pre>
+<p><img src="/post/basic-statistics/distributions_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code># note: we can also implement our own sampler using the densities
+my.sample &lt;- sample(iq.df$IQ, 100, prob = iq.df$Density, replace = TRUE)
+my.sample.df &lt;- data.frame(&quot;IQ&quot; = my.sample)
+ggplot(my.sample.df, aes(x = IQ)) + geom_histogram()</code></pre>
+<p><img src="/post/basic-statistics/distributions_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<p>Note that we called <code>set.seed</code> in order to ensure that the random number generator always generates the same sequence of numbers for reproducibility.</p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>Of the four functions dealing with distributions, <code>dnorm</code> is the most important one. This is because the values from <code>pnorm</code>, <code>qnorm</code>, and <code>rnorm</code> are based on <code>dnorm</code>. Still, <code>pnorm</code>, <code>qnorm</code>, and <code>rnorm</code> are very useful convenience functions when dealing with the normal distribution. If you would like to learn about the corresponding functions for the other distributions, you can simply call <code>?distribtuion</code> to obtain more information.</p>
+</div>
