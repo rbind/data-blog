@@ -1,13 +1,13 @@
 ---
 title: "Plots"
-thumbnail: "/tags/plot/abstract-curves-led-1944.jpg"
+thumbnail: "/tags/plot/chart-close-up-data-590022.jpg"
 ---
-<img src="abstract-curves-led-1944.jpg">
+<img src="chart-close-up-data-590022.jpg">
 
 There is a large number of different types of plots for visualizing data. Of those, however, only a few are frequently used. The most important plots are the following:
 
-* The [histogram](/post/data-visualization/histogram/) consists of bars that indicate the frequency of measurements
-* The scatter plot shows the value of individual measurements as points
+* The [histogram](/post/data-visualization/histogram/) consists of bars that indicate the frequency of measurements and is ideal for showing the distribution of a variable
+* The [scatter plot](/post/data-visualization/scatterplot/) shows the value of two variables as points and is ideal for identifying correlated variables
 * The bar plot shows measurements as bars
 * The box plot indicates variation by showing the most frequently observed measurements (e.g. the median)
 * The [Q-Q plot](/post/statistical_test/signed_wilcox_rank_test/): compare whether two samples have similar distributions
