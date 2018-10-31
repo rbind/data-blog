@@ -3,6 +3,8 @@ title = "datascienceblog.net: R for Data Science "
 languageCode = "en-us"
 paginate = "10" # Number of posts per page
 theme = "Mainroad"
+# enable staticman comments (staticman.net)
+StaticmanComments = "true"
 disqusShortname = "datascienceblog-net" # Enable comments by entering your Disqus shortname
 googleAnalytics = "" # Enable Google Analytics by entering your tracking id
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
