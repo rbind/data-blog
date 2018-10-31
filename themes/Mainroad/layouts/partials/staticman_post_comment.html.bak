@@ -1,0 +1,8 @@
+<form method="POST" action="https://staticmanbot.herokuapp.com/v2/entry/matdoering/data-blog/master/comments">
+  <input name="options[redirect]" type="hidden" value="{{ .Site.BaseURL }}">
+  <input name="fields[path]" type="hidden" value="{{ path }}">
+  Name: <input name="fields[name]" type="text" />
+  Email: <input name="fields[email]" type="email" />
+  Comment: <textarea name="fields[message]"></textarea>
+  <button type="submit">Post comment!</button>
+</form>
