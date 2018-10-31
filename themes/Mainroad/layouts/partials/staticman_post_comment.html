@@ -10,8 +10,6 @@
     <input type="hidden" name="options[origin]" value="{{ .Permalink }}">
     <input type="hidden" name="options[parent]" value="{{ .File.BaseFileName }}">
     <input type="hidden" name="fields[reply_to]" value="">
-    <input type="hidden" name="options[reCaptcha][siteKey]" value="{{ .Site.Params.recaptcha_siteKey }}">
-    <input type="hidden" name="options[reCaptcha][secret]" value="{{ .Site.Params.recaptcha_secret }}">
 
     <fieldset>
       <input name="fields[name]" type="text" class="post-comment-field" placeholder="Your name">
@@ -25,24 +23,11 @@
       <textarea name="fields[body]" class="post-comment-field" placeholder="Your message. Feel free to use Markdown." rows="10"></textarea>
     </fieldset>
     
-
-  <button type="submit">Post comment!</button>
+    <fieldset>
+      <input type="submit" class="post-comment-field btn" value="Submit" id="submit_button">
     </fieldset>
 
   </form>
-
-  <script async src='https://www.google.com/recaptcha/api.js' ></script>
-
-
-  <script type="text/javascript">
-    document.getElementById("submit_button").disabled = true;
-  </script>
-  
-  <script type="text/javascript">
-    function enableBtn(){
-       document.getElementById("submit_button").disabled = false;
-      }
-  </script>
 
   <div id="post-submitted" class="dialog">
     <h3>Thank you</h3>
