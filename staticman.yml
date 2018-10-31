@@ -14,7 +14,7 @@ comments:
   name: "www.datascienceblog.net"
   notifications:
     enabled: false
-  path: "data/comments"
+  path: "_data/comments"
   requiredFields: ["path", "name", "email", "message"] # path doesn't work?
   transforms:
     body: "frontmatterContent"

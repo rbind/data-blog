@@ -5,7 +5,8 @@ paginate = "10" # Number of posts per page
 theme = "Mainroad"
 # enable staticman comments (staticman.net)
 StaticmanComments = "true"
-disqusShortname = "datascienceblog-net" # Enable comments by entering your Disqus shortname
+#disqusShortname = "datascienceblog-net" # Enable comments by entering your Disqus shortname
+disqusShortname = ""
 googleAnalytics = "" # Enable Google Analytics by entering your tracking id
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 rssLimit = 20 # max nbr of entries shown in rss feed
