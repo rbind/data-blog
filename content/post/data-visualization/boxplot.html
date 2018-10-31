@@ -1,0 +1,47 @@
+---
+title: "Comparing medians and inter-quartile ranges using the box plot"
+author: Matthias Döring
+date: '2018-10-31'
+categories:
+  - data-visualization
+tags:
+  - plot
+thumbnail: "/post/data-visualization/boxplot_cover.png"
+
+---
+
+
+
+<p>The box plot is useful for comparing the quartiles of quantitative variables. More specifically, lower and upper ends of a box (the hinges) are defined by the first (Q1) and third quartile (Q3). The median (Q2) is shown as a horizontal line within the box. Additionally, outliers are indicated by the whiskers of the boxes whose definition is implementation-dependent. For example, in <code>geom_boxplot</code> of ggplot2, whiskers are defined by the inter-quartile range (IQR = Q3 - Q1), extending no further than 1.5 * IQR. <!--more--></p>
+<div id="creating-a-box-plot-in-native-r" class="section level2">
+<h2>Creating a box plot in native R</h2>
+<p>In native R, a box plot can be obtained via <code>boxplot</code>.</p>
+<pre class="r"><code>data(warpbreaks)
+# create positions for tick marks, one more than number of bars
+x &lt;- warpbreaks$breaks
+# create labels
+x.labels &lt;- paste0(warpbreaks$wool, &quot;-&quot;, warpbreaks$tension)
+# specify colors for groups
+group.cols &lt;- c(&quot;darkred&quot;, &quot;red&quot;, &quot;darksalmon&quot;, 
+                &quot;darkblue&quot;, &quot;blue&quot;, &quot;lightblue&quot;)
+cols &lt;- c(rep(group.cols[1], 9), rep(group.cols[2], 9), 
+        rep(group.cols[3], 9), rep(group.cols[4], 9), 
+        rep(group.cols[5], 9), rep(group.cols[6], 9))
+boxplot(x ~ warpbreaks$wool + warpbreaks$tension, col = group.cols)
+legend(&quot;topright&quot;, legend = c(unique(x.labels)), 
+        col = group.cols, pch = 20)</code></pre>
+<p><img src="/post/data-visualization/boxplot_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+<div id="creating-a-box-plot-with-ggplot" class="section level2">
+<h2>Creating a box plot with ggplot</h2>
+<p>We could compare the tensions for each type of wool using <code>facet_wrap</code> in the following way:</p>
+<pre class="r"><code>library(ggplot2)
+ggplot(warpbreaks, aes(x = tension, y = breaks)) +
+    geom_boxplot() + facet_wrap(.~wool) +
+    ggtitle(&quot;Breaks for wool A and B&quot;)</code></pre>
+<p><img src="/post/data-visualization/boxplot_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
+    geom_boxplot() + 
+    ggtitle(&quot;Breaks for wool A and B&quot;)</code></pre>
+<p><img src="/post/data-visualization/boxplot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>

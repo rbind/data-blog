@@ -1,0 +1,95 @@
+---
+title: "Bar plots and error bars"
+author: Matthias Döring
+date: '2018-10-31'
+categories:
+  - data-visualization
+tags:
+  - plot
+thumbnail: "/post/data-visualization/barplot_cover.png"
+
+---
+
+
+
+<p>Bar plots display quantities according to the height of bars. Since standard bar plots do not indicate the level of variation in the data, they are most appropriate for showing individual values (e.g. count data) rather than aggregates of several values (e.g. arithmetic means). Although variation can be shown through error bars, this is only appropriate if the data are normally distributed. <!--more--></p>
+<div id="plotting-a-histogram-in-native-r" class="section level2">
+<h2>Plotting a histogram in native R</h2>
+<p>To obtain a bar plot in native R, we can use the <code>barplot</code> function.</p>
+<pre class="r"><code>data(warpbreaks)
+# create positions for tick marks, one more than number of bars
+x &lt;- warpbreaks$breaks
+# create labels
+x.labels &lt;- paste0(warpbreaks$wool, &quot;-&quot;, warpbreaks$tension)
+# specify colors for groups
+group.cols &lt;- c(&quot;darkred&quot;, &quot;red&quot;, &quot;darksalmon&quot;, 
+                &quot;darkblue&quot;, &quot;blue&quot;, &quot;lightblue&quot;)
+cols &lt;- c(rep(group.cols[1], 9), rep(group.cols[2], 9), 
+        rep(group.cols[3], 9), rep(group.cols[4], 9), 
+        rep(group.cols[5], 9), rep(group.cols[6], 9))
+barplot(x, space = 0,  col = cols)
+legend(&quot;topright&quot;, legend = c(unique(x.labels)), col = group.cols, pch = 20)</code></pre>
+<p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-1-1.png" width="672" /> A disadvantage of this approach is that it is tedious to specify the <a href="http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf">coloring vector</a> if there are many group combinations.</p>
+</div>
+<div id="plotting-a-histogram-with-ggplot" class="section level2">
+<h2>Plotting a histogram with ggplot</h2>
+<p>To compare the breaks associated with the two types of wool, we’ll use <code>facet_wrap</code> so as to create a facet for wool A and wool B, respectively.</p>
+<pre class="r"><code>library(ggplot2)
+# need &#39;stat = &quot;identity&quot;&#39; because we provide y values
+ggplot(warpbreaks, aes(x = tension, y = breaks)) +
+    geom_bar(stat = &quot;identity&quot;) + facet_wrap(.~wool) +
+    ggtitle(&quot;Breaks for wool A and B&quot;)</code></pre>
+<p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>This plot shows the total number of strand breaks. We can verify this in the following way:</p>
+<pre class="r"><code>sum(warpbreaks$breaks[warpbreaks$wool == &quot;A&quot; &amp; warpbreaks$tension == &quot;L&quot;])</code></pre>
+<pre><code>## [1] 401</code></pre>
+<p>Because there are nine measurements for every combination of wool and tension, this is an appropriate summary statistic. However, the sum of breaks it not very interpretable as it does not allow us to measure the average number of breaks and the associated variation.</p>
+<div id="plotting-means-and-error-bars-68-confidence-interval" class="section level3">
+<h3>Plotting means and error bars (68% confidence interval)</h3>
+<p>To improve the interpretability of the plot, we will compute the mean and the standard deviation. We will then plot the mean number of strand breaks and indicate the standard deviation using error bars. If the data are normally distributed, error bars defined by one standard deviation indicate the 68% confidence interval.</p>
+<p>In the first</p>
+<pre class="r"><code>library(plyr)
+# compute mean and sd per combination of wool &amp; tension
+df &lt;- ddply(warpbreaks, c(&quot;wool&quot;, &quot;tension&quot;), summarize, Mean = mean(breaks), SD = sd(breaks))
+ggplot(df, aes(x = tension, y = Mean)) +
+    geom_bar(stat = &quot;identity&quot;) + facet_wrap(.~wool) +
+    ggtitle(&quot;Breaks for wool A and B&quot;) + ylab(&quot;Mean breaks&quot;) +
+    # add 68% CI errorbar 
+    geom_errorbar(aes(ymin = Mean - SD, ymax = Mean + SD), width = 0.2)</code></pre>
+<p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>A side-by-side comparison of the two wools can be obtained if <code>facet_wrap</code> is not used and the <code>geom_bar</code> position argument is set to <em>dodge</em>.</p>
+<pre class="r"><code>ggplot(df, aes(x = tension, y = Mean, fill = wool)) +
+    geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) + 
+    ggtitle(&quot;Breaks for wool A and B&quot;) + ylab(&quot;Mean breaks&quot;) +
+    geom_errorbar(aes(ymin = Mean - SD, ymax = Mean + SD), width = 0.2,
+        position = position_dodge(0.9))</code></pre>
+<p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="plotting-means-and-error-bars-95-confidence-interval" class="section level3">
+<h3>Plotting means and error bars (95% confidence interval)</h3>
+<p>In the next plot, we will draw the 95% confidence interval by defining the error bars using a standard deviation of 1.95. Additionally, we will display the mean values using <code>geom_text</code>.</p>
+<pre class="r"><code>ggplot(df, aes(x = tension, y = Mean, fill = wool)) +
+    geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) + 
+    ggtitle(&quot;Breaks for wool A and B&quot;) + ylab(&quot;Mean breaks&quot;) +
+    geom_errorbar(aes(ymin = Mean - 1.96 * SD, ymax = Mean + 1.96 * SD), width = 0.2, position = position_dodge(0.9)) +
+    geom_text(aes(label = round(Mean, 2)), size = 6, 
+    position = position_dodge(0.85), vjust = -0.5)</code></pre>
+<p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+</div>
+<div id="box-plot-alternatives" class="section level2">
+<h2>Box plot alternatives</h2>
+<p>As you can see from the last plot, the bar plot is inappropriate for highly variable measurements with outliers because then the mean is ill-defined and the error bars tend to dominate the visuals. Therefore, in these cases, I’d recommend a plot that is tailored towards displaying variation such as a <a href="/post/data-visualization/boxplot/">box plot</a>, which displays the first, second, and third quartiles.</p>
+<p>Just compare the following two plots, which clearly demonstrate that the box plot is superior for these data.</p>
+<pre class="r"><code>require(gridExtra)</code></pre>
+<pre><code>## Loading required package: gridExtra</code></pre>
+<pre class="r"><code>p.bar &lt;- ggplot(df, aes(x = tension, y = Mean, fill = wool)) +
+    geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) + 
+    geom_errorbar(aes(ymin = Mean - 1.96 * SD, ymax = Mean + 1.96 * SD), 
+    width = 0.2, position = position_dodge(0.9)) + 
+    ggtitle(&quot;Bar plot&quot;)
+p.box &lt;- ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
+    geom_boxplot() + ggtitle(&quot;Box plot&quot;)
+grid.arrange(p.bar, p.box, ncol=2)</code></pre>
+<p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>

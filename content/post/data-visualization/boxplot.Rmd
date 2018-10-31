@@ -1,0 +1,51 @@
+---
+title: "Comparing medians and inter-quartile ranges using the box plot"
+author: Matthias Döring
+date: '2018-10-31'
+categories:
+  - data-visualization
+tags:
+  - plot
+thumbnail: "/post/data-visualization/boxplot_cover.png"
+
+---
+The box plot is useful for comparing the quartiles of quantitative variables. More specifically, lower and upper ends of a box (the hinges) are defined by the first (Q1) and third quartile (Q3). The median (Q2) is shown as a horizontal line within the box. Additionally, outliers are indicated by the whiskers of the boxes whose definition is implementation-dependent. For example, in `geom_boxplot` of ggplot2, whiskers are defined by the inter-quartile range (IQR = Q3 - Q1), extending no further than 1.5 * IQR.
+<!--more-->
+
+## Creating a box plot in native R
+
+In native R, a box plot can be obtained via `boxplot`.
+
+```{r}
+data(warpbreaks)
+# create positions for tick marks, one more than number of bars
+x <- warpbreaks$breaks
+# create labels
+x.labels <- paste0(warpbreaks$wool, "-", warpbreaks$tension)
+# specify colors for groups
+group.cols <- c("darkred", "red", "darksalmon", 
+                "darkblue", "blue", "lightblue")
+cols <- c(rep(group.cols[1], 9), rep(group.cols[2], 9), 
+        rep(group.cols[3], 9), rep(group.cols[4], 9), 
+        rep(group.cols[5], 9), rep(group.cols[6], 9))
+boxplot(x ~ warpbreaks$wool + warpbreaks$tension, col = group.cols)
+legend("topright", legend = c(unique(x.labels)), 
+        col = group.cols, pch = 20)
+```
+
+## Creating a box plot with ggplot
+
+We could compare the tensions for each type of wool using `facet_wrap` in the following way:
+
+```{r}
+library(ggplot2)
+ggplot(warpbreaks, aes(x = tension, y = breaks)) +
+    geom_boxplot() + facet_wrap(.~wool) +
+    ggtitle("Breaks for wool A and B")
+```
+
+```{r}
+ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
+    geom_boxplot() + 
+    ggtitle("Breaks for wool A and B")
+```
