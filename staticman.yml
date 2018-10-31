@@ -3,7 +3,7 @@ comments:
   branch: "master"
   commitMessage: "You have a new comment on your website."
   #extension: "md"
-  filename: "{fields.slug}@id"
+  filename: "{@id}"
   #format: "frontmatter"
   format: "yml"
   generatedFields:

@@ -25,17 +25,8 @@
       <textarea name="fields[body]" class="post-comment-field" placeholder="Your message. Feel free to use Markdown." rows="10"></textarea>
     </fieldset>
     
-    <fieldset>
-      <div class="notify-me">
-        <input type="checkbox" id="comment-form-reply" name="options[subscribe]" value="email">
-        Send me an email when someone comments on this post.
-      </div>
-    </fieldset>
 
-    <fieldset>
-      <div class="g-recaptcha" data-sitekey="{{ .Site.Params.recaptcha_siteKey }}" data-callback="enableBtn"></div>
-
-      <input type="submit" class="post-comment-field btn" value="Submit" id="submit_button">
+  <button type="submit">Post comment!</button>
     </fieldset>
 
   </form>
