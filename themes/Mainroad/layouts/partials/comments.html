@@ -4,7 +4,5 @@
 </section>
 {{end}}
 {{ if and (ge (len .Site.Params.staticman_api) 1) (not (or .Site.Params.disable_comments .Params.disable_comments)) (not .Site.IsServer) }}
-<section class="comments">
 	{{ template "partials/staticman_post_comment.html.bak" . }}
-</section>
 {{ end }}

@@ -1,4 +1,6 @@
-<form method="POST" action="https://staticmanbot.herokuapp.com/v2/entry/matdoering/data-blog/master/comments">
+<section class = "comments">
+    {{ printf "%#v" .Permalink }}
+    <form method="POST" action="https://staticmanbot.herokuapp.com/v2/entry/matdoering/data-blog/master/comments">
     <input type="hidden" name="options[slug]" value="{{ .Permalink }}">
   <input name="options[redirect]" type="hidden" value="{{ .Site.BaseURL }}">
   <input name="fields[path]" type="hidden" value="{{ path }}">
@@ -7,3 +9,4 @@
   Comment: <textarea name="fields[message]"></textarea>
   <button type="submit">Post comment!</button>
 </form>
+</section>
