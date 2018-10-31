@@ -10,7 +10,7 @@ comments:
       type: date
       options:
         format: "iso8601"
-  moderation: false
+  moderation: true
   name: "www.datascienceblog.net"
   notifications:
     enabled: false
