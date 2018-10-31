@@ -5,6 +5,7 @@ comments:
   #extension: "md"
   filename: "{fields.slug}"
   #format: "frontmatter"
+  format: "yml"
   generatedFields:
     date:
       type: date
