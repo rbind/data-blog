@@ -1,4 +1,5 @@
 <form method="POST" action="https://staticmanbot.herokuapp.com/v2/entry/matdoering/data-blog/master/comments">
+    <input type="hidden" name="options[slug]" value="{{ .Permalink }}">
   <input name="options[redirect]" type="hidden" value="{{ .Site.BaseURL }}">
   <input name="fields[path]" type="hidden" value="{{ path }}">
   Name: <input name="fields[name]" type="text" />
