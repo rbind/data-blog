@@ -1,5 +1,5 @@
 comments:
-  allowedFields: ["name", "email", "path", "body"]
+  allowedFields: ["name", "email", "message"] # path doesn't work?
   branch: "master"
   commitMessage: "You have a new comment on your website."
   extension: "md"
@@ -10,12 +10,12 @@ comments:
       type: date
       options:
         format: "iso8601"
-  moderation: true
+  moderation: false
   name: "www.datascienceblog.net"
   notifications:
     enabled: false
-  path: "_data/comments"
-  requiredFields: ["name", "email", "path", "body"]
+  path: "data/comments"
+  requiredFields: ["name", "email", "message"] # path doesn't work?
   transforms:
     body: "frontmatterContent"
     email: md5
