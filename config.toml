@@ -27,6 +27,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   post_navigation = true
   postSections = ["post"]
   mathjax = true # Enable MathJax
+  staticman_api = "https://staticmanbot.herokuapp.com/v2/entry/matdoering/data-blog/master/comments"
 
 [Params.sidebar]
   home = "right"   # Configure layout for home page

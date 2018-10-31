@@ -2,9 +2,9 @@ comments:
   allowedFields: ["path", "name", "email", "message"] # path doesn't work?
   branch: "master"
   commitMessage: "You have a new comment on your website."
-  extension: "md"
-  filename: "{@id}"
-  format: "frontmatter"
+  #extension: "md"
+  filename: "{fields.slug}"
+  #format: "frontmatter"
   generatedFields:
     date:
       type: date
@@ -14,8 +14,7 @@ comments:
   name: "www.datascienceblog.net"
   notifications:
     enabled: false
-  path: "_data/comments"
+  path: "data/comments"
   requiredFields: ["path", "name", "email", "message"] # path doesn't work?
   transforms:
     body: "frontmatterContent"
-    email: md5
