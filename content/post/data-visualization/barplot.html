@@ -1,7 +1,8 @@
 ---
-title: "Bar plots and error bars"
+title: "Bar Plots and Error Bars"
 author: Matthias Döring
 date: '2018-10-31'
+description: "Plotting bar graphs in R is easy. Here, you will learn how to draw error bars and cases where bar graphs are not appropriate."
 categories:
   - data-visualization
 tags:
@@ -92,4 +93,5 @@ p.box &lt;- ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
     geom_boxplot() + ggtitle(&quot;Box plot&quot;)
 grid.arrange(p.bar, p.box, ncol=2)</code></pre>
 <p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>If you would like to learn more, just read one of my previous posts about situations when the <a href="/post/basic-statistics/mean_vs_median/">median is more appropriate than the mean</a>.</p>
 </div>

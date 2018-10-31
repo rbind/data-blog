@@ -3,6 +3,7 @@ title: "Parametric Testing: How Many Samples Do I Need?"
 author: Matthias Döring
 date: '2018-10-17'
 thumbnail: "post/statistical_test/parametric_sample_size_cover.png"
+description: "Parametric tests require that data are normally distributed. Here, you will learn how many samples are necessary to satisfy the assumptions of parametric tests."
 categories:
   - statistical test
 tags:

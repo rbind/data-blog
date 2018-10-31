@@ -2,6 +2,7 @@
 title: "Using probability distributions in R: dnorm, pnorm, qnorm, and rnorm"
 author: Matthias Döring
 thumbnail: "/post/basic-statistics/distributions_cover.png"
+description: "Dealing with distributions is easy in R. Learn the ins and outs of the dnorm, pnorm, qnorm, and rnorm functions now!"
 date: '2018-10-29'
 categories:
   - basic-statistics

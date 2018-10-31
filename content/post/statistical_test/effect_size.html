@@ -2,6 +2,7 @@
 title: "Effect Sizes: Why Significance Alone is Not Enough"
 author: Matthias Döring
 date: '2018-10-20'
+description: "Effect sizes are often overlooked in favor of significance. Here, you will learn why effect sizes should be considered and how they can be computed using R."
 thumbnail: "post/statistical_test/effect_size_cover.png"
 categories:
   - statistical test
@@ -11,8 +12,7 @@ tags:
 
 
 
-<p>So, you performed a test for significance and obtained a positive result. That’s great but it’s not time to celebrate yet. You may ask: <em>Why? Isn’t a significant test result sufficient to show the existence of an effect?</em> This statement, however, is not true for two reasons. First, a significant result only indicates the existence of an effect but doesn’t prove it. For example, at a significance level of 5%, an exact test will yield a false positive result in 5% of the cases. Second, a significant result does not necessarily make a statement about the magnitude of the effect. In this post, we’ll investigate the difference between statistical significance and the effect size, which describes the magnitude of an effect.
-<!--more--></p>
+<p>So, you performed a test for significance and obtained a positive result. That’s great but it’s not time to celebrate yet. You may ask: <em>Why? Isn’t a significant test result sufficient to show the existence of an effect?</em> This statement, however, is not true for two reasons. First, a significant result only indicates the existence of an effect but doesn’t prove it. For example, at a significance level of 5%, an exact test will yield a false positive result in 5% of the cases. Second, a significant result does not necessarily make a statement about the magnitude of the effect. In this post, we’ll investigate the difference between statistical significance and the effect size, which describes the magnitude of an effect. <!--more--></p>
 <div id="significance-depends-on-sample-size-and-effect-size" class="section level2">
 <h2>Significance depends on sample size and effect size</h2>
 <p>To exemplify the difference between statistical significance and effect size, let’s assume that we are conducting a study investigating two groups, <span class="math inline">\(G_1\)</span> and <span class="math inline">\(G_2\)</span>, with respect to two outcomes, <span class="math inline">\(Y_1\)</span> and <span class="math inline">\(Y_1\)</span>. For this purpose, we’ll generate artificial data and determine whether measurements are independent of the groups using the chi-squared test.</p>
@@ -91,9 +91,7 @@ print(chi.result.S$p.value)</code></pre>
 </div>
 <div id="determining-the-effect-size-with-cramers-v" class="section level2">
 <h2>Determining the effect size with Cramer’s V</h2>
-<p>The effect size of the <span class="math inline">\(\chi^2\)</span> test can be determined using Cramer’s V. Cramer’s V is a normalized version of the <span class="math inline">\(\chi^2\)</span> test statistic. It is defined by
-<span class="math display">\[V = \sqrt{\frac{\chi^2}{n \cdot (c - 1)}}\]</span>
-where <span class="math inline">\(n\)</span> is the sample size and <span class="math inline">\(c = \min(m,n)\)</span> is the minimum of the number of rows <span class="math inline">\(m\)</span> and columns <span class="math inline">\(n\)</span> in the contingency table. Interpretation of Cramer’s V is easy due to <span class="math inline">\(V \in [0,1]\)</span>. For large effects, <span class="math inline">\(V\)</span> will approach 1 but if there’s no effect <span class="math inline">\(V\)</span> will be close to 0.</p>
+<p>The effect size of the <span class="math inline">\(\chi^2\)</span> test can be determined using Cramer’s V. Cramer’s V is a normalized version of the <span class="math inline">\(\chi^2\)</span> test statistic. It is defined by <span class="math display">\[V = \sqrt{\frac{\chi^2}{n \cdot (c - 1)}}\]</span> where <span class="math inline">\(n\)</span> is the sample size and <span class="math inline">\(c = \min(m,n)\)</span> is the minimum of the number of rows <span class="math inline">\(m\)</span> and columns <span class="math inline">\(n\)</span> in the contingency table. Interpretation of Cramer’s V is easy due to <span class="math inline">\(V \in [0,1]\)</span>. For large effects, <span class="math inline">\(V\)</span> will approach 1 but if there’s no effect <span class="math inline">\(V\)</span> will be close to 0.</p>
 <div id="an-r-function-for-computing-cramers-v" class="section level3">
 <h3>An R function for computing Cramer’s V</h3>
 <p>Since there’s no function to compute Cramer’s V in base R, we’ll implement it ourselves as follows:</p>

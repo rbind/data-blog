@@ -3,6 +3,7 @@ title: "Mean vs Median: When to Use Which Measure?"
 author: Matthias Döring
 thumbnail: "/post/basic-statistics/mean_vs_median_avatar.jpg"
 date: '2018-10-26'
+description: "If your data follows a normal distribution using the mean is fine. But what should you do in other cases?"
 categories:
   - basic-statistics
 tags:

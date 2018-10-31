@@ -3,6 +3,7 @@ title: "Comparing Multiple Variables Across Groups: MANOVA"
 author: Matthias Döring
 date: '2018-10-23'
 draft: true
+description: "MANOVA is an extension of ANOVA if there are several categorical variables. Here, you will learn how to use MANOVA in R."
 categories:
   - statistical test
 tags:

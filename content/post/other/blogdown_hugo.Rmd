@@ -2,6 +2,7 @@
 title: "5 Steps to Create a Blog with Hugo and R"
 author: Matthias Döring
 date: '2018-10-19'
+description: "Want to create a blog? It has never been easier than using Hugo, a static website generator."
 thumbnail: "post/other/blogdown_hugo_avatar.png"
 thumbnailsrc: "Figure: https://learn.netlify.com/en/shortcodes/attachments/" 
 categories:

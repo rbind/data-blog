@@ -2,6 +2,7 @@
 title: "Effect Sizes: Why Significance Alone is Not Enough"
 author: Matthias Döring
 date: '2018-10-20'
+description: "Effect sizes are often overlooked in favor of significance. Here, you will learn why effect sizes should be considered and how they can be computed using R."
 thumbnail: "post/statistical_test/effect_size_cover.png"
 categories:
   - statistical test

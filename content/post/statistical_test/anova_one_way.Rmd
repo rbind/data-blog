@@ -2,6 +2,7 @@
 title: "Comparing Measurements Across Several Groups: ANOVA"
 author: Matthias Döring
 date: '2018-10-22'
+description: "To compare the statistical significance of multiple quantitative variable, the ANOVA test is the way to go. Learn what you should consider when performing an ANOVA in R ..."
 thumbnail: "post/statistical_test/anova_one_way_cover.png"
 categories:
   - statistical test

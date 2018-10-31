@@ -2,6 +2,7 @@
 title: "SEO for Hugo sites: noindex for taxonomies (tags/categories)" 
 author: Matthias Döring
 date: '2018-10-20'
+description: "Would you like to set the noindex meta tag for Hugo archive pages? This post shows how it is possible!"
 thumbnail: "post/other/blogdown_hugo_avatar.png"
 thumbnailsrc: "Figure: https://learn.netlify.com/en/shortcodes/attachments/"
 categories:

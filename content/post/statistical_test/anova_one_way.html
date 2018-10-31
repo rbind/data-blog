@@ -2,6 +2,7 @@
 title: "Comparing Measurements Across Several Groups: ANOVA"
 author: Matthias Döring
 date: '2018-10-22'
+description: "To compare the statistical significance of multiple quantitative variable, the ANOVA test is the way to go. Learn what you should consider when performing an ANOVA in R ..."
 thumbnail: "post/statistical_test/anova_one_way_cover.png"
 categories:
   - statistical test
@@ -12,8 +13,7 @@ tags:
 
 
 
-<p>The means of quantitative measurements from two groups can be compared using Student’s t-test. To compare the means of measurements for more than two levels of a categorical variable, one-way ANOVA has to be used. Here, we’ll explore the parametric, one-way ANOVA test as well as the non-parametric version of the test, the Kruskal-Wallis test, which compares median values.
-<!--more--></p>
+<p>The means of quantitative measurements from two groups can be compared using Student’s t-test. To compare the means of measurements for more than two levels of a categorical variable, one-way ANOVA has to be used. Here, we’ll explore the parametric, one-way ANOVA test as well as the non-parametric version of the test, the Kruskal-Wallis test, which compares median values. <!--more--></p>
 <div id="parametric-testing-with-the-one-way-anova-test" class="section level2">
 <h2>Parametric testing with the one-way ANOVA test</h2>
 <p><em>ANOVA</em> stands for analysis of variance and indicates that test analyzes the within-group and between-group variance to determine whether there is a difference in group means.</p>
@@ -47,8 +47,7 @@ print(df)</code></pre>
 ## 10 20 21 0  5 2 26
 ## 11 14  7 1  2 6 24
 ## 12 13 13 4  4 4 13</code></pre>
-<p>The entries of <code>df</code> constitute a matrix <span class="math inline">\(X \in \mathbb{N}^{n \times p}\)</span> with <span class="math inline">\(n\)</span> rows and <span class="math inline">\(p\)</span> columns (groups). The observation in row <span class="math inline">\(i\)</span> and column <span class="math inline">\(j\)</span> is denoted by <span class="math inline">\(x_{ij}\)</span>. The measurements for group <span class="math inline">\(i\)</span> are indicated by <span class="math inline">\(X_i\)</span>, where <span class="math inline">\(\overline{X}_i\)</span> indicates the mean of the measurements for group <span class="math inline">\(i\)</span> and <span class="math inline">\(\overline{X}\)</span> indicates the overall mean. Let <span class="math inline">\(n_j\)</span> indicate the number of measurements for group <span class="math inline">\(j \in \{1, \ldots, p\}\)</span>. Note that the sample sizes do not have to be same
-across groups for one-way ANOVA. This would only be a problem for factorial ANOVA (ANOVA with at least two independent variables) due to confounding.</p>
+<p>The entries of <code>df</code> constitute a matrix <span class="math inline">\(X \in \mathbb{N}^{n \times p}\)</span> with <span class="math inline">\(n\)</span> rows and <span class="math inline">\(p\)</span> columns (groups). The observation in row <span class="math inline">\(i\)</span> and column <span class="math inline">\(j\)</span> is denoted by <span class="math inline">\(x_{ij}\)</span>. The measurements for group <span class="math inline">\(i\)</span> are indicated by <span class="math inline">\(X_i\)</span>, where <span class="math inline">\(\overline{X}_i\)</span> indicates the mean of the measurements for group <span class="math inline">\(i\)</span> and <span class="math inline">\(\overline{X}\)</span> indicates the overall mean. Let <span class="math inline">\(n_j\)</span> indicate the number of measurements for group <span class="math inline">\(j \in \{1, \ldots, p\}\)</span>. Note that the sample sizes do not have to be same across groups for one-way ANOVA. This would only be a problem for factorial ANOVA (ANOVA with at least two independent variables) due to confounding.</p>
 </div>
 <div id="computing-the-anova-test-statistic" class="section level2">
 <h2>Computing the ANOVA test statistic</h2>
@@ -114,8 +113,7 @@ plot(spray.model, which = 2)</code></pre>
 </div>
 <div id="non-parametric-testing-with-the-kruskal-wallis-test" class="section level2">
 <h2>Non-parametric testing with the Kruskal-Wallis test</h2>
-<p>If the assumptions of the ANOVA test do not hold, one can use a non-parametric ANOVA test, the Kruskal-Wallis test. In contrast to the parametric version of the test, Kruskal-Wallis test compares the medians of the groups rather than the means. Since the test is an extension of the Wilcoxon rank-sum test, their test statistics are computed in a similar manner. After ranking all
-observations, the test statistic can be obtained as:</p>
+<p>If the assumptions of the ANOVA test do not hold, one can use a non-parametric ANOVA test, the Kruskal-Wallis test. In contrast to the parametric version of the test, Kruskal-Wallis test compares the medians of the groups rather than the means. Since the test is an extension of the Wilcoxon rank-sum test, their test statistics are computed in a similar manner. After ranking all observations, the test statistic can be obtained as:</p>
 <p><span class="math display">\[H = (n − 1) \frac{\sum_{j = 1}^{p} n_j (\overline{r}_j - \overline{r})^2}
                 {\sum_{j = 1}^p \sum_{i = 1}^{n_j} (r_{ij} − \overline{r})^2}\]</span></p>
 <p>Here, <span class="math inline">\(\overline{r}_j = \frac{1}{n_j} \sum_{i = 1}^{n_j} r_{ij}\)</span> is the average rank of all observations in group <span class="math inline">\(j\)</span>, <span class="math inline">\(r_ij\)</span> is the rank of the <span class="math inline">\(i\)</span>-th measurement in group <span class="math inline">\(j\)</span>, and <span class="math inline">\(\overline{r}\)</span> is the average of all <span class="math inline">\(r_{ij}\)</span>. The interpretation of the test statistic is similar as for the parametric ANOVA: the enumerator indicates the between-group variance of ranks, which corresponds to the within-group sum of squared differences.</p>
