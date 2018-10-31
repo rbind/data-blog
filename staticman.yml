@@ -1,5 +1,5 @@
 comments:
-  allowedFields: ["name", "email", "message"] # path doesn't work?
+  allowedFields: ["path", "name", "email", "message"] # path doesn't work?
   branch: "master"
   commitMessage: "You have a new comment on your website."
   extension: "md"
@@ -15,7 +15,7 @@ comments:
   notifications:
     enabled: false
   path: "data/comments"
-  requiredFields: ["name", "email", "message"] # path doesn't work?
+  requiredFields: ["path", "name", "email", "message"] # path doesn't work?
   transforms:
     body: "frontmatterContent"
     email: md5
