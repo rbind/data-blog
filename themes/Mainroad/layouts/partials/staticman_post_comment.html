@@ -24,8 +24,7 @@
 
   <h3 style = "margin-top:20px">Leave a comment</h3>
 
-  <form class="post-comment" method="POST" action="https://staticmanbot.herokuapp.com/v2/entry/matdoering/data-blog/master/comments">
-  <!--form class="post-new-comment" method="POST" action="http://localhost:8055/v2/entry/eduardoboucas/staticman-test/master/comments"-->
+  <form class="post-comment" method="POST" action="{{ .Site.Params.staticman_api }}">
     <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#comment-submitted">
     <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#post-error">
     <input type="hidden" name="options[entryId]" value="{{ .UniqueID }}">
