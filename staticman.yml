@@ -1,10 +1,8 @@
 comments:
-  allowedFields: ["path", "name", "email", "message"] # path doesn't work?
+  allowedFields: ["path", "name", "email", "message"]
   branch: "master"
   commitMessage: "You have a new comment on your website."
-  #extension: "md"
-  filename: "{@id}"
-  #format: "frontmatter"
+  filename: "{@timestamp}_{@id}"
   format: "yml"
   generatedFields:
     date:
@@ -16,6 +14,7 @@ comments:
   notifications:
     enabled: false
   path: "data/comments"
-  requiredFields: ["path", "name", "email", "message"] # path doesn't work?
+  requiredFields: ["path", "name", "email", "message"]
   transforms:
     body: "frontmatterContent"
+    email: "md5" # encrypt email addresses

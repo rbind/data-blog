@@ -2,7 +2,6 @@
   <h2>Comments</h2>
   {{ $mycomments := .Site.Data.comments }}
   {{ $.Scratch.Add "hasComments" 0 }}
-  {{ $entryId := .UniqueID }}
 
   {{ range $mycomments }}
     {{ if in .path $.File.Path }}
