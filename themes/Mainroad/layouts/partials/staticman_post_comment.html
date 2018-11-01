@@ -6,6 +6,9 @@
   {{ $entryId := .UniqueID }}
 
   {{ range $comments }}
+    {{ printf "%#v" .Name }}
+    {{ printf "%#v" $entryId }}
+
     {{ if eq .Name $entryId }}
       {{ $.Scratch.Add "hasComments" 1 }}
       {{ range $index, $comments := (index $.Site.Data.comments $entryId ) }}
