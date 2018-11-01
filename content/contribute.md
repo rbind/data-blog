@@ -2,6 +2,7 @@
 title: "How can I contribute to this blog?"
 slug: "/contribute-to-datascienceblog/"
 date: 2018-10-26
+description: "Do you want to share your experience as a data scientist or talk about a project that you are excited about? Start contributing now!"
 authorbox: false
 sidebar: true
 disable_comments: false

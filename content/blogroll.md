@@ -3,6 +3,7 @@ title: Recommended Resources for Data Science and R
 slug: "recommended-resources-data-science-and-R"
 date: 2018-10-19
 author: "Matthias Döring"
+description: "Data scientists need a highly diverse skill set. This page lists useful resources for learning about programming with R, machine learning, and statistics."
 authorbox: false
 sidebar: true
 disable_comments: false

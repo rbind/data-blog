@@ -1,6 +1,7 @@
 ---
 title: About Data Science With R
 slug: "about-data-science-with-R"
+description: "datascienceblog.net was created for learning the skills that you need to become a successful data scientist. The blog focuses on applications of statistical testing, machine learning, and data visualiation using R."
 linktitle: About
 date: 2018-10-16
 authorbox: true

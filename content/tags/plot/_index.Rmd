@@ -1,6 +1,7 @@
 ---
 title: "Plots"
 thumbnail: "/tags/plot/chart-close-up-data-590022.jpg"
+description: "Plots are the most important tool for communicating results. However, choosing the right type of plot can be challenginge. Learn here, how to choose between histograms, scatter plots, box plots, and so on."
 ---
 <img src="chart-close-up-data-590022.jpg">
 
