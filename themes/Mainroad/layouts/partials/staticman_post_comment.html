@@ -10,8 +10,8 @@
         {{ $.Scratch.Add "hasComments" 1 }}
         <div class="post-comment">
           <div class="post-comment-header">
-            <img class="post-comment-avatar" src="https://www.gravatar.com/avatar/{{ .email }}?s=50">
-            <p class="post-comment-info"><strong>{{ .name }}</strong><br>{{ dateFormat "02/01/2006" .date }}</p>
+            <img class="post-comment-avatar" src="https://www.gravatar.com/avatar/{{ .email }}?s=40">
+            <p class="post-comment-info"><strong>{{ .name }}</strong><br>{{ dateFormat "02 Jan 06 15:04 MST" .date }}</p>
           </div>
           {{ .message | markdownify }}
         </div>
