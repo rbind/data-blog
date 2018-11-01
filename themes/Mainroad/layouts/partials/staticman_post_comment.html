@@ -1,5 +1,5 @@
 <section class="post-comments">
-  <h3>Comments</h3>
+  <h2>Comments</h2>
   {{ $mycomments := .Site.Data.comments }}
   {{ $.Scratch.Add "hasComments" 0 }}
   {{ $entryId := .UniqueID }}
@@ -18,19 +18,20 @@
   {{ end }}
 
   {{ if eq ($.Scratch.Get "hasComments") 0 }}
-    <p>Be the first to comment!</p>
+    <p>There aren't any comments yet. Be the first to comment!</p>
   {{ end }}
 
-  <h3>Say something</h3>
+  <h3>Leave a comment</h3>
 
   <form class="post-new-comment" method="POST" action="https://staticmanbot.herokuapp.com/v2/entry/matdoering/data-blog/master/comments">
   <!--form class="post-new-comment" method="POST" action="http://localhost:8055/v2/entry/eduardoboucas/staticman-test/master/comments"-->
     <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#comment-submitted">
+    <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#post-error">
     <input type="hidden" name="options[entryId]" value="{{ .UniqueID }}">
   <input name="fields[path]" type="hidden" value="{{ .File.Path }}">
     <input name="fields[name]" type="text" class="post-comment-field" placeholder="Your name">
     <input name="fields[email]" type="email" class="post-comment-field" placeholder="Your email address">
-    <textarea name="fields[message]" class="post-comment-field" placeholder="Your message. Feel free to use Markdown." rows="10"></textarea>
+    <textarea name="fields[message]" class="post-comment-field" placeholder="Your message. Feel free to use Markdown." rows="3"></textarea>
     <input type="submit" class="post-comment-field btn" value="Submit">
   </form>
 </section>
@@ -40,3 +41,10 @@
   <p>Your comment has been submitted and will be published once it has been approved.</p>
   <p><a href="#" class="btn">OK</a></p>
 </div>
+
+<div id="post-error" class="dialog">
+    <h3>Sorry!</h3>
+    <p>Your post has not been submitted. Please return to the form and make sure that all fields are entered. Thank You!</p>
+    <p><a href="#" class="btn">OK</a></p>
+  </div> 
+
