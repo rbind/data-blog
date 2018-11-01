@@ -2,7 +2,7 @@ comments:
   allowedFields: ["path", "name", "email", "message"]
   branch: "master"
   commitMessage: "You have a new comment on your website."
-  filename: "{fields.path}/{fields.date}_{@id}"
+  filename: "{fields.date}_{@id}"
   format: "yml"
   generatedFields:
     date:

@@ -1226,13 +1226,14 @@ textarea {
 .highlighttable td,th{padding:0;border:0;}td.code{width:95%;}
 
 .post-comments {
-  margin-top: 60px;
+  margin-top: 20px;
 }
 
 .post-comment {
-  background-color: #eee;
   padding: 20px;
   margin-top: 20px;
+  border:2px solid #e7e7e7;
+  background-color:#fcfcfc;
 }
 
 .post-comment-header {
@@ -1259,6 +1260,7 @@ textarea {
   margin-top: 20px;
   outline-color: #F76C5E;
   width: 100%;
+  background-color:#ffffff;
 }
 
 .btn:hover {
