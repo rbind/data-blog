@@ -7,7 +7,7 @@
 
   {{ range $mycomments }}
     {{ printf "%#v" .path }}
-    {{ if eq $.Site.Data.comments.Name.path $.Permalink }}
+    {{ if eq .path $.Permalink }}
       {{ $.Scratch.Add "hasComments" 1 }}
       {{ range $index, $comments := (index $.Site.Data.comments $entryId ) }}
         <div class="post-comment">
