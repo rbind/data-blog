@@ -1281,7 +1281,7 @@ textarea {
   width: 100%;
   height: 100%;
   text-align: center;
-  overflow: hidden;
+  z-index: 1;
 }
 
 .dialog:target {
