@@ -1,0 +1,74 @@
+---
+title: "Staticman: an alternative to Disqus for comments on static sites"
+author: Matthias Döring
+date: '2018-11-01'
+description: "Staticman is an alternative to Disqus for including comments in a static page. Here, I discuss how this can be done for Hugo."
+thumbnail: "/post/other/staticman_comments_avatar.png"
+thumbnailsrc: "Figure: staticman.net"
+categories:
+  - other
+tags:
+  - Hugo
+---
+
+
+
+<p>Comments are an important aspect of many website, particularly blogs, whose success depends on their ability to create communities. However, including comments is inherently more difficult for static websites than for dynamic websites (e.g. managed through Wordpress). With Hugo, comments can be easily integrated via Disqus. The disadvantage, however, is that foreign JavaScript code needs to be executed and that the comments are not part of the page itself. Here, I will
+explain how comments can be integrated into a web page using Staticman.</p>
+<!--more-->
+<div id="what-is-staticman" class="section level2">
+<h2>What is Staticman?</h2>
+<p><a href="https://staticman.net/">Staticman</a> is an API, which allows for the integration of comments into static web pages. What is the idea of this approach?</p>
+<ul>
+<li>To create a new comment, a request is sent to the Staticman API.</li>
+<li>If the moderation option is set to true, a Staticman GitHub account will automatically create a pull request for the submitted comment. The user can then decide whether to merge the pull request or close it. If the moderation option is set to false, comments are automatically merged into the page.</li>
+<li>The static web page is rebuilt and the comments are displayed.</li>
+</ul>
+</div>
+<div id="problems-with-the-staticman-api" class="section level2">
+<h2>Problems with the Staticman API</h2>
+<p>Unfortunately, it seems that the public Staticman API is overstrained. When I wanted to use the API, the Staticman GitHub account would not accept my collaboration invitation quoting “Invitation not found” <a href="https://staticman.net/docs/">when trying to connect to the API as described in the official documentation</a>. It turned out that <a href="https://github.com/eduardoboucas/staticman/issues/227">many other people also had the same problem</a>. Luckily, the problem can be overcome by hosting your own version of the Staticman API. So this is what I did.</p>
+</div>
+<div id="hosting-your-own-staticman-api" class="section level2">
+<h2>Hosting your own Staticman API</h2>
+<p>To host my own version of the Staticman API, I’ve followed <a href="https://vincenttam.gitlab.io/post/2018-09-16-staticman-powered-gitlab-pages/2/">this great tutorial</a>. Here, I’ll briefly summarize the required steps for getting Staticman running for a GitHub repository.</p>
+<ol style="list-style-type: decimal">
+<li>Create a new GitHub account for the Staticman API</li>
+<li>Create a GitHub token for this account, allowing API/write access</li>
+<li>Clone an instance of <a href="https://github.com/eduardoboucas/staticman/">Staticman</a></li>
+<li>Create a private RSA key for use with the API:
+<code>openssl genrsa -out key.pem</code></li>
+<li>Create an account at <a href="https://www.heroku.com">Heroku</a>, a free web app hoster and download the Heroku CLI</li>
+<li>After logging into the CLI using <code>heroku login</code>, create a new Staticman app and configure it:
+<code>cd ~/staticman</code>
+<code>heroku create {nameOfYourStaticmanApp}</code>
+<code>$heroku config:set NODE_ENV=&quot;production&quot;</code>
+<code>$heroku config:set RSA_PRIVATE_KEY=&quot;$(cat key.pem)&quot;</code>
+<code>$heroku config:set GITHUB_TOKEN=&quot;Your_Token&quot;</code></li>
+<li>Create a production branch:
+<code>git checkout -b production origin/dev</code></li>
+<li>Add <code>config.production.json</code> to <code>.gitignore</code></li>
+<li>Commit the changes:
+<code>git add config.production.json Procfile .gitignore</code>
+<code>git commit -m &quot;Set up Staticman v3 for deployment to Heroku&quot;</code></li>
+<li>Deploy the API:
+``git push heroku production:master```</li>
+<li>After the API has been built successfully, you should be greeted with <em>Hello from Staticman version 3.0.0!</em> when visiting your API instance at <code>https://{nameOfYourStaticmanApp}.herokuapp.com</code>.</li>
+</ol>
+</div>
+<div id="reconfiguring-your-theme" class="section level2">
+<h2>Reconfiguring your theme</h2>
+<p>Once the API is running, you need to adjust your Hugo theme to let users submit comments through the API and have the available comments in your data folder displayed. There are already several tutorials available that deal with this problem, for example, <a href="https://www.bhnywl.com/blog/comments-for-your-static-blog-with-staticman/">here</a> and <a href="https://networkhobo.com/2017/12/30/hugo---staticman-nested-replies-and-e-mail-notifications/">here</a>.</p>
+<p>Since I had some problems with these tutorial, I’d recommend starting with the <a href="https://github.com/eduardoboucas/hugo-plus-staticman">commenting system from the official demo site</a>. I’ll shortly go through the most important aspects:</p>
+<ul>
+<li>The configuration of the API is done via <em>staticman.yml</em>. Adjust these values according to your needs.</li>
+<li>Adjust the <a href="https://github.com/eduardoboucas/hugo-plus-staticman/blob/master/themes/hugo-type-theme/static/css/main.css">CSS for the comments</a> to your needs.</li>
+<li>Adjust the template responsible for comments in your theme folder using the <a href="https://github.com/eduardoboucas/hugo-plus-staticman/tree/master/themes/hugo-type-theme/layouts/partials">templates from the demo</a>.</li>
+</ul>
+<p>When I tried to get the comments template working, I couldn’t get any comments displayed because the unique IDs never matched. Thus, I’ve ended up with a <a href="https://github.com/matdoering/data-blog/blob/master/themes/Mainroad/layouts/partials/staticman_post_comment.html">modified partial template for the Staticman commenting system</a>. The idea of my approach is to store the path of the page in the comment file and then to check whether the comment’s path is a subset of the page’s path via <code>{{ if in .path $.File.Path }}</code>.</p>
+</div>
+<div id="remaining-issues" class="section level2">
+<h2>Remaining issues</h2>
+<p>The only remaining issue I have is that it doesn’t seem to be possible to store comments in subfolders of <code>data/comments</code>. This is because Hugo doesn’t allow access to files when looping over the data. Thus, all comments of a site have to be stored in a single folder, which could be a problem if there are thousands of comments. For small sites, however, this should be fine.</p>
+<p>I hope this overview helped you getting started with Staticman for Hugo. Many thanks to <a href="https://eduardoboucas.com/">Eduardo Bouças</a> for this great tool! If you have any questions, just write a comment below ;-)</p>
+</div>
