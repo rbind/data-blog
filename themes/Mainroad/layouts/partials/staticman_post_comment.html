@@ -1,15 +1,13 @@
 <section class="post-comments">
   <h3>Comments</h3>
-
+  {{ $mycomments := .Site.Data.comments }}
   {{ $comments := readDir "data/comments" }}
   {{ $.Scratch.Add "hasComments" 0 }}
   {{ $entryId := .UniqueID }}
 
-  {{ range $comments }}
-    {{ printf "%#v" .Name }}
-    {{ printf "%#v" $entryId }}
-
-    {{ if eq .Name $entryId }}
+  {{ range $mycomments }}
+    {{ printf "%#v" .path }}
+    {{ if eq $.Site.Data.comments.Name.path $.Permalink }}
       {{ $.Scratch.Add "hasComments" 1 }}
       {{ range $index, $comments := (index $.Site.Data.comments $entryId ) }}
         <div class="post-comment">
