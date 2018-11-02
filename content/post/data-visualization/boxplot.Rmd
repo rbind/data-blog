@@ -15,7 +15,7 @@ The box plot is useful for comparing the quartiles of quantitative variables. Mo
 
 ## Creating a box plot in native R
 
-In native R, a box plot can be obtained via `boxplot`.
+We will use the [warpbreaks data set](/post/statistical_test/contingency_table_tests/) to exemplify the use of box plots. In native R, a box plot can be obtained via `boxplot`.
 
 ```{r}
 data(warpbreaks)
@@ -50,3 +50,17 @@ ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
     geom_boxplot() + 
     ggtitle("Breaks for wool A and B")
 ```
+
+### Showing all points
+
+To view the individual measurements associated with the box plot, we set ```outlier.shape = NA``` to prevent duplicates and call ```geom_point```.
+
+```{r}
+ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
+    geom_boxplot(outlier.shape = NA) + 
+    ggtitle("Breaks for wool A and B") +
+    # dodge points sideways because there are two boxes per tick
+    geom_point(position = position_dodge(0.75))
+```
+
+Showing all the points helps us to identify whether the sample size is sufficient. In this case, most pairs of wool and tension exhibit high variabilities (especially wool A with tension L). Thus, the question would be whether this level of variability is inherent to the data or a result of the small number of samples (n = 9). 

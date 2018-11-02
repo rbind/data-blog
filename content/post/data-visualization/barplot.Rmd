@@ -15,6 +15,7 @@ Bar plots display quantities according to the height of bars. Since standard bar
 
 ## Plotting a histogram in native R
 
+We will use the [warpbreaks data set](/post/statistical_test/contingency_table_tests/) to exemplify the use of bar plots.
 To obtain a bar plot in native R, we can use the `barplot` function.
 
 ```{r}

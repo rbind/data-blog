@@ -16,7 +16,7 @@ thumbnail: "/post/data-visualization/boxplot_cover.png"
 <p>The box plot is useful for comparing the quartiles of quantitative variables. More specifically, lower and upper ends of a box (the hinges) are defined by the first (Q1) and third quartile (Q3). The median (Q2) is shown as a horizontal line within the box. Additionally, outliers are indicated by the whiskers of the boxes whose definition is implementation-dependent. For example, in <code>geom_boxplot</code> of ggplot2, whiskers are defined by the inter-quartile range (IQR = Q3 - Q1), extending no further than 1.5 * IQR. <!--more--></p>
 <div id="creating-a-box-plot-in-native-r" class="section level2">
 <h2>Creating a box plot in native R</h2>
-<p>In native R, a box plot can be obtained via <code>boxplot</code>.</p>
+<p>We will use the <a href="/post/statistical_test/contingency_table_tests/">warpbreaks data set</a> to exemplify the use of box plots. In native R, a box plot can be obtained via <code>boxplot</code>.</p>
 <pre class="r"><code>data(warpbreaks)
 # create positions for tick marks, one more than number of bars
 x &lt;- warpbreaks$breaks
@@ -45,4 +45,15 @@ ggplot(warpbreaks, aes(x = tension, y = breaks)) +
     geom_boxplot() + 
     ggtitle(&quot;Breaks for wool A and B&quot;)</code></pre>
 <p><img src="/post/data-visualization/boxplot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<div id="showing-all-points" class="section level3">
+<h3>Showing all points</h3>
+<p>To view the individual measurements associated with the box plot, we set <code>outlier.shape = NA</code> to prevent duplicates and call <code>geom_point</code>.</p>
+<pre class="r"><code>ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
+    geom_boxplot(outlier.shape = NA) + 
+    ggtitle(&quot;Breaks for wool A and B&quot;) +
+    # dodge points sideways because there are two boxes per tick
+    geom_point(position = position_dodge(0.75))</code></pre>
+<p><img src="/post/data-visualization/boxplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Showing all the points helps us to identify whether the sample size is sufficient. In this case, most pairs of wool and tension exhibit high variabilities (especially wool A with tension L). Thus, the question would be whether this level of variability is inherent to the data or a result of the small number of samples (n = 9).</p>
+</div>
 </div>
