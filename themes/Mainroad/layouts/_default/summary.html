@@ -27,10 +27,10 @@
             {{ replaceRE "(?s)(<!--more-->.*)" "" .Content  | safeHTML }}
             </p>
             {{ else }} -->
-            {{ if .Description }}
-                {{ .Description }}
+            {{ if .Params.Description }}
+                {{ .Params.Description }}
             {{ else }}
-            {{ .Summary | plainify | safeHTML }}
+            {{ .Params.Summary | plainify | safeHTML }}
             {{ end }}
             <!--{{ end }}-->
 	</div>
