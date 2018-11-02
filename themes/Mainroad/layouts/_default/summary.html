@@ -30,7 +30,7 @@
             {{ if .Params.Description }}
                 {{ .Params.Description }}
             {{ else }}
-            {{ .Params.Summary | plainify | safeHTML }}
+            {{ .Summary | plainify | safeHTML }}
             {{ end }}
             <!--{{ end }}-->
 	</div>
