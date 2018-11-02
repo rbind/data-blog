@@ -20,8 +20,8 @@ rssLimit = 20 # max nbr of entries shown in rss feed
 [Params]
   subtitle = "Understand. Implement. Succeed." # Subtitle of your site
   description = "Interested in data science? Profit from this blog's comprehensive applications of statistical testing, machine learning, and visualization in R!"
-  opengraph = true
-  twitter_cards = false
+  opengraph = true # for social media links to blog
+  twitter_cards = true # for twitter links to blog
   readmore = false # Show "Read more" button in list if true
   authorbox = false
   post_navigation = true
@@ -34,11 +34,14 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   list = "right"   # Configure layout for list pages
   single = "right" # Configure layout for single pages
   # Enable widgets in given order
-  widgets = ["search", "recent", "categories", "taglist"]
+  widgets = ["search", "recent", "categories", "taglist", "social"]
 
 [Params.widgets]
   recent_num = 5 # Set the number of articles in the "Recent articles" widget
   tags_counter = false # Enable counter for each tag in "Tags" widget (disabled by default)
+
+#[Params.widgets.social]
+  # Enable parts of social widget
 
 #[taxonomies]
   #category = ""

@@ -1,17 +1,30 @@
 ---
 title: "Plots"
 thumbnail: "/tags/plot/chart-close-up-data-590022.jpg"
-description: "Plots are the most important tool for communicating results. However, choosing the right type of plot can be challenginge. Learn here, how to choose between histograms, scatter plots, box plots, and so on."
+description: "Plots are the most important tool for communicating results. However, choosing the right type of plot can be challenging. Learn here, how to choose between histograms, scatter plots, box plots, and so on."
 ---
 <img src="chart-close-up-data-590022.jpg">
 
-There is a large number of different types of plots for visualizing data. Of those, however, only a few are frequently used. The most important plots are the following:
+There is a large number of different types of plots for visualizing data. 
 
-* The [histogram](/post/data-visualization/histogram/) consists of bars that indicate the frequency of measurements and is ideal for showing the distribution of a variable.
-* The [scatter plot](/post/data-visualization/scatterplot/) shows the value of two variables as points and is ideal for identifying correlated variables.
+## Basic plots
+
+The following plots are frequently used:
+
 * The [bar plot](/post/data-visualization/barplot/) shows the extent of values according to the height of bars. If the data are normally distributed, they can be display variation by including error bars.
 * The [box plot](/post/data-visualization/boxplot/) indicates variation by showing the most frequently observed measurements in terms of the first, second, and third quartile.
+* The [histogram](/post/data-visualization/histogram/) consists of bars that indicate the frequency of measurements and is ideal for showing the distribution of a variable.
+* The [line plot](/post/data-visualization/line-plot/) connects individual measurements using lines. It is most suited for time-series data.
+* The [scatter plot](/post/data-visualization/scatterplot/) shows the value of two variables as points and is ideal for identifying correlated variables.
+
+## Further plots
+
+The following plots are less frequently used than the basic plots. Nevertheless, these plots may be very useful for specific applications.
+
+* The beeswarm plot is an alternative to the box plot that draws individual data points
 * The [Q-Q plot](/post/statistical_test/signed_wilcox_rank_test/) can be used to compare whether two samples have similar distributions.
+* The radar plot shows the values of several properties in a circular layout
+* The violin plot is an alternative to the box plot that provides more information on the distribution of the values
 
 ## Posts about plots
 
