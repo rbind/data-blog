@@ -2,7 +2,7 @@
 title: "Bar Plots and Error Bars"
 author: Matthias Döring
 date: '2018-10-31'
-description: "Plotting bar graphs in R is easy. Here, you will learn how to draw error bars and cases where bar graphs are not appropriate."
+description: "Bar plots are frequently used due to their simplicity. However, they also do not convey a lot of information. Here, I discuss how error bars can be used to visualize variance and under which circumstances bar charts should not be used."
 categories:
   - data-visualization
 tags:
@@ -13,10 +13,12 @@ thumbnail: "/post/data-visualization/barplot_cover.png"
 
 
 
-<p>Bar plots display quantities according to the height of bars. Since standard bar plots do not indicate the level of variation in the data, they are most appropriate for showing individual values (e.g. count data) rather than aggregates of several values (e.g. arithmetic means). Although variation can be shown through error bars, this is only appropriate if the data are normally distributed. <!--more--></p>
+<p>Bar plots display quantities according to the height of bars. Since standard bar plots do not indicate the level of variation in the data, they are most appropriate for showing individual values (e.g. count data) rather than aggregates of several values (e.g. arithmetic means). Although variation can be shown through error bars, this is only appropriate if the data are normally distributed.
+<!--more--></p>
 <div id="plotting-a-histogram-in-native-r" class="section level2">
 <h2>Plotting a histogram in native R</h2>
-<p>We will use the <a href="/post/statistical_test/contingency_table_tests/">warpbreaks data set</a> to exemplify the use of bar plots. To obtain a bar plot in native R, we can use the <code>barplot</code> function.</p>
+<p>We will use the <a href="/post/statistical_test/contingency_table_tests/">warpbreaks data set</a> to exemplify the use of bar plots.
+To obtain a bar plot in native R, we can use the <code>barplot</code> function.</p>
 <pre class="r"><code>data(warpbreaks)
 # create positions for tick marks, one more than number of bars
 x &lt;- warpbreaks$breaks
@@ -30,7 +32,8 @@ cols &lt;- c(rep(group.cols[1], 9), rep(group.cols[2], 9),
         rep(group.cols[5], 9), rep(group.cols[6], 9))
 barplot(x, space = 0,  col = cols)
 legend(&quot;topright&quot;, legend = c(unique(x.labels)), col = group.cols, pch = 20)</code></pre>
-<p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-1-1.png" width="672" /> A disadvantage of this approach is that it is tedious to specify the <a href="http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf">coloring vector</a> if there are many group combinations.</p>
+<p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+A disadvantage of this approach is that it is tedious to specify the <a href="http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf">coloring vector</a> if there are many group combinations.</p>
 </div>
 <div id="plotting-a-histogram-with-ggplot" class="section level2">
 <h2>Plotting a histogram with ggplot</h2>
@@ -82,8 +85,6 @@ ggplot(df, aes(x = tension, y = Mean)) +
 <h2>Box plot alternatives</h2>
 <p>As you can see from the last plot, the bar plot is inappropriate for highly variable measurements with outliers because then the mean is ill-defined and the error bars tend to dominate the visuals. Therefore, in these cases, I’d recommend a plot that is tailored towards displaying variation such as a <a href="/post/data-visualization/boxplot/">box plot</a>, which displays the first, second, and third quartiles.</p>
 <p>Just compare the following two plots, which clearly demonstrate that the box plot is superior for these data.</p>
-<pre class="r"><code>require(gridExtra)</code></pre>
-<pre><code>## Loading required package: gridExtra</code></pre>
 <pre class="r"><code>p.bar &lt;- ggplot(df, aes(x = tension, y = Mean, fill = wool)) +
     geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) + 
     geom_errorbar(aes(ymin = Mean - 1.96 * SD, ymax = Mean + 1.96 * SD), 
@@ -91,7 +92,10 @@ ggplot(df, aes(x = tension, y = Mean)) +
     ggtitle(&quot;Bar plot&quot;)
 p.box &lt;- ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
     geom_boxplot() + ggtitle(&quot;Box plot&quot;)
-grid.arrange(p.bar, p.box, ncol=2)</code></pre>
+# load gridExtra to show plots side-by-side using grid.arrange
+require(gridExtra)</code></pre>
+<pre><code>## Loading required package: gridExtra</code></pre>
+<pre class="r"><code>grid.arrange(p.bar, p.box, ncol=2)</code></pre>
 <p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>If you would like to learn more, just read one of my previous posts about situations when the <a href="/post/basic-statistics/mean_vs_median/">median is more appropriate than the mean</a>.</p>
 </div>

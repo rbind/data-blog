@@ -20,18 +20,19 @@
 		{{- end }}
 	</header>
 	<div class="content list__excerpt post__content clearfix">
+        <!--
         {{ $summaries := findRE "<!--more-->.*" .Content }}
         {{ if ge (len $summaries) 1 }}
          <p class = "summary">
             {{ replaceRE "(?s)(<!--more-->.*)" "" .Content  | safeHTML }}
             </p>
-        {{ else }}
+            {{ else }} -->
             {{ if .Description }}
                 {{ .Description }}
             {{ else }}
             {{ .Summary | plainify | safeHTML }}
             {{ end }}
-      {{ end }}
+            <!--{{ end }}-->
 	</div>
 	{{- if .Site.Params.readmore }}
 	{{- if .Truncated }}
