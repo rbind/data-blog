@@ -27,8 +27,8 @@
             {{ replaceRE "(?s)(<!--more-->.*)" "" .Content  | safeHTML }}
             </p>
             {{ else }} -->
-            {{ if .Params.Description }}
-                {{ .Params.Description | plainify | safeHTML}}
+            {{ if .Params.description }}
+                {{ .Params.description | plainify | safeHTML}}
             {{ else }}
             {{ .Summary | plainify | safeHTML }}
             {{ end }}
