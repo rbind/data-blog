@@ -28,7 +28,7 @@
             </p>
             {{ else }} -->
             {{ if .Params.Description }}
-                {{ .Params.Description }}
+                {{ .Params.Description | plainify | safeHTML}}
             {{ else }}
             {{ .Summary | plainify | safeHTML }}
             {{ end }}
