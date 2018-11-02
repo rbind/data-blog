@@ -1,16 +1,11 @@
 ---
-title: "Type 1 vs type 2 errors: significance vs power"
+title: "Type 1 vs Type 2 Errors: Significance vs Power"
 author: Matthias Döring
 date: '2018-10-22'
 thumbnail: "post/statistical_test/type1_vs_type2_cover.png"
 description: "When designing and performing statistical tests it is important to think about type 1 and type 2 errors as these errors critically influence significance and power."
 categories:
   - statistical test
-tags:
-  - type 1 error
-  - type 2 error
-  - null hypothesis
-  - power
 ---
 When planning statistical tests, it is important to think about the consequenes of type 1 and type 2 errors. Typically, type 1 errors are considered to be the worse type of error. While the rate of type 1 errors is limited by the significance level, the rate of type 2 errors depends on the statistical power of the test. Here, we discuss how the null hypothesis should be chosen and how the two types of errors are related.
 <!--more-->

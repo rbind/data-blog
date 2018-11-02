@@ -6,13 +6,13 @@ date: '2018-10-26'
 description: "If your data follows a normal distribution using the mean is fine. But what should you do in other cases?"
 categories:
   - basic-statistics
-tags:
-- average
 ---
 
 
 
-<p>Two of the most commonly used statistical measures are the mean and the median. Both measures indicate the central value of a distribution, that is, the value at which one would expect the majority of data points to lie. In many applications, however, it is useful to think about which of the two measures is more appropriate given the data at hand. In this post, we’ll investigate the differences between both quantities and give recommendations when one should be preferred over the other. <!--more--></p>
+<p>Two of the most commonly used statistical measures are the mean and the median. Both measures indicate the central value of a distribution, that is, the value at which one would expect the majority of data points to lie. In many applications, however, it is useful to think about which of the two measures is more appropriate given the data at hand. In this post, we’ll investigate the differences between both quantities and give recommendations when one should be
+preferred over the other.
+<!--more--></p>
 <div id="the-mean" class="section level2">
 <h2>The mean</h2>
 <p>The arithmetic mean is what most people simply know as <em>the average</em>. To be exact, however, we have to note that the mean is just one type of average. Before getting lost in the intricacies of these terms, let’s move on to the definition of the mean</p>
@@ -74,7 +74,8 @@ print(x.median)</code></pre>
 </div>
 <div id="comparison-of-mean-and-median" class="section level2">
 <h2>Comparison of mean and median</h2>
-<p>Having defined both types of averages, we can now look into the difference between the two. While the arithmetic mean considers <strong>all</strong> the values in a vector, the median value only considers a <strong>subset</strong> of values. This is because the median basically discards all vector elements except for the most central value(s). This feature of the median can make a big difference. As we have seen in our example, the mean of <span class="math inline">\(x\)</span> (133) was much larger than its median (40). In this case, this is because the median discards the value 1000 in <span class="math inline">\(x\)</span>, while the arithmetic mean considers it.</p>
+<p>Having defined both types of averages, we can now look into the difference between the two. While the arithmetic mean considers <strong>all</strong> the values in a vector, the median value only considers a <strong>subset</strong> of values. This is because the median basically discards all vector elements except for the most central value(s). This feature of the median can make a big difference. As we have seen in our example, the mean of <span class="math inline">\(x\)</span> (133) was much larger than its median (40).
+In this case, this is because the median discards the value 1000 in <span class="math inline">\(x\)</span>, while the arithmetic mean considers it.</p>
 <p>This brings us to the question we wanted to answer: when to use the mean and when to use the median? The answer is simple. If your data contains outliers such as the 1000 in our example, then you would typically rather use the median because otherwise the value of the mean would be dominated by the outliers rather than the typical values. In conclusion, if you are considering the mean, check your data for outliers. A simple way to do this is to plot a histogram of the data.</p>
 <pre class="r"><code>hist(x)</code></pre>
 <p><img src="/post/basic-statistics/mean_vs_median_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>

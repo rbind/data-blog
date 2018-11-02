@@ -6,7 +6,6 @@ date: '2018-10-20'
 categories:
   - statistical test
 tags:
-  - contingency table
   - matched data
 ---
 

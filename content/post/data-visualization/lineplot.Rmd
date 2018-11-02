@@ -1,5 +1,5 @@
 ---
-title: "Visualizing time-series data with line plots"
+title: "Visualizing Time-Series Data with Line Plots"
 author: Matthias Döring
 date: '2018-11-02'
 description: "Line plots are the go-to plot for time series data. Here, we show several options (e.g. native R, MTS package, ggplot) for creating beautiful line plots in R."

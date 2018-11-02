@@ -1,5 +1,5 @@
 ---
-title: "Testing Independence on Contingency Tables: Chi-Squared vs Fisher's Exact Test"
+title: "Testing Independence: Chi-Squared vs Fisher's Exact Test"
 author: Matthias Döring
 date: '2018-10-17'
 thumbnail: "post/statistical_test/contingency_table_tests_cover.png"
@@ -7,9 +7,7 @@ description: "Testing whether two groups are independent of each other is a comm
 categories:
   - statistical test
 tags:
-  - multiple testing
   - non-parametric test
-  - contingency table
 ---
 One of the most common areas of statistical testing is testing for independence in contingency tables. In this post, I will show how contingency tables can be computed and I will introduce two popular tests on contingency tables: the chi-squared test and Fisher's exact test.
 <!--more-->

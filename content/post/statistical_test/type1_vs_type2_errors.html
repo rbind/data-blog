@@ -1,21 +1,17 @@
 ---
-title: "Type 1 vs type 2 errors: significance vs power"
+title: "Type 1 vs Type 2 Errors: Significance vs Power"
 author: Matthias Döring
 date: '2018-10-22'
 thumbnail: "post/statistical_test/type1_vs_type2_cover.png"
 description: "When designing and performing statistical tests it is important to think about type 1 and type 2 errors as these errors critically influence significance and power."
 categories:
   - statistical test
-tags:
-  - type 1 error
-  - type 2 error
-  - null hypothesis
-  - power
 ---
 
 
 
-<p>When planning statistical tests, it is important to think about the consequenes of type 1 and type 2 errors. Typically, type 1 errors are considered to be the worse type of error. While the rate of type 1 errors is limited by the significance level, the rate of type 2 errors depends on the statistical power of the test. Here, we discuss how the null hypothesis should be chosen and how the two types of errors are related. <!--more--></p>
+<p>When planning statistical tests, it is important to think about the consequenes of type 1 and type 2 errors. Typically, type 1 errors are considered to be the worse type of error. While the rate of type 1 errors is limited by the significance level, the rate of type 2 errors depends on the statistical power of the test. Here, we discuss how the null hypothesis should be chosen and how the two types of errors are related.
+<!--more--></p>
 <div id="type-1-vs-type-2-error" class="section level2">
 <h2>Type 1 vs type 2 error</h2>
 <p>Type 1 and type 2 errors are defined in the following way for a null hypothesis <span class="math inline">\(H_0\)</span>:</p>
@@ -59,11 +55,12 @@ tags:
 <p>Since the type 1 error rate is typically more stringently controlled than the type 2 error rate (i.e. <span class="math inline">\(\alpha &lt; \beta\)</span>), the alternative hypothesis often corresponds to the effect you would like to demonstrate. In this way, if the null hypothesis is rejected, it is unlikely that the rejection is a type 1 error. When statistical testing is used to inform decision making, the null hypothesis whose type 1 error would have the worse consequence should be selected. Let’s consider two examples for choosing the null hypothesis in this manner.</p>
 <div id="example-1-introduction-of-a-new-drug" class="section level3">
 <h3>Example 1: introduction of a new drug</h3>
-<p>Let’s assume there’s a well-tried, FDA-approved drug that is effective against cancer. Having developed a new drug, your company wants to decide whether it should supplant the old drug with the new drug. Here, you definitely want to use a directional test in order to show that one drug is superior over the other. However, given effectivity measures A and B for the old and the new drug, respectively, how should the null hypothesis be formulated? Take a look at the consequences of the choice:</p>
+<p>Let’s assume there’s a well-tried, FDA-approved drug that is effective against cancer. Having developed a new drug, your company wants to decide whether it should supplant the old drug with the new drug. Here, you definitely want to use a directional test in order to show that one drug is superior over the other. However, given effectivity measures A and B for the old and the new drug, respectively, how should the null hypothesis be formulated? Take a look at the consequences of the
+choice:</p>
 <table>
 <colgroup>
 <col width="8%" />
-<col width="13%" />
+<col width="12%" />
 <col width="78%" />
 </colgroup>
 <thead>
@@ -94,7 +91,7 @@ tags:
 <table>
 <colgroup>
 <col width="8%" />
-<col width="13%" />
+<col width="12%" />
 <col width="78%" />
 </colgroup>
 <thead>

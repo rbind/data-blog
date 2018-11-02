@@ -6,8 +6,6 @@ description: "Effect sizes are often overlooked in favor of significance. Here, 
 thumbnail: "post/statistical_test/effect_size_cover.png"
 categories:
   - statistical test
-tags:
-  - effect size
 ---
 
 So, you performed a test for significance and obtained a positive result. That's great but it's not time to celebrate yet. You may ask: *Why? Isn't a significant test result sufficient to show the existence of an effect?* This statement, however, is not true for two reasons. First, a significant result only indicates the existence of an effect but doesn't prove it. For example, at a significance level of 5%, an exact test will yield a false positive result in 5% of the cases. Second, a significant result does not necessarily make a statement about the magnitude of the effect. In this post, we'll investigate the difference between statistical significance and the effect size, which describes the magnitude of an effect.

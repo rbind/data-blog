@@ -1,5 +1,5 @@
 ---
-title: "SEO for Hugo sites: noindex for taxonomies (tags/categories)" 
+title: "Setting Noindex for Hugo Taxonomy Pages"
 author: Matthias Döring
 date: '2018-10-20'
 description: "Would you like to set the noindex meta tag for Hugo archive pages? This post shows how it is possible!"
@@ -9,12 +9,12 @@ categories:
   - other
 tags:
   - Hugo
-  - SEO
 ---
 
 
 
-<p>Taxonomies in Hugo are a great way to structure information provided by a blog. For search engine optimization (SEO) purposes, however, the existence of duplicate content on a site can be a problem. If you think this is the case for your site, then you can use the <em>noindex</em> meta tag for all of the taxonomy sites that do not provide unique content. This post shows you how to get it done. <!--more--></p>
+<p>Taxonomies in Hugo are a great way to structure information provided by a blog. For search engine optimization (SEO) purposes, however, the existence of duplicate content on a site can be a problem. If you think this is the case for your site, then you can use the <em>noindex</em> meta tag for all of the taxonomy sites that do not provide unique content. This post shows you how to get it done.
+<!--more--></p>
 <div id="adjust-your-themes-baseof.html-file" class="section level2">
 <h2>Adjust your theme’s <em>baseof.html</em> file</h2>
 <p>The file <em>baseof.html</em> defines the basic structure of your website. You can find it under <em>layouts/_default</em> of your theme’s folder. For example, my <em>baseof.html</em> is located under <em>themes/Mainroad/layouts/_default/baseof.htm</em>. Simply add this code within the head tag:</p>

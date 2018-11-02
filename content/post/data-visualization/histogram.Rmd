@@ -1,5 +1,5 @@
 ---
-title: "Determining the distribution of data using histograms"
+title: "Determining the Distribution of Data Using Histograms"
 author: Matthias Döring
 date: '2018-10-28'
 description: "Histograms are an ideal tool for exploring the distribution of a variable and can be easily achieved using R."

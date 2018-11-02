@@ -1,5 +1,5 @@
 ---
-title: "Staticman: an alternative to Disqus for comments on static sites"
+title: "Staticman: An Alternative to Disqus for Comments on Static Sites"
 author: Matthias Döring
 date: '2018-11-01'
 description: "Staticman is an alternative to Disqus for including comments in a static page. Here, I discuss how to set up your own instance of the Staticman API and how it is integrated into a Hugo site."
@@ -10,7 +10,7 @@ categories:
 tags:
   - Hugo
 ---
-Comments are an important aspect of many website, particularly blogs, whose success depends on their ability to create communities. However, including comments is inherently more difficult for static websites than for dynamic websites (e.g. managed through Wordpress). With Hugo, comments can be easily integrated via Disqus. The disadvantage, however, is that foreign JavaScript code needs to be executed and that the comments are not part of the page itself. Here, I will
+Comments are an important aspect of many websites, particularly blogs, whose success depends on their ability to create communities. However, including comments is inherently more difficult for static websites than for dynamic websites (e.g. managed through Wordpress). With Hugo, comments can be easily integrated via Disqus. The disadvantage, however, is that foreign JavaScript code needs to be executed and that the comments are not part of the page itself. Here, I will
 explain how comments can be integrated into a web page using Staticman.
 
 <!--more-->

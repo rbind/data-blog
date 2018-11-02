@@ -1,5 +1,5 @@
 ---
-title: "SEO for Hugo sites: noindex for taxonomies (tags/categories)" 
+title: "Setting Noindex for Hugo Taxonomy Pages"
 author: Matthias Döring
 date: '2018-10-20'
 description: "Would you like to set the noindex meta tag for Hugo archive pages? This post shows how it is possible!"
@@ -9,7 +9,6 @@ categories:
   - other
 tags:
   - Hugo
-  - SEO
 ---
 
 Taxonomies in Hugo are a great way to structure information provided by a blog. For search engine optimization (SEO) purposes, however, the existence of duplicate content on a site can be a problem. If you think this is the case for your site, then you can use the *noindex* meta tag for all of the taxonomy sites that do not provide unique content. This post shows you how to get it done. 

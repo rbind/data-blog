@@ -6,8 +6,6 @@ description: "Dealing with distributions is easy in R. Learn the ins and outs of
 date: '2018-10-29'
 categories:
   - basic-statistics
-tags:
-- distribution
 ---
 R is a great tool for working with distributions. However, one has to know which specific function is the right wrong. Here, I'll discuss which functions are available for dealing with the normal distribution: dnorm, pnorm, qnorm, and rnorm.
 <!--more-->

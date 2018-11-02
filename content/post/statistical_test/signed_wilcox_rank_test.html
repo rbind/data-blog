@@ -1,5 +1,5 @@
 ---
-title: "Comparing Two Groups of Paired Quantitative Data: Wilcoxon Signed Rank Test vs Paired Student's t-test"
+title: "Wilcoxon Signed Rank Test vs Paired Student's t-test"
 author: Matthias Döring
 date: '2018-10-16'
 description: "If you want to compare the means or medians of paired measurements, you can use a paired Student's t-test or a Wilcoxon signed rank test, respectively. Learn how to use these tests in R here!"
@@ -7,7 +7,6 @@ thumbnail: "post/statistical_test/signed_wilcox_rank_test_cover.png"
 categories:
   - statistical test
 tags:
-  - Wilcoxon test
   - non-parametric test
   - parametric test
   - matched data
@@ -16,7 +15,8 @@ tags:
 
 
 
-<p>In this post, we will explore tests for comparing two groups of dependent (i.e. paired) quantitative data: the Wilcoxon signed rank test and the paired Student’s t-test. The critical difference between these tests is that the test from Wilcoxon is a non-parametric test, while the t-test is a parametric test. In the following, we will explore the ramifications of this difference. <!--more--></p>
+<p>In this post, we will explore tests for comparing two groups of dependent (i.e. paired) quantitative data: the Wilcoxon signed rank test and the paired Student’s t-test. The critical difference between these tests is that the test from Wilcoxon is a non-parametric test, while the t-test is a parametric test. In the following, we will explore the ramifications of this difference.
+<!--more--></p>
 <div id="the-sleep-data-set" class="section level2">
 <h2>The sleep data set</h2>
 <p>Let’s consider the sleep data set. The data set contrasts the effect of two soporific drugs (aka sleeping pills) by providing the change in the number of hours slept after taking the drug compared to a baseline:</p>
@@ -60,7 +60,9 @@ print(sleep)</code></pre>
 </div>
 <div id="wilcoxon-signed-rank-test" class="section level2">
 <h2>Wilcoxon Signed Rank Test</h2>
-<p>The Wilcoxon signed rank test uses the sum of the signed ranks as the test statistic <span class="math inline">\(W\)</span>: <span class="math display">\[W=\sum _{{i=1}}^{{N}}[\operatorname{sgn}(x_{{2,i}}-x_{{1,i}})\cdot R_{i}]\]</span> Here, the <span class="math inline">\(i\)</span>-th of <span class="math inline">\(N\)</span> measurement pairs is indicated by <span class="math inline">\(x_i = (x_{1,i}, x_{2,i})\)</span> and <span class="math inline">\(R_{i}\)</span> denotes the rank of the pair. The rank simply represents the position of an observation in an ordered list of <span class="math inline">\(|x_{2,i} - x_{1,i}|\)</span>. The inuition of the test statistic is that pairs with large absolute differences will have large ranks <span class="math inline">\(R_{i}\)</span>. Thus, these pairs are the determining factors of <span class="math inline">\(W\)</span>, while pairs exhibiting small absolute differences have a low <span class="math inline">\(R_{i}\)</span> and therefore little influence on the outcome of the test. Since the test statistic is based on ranks rather than the measurements themselves, the Wilcoxon signed rank test can be thought of as testing for shifts in median values between two groups.</p>
+<p>The Wilcoxon signed rank test uses the sum of the signed ranks as the test statistic <span class="math inline">\(W\)</span>:
+<span class="math display">\[W=\sum _{{i=1}}^{{N}}[\operatorname{sgn}(x_{{2,i}}-x_{{1,i}})\cdot R_{i}]\]</span>
+Here, the <span class="math inline">\(i\)</span>-th of <span class="math inline">\(N\)</span> measurement pairs is indicated by <span class="math inline">\(x_i = (x_{1,i}, x_{2,i})\)</span> and <span class="math inline">\(R_{i}\)</span> denotes the rank of the pair. The rank simply represents the position of an observation in an ordered list of <span class="math inline">\(|x_{2,i} - x_{1,i}|\)</span>. The inuition of the test statistic is that pairs with large absolute differences will have large ranks <span class="math inline">\(R_{i}\)</span>. Thus, these pairs are the determining factors of <span class="math inline">\(W\)</span>, while pairs exhibiting small absolute differences have a low <span class="math inline">\(R_{i}\)</span> and therefore little influence on the outcome of the test. Since the test statistic is based on ranks rather than the measurements themselves, the Wilcoxon signed rank test can be thought of as testing for shifts in median values between two groups.</p>
 <p>To perform the test in R, we can use the <code>wilcox.test</code> function. However, we have to explicitly set the <em>paired</em> argument to indicate that we are dealing with matched observations. To specify the one-tailed test, we set the <em>alternative</em> argument to <em>greater</em>. In this way, the alternative of the test is whether drug 2 is associated with larger increases in sleep duration than drug 1.</p>
 <pre class="r"><code>x &lt;- sleep$extra[sleep$drug == 2]
 y &lt;- sleep$extra[sleep$drug == 1]
@@ -113,8 +115,10 @@ ggplot(diff.df, aes(x = diff)) + geom_histogram()</code></pre>
 <p>Looking at the histogram, the data seem rather uniformly than normally distributed. To take a closer look, we compare the differences to the values that would be expected from a normal distribution using a <a href="https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot">Q-Q (quantile-quantile) plot</a>:</p>
 <pre class="r"><code>require(car) # load car package to use &#39;qqp&#39; rather than native &#39;qqplot&#39; function</code></pre>
 <pre><code>## Loading required package: car</code></pre>
+<pre><code>## Loading required package: carData</code></pre>
 <pre class="r"><code>qqp(diff.df$diff)</code></pre>
 <p><img src="/post/statistical_test/signed_wilcox_rank_test_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre><code>## [1] 9 5</code></pre>
 <p>The Q-Q plot shows that the differences fit the normal model quite well, except for the heavy tails. From this, we could conclude that the assumption of the t-test is sufficiently met. Still, we’re left with a feeling of uncertainty about whether the t-test was the most appropriate choice for these data.</p>
 </div>
 </div>
