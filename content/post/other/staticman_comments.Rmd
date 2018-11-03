@@ -50,7 +50,7 @@ To host my own version of the Staticman API, I've followed [this great tutorial]
    ```git add config.production.json Procfile .gitignore```
    ```git commit -m "Set up Staticman v3 for deployment to Heroku"```
 10. Deploy the API:
-   ``git push heroku production:master```
+   ```git push heroku production:master```
 11. After the API has been built successfully, you should be greeted with *Hello from Staticman version 3.0.0!* when visiting your API instance at ```https://{nameOfYourStaticmanApp}.herokuapp.com```.
 
 ## Reconfiguring your theme
