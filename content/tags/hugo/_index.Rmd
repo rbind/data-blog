@@ -1,0 +1,40 @@
+---
+title: "Hugo: A Framework for Static Websites"
+description: "Hugo is a generator for static sites on the web. For example, this blog has been created with Hugo. Here, I discuss how Hugo can be used to create a blog, implement a commenting system, and much more."
+thumbnail: "/post/other/blogdown_hugo_avatar.png"
+---
+<img src="/post/other/blogdown_hugo_avatar.png">
+
+[Hugo](https://gohugo.io/) is a tool for creating *static websites*. *How is this different from a dynamic website?* you may be wondering. While a static website is delivered to clients in the same way that is stored, dynamic websites build pages using an application server. As a consequence, static and dynamic web pages have contrasting properties:
+
+| Criterion                      | Static | Dynamic         |
+|--------------------------------|--------|-----------------|
+|  Loading Times                 | Fast   | Slow            |
+| Required Expertise for Maintenance            | High   | Low             |
+| Security                       | High   | Potentially Low |
+| Potential for User Interaction | Low    | High            |
+
+Let's take a look at these aspects in more detail.
+
+### Loading times
+
+Static websites can typically be loaded much faster. Why? Displaying a static page essentially only requires loading the associated HTML file as well as any additional resources (images etc). For a dynamic site, the same data have to be loaded but the dynamic content has to be loaded additionally. Since this type of content typically requires interacting with a database, it takes some time until the data have been loaded and the final page is ready.
+
+### Required expertise
+
+Maintaining a static site is slightly harder than maintaining a dynamic site. This is because dynamic websites are usually based on content management systems (CMSs) such as [WordPress](https://wordpress.org/). CMSs are very easy to use because content can be created in what-you-see-is-what-you-get editors. For static websites, on the other hand, such editors are not available and it is necessary to work with data in a more raw format such as Markdown, which merely specifies how the content is supposed to
+look. So, if you are not a person that shies away from some technicalities, static web pages are fine. But if you don't like the idea of working in some form of code editor, then a static site is not for you.
+
+### Security
+
+With regard to security, static sites are definitely the safer alternative. Since dynamic web sites rely on several applications that run in unison (e.g. CMS, database, additional scripts) it is more likely that one of them is vulnerable to attacks. For example, [there is a long list of security vulnerabilities for Wordpress](https://www.cvedetails.com/vulnerability-list/vendor_id-2337/product_id-4096/), so it is key to continually update the software to stay safe. With static sites, on the other hand, there is no software that is running in the background, so there are no vulnerabilities and it is not necessary to continually update.
+
+### Potential for User Interaction
+
+The low potential for user interaction is the biggest downside to static websites. For example, a dynamic website may display the five most popular posts, show a poll where users can participate, or may ask for users to upload their own content. These dynamic elements can hardly be integrated into static websites. For example, for something simple as a commenting systems, many static web sites rely on external services such as [Disqus](https://disqus.com/). However, there
+are also [alternatives](https://gohugo.io/content-management/comments/) such as [Staticman](https://staticman.net/).
+
+## Posts about Hugo
+
+Since this blog has been created with Hugo, the following posts deal with the framework.
+
