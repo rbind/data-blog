@@ -59,8 +59,9 @@ To view the individual measurements associated with the box plot, we set ```outl
 ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
     geom_boxplot(outlier.shape = NA) + 
     ggtitle("Breaks for wool A and B") +
-    # dodge points sideways because there are two boxes per tick
-    geom_point(position = position_dodge(0.75))
+    # dodge points horizontally (there are two bars per tick)
+    # and jitter points horizontally so that they don't overlap
+    geom_point(position = position_jitterdodge(jitter.width = 0.1))
 ```
 
-Showing all the points helps us to identify whether the sample size is sufficient. In this case, most pairs of wool and tension exhibit high variabilities (especially wool A with tension L). Thus, the question would be whether this level of variability is inherent to the data or a result of the small number of samples (n = 9). 
+Showing all the points helps us to identify whether the sample size is sufficient. In this case, most pairs of wool and tension exhibit high variabilities (especially wool A with tension L). Thus, the question would be whether this level of variability is inherent to the data or a result of the small number of samples (n = 9). Note that you can combine a box plot with a [beeswarm plot](/post/data-visualization/boxplot_alternatives/) to optimize the locations of the points.

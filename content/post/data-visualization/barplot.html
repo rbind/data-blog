@@ -93,9 +93,8 @@ ggplot(df, aes(x = tension, y = Mean)) +
 p.box &lt;- ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
     geom_boxplot() + ggtitle(&quot;Box plot&quot;)
 # load gridExtra to show plots side-by-side using grid.arrange
-require(gridExtra)</code></pre>
-<pre><code>## Loading required package: gridExtra</code></pre>
-<pre class="r"><code>grid.arrange(p.bar, p.box, ncol=2)</code></pre>
+require(gridExtra)
+grid.arrange(p.bar, p.box, ncol=2)</code></pre>
 <p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>If you would like to learn more, just read one of my previous posts about situations when the <a href="/post/basic-statistics/mean_vs_median/">median is more appropriate than the mean</a>.</p>
 </div>

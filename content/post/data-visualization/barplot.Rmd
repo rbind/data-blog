@@ -100,7 +100,7 @@ As you can see from the last plot, the bar plot is inappropriate for highly vari
 
 Just compare the following two plots, which clearly demonstrate that the box plot is superior for these data.
 
-```{r}
+```{r, message = FALSE}
 p.bar <- ggplot(df, aes(x = tension, y = Mean, fill = wool)) +
     geom_bar(stat = "identity", position = "dodge") + 
     geom_errorbar(aes(ymin = Mean - 1.96 * SD, ymax = Mean + 1.96 * SD), 

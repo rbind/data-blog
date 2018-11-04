@@ -1,0 +1,68 @@
+---
+title: "Box Plot Alternatives: Beeswarm and Violin Plots"
+author: Matthias Döring
+date: '2018-11-04'
+description: "Box plots are limited since they only show Q1, Q2, and Q3. Box plot alternatives such as the beeswarm and violin plot, however, provide more information about the overall distribution of the data."
+categories:
+  - data-visualization
+tags:
+  - plot
+thumbnail: "/post/data-visualization/boxplot_alternatives_cover.png"
+---
+
+
+
+<p><a href="/post/data-visualization/boxplot/">Box plots</a> are great as they do not only indicate the median value but also show the variation of the measurements in terms of the 1st and 3rd quartiles. There are, however, also plots that provide a bit of additional information. Here, we take a closer look at potential alternatives to the box plot: the beeswarm and the violin plot.</p>
+<div id="the-beeswarm-plot" class="section level2">
+<h2>The beeswarm plot</h2>
+<p>An implementation of the beeswarm plot is available via the <a href="http://www.cbs.dtu.dk/~eklund/beeswarm/">beeswarm package</a>. In principle, the beeswarm plot resembles a one-dimensional scatter plot because it displays individual measurements as points. The difference, however, is that the beeswarm plot applies a logic ensuring that plotted points are close to each other and do not overlap.</p>
+<p>So, when should you use a beeswarm plot? Since the points in a beeswarm plot should not overlap, this type of plot is only suitable for a relatively small number of measurements. They are also suitable if measurements exhibit different groups because individual points can be colored accordingly.</p>
+<div id="using-the-beeswarm-plot-in-r" class="section level3">
+<h3>Using the beeswarm plot in R</h3>
+<p>We will use the <a href="/post/statistical_test/contingency_table_tests/">warpbreaks data set</a> to exemplify the use of the plot.</p>
+<pre class="r"><code>data(warpbreaks)
+library(beeswarm)
+# option 1: color by group
+beeswarm(breaks ~ wool + tension, data = warpbreaks,
+    main = &quot;Beeswarm of breaks versus wool and tension&quot;,
+    col = rep(c(&quot;red&quot;, &quot;blue&quot;), 3))</code></pre>
+<p><img src="/post/data-visualization/boxplot_alternatives_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code># option 2: color individual points
+beeswarm(breaks ~ wool, data = warpbreaks,
+    main = &quot;Breaks versus wool&quot;,
+    pwcol = as.numeric(tension), pch = 16)
+legend(&quot;topright&quot;, legend = levels(warpbreaks$tension),
+       title = &quot;Tension&quot;, pch = 16, col = 1:3)</code></pre>
+<p><img src="/post/data-visualization/boxplot_alternatives_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+<p>The beeswarm plot can also be combined with a box plot in the following way:</p>
+<pre class="r"><code>boxplot(breaks ~ wool, data = warpbreaks, 
+        main = &quot;Boxplot with beeswarm&quot;,
+    # do not duplicate outliers:
+    outline = FALSE)
+beeswarm(breaks ~ wool, data = warpbreaks,
+    main = &quot;Beeswarm of breaks versus wool&quot;, add = TRUE,
+    pwcol = as.numeric(tension), pch = 16)
+legend(&quot;topright&quot;, legend = levels(warpbreaks$tension),
+       title = &quot;Tension&quot;, pch = 16, col = 1:3)</code></pre>
+<p><img src="/post/data-visualization/boxplot_alternatives_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+</div>
+<div id="the-violin-plot" class="section level2">
+<h2>The violin plot</h2>
+<p>The idea of a violin plot is to combine a box plot with a density plot. Since it relies on density estimation, the plot only makes sense if a sufficient number of data are available for obtaining reliable estimates. Otherwise, the estimated densities may indicate trends that are not really in the data.</p>
+<div id="creating-a-violin-plot-in-r" class="section level3">
+<h3>Creating a violin plot in R</h3>
+<p>To demonstrate how a violin plot is different from a box plot, compare the following two representations:</p>
+<pre class="r"><code>library(ggplot2)
+require(gridExtra)
+p.violin &lt;- ggplot(warpbreaks, aes(x = wool, y = breaks)) +
+    # add horizontal lines at Q1, Q2, and Q3
+    geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
+    ggtitle(&quot;Violin plot&quot;)
+p.box &lt;- ggplot(warpbreaks, aes(x = wool, y = breaks)) +
+    geom_boxplot() + ggtitle (&quot;Box plot&quot;)
+grid.arrange(p.violin, p.box, ncol = 2)</code></pre>
+<p><img src="/post/data-visualization/boxplot_alternatives_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+In this case, we see the limitation of the violin plot for small sample sizes (hint: the limitation is not that the plot does not seem to show violins but vases). The violin for wool A stretches up to the outliers at a value of 65 indicating. Since the width is similar at values 40 and 60, one could think that there are many such measurements. The box plot, on the other hand, reveals that there are indeed only two measurements with a value greater than 60.</p>
+</div>
+</div>

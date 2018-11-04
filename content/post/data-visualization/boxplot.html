@@ -52,9 +52,10 @@ ggplot(warpbreaks, aes(x = tension, y = breaks)) +
 <pre class="r"><code>ggplot(warpbreaks, aes(x = tension, y = breaks, fill = wool)) +
     geom_boxplot(outlier.shape = NA) + 
     ggtitle(&quot;Breaks for wool A and B&quot;) +
-    # dodge points sideways because there are two boxes per tick
-    geom_point(position = position_dodge(0.75))</code></pre>
+    # dodge points horizontally (there are two bars per tick)
+    # and jitter points horizontally so that they don&#39;t overlap
+    geom_point(position = position_jitterdodge(jitter.width = 0.1))</code></pre>
 <p><img src="/post/data-visualization/boxplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p>Showing all the points helps us to identify whether the sample size is sufficient. In this case, most pairs of wool and tension exhibit high variabilities (especially wool A with tension L). Thus, the question would be whether this level of variability is inherent to the data or a result of the small number of samples (n = 9).</p>
+<p>Showing all the points helps us to identify whether the sample size is sufficient. In this case, most pairs of wool and tension exhibit high variabilities (especially wool A with tension L). Thus, the question would be whether this level of variability is inherent to the data or a result of the small number of samples (n = 9). Note that you can combine a box plot with a <a href="/post/data-visualization/boxplot_alternatives/">beeswarm plot</a> to optimize the locations of the points.</p>
 </div>
 </div>
