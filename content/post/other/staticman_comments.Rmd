@@ -34,6 +34,8 @@ To host my own version of the Staticman API, I've followed [this great tutorial]
 1. Create a new GitHub account for the Staticman API
 2. Create a GitHub token for this account, allowing API/write access
 3. Clone an instance of [Staticman](https://github.com/eduardoboucas/staticman/)
+4. In the staticman folder, create a file called ```Procfile``` and store a single line in there: 
+   ```npm start```
 4. Create a private RSA key for use with the API:
    ```openssl genrsa -out key.pem```
 5. Create an account at [Heroku](https://www.heroku.com), a free web app hoster and download the Heroku CLI
@@ -66,6 +68,8 @@ Since I had some problems with these tutorial, I'd recommend starting with the [
 When I tried to get the comments template working, I couldn't get any comments displayed because the unique IDs never matched. Thus, I've ended up with a [modified partial template for the Staticman commenting system](https://github.com/matdoering/data-blog/blob/master/themes/Mainroad/layouts/partials/staticman_post_comment.html). The idea of my approach is to store the path of the page in the comment file and then to check whether the comment's path is a subset of the page's path via ```{{ if in .path $.File.Path }}```.
 
 ## Remaining issues
-The only remaining issue I have is that it doesn't seem to be possible to store comments in subfolders of ```data/comments```. This is because Hugo doesn't allow access to files when looping over the data. Thus, all comments of a site have to be stored in a single folder, which could be a problem if there are thousands of comments. For small sites, however, this should be fine.
+The only remaining issue I have is that it doesn't seem to be possible to load comments from subfolders of ```data/comments```. It seems that Hugo doesn't allow access to files when looping over diffferent folders because file access [seems to require specific paths rather than dynamic paths](https://gohugo.io/templates/data-templates/). For example, you can access the comment files using ```.Site.Data.comments``` but you wouldn’t be able to access files by constructing a path via print ```.Site.Data.comments <pathToDirectory>.```
+
+Thus, all comments of a site have to be stored in a single folder, which could be a problem if there are thousands of comments. For small sites, however, this should be fine.
 
 I hope this overview helped you getting started with Staticman for Hugo. Many thanks to [Eduardo Bouças](https://eduardoboucas.com/) for this great tool! If you have any questions, just write a comment below ;-) 

@@ -1229,11 +1229,19 @@ textarea {
   margin-top: 20px;
 }
 
+
 .post-comment {
   padding: 20px;
   margin-top: 20px;
   border:2px solid #e7e7e7;
   background-color:#fcfcfc;
+  display: block;
+}
+
+.post-comment a {
+	color: black;
+	text-decoration: underline;
+
 }
 
 .post-comment-header {

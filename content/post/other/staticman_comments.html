@@ -36,6 +36,8 @@ explain how comments can be integrated into a web page using Staticman.</p>
 <li>Create a new GitHub account for the Staticman API</li>
 <li>Create a GitHub token for this account, allowing API/write access</li>
 <li>Clone an instance of <a href="https://github.com/eduardoboucas/staticman/">Staticman</a></li>
+<li>In the staticman folder, create a file called <code>Procfile</code> and store a single line in there:
+<code>npm start</code></li>
 <li>Create a private RSA key for use with the API:
 <code>openssl genrsa -out key.pem</code></li>
 <li>Create an account at <a href="https://www.heroku.com">Heroku</a>, a free web app hoster and download the Heroku CLI</li>
@@ -52,7 +54,7 @@ explain how comments can be integrated into a web page using Staticman.</p>
 <code>git add config.production.json Procfile .gitignore</code>
 <code>git commit -m &quot;Set up Staticman v3 for deployment to Heroku&quot;</code></li>
 <li>Deploy the API:
-``git push heroku production:master```</li>
+<code>git push heroku production:master</code></li>
 <li>After the API has been built successfully, you should be greeted with <em>Hello from Staticman version 3.0.0!</em> when visiting your API instance at <code>https://{nameOfYourStaticmanApp}.herokuapp.com</code>.</li>
 </ol>
 </div>
@@ -69,6 +71,7 @@ explain how comments can be integrated into a web page using Staticman.</p>
 </div>
 <div id="remaining-issues" class="section level2">
 <h2>Remaining issues</h2>
-<p>The only remaining issue I have is that it doesn’t seem to be possible to store comments in subfolders of <code>data/comments</code>. This is because Hugo doesn’t allow access to files when looping over the data. Thus, all comments of a site have to be stored in a single folder, which could be a problem if there are thousands of comments. For small sites, however, this should be fine.</p>
+<p>The only remaining issue I have is that it doesn’t seem to be possible to load comments from subfolders of <code>data/comments</code>. It seems that Hugo doesn’t allow access to files when looping over diffferent folders because file access <a href="https://gohugo.io/templates/data-templates/">seems to require specific paths rather than dynamic paths</a>. For example, you can access the comment files using <code>.Site.Data.comments</code> but you wouldn’t be able to access files by constructing a path via print <code>.Site.Data.comments &lt;pathToDirectory&gt;.</code></p>
+<p>Thus, all comments of a site have to be stored in a single folder, which could be a problem if there are thousands of comments. For small sites, however, this should be fine.</p>
 <p>I hope this overview helped you getting started with Staticman for Hugo. Many thanks to <a href="https://eduardoboucas.com/">Eduardo Bouças</a> for this great tool! If you have any questions, just write a comment below ;-)</p>
 </div>
