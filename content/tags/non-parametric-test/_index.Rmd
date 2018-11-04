@@ -5,5 +5,18 @@ thumbnail: "/tags/non-parametric-test/non_parametric_avatar.jpg"
 ---
 <img src="non_parametric_avatar.jpg">
 
+The benefit of non-parametric tests over [parametric tests](/tags/parametric-test/) is that they not make any assumptions about the data. Thus, they are well-suited in situations where the assumptions of parametric tests are not met, which is typically the case for small sample sizes.
+
+## Popular non-parametric test
+
+This table gives an overview over popular non-parametric tests:
+
+| Test                      | Test for what?                     |
+|---------------------------|------------------------------------|
+| Wilcoxon rank sum test    | Difference in medians              |
+| [Wilcoxon signed-rank test](/post/statistical_test/signed_wilcox_rank_test/) | Difference in paired means         |
+| [Fisher's exact test](/post/statistical_test/contingency_table_tests/)       | Independence in contingency tables |
+| [Kruskal-Wallis test](/post/statistical_test/anova_one_way/)       | Difference of multiple medians     |
+
 ## Posts about Non-Parametric Significance Testing
 
