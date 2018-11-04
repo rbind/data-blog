@@ -1,0 +1,9 @@
+---
+title: "Non-Parametric Significance Tests"
+description: "Parametric tests assume that the data follow a certain distribution. This page introduces how tests such as t-test, Chi-squared test, and ANOVA work in R."
+thumbnail: "/tags/non-parametric-test/non_parametric_avatar.jpg"
+---
+<img src="non_parametric_avatar.jpg">
+
+## Posts about Non-Parametric Significance Testing
+
