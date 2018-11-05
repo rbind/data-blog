@@ -1,6 +1,6 @@
 ---
 title: "Other"
-thumbnail: "/categories/data-visualization/flat-lay-outside-poolside-1247526.jpg"
+thumbnail: "/categories/other/flat-lay-outside-poolside-1247526.jpg"
 ---
 <img src="flat-lay-outside-poolside-1247526.jpg">
 

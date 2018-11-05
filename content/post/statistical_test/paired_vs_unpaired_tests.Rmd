@@ -2,7 +2,7 @@
 title: "Testing Significance on Paired Measurements: What Can Go Wrong?"
 author: Matthias Döring
 date: '2018-10-19'
-description: "Measurements often come in pair. Here I discuss what can go wrong when performing statistical tests that do not take this structure into account."
+description: "Measurements often come in pairs. Here I discuss what can go wrong when performing statistical tests that do not take this structure into account."
 thumbnail: "post/statistical_test/paired_vs_unpaired_tests_cover.png"
 categories:
   - statistical test
