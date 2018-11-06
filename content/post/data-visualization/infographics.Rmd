@@ -6,7 +6,7 @@ description: "People without technical backgrounds can have a hard time understa
 categories:
   - data-visualization
 tags:
-thumbnail: "/post/data-visualization/infographics_cover.jpg"
+thumbnail: "/post/data-visualization/infographics_avatar.jpg"
 
 ---
 Nowadays, infographics are everywhere. Fortunately, you do not have to be a professional designer to create them because there are several free platforms that assist you in creating engaging infographics. In this post, I compare three freely available tools for creating static infographics: Venngage, easelly, and Infogram. Each of the tools is reviewed according to three criteria:
