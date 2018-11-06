@@ -19,7 +19,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
 
 [Params]
   subtitle = "Understand. Implement. Succeed." # Subtitle of your site
-  description = "Interested in data science? Profit from this blog's comprehensive applications of statistical testing, machine learning, and visualization in R!"
+  description = "Blog about data science with a focus on applications in R. Topics include statistical testing, machine learning, and data visualization. Find the answers to your questions!"
   opengraph = true # for social media links to blog
   twitter_cards = true # for twitter links to blog
   readmore = false # Show "Read more" button in list if true
