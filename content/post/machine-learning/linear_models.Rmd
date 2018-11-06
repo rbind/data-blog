@@ -1,0 +1,21 @@
+---
+title: "Interpreting Linear Prediction Models"
+author: Matthias Döring
+date: '2018-11-06T15:00:00Z'
+description: "Linear machine learning models are very convenient for interpretation. This post discusses the most important aspects when interpreting linear models."
+categories:
+  - machine-learning
+tags:
+  - linear-model
+thumbnail: "/post/data-visualization/barplot_cover.png"
+
+---
+
+## The airquality data set
+
+The airquality data set contains 154 measurements of the following four air quality metrices as obtained in New York:
+
+* Ozone: Mean ozone level in parts per billion
+* Solar.R: Solar radiation in [Langleys](https://en.wikipedia.org/wiki/Langley_(unit))
+Wind: Average wind speed in miles per hour at 0700 and 1000 hours at LaGuardia Airport
+* Temp: Maximum daily temperature in degrees Fahrenheit at La Guardia Airport.
