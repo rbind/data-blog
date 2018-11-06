@@ -1,0 +1,298 @@
+---
+title: "Interpreting Linear Prediction Models"
+author: Matthias Döring
+date: '2018-11-06T15:00:00Z'
+description: "Linear machine learning models are very convenient for interpretation. This post discusses the following aspects: residuals, coefficients, standard errors, p-values, the F-statistic, and much more."
+categories:
+  - machine-learning
+tags:
+thumbnail: "/post/machine-learning/linear_models_cover.png"
+
+---
+
+
+
+<p>Although linear models are one of the simplest machine learning techniques, they are still a powerful tool for predictions. This is particularly due to the fact that linear models are especially easy to interpret. Here, I discuss the most important aspects when interpreting linear models by example of ordinary least-squares regression using the airquality data set.</p>
+<div id="the-airquality-data-set" class="section level2">
+<h2>The airquality data set</h2>
+<p>The airquality data set contains 154 measurements of the following four air quality metrics as obtained in New York:</p>
+<ul>
+<li>Ozone: Mean ozone level in parts per billion</li>
+<li>Solar.R: Solar radiation in <a href="https://en.wikipedia.org/wiki/Langley_(unit)">Langleys</a></li>
+<li>Wind: Average wind speed in miles per hour</li>
+<li>Temp: Maximum daily temperature in degrees Fahrenheit</li>
+</ul>
+<p>We’ll clean up the data set by removing all <code>NA</code> entries and excluding the <code>Month</code> and <code>Day</code> columns, which should not play a role as predictors.</p>
+<pre class="r"><code>data(airquality)
+ozone &lt;- subset(na.omit(airquality), 
+        select = c(&quot;Ozone&quot;, &quot;Solar.R&quot;, &quot;Wind&quot;, &quot;Temp&quot;))</code></pre>
+<div id="data-exploration-and-preparation" class="section level3">
+<h3>Data exploration and preparation</h3>
+<p>The prediction task is the following: Can we predict the ozone level given solar radiation, wind speed, and temperature? To see whether the assumptions of the linear model are appropriate for the data at hand, we will compute the correlation between the variables:</p>
+<pre class="r"><code># scatterplot matrix 
+plot(ozone)</code></pre>
+<p><img src="/post/machine-learning/linear_models_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code># pairwise variable correlations
+cors &lt;- cor(ozone)
+print(cors)</code></pre>
+<pre><code>##              Ozone    Solar.R       Wind       Temp
+## Ozone    1.0000000  0.3483417 -0.6124966  0.6985414
+## Solar.R  0.3483417  1.0000000 -0.1271835  0.2940876
+## Wind    -0.6124966 -0.1271835  1.0000000 -0.4971897
+## Temp     0.6985414  0.2940876 -0.4971897  1.0000000</code></pre>
+<pre class="r"><code># which variables are highly correlated, exclude self-correlation
+cor.idx &lt;- which(abs(cors) &gt;= 0.5 &amp; cors != 1, arr.ind = TRUE)
+cor.names &lt;- paste0(colnames(ozone)[cor.idx[,1]], &quot;+&quot;, 
+            colnames(ozone)[cor.idx[,2]], &quot;: &quot;, round(cors[cor.idx], 2))
+print(cor.names)</code></pre>
+<pre><code>## [1] &quot;Wind+Ozone: -0.61&quot; &quot;Temp+Ozone: 0.7&quot;   &quot;Ozone+Wind: -0.61&quot;
+## [4] &quot;Ozone+Temp: 0.7&quot;</code></pre>
+<p>Since ozone is involved in two linear interactions, namely:</p>
+<ul>
+<li>Ozone has a positive correlation with temperature</li>
+<li>Ozone has a negative correlation with wind</li>
+</ul>
+<p>This suggests that it should be possible to form a linear model predicting the ozone level using the remaining features.</p>
+</div>
+<div id="splitting-into-training-and-test-sets" class="section level3">
+<h3>Splitting into training and test sets</h3>
+<p>We will take 70% of samples for training and 30% for testing:</p>
+<pre class="r"><code>set.seed(123)
+N.train &lt;- ceiling(0.7 * nrow(ozone))
+N.test &lt;- nrow(ozone) - N.train
+trainset &lt;- sample(seq_len(nrow(ozone)), N.train)
+testset &lt;- setdiff(seq_len(nrow(ozone)), trainset)</code></pre>
+</div>
+</div>
+<div id="investigating-the-linear-model" class="section level2">
+<h2>Investigating the linear model</h2>
+<p>To illustrate the most important aspects of interpreting linear models, we will train an ordinary least-squares model for the training data in the following way:</p>
+<pre class="r"><code>model &lt;- lm(Ozone ~ Solar.R + Temp + Wind, ozone, trainset)</code></pre>
+<p>To interpret the model, we use the <code>summary</code> function:</p>
+<pre class="r"><code>model.summary &lt;- summary(model)
+print(model.summary)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Ozone ~ Solar.R + Temp + Wind, data = ozone, subset = trainset)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -36.135 -12.670  -2.221   9.420  65.914 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -65.76604   22.52381  -2.920 0.004638 ** 
+## Solar.R       0.05309    0.02305   2.303 0.024099 *  
+## Temp          1.56320    0.25530   6.123 4.03e-08 ***
+## Wind         -2.61904    0.68921  -3.800 0.000295 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 18.17 on 74 degrees of freedom
+## Multiple R-squared:  0.5924, Adjusted R-squared:  0.5759 
+## F-statistic: 35.85 on 3 and 74 DF,  p-value: 2.039e-14</code></pre>
+<div id="the-residuals" class="section level3">
+<h3>The residuals</h3>
+<p>The first piece of information we obtain is on the residuals. The term <em>residual</em> comes from the residual sum of squares (RSS), which is defined as</p>
+<span class="math display">\[\begin{align*}
+r_i &amp;= y_i - f(x_i) \\
+\text{RSS} &amp;= \sum_{i=1}^n r_i^2
+\end{align*}\]</span>
+<p>where the residual <span class="math inline">\(r_i\)</span> is defined as the difference between observed and predicted values, <span class="math inline">\(f(x_i)\)</span>, from the observed value, <span class="math inline">\(y_i\)</span>.</p>
+<p>The residual median value suggest that the model generally predicts slightly higher values of ozone than observed. The large maximum value, however, indicates that some outlier predictions are also much too low. Looking at a numbers can be a bit abstract, so let us plot the predictions of the model against the observed values:</p>
+<pre class="r"><code>res &lt;- residuals(model)
+# ensure that x- and y-axis have the same range
+pred &lt;- model$fitted.values
+obs &lt;- ozone[trainset, &quot;Ozone&quot;]
+# determine maximal range
+val.range &lt;- range(pred, obs)
+plot(obs, pred, 
+    xlim = val.range, ylim = val.range,  
+    xlab = &quot;Observed ozone concentration&quot;, 
+    ylab = &quot;Predicted ozone concentration&quot;,
+    main = &quot;Residuals of the linear model for the training data&quot;)
+# show ideal prediction as a diagonal
+abline(0,1, col = &quot;red&quot;)
+# add residuals to the plot
+segments(obs, pred, obs, pred + res)</code></pre>
+<p><img src="/post/machine-learning/linear_models_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="the-coefficients" class="section level3">
+<h3>The coefficients</h3>
+<p>Now that we understand the residuals, let’s take a look at the coefficients. We can use the <code>coefficients</code> function to obtain the fitted coefficients of the model:</p>
+<pre class="r"><code>coefficients(model)</code></pre>
+<pre><code>##  (Intercept)      Solar.R         Temp         Wind 
+## -65.76603538   0.05308965   1.56320267  -2.61904128</code></pre>
+<p>Note that the intercept of the model has quite a low value. This is the value that the model will predict in the case that all independent values are zero. The low coefficient for <code>Solar.R</code> indicates that solar radiation does not play an important role for predicting ozone levels, which does not come as a surprise as it did not show a large correlation with the ozone level in our exploratory analysis. The coefficient for <code>Temp</code> indicates that ozone levels are high if the temperature is high (since ozone will form faster). The coefficient for <code>Wind</code> tells us that ozone levels will be low for fast winds (since ozone will be blown away).</p>
+<p>The other values associated with the coefficients give information about the statistical certainty of the estimates.</p>
+<pre class="r"><code>model.summary$coefficients</code></pre>
+<pre><code>##                 Estimate  Std. Error   t value     Pr(&gt;|t|)
+## (Intercept) -65.76603538 22.52380940 -2.919845 4.638426e-03
+## Solar.R       0.05308965  0.02305379  2.302860 2.409936e-02
+## Temp          1.56320267  0.25530453  6.122894 4.034064e-08
+## Wind         -2.61904128  0.68920661 -3.800081 2.946349e-04</code></pre>
+<ul>
+<li><code>Std. Error</code> is the standard error of the coefficient estimate</li>
+<li><code>t value</code> indicates the value of the coefficient in terms of the standard error</li>
+<li><code>Pr(&gt;|t|)</code> is the p-value for the t-test, which indicates the significance of the test statistic</li>
+</ul>
+</div>
+<div id="the-standard-error" class="section level3">
+<h3>The standard error</h3>
+<p>The standard error of the coefficients is defined as the standard deviation of the feature variance:</p>
+<p><span class="math display">\[\hat{\sigma} = \sqrt{\text{diag}\left(\sigma_{\text{err}}^2 (X^T X)^{-1}\right)}\]</span></p>
+<p>where <span class="math inline">\({X^T X}^{-1}\)</span> is the inverse of the design matrix <span class="math inline">\(X\)</span>, which includes the intercept, and where <span class="math inline">\(\sigma_{\text{err}}^2\)</span> is the variance of the error.</p>
+<p>In R, the standard errors of the model estimates can be computed via:</p>
+<pre class="r"><code># compute variance-covariance matrix of model estimates
+var.matrix &lt;- vcov(model)
+print(var.matrix)</code></pre>
+<pre><code>##              (Intercept)       Solar.R         Temp          Wind
+## (Intercept) 507.32198977  2.893612e-02 -5.345957524 -9.940961e+00
+## Solar.R       0.02893612  5.314773e-04 -0.001667748  7.495211e-05
+## Temp         -5.34595752 -1.667748e-03  0.065180401  6.715467e-02
+## Wind         -9.94096142  7.495211e-05  0.067154670  4.750058e-01</code></pre>
+<pre class="r"><code># use variances from variance-covariance matrix
+std.err &lt;- sqrt(diag(vcov(model)))
+print(std.err)</code></pre>
+<pre><code>## (Intercept)     Solar.R        Temp        Wind 
+## 22.52380940  0.02305379  0.25530453  0.68920661</code></pre>
+<p>Now, you are probably wondering where the values from <code>vcov</code> are coming from. It is defined as the variance-covariance matrix of the design matrix scaled by the variance of the error:</p>
+<pre class="r"><code>scaled.var.matrix &lt;- model.summary$cov.unscaled * model.summary$sigma^2
+print(scaled.var.matrix)</code></pre>
+<pre><code>##              (Intercept)       Solar.R         Temp          Wind
+## (Intercept) 507.32198977  2.893612e-02 -5.345957524 -9.940961e+00
+## Solar.R       0.02893612  5.314773e-04 -0.001667748  7.495211e-05
+## Temp         -5.34595752 -1.667748e-03  0.065180401  6.715467e-02
+## Wind         -9.94096142  7.495211e-05  0.067154670  4.750058e-01</code></pre>
+<p>The variance that is used to scale to unscaled variance-covariance matrix is the estimated variance of the error, which is defined by</p>
+<p><span class="math display">\[ \sigma_{\text{err}}^2 = \frac{1}{n-p} \text{RSS}\]</span></p>
+<p>The <code>cov.unscaled</code> parameter is simply the variance-covariance matrix of all features <span class="math inline">\(\beta_i\)</span> (including the intercept) of the design matrix:</p>
+<pre class="r"><code># include intercept as a feature via &#39;model.matrix&#39;
+X &lt;- model.matrix(model) # design matrix
+# solve X^T %*% X = I to find the inverse of X^T * X
+unscaled.var.matrix &lt;- solve(crossprod(X), diag(4))
+print(paste(&quot;Is this the same?&quot;, isTRUE(all.equal(unscaled.var.matrix, model.summary$cov.unscaled, check.attributes = FALSE))))</code></pre>
+<pre><code>## [1] &quot;Is this the same? TRUE&quot;</code></pre>
+<div id="the-t-value" class="section level4">
+<h4>The t-value</h4>
+<p>The t-value is defined as</p>
+<p><span class="math display">\[t_i = \frac{\hat{\beta}_i}{\hat{\sigma}_i}\]</span></p>
+<p>In R, they are computed via</p>
+<pre class="r"><code># divide model coefficients by standard errors
+t.vals &lt;- coef(model) / std.err
+print(t.vals)</code></pre>
+<pre><code>## (Intercept)     Solar.R        Temp        Wind 
+##   -2.919845    2.302860    6.122894   -3.800081</code></pre>
+</div>
+<div id="the-p-value" class="section level4">
+<h4>The p-value</h4>
+<p>The p-value is computed under the assumption that <span class="math inline">\(\beta_i = 0\)</span> for all coefficients. The t-values follow a t-distribution with</p>
+<pre class="r"><code>model.df &lt;- df.residual(model)</code></pre>
+<p>degrees of freedom. The degrees of freedom of a linear model is defined as <span class="math display">\[\text{df} = n - p\]</span> where <span class="math inline">\(n\)</span> is the number of samples and <span class="math inline">\(p\)</span> is the number of features (including the inctercept). The p-value indicates the likelihood that the obtained coefficient estimates are different from zero purely by chance. Thus, a low p-value suggests that there is a significant association between a variable and the outcome.</p>
+</div>
+</div>
+<div id="further-statistics" class="section level3">
+<h3>Further statistics</h3>
+<p>The following additional statistics are provided by the <code>summary</code> function: the multiple R-squared, the adjusted R-squared, and the F-statistic. A nice summary of these statistics is available at <a href="https://stats.stackexchange.com/questions/5135/interpretation-of-rs-lm-output">StackExchange</a>.</p>
+<div id="residual-standard-error" class="section level4">
+<h4>Residual standard error</h4>
+<p>As the name suggests, the residual standard error is the square root of the mean RSS (MSE) of model:</p>
+<pre class="r"><code>rss &lt;- sum(res^2)
+mean.rss &lt;- rss / model.df
+res.std.error &lt;- sqrt(mean.rss)
+print(res.std.error)</code></pre>
+<pre><code>## [1] 18.16979</code></pre>
+<p>The residual standard error simply indicates the average accuracy of the model. In this case, the value is quite low, indicating that the model has a good fit.</p>
+</div>
+<div id="the-multiple-r-squared" class="section level4">
+<h4>The multiple R-squared</h4>
+<p>The multiple R-squared indicates the coefficient of determination. It is defined as the square of the correlation between estimates and observed outcomes:</p>
+<pre class="r"><code>r.squared &lt;- cor(pred, obs)^2
+print(r.squared)</code></pre>
+<pre><code>## [1] 0.5924073</code></pre>
+<p>In contrast to the correlation, which is in <span class="math inline">\([-1,1]\)</span>, R-squared is in <span class="math inline">\([0,1]\)</span>.</p>
+</div>
+<div id="the-adjusted-r-squared" class="section level4">
+<h4>The adjusted R-squared</h4>
+<p>The adjusted R-squared value adjusts the R-squared according to the complexity of the model:</p>
+<p><span class="math display">\[R^2_{a} = 1 - (1 - R^2) \frac{n - 1}{n - p - 1}\]</span></p>
+<p>where <span class="math inline">\(n\)</span> is the number of observations and <span class="math inline">\(p\)</span> the number of features. Thus, the adjusted R-squared can be computed like this:</p>
+<pre class="r"><code>n &lt;- length(trainset) # number of samples
+p &lt;- length(coefficients(model)) - 1 # number of features w/o intercept
+r.squared.adj &lt;- 1 - (1 - r.squared) * ((n - 1) / (n - p - 1))
+print(r.squared.adj)</code></pre>
+<pre><code>## [1] 0.5758832</code></pre>
+<p>If there is a considerable difference between R-squared and the adjusted R-squared, this indicates that one may consider reducing the feature space.</p>
+</div>
+<div id="the-f-statistic" class="section level4">
+<h4>The F-statistic</h4>
+<p>The F-statistic is defined as the ratio of explained vs unexplained variance. For regression, the F-statistic always indicates the difference between two models where model 1 (<span class="math inline">\(p_1\)</span>) is defined by a subset of features from model 2 (<span class="math inline">\(p_2\)</span>):</p>
+<p><span class="math display">\[F={\frac  {\left({\frac  {{\text{RSS}}_{1}-{\text{RSS}}_{2}}{p_{2}-p_{1}}}\right)}{\left({\frac  {{\text{RSS}}_{2}}{n-p_{2}}}\right)}}\]</span></p>
+<p>The F-statistic describes the extent to which the predictive performance (in terms of the RSS) of model 2 is superior over model 1. The default F-statistic that is reported refers to the difference between the trained model and the intercept-only model:</p>
+<pre class="r"><code># create intercept-only model
+null.model &lt;- lm(formula = Ozone ~ 1, ozone, trainset)
+print(null.model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Ozone ~ 1, data = ozone, subset = trainset)
+## 
+## Coefficients:
+## (Intercept)  
+##       36.76</code></pre>
+<pre class="r"><code># plot the incercept-only prediction function
+plot(ozone$Ozone[trainset], null.model$fitted.values)</code></pre>
+<p><img src="/post/machine-learning/linear_models_files/figure-html/unnamed-chunk-17-1.png" width="672" /> Hence, the null hypothesis of the test is that the fit of the intercept-only model and the specified model is equal. If the null hypothesis can be rejected, this implies that the specified model has a better fit than the null model.</p>
+<p>Let’s calculate this by hand to show the idea:</p>
+<pre class="r"><code>rss &lt;- function(model) {
+    return(sum(model$residuals^2))
+}
+f.statistic &lt;- function(model1, model2) {
+    n &lt;- length(model1$fitted.values)
+    n2 &lt;- length(model2$fitted.values)
+    if (n != n2) {
+        stop(&quot;Both models should have the same number of training samples!&quot;)
+    }
+    p1 &lt;- length(coefficients(model1))
+    p2 &lt;- length(coefficients(model2))
+    enum &lt;- (rss(model1) - rss(model2)) / (p2 - p1)
+    denom &lt;- rss(model2) / (n - p2)
+    out &lt;- enum/denom
+    return(out)
+}
+# compare the intercept-only model and the model with 3 features
+f.statistic(null.model, model)</code></pre>
+<pre><code>## [1] 35.85126</code></pre>
+<p>In this case, the F-statistic has a large value, which indicates that we the trained model is significantly better than an intercept-only model.</p>
+</div>
+</div>
+</div>
+<div id="confidence-intervals" class="section level2">
+<h2>Confidence intervals</h2>
+<p>Confidence intervals are a useful tool for interpreting linear models. By default, <code>confint</code> computes the 95% confidence interval (<span class="math inline">\(\pm 1.96 \hat{\sigma}\)</span>):</p>
+<pre class="r"><code>ci &lt;- confint(model)
+apply(ci, 1, function(x) paste0(&quot;95% CI: [&quot;, 
+        round(x[1], 2), &quot;,&quot;, round(x[2], 2), &quot;]&quot;))</code></pre>
+<pre><code>##                (Intercept)                    Solar.R 
+## &quot;95% CI: [-110.65,-20.89]&quot;       &quot;95% CI: [0.01,0.1]&quot; 
+##                       Temp                       Wind 
+##      &quot;95% CI: [1.05,2.07]&quot;    &quot;95% CI: [-3.99,-1.25]&quot;</code></pre>
+<p>These values indicate that the model is quite unsure about the estimate of the intercept. This could suggest that more data is necessary to obtain a better fit.</p>
+</div>
+<div id="retrieving-confidence-and-prediction-intervals-for-estimated-values" class="section level2">
+<h2>Retrieving confidence and prediction intervals for estimated values</h2>
+<p>The predictions from a linear model can be turned into intervals by providing the <code>interval</code> argument. These intervals give a measure of confidence for the predicted values. There are two types of intervals: confidence and prediction intervals. Let’s apply our model on the test set using different arguments for the <code>interval</code> parameter to see the difference between the two types of intervals:</p>
+<pre class="r"><code># compute confidence intervals (CI) for predictions:
+preds.ci &lt;- predict(model, newdata = ozone[trainset,], interval = &quot;confidence&quot;)
+# compute prediction intervals (PI) for predictions:
+preds.pred &lt;- predict(model, newdata = ozone[trainset,], interval = &quot;prediction&quot;)
+# note that the values differ:
+cbind(rbind(preds.ci[1,], preds.pred[2,]), &quot;Method&quot; = c(&quot;CI&quot;, &quot;PI&quot;))</code></pre>
+<pre><code>##      fit                lwr                upr                Method
+## [1,] &quot;24.5995427660305&quot; &quot;19.4517960809593&quot; &quot;29.7472894511018&quot; &quot;CI&quot;  
+## [2,] &quot;55.8952080718515&quot; &quot;18.6819641450219&quot; &quot;93.108451998681&quot;  &quot;PI&quot;</code></pre>
+<p>The confidence intervals are narrow intervals, while the prediction (tolerance) intervals are wide intervals. Their values are based on the provided tolerance/significance level, as specified by the <code>level</code> parameter (default: 0.95).</p>
+<p>Their definitions are slightly different. Given a new observation <span class="math inline">\(x\)</span>, CIs and PIs are defined as follows</p>
+<p><span class="math display">\[\hat{y}_{\text{CI}} \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(\frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span> <span class="math display">\[\hat{y}_{\text{PI}}  \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(1 + \frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span></p>
+<p>where <span class="math inline">\(t_{\alpha/2, \text{df}}\)</span> is the t-value with <span class="math inline">\(\text{df} = 2\)</span> degrees of freedom and a significance level of <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\sigma_{\text{err}}\)</span> is the standard error of the residual, <span class="math inline">\({\sigma}_x^2\)</span> is the variance of the independent features, and <span class="math inline">\(\overline{x}\)</span> indicates the mean value of the features. More detailed <a href="https://rpubs.com/aaronsc32/regression-confidence-prediction-intervals">explanations for calculating CIs and PIs are available at RPubs</a> and <a href="https://www.youtube.com/watch?feature=player_embedded&amp;v=qVCQi0KPR0s">through this video</a>.</p>
+<p>With regard to their interpretation, <a href="https://www.graphpad.com/support/faq/the-distinction-between-confidence-intervals-prediction-intervals-and-tolerance-intervals/">the difference between the two intervals is further discussed at GraphPad</a>.</p>
+</div>
