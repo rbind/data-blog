@@ -1,0 +1,364 @@
+---
+title: "Finding a Suitable Linear Model for Ozone Prediction"
+author: Matthias Döring
+date: '2018-11-07T15:00:00Z'
+description: "Although ordinary least-squares regression is often used, it is not appropriate for all types of data. Using the airquality data set, I try to find a generalized linear model that fits the data better. For this purpose, I use the following methods: weighted regression, Poisson regression, and imputation."
+categories:
+  - machine-learning
+tags:
+    - analysis
+    - linear model
+thumbnail: "/post/machine-learning/improving_ozone_prediction_cover.png"
+
+---
+
+In a previous post, I have [introduced the airquality data set](/post/machine-learning/linear_models/) in order to demonstrate how linear models are interpreted. The goal of this post is to find a suitable linear model for the prediction of ozone levels given the features in the data set.
+
+## Data preprocessing
+
+Since the airquality data set contains some missing values, we will remove those before we begin to fit models and select 70% of the samples for training and use the remainder for testing:
+
+```{r}
+data(airquality)
+ozone <- subset(na.omit(airquality), 
+        select = c("Ozone", "Solar.R", "Wind", "Temp"))
+set.seed(123)
+N.train <- ceiling(0.7 * nrow(ozone))
+N.test <- nrow(ozone) - N.train
+trainset <- sample(seq_len(nrow(ozone)), N.train)
+testset <- setdiff(seq_len(nrow(ozone)), trainset)
+```
+
+## Ordinary least-squares model
+
+As a baseline model, we will use an ordinary least-squares (OLS) model. Before defining the model, we define a function for plotting linear models:
+
+```{r}
+transform.residuals <- function(model, residuals = NULL) {
+    ## transform residuals according to link functions of GLMs
+    if (is.null(residuals)) {
+        # training residuals:
+        residuals <- residuals(model)
+        # adjust value when residuals are weighted
+        residuals <- residuals * sqrt(weights(model))
+    }
+    return(family(model)$linkfun(residuals))
+}
+plot.linear.model <- function(model, test.preds = NULL, test.labels = NULL, 
+                            test.only = FALSE, show.raw.residuals = FALSE) {
+    # ensure that model is interpreted as a GLM
+    pred <- model$fitted.values
+    obs <- model$model[,1]
+    if (test.only) {
+        # plot only the results for the test set
+        plot.df <- NULL
+        plot.res.df <- NULL
+    } else {
+        plot.df <- data.frame("Prediction" = pred, "Outcome" = obs, 
+                                "DataSet" = "training")
+        model.residuals <- obs - pred
+        if (show.raw.residuals ) {
+            model.residuals <- residuals(model)
+        }
+        plot.res.df <- data.frame("x" = obs, "y" = pred, 
+                        "x1" = obs, "y2" = pred + model.residuals,
+                        "DataSet" = "training")
+    }
+    r.squared <- NULL
+    if (!is.null(test.preds) && !is.null(test.labels)) {
+        # store predicted points: 
+        test.df <- data.frame("Prediction" = test.preds, 
+                            "Outcome" = test.labels, "DataSet" = "test")
+        # store residuals for predictions on the test data
+        test.residuals <- test.labels - test.preds
+        if (show.raw.residuals) {
+           test.residuals <- transform.residuals(model, test.residuals) 
+        }
+        test.res.df <- data.frame("x" = test.labels, "y" = test.preds,
+                        "x1" = test.labels, "y2" = test.preds + test.residuals,
+                         "DataSet" = "test")
+        # append to existing data
+        plot.df <- rbind(plot.df, test.df)
+        plot.res.df <- rbind(plot.res.df, test.res.df)
+        # annotate model with R^2 value
+        r.squared <- round(cor(test.preds, test.labels)^2, 3)
+    }
+    #######
+    library(ggplot2)
+    p <- ggplot() + 
+        # plot training samples
+        geom_point(data = plot.df, 
+            aes(x = Outcome, y = Prediction, color = DataSet)) +
+        # plot residuals
+        geom_segment(data = plot.res.df, alpha = 0.2,
+            aes(x = x, y = y, xend = x1, yend = y2, group = DataSet)) +
+        # plot optimal regressor
+        geom_abline(color = "red", slope = 1)
+    if (!is.null(r.squared)) {
+        # plot r squared of predictions
+        max.val <- max(plot.df$Outcome, plot.df$Prediction)
+        x.pos <- 0.1 * max.val
+        y.pos <- 0.9 * max.val
+        label <- paste0("R^2: ", r.squared)
+        p <- p + annotate("text", x = x.pos, y = y.pos, label = label, size = 5)
+    }
+    return(p)
+}
+```
+
+Now, we build an OLS model using ```lm``` and plot the estimates of the model:
+
+```{r}
+# fit linear model
+model <- lm(Ozone ~ Solar.R + Temp + Wind, ozone, trainset)
+test.preds <- predict(model, newdata = ozone[testset,])
+test.labels <- ozone$Ozone[testset]
+# create a plot to compare fit for training vs test points
+p.OLS <- plot.linear.model(model, test.preds, test.labels)
+p.OLS
+```
+
+Looking at the fit of the model, there are two main observations:
+
+* High ozone levels are underestimated
+* Negative ozone levels are predicted
+
+Let us investigate these two issues in more detail in the following.
+
+### High ozone levels are underestimated
+
+Looking at the plot, it is noticeable that the linear model fits the outcome well when ozone is in the range [0,100]. However, when the actually observed ozone concentration is above 100, the model underpredicts the value considerably. Since high ozone levels can be health-threatening, it would be particularly detrimental to underestimate these high ozone levels. Let us investigate the data to identify why the model has problems with these outliers.
+
+```{r}
+# density of the residuals: should be normal for least-squares
+plot(density(residuals(model)))
+```
+
+The histogram indicates that values at the right tail of the residual distribution are indeed problematic. Since the residuals are not really normally distributed, a linear model is not the best model. Indeed the residuals rather seem to follow some form of Poisson distribution. To find out why the fit of the least-squares model is so bad for the outliers, we take another look at the data.
+
+```{r}
+# cutoff at 95% quantile
+ozone.cut <- quantile(ozone$Ozone, 0.95)
+idx <- which(ozone$Ozone >= ozone.cut)
+# compare observations with high ozone with whole data set
+summary(ozone[idx,])
+summary(ozone)
+```
+
+Looking at the distributions of the two groups of observations, we cannot see a large difference between high-ozone observations and the other samples. We can, however, find the culprit using the plot of the model predictions above. In the plot, we see that most of the data points are centered around the [0, 50] ozone range. To fit these observations well, the intercept has a large negative value of `r round(coefficients(model)[1], 2)`, which is why the model underestimates ozone levels for larger values of ozone, which are underrepresented in the training data. 
+
+### The model predicts negative ozone levels
+
+If the observed ozone concentration is close to 0, the model often predicts negative ozone levels. Of course, this cannot be because concentrations cannot go below 0. Again, we investigate the data to find out why the model still makes these predictions.
+
+For this purpose, we will select all observations whose ozone level is in the 5th percentile and investigate their feature values:
+
+```{r}
+# cutoff at 5% quantile
+ozone.cut <- quantile(ozone$Ozone, 0.05)
+idx <- which(ozone$Ozone <= ozone.cut)
+# compare observations with low ozone with whole data set
+summary(ozone[idx,])
+summary(ozone)
+```
+
+What we find is that, for low ozone levels, the average solar radiation is much lower, while the average wind speed is much higher. To understand why we have negative predictions, let us now look at the model coefficients:
+
+```{r}
+coefficients(model)
+```
+
+So, for low ozone levels, the positive coefficient for ```Solar.R``` cannot make up the negative pull of both the intercept and the coefficient for ```Wind``` because for low ozone levels, values for ```Solar.R``` are low, while values for ```Wind``` are high.
+
+## Dealing with negative ozone level predictions
+
+Let us first deal with the problem of predicting negative ozone levels. 
+
+### Truncated ordinary-least squares model
+
+A simple approach for dealing with negative predictions is to replace them with the minimal possible value instead. In this way, if we would hand our model to a customer, he would not start suspecting that something is wrong with the model. We could do this with the following function:
+
+```{r}
+predict.nonnegative <- function(model, newdata) {
+   preds <- predict(model, newdata = newdata) 
+   # correct for negative predictions
+   preds[preds < 0] <- 0
+   return(preds)
+}
+```
+
+Let us now verify how this would improve our predictions on the test data. Remember, the $R^2$ of the initial model was was $0.604$.
+
+```{r}
+nonnegative.preds <- predict.nonnegative(model, ozone[testset,])
+# plot only the test predictions to verify the results
+plot.linear.model(model, nonnegative.preds, ozone$Ozone[testset], test.only = TRUE)
+```
+
+As we see, this hack curbs the problem and increases $R^2$ to $0.646$. However, correcting the negative values in this way, does not change the fact that our model is wrong because the fitting procedure did not take into consideration that negative values should be impossible. 
+
+### Poisson regression
+
+To prevent negative estimates, we can use of a generalized linear model (GLM) that assumes a Poisson distribution rather than a normal distribution:
+
+```{r}
+pois.model <- glm(Ozone ~ Solar.R + Temp + Wind, family = "poisson",data = ozone[trainset, ])
+# need to set type to 'response' to get exponentiated predictions 
+pois.preds <- predict(pois.model, newdata = ozone[testset,], type = "response") 
+plot.linear.model(pois.model, pois.preds, ozone$Ozone[testset])
+```
+
+The $R^2$ value of 0.616 indicates that Poisson regression is slightly superior over ordinary least-squares (0.604). However, its performance is not superior to the model that truncates negative values to 0 (0.646).
+
+### Logarithm transformation
+
+Another approach for dealing with negative predictions is taking the logarithm of the outcome:
+
+```{r}
+log.model <- lm(log(Ozone) ~ Solar.R + Temp + Wind, ozone, trainset)
+log.preds <- predict(pois.model, newdata = ozone[testset,], type = "response") 
+plot.linear.model(log.model, log.preds, ozone$Ozone[testset], test.only = TRUE)
+```
+
+Note that although the result is identical to the result via Poisson regression, the two methods are not identical in general.
+
+## Dealing with the underestimation of high ozone levels
+
+Ideally, we would have a better sampling of measurements with high ozone levels. However, since we cannot collect more data, we need to make do with what we have. One way to deal with the underestimation of high ozone levels is adjusting the loss function. 
+
+### Weighted regression
+
+Using weighted regression, we can influence the impact of the residuals of the outliers. For this purpose, we will calculate the z-scores of the ozone levels and then use their exponential as the weight for the model such that the impact of outliers is increased.
+
+```{r}
+get.weights <- function(ozone) {
+    z.scores <- (ozone$Ozone - mean(ozone$Ozone)) / sd(ozone$Ozone)
+    weights <- exp(z.scores)
+    weights <- weights / mean(weights) # normalize to mean 1
+    return(weights)
+}
+weights <- get.weights(ozone)
+weight.model <- lm(Ozone ~ Solar.R + Temp + Wind, ozone, trainset, weights = weights)
+weight.preds <- predict(weight.model, newdata = ozone[testset,], type = "response")
+plot.linear.model(weight.model, weight.preds, ozone$Ozone[testset])
+```
+
+This model is definitely better than the ordinary least-squares model. Can we improve if further?
+
+### Weighted Poisson regression 
+
+```{r, message = FALSE}
+w.pois.model <- glm(Ozone ~ Solar.R + Temp + Wind, ozone, trainset, 
+                    weights = weights, family = "poisson")
+w.pois.preds <- predict(w.pois.model, newdata = ozone[testset,], type = "response") 
+p.w.pois <- plot.linear.model(w.pois.model, w.pois.preds, ozone$Ozone[testset])
+```
+
+As we see, this model combines the advantages of using Poisson regression (non-negative predictions) with the use of weights (underestimation of outliers). Indeed, the $R^2$ of this model is the lowest yet (0.652 vs 0.646 from the truncated linear model). Now, we could fiddle around more with the weights but we are not going to do this because then we would need to set a validation data set aside for tuning the weight parameter, which we are not going to do here for brevity's sake.
+
+Finally, let us investigate the model coefficients:
+
+```{r}
+coefficients(w.pois.model)
+```
+
+The model is now still dominated by the intercept but now it is positive. Thus, if all other features have a value of 0, the prediction of the model will still be positive. 
+
+## Data set augmentation
+
+Having optimized the model, we now go back to the initial data set. Remember that we have removed all observations with missing values at the beginning of the analysis? Well, this is not ideal because we have discarded valuable information, which could be used to obtain a better model. 
+
+### Investigating the missing values
+
+Let us first investigate the missing values:
+
+```{r}
+data(airquality)
+# store old ozone data set
+ozone.old <- ozone
+# remove time-specific features
+ozone <- subset(airquality, select = c("Ozone", "Solar.R", "Wind", "Temp"))
+# select observations with missing values
+na.idx <- as.numeric(which(apply(is.na(ozone),1, any)))
+na.df <- ozone[na.idx, ]
+# ratio of missing values
+ratio.missing <- length(na.idx) / nrow(ozone)
+print(paste0(round(ratio.missing * 100, 3), "%"))
+# which features are missing most often?
+nbr.missing <- apply(ozone, 2, function(x) length(which(is.na(x))))
+print(nbr.missing)
+# multiple features missing in one observation?
+nbr.missing <- apply(ozone, 1, function(x) length(which(is.na(x))))
+table(nbr.missing)
+```
+
+The investigation reveals that a considerable percentage of observations were previously excluded due to missing values. More specifically, the only features that are missing are ```Ozone``` (37 times) and ```Solar.R``` (7 times). Usually, only one feature is missing (40 times) and rarely are two features missing (2 times).
+
+### Adjusting training and test indices
+
+To ensure that the same observations are used for testing as previously, we have to remap the old incies to the full airquality data set:
+
+```{r}
+## ensure that same observations are used for testing again:
+# adjust training/test indices for the new data set
+old.trainset <- trainset
+trainset <- match(rownames(ozone.old)[old.trainset], rownames(ozone))
+# add NA observations to training data set
+trainset <- c(trainset, na.idx)
+testset <- setdiff(seq_len(nrow(ozone)), trainset)
+```
+
+### Imputing missing values
+To obtain estimates of the missing values, we can use imputation. The idea of this approach is to form predictive models using the known features in order to estimates the missing features. In this way, no observations have to be discarded. When imputing values, it is important that the test data are not used because this would defeat its purpose (the test set would not be independent of the model anymore).
+
+```{r, message = FALSE}
+# use Hmisc for imputing missing values
+library(Hmisc)
+# use aregImpute for multiple imputation
+imputed <- aregImpute(Ozone ~ Solar.R + Temp + Wind, ozone, pr = FALSE)
+# list.out: return a list; imputation: arbitrarily use the first imputation
+imputed.data <- as.data.frame(impute.transcan(imputed, data = ozone,
+                imputation = 1, list.out = TRUE,  pr = FALSE))
+# inspect imputed observations with respect to the outcome 
+summary(as.numeric(imputed.data$Ozone))
+```
+
+Note that ```aregImpute``` makes several multiple imputations with different bootstrap samples, which can be specified using the `n.impute` parameter. Since we want to use the imputations from all runs rather than a single one, we will use the ```fit.mult.impute``` function to define our model:
+
+```{r, message = FALSE}
+# compute new weights
+weights <- get.weights(imputed.data)
+# use imputations from all iterations rather than an arbitrary iteration:
+fmi <- fit.mult.impute(Ozone ~ Solar.R + Temp + Wind,
+        fitter=glm, xtrans = imputed, family = "poisson", 
+        data = ozone, subset = trainset, pr = FALSE) #, weights = weights)
+        # weights arguments (weights = weights) not used due to error:
+        # "..2 used in an incorrect context, no ... to look in"
+fmi.preds <- predict.glm(fmi, newdata = ozone[testset,], type = "response") 
+plot.linear.model(fmi, fmi.preds, ozone$Ozone[testset])
+```
+
+Let us use just a single imputation in order to specify the weights again:
+
+```{r, message = FALSE, warning = FALSE}
+w.pois.model <- glm(Ozone ~ Solar.R + Temp + Wind, imputed.data, trainset, 
+                    weights = weights, family = "poisson")
+w.pois.preds <- predict(w.pois.model, newdata = imputed.data[testset,], type = "response") 
+plot.linear.model(w.pois.model, w.pois.preds, imputed.data$Ozone[testset])
+```
+
+In this case, the weighted Poisson model based on imputed data did not perform better than the model that simply excluded missing data. This indicates that imputation of the missing values rather introduces noise into the data than signal we can work with. 
+
+## Summary
+
+We started with an OLS regression model ($R^2 = 0.604$) and tried to find a linear model with a better fit. The first idea was to truncate the predictions of the model at 0 ($R^2 = 0.646$). To predict outliers more accurately, we trained a weighted linear regression model ($R^2 = 0.621$). Next, to predict only positive values, we trained a weighted Poisson regression model ($R^2 = 0.652$).
+
+Thereafter, we tried to further improve the model by imputing missing values with the ```Hmisc``` package. Although the resulting models were better than the initial OLS model, they did not obtain a higher performance than previously ($R^2 = 0.627$).
+
+In conclusion, the weighted Poisson regression model seems to be the most appropriate model for the airquality data set, although simply truncating negative predictions from the ordinary least-squares model worked similarly well. Here are the visualizations of the OLS and weighted Poisson regression models in comparison:
+
+```{r, fig.width = 12, message = FALSE}
+library(gridExtra) # for grid.arrange
+library(grid) # for textGrob function
+grid.arrange(p.OLS, p.w.pois, nrow = 1, top=textGrob("Ordinary least squares vs weighted Poisson regression",gp=gpar(fontsize=20,font=3)))
+```
