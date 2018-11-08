@@ -107,11 +107,18 @@ plot.linear.model <- function(model, test.preds = NULL, test.labels = NULL,
 }
 ```
 
-Now, we build an OLS model using ```lm``` and plot the estimates of the model:
+Now, we build an OLS model using ```lm``` and investitage the confidence intervals of the feature estimates:
 
 ```{r}
 # fit linear model
 model <- lm(Ozone ~ Solar.R + Temp + Wind, ozone, trainset)
+# get confidence intervals
+confint(model)
+```
+
+We see that the model does not seem to be so sure about the setting for the intercept. Let us see whether the model still performs well:
+
+```{r}
 test.preds <- predict(model, newdata = ozone[testset,])
 test.labels <- ozone$Ozone[testset]
 # create a plot to compare fit for training vs test points
@@ -356,7 +363,14 @@ We started with an OLS regression model ($R^2 = 0.604$) and tried to find a line
 
 Thereafter, we tried to further improve the model by imputing missing values with the ```Hmisc``` package. Although the resulting models were better than the initial OLS model, they did not obtain a higher performance than previously ($R^2 = 0.627$).
 
-In conclusion, the weighted Poisson regression model seems to be the most appropriate model for the airquality data set, although simply truncating negative predictions from the ordinary least-squares model worked similarly well. Here are the visualizations of the OLS and weighted Poisson regression models in comparison:
+In conclusion, the weighted Poisson regression model seems to be the most appropriate model for the airquality data set, although simply truncating negative predictions from the ordinary least-squares model worked similarly well. You may ask: was all this work worth the effort? Indeed, the difference in the predictions between the initial model and the weighted Poisson model is significant at the 5% significance level:
+
+```{r}
+# does the new model predict significantly different values?
+wilcox.test(test.preds, w.pois.preds, paired = TRUE)
+```
+
+The difference between the models becomes clear when we compare them side-by-side: 
 
 ```{r, fig.width = 12, message = FALSE}
 library(gridExtra) # for grid.arrange

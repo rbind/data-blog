@@ -1,0 +1,67 @@
+---
+title: "Interpreting Generalized Linear Models"
+author: Matthias Döring
+date: '2018-11-08T15:00:00Z'
+draft: true
+description: "TODO"
+categories:
+  - machine-learning
+tags:
+thumbnail: "/post/machine-learning/linear_models_cover.png"
+
+---
+
+
+
+<div id="data-preparation" class="section level2">
+<h2>Data preparation</h2>
+<p>We will take 70% of samples for training and 30% for testing:</p>
+<pre class="r"><code>data(airquality)
+ozone &lt;- subset(na.omit(airquality), 
+        select = c(&quot;Ozone&quot;, &quot;Solar.R&quot;, &quot;Wind&quot;, &quot;Temp&quot;))
+set.seed(123)
+N.train &lt;- ceiling(0.7 * nrow(ozone))
+N.test &lt;- nrow(ozone) - N.train
+trainset &lt;- sample(seq_len(nrow(ozone)), N.train)
+testset &lt;- setdiff(seq_len(nrow(ozone)), trainset)</code></pre>
+</div>
+<div id="interpretation-of-generalized-linear-models" class="section level2">
+<h2>Interpretation of generalized linear models</h2>
+<p>Interpreting generalized linear models (GLM) obtained through <code>glm</code> is similar to <a href="/post/machine-learning/linear_models/">interpreting conventional linear models</a>. Still, there are some differences. Let us first build a GLM that corresponds to our previous model:</p>
+<pre class="r"><code>model.pois &lt;- glm(Ozone ~ Solar.R + Temp + Wind, data = ozone, 
+                family = &quot;poisson&quot;, subset = trainset)
+summary(model.pois)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Ozone ~ Solar.R + Temp + Wind, family = &quot;poisson&quot;, 
+##     data = ozone, subset = trainset)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -5.3137  -2.0913  -0.6163   1.7141   6.0361  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  0.343052   0.228505   1.501    0.133    
+## Solar.R      0.001887   0.000251   7.519 5.52e-14 ***
+## Temp         0.045357   0.002491  18.210  &lt; 2e-16 ***
+## Wind        -0.072509   0.006728 -10.777  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 1464.87  on 77  degrees of freedom
+## Residual deviance:  453.25  on 74  degrees of freedom
+## AIC: 863.48
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div id="residuals" class="section level1">
+<h1>Residuals:</h1>
+<p><a href="https://stackoverflow.com/questions/2531489/understanding-glmresiduals-and-residglm" class="uri">https://stackoverflow.com/questions/2531489/understanding-glmresiduals-and-residglm</a> <a href="http://people.stat.sfu.ca/~raltman/stat402/402L11.pdf" class="uri">http://people.stat.sfu.ca/~raltman/stat402/402L11.pdf</a></p>
+</div>
+<div id="null-deviance" class="section level1">
+<h1>Null deviance:</h1>
+<p><a href="https://www.youtube.com/watch?v=JC56jS2gVUE" class="uri">https://www.youtube.com/watch?v=JC56jS2gVUE</a></p>
+</div>

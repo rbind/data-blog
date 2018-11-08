@@ -282,14 +282,14 @@ apply(ci, 1, function(x) paste0(&quot;95% CI: [&quot;,
 <h2>Retrieving confidence and prediction intervals for estimated values</h2>
 <p>The predictions from a linear model can be turned into intervals by providing the <code>interval</code> argument. These intervals give a measure of confidence for the predicted values. There are two types of intervals: confidence and prediction intervals. Let’s apply our model on the test set using different arguments for the <code>interval</code> parameter to see the difference between the two types of intervals:</p>
 <pre class="r"><code># compute confidence intervals (CI) for predictions:
-preds.ci &lt;- predict(model, newdata = ozone[trainset,], interval = &quot;confidence&quot;)
+preds.ci &lt;- predict(model, newdata = ozone[testset,], interval = &quot;confidence&quot;)
 # compute prediction intervals (PI) for predictions:
-preds.pred &lt;- predict(model, newdata = ozone[trainset,], interval = &quot;prediction&quot;)
+preds.pred &lt;- predict(model, newdata = ozone[testset,], interval = &quot;prediction&quot;)
 # note that the values differ:
 cbind(rbind(preds.ci[1,], preds.pred[2,]), &quot;Method&quot; = c(&quot;CI&quot;, &quot;PI&quot;))</code></pre>
-<pre><code>##      fit                lwr                upr                Method
-## [1,] &quot;24.5995427660305&quot; &quot;19.4517960809593&quot; &quot;29.7472894511018&quot; &quot;CI&quot;  
-## [2,] &quot;55.8952080718515&quot; &quot;18.6819641450219&quot; &quot;93.108451998681&quot;  &quot;PI&quot;</code></pre>
+<pre><code>##      fit                 lwr                 upr                Method
+## [1,] &quot;-4.42397219873667&quot; &quot;-13.4448767773931&quot; &quot;4.59693237991976&quot; &quot;CI&quot;  
+## [2,] &quot;-22.0446990408131&quot; &quot;-61.0004555440645&quot; &quot;16.9110574624383&quot; &quot;PI&quot;</code></pre>
 <p>The confidence intervals are narrow intervals, while the prediction (tolerance) intervals are wide intervals. Their values are based on the provided tolerance/significance level, as specified by the <code>level</code> parameter (default: 0.95).</p>
 <p>Their definitions are slightly different. Given a new observation <span class="math inline">\(x\)</span>, CIs and PIs are defined as follows</p>
 <p><span class="math display">\[\hat{y}_{\text{CI}} \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(\frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span> <span class="math display">\[\hat{y}_{\text{PI}}  \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(1 + \frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span></p>

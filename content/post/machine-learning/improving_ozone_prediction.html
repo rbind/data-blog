@@ -101,15 +101,23 @@ plot.linear.model &lt;- function(model, test.preds = NULL, test.labels = NULL,
     }
     return(p)
 }</code></pre>
-<p>Now, we build an OLS model using <code>lm</code> and plot the estimates of the model:</p>
+<p>Now, we build an OLS model using <code>lm</code> and investitage the confidence intervals of the feature estimates:</p>
 <pre class="r"><code># fit linear model
 model &lt;- lm(Ozone ~ Solar.R + Temp + Wind, ozone, trainset)
-test.preds &lt;- predict(model, newdata = ozone[testset,])
+# get confidence intervals
+confint(model)</code></pre>
+<pre><code>##                     2.5 %       97.5 %
+## (Intercept) -1.106457e+02 -20.88636548
+## Solar.R      7.153968e-03   0.09902534
+## Temp         1.054497e+00   2.07190804
+## Wind        -3.992315e+00  -1.24576713</code></pre>
+<p>We see that the model does not seem to be so sure about the setting for the intercept. Let us see whether the model still performs well:</p>
+<pre class="r"><code>test.preds &lt;- predict(model, newdata = ozone[testset,])
 test.labels &lt;- ozone$Ozone[testset]
 # create a plot to compare fit for training vs test points
 p.OLS &lt;- plot.linear.model(model, test.preds, test.labels)
 p.OLS</code></pre>
-<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>Looking at the fit of the model, there are two main observations:</p>
 <ul>
 <li>High ozone levels are underestimated</li>
@@ -121,7 +129,7 @@ p.OLS</code></pre>
 <p>Looking at the plot, it is noticeable that the linear model fits the outcome well when ozone is in the range [0,100]. However, when the actually observed ozone concentration is above 100, the model underpredicts the value considerably. Since high ozone levels can be health-threatening, it would be particularly detrimental to underestimate these high ozone levels. Let us investigate the data to identify why the model has problems with these outliers.</p>
 <pre class="r"><code># density of the residuals: should be normal for least-squares
 plot(density(residuals(model)))</code></pre>
-<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>The histogram indicates that values at the right tail of the residual distribution are indeed problematic. Since the residuals are not really normally distributed, a linear model is not the best model. Indeed the residuals rather seem to follow some form of Poisson distribution. To find out why the fit of the least-squares model is so bad for the outliers, we take another look at the data.</p>
 <pre class="r"><code># cutoff at 95% quantile
 ozone.cut &lt;- quantile(ozone$Ozone, 0.95)
@@ -192,7 +200,7 @@ summary(ozone[idx,])</code></pre>
 <pre class="r"><code>nonnegative.preds &lt;- predict.nonnegative(model, ozone[testset,])
 # plot only the test predictions to verify the results
 plot.linear.model(model, nonnegative.preds, ozone$Ozone[testset], test.only = TRUE)</code></pre>
-<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p>As we see, this hack curbs the problem and increases <span class="math inline">\(R^2\)</span> to <span class="math inline">\(0.646\)</span>. However, correcting the negative values in this way, does not change the fact that our model is wrong because the fitting procedure did not take into consideration that negative values should be impossible.</p>
 </div>
 <div id="poisson-regression" class="section level3">
@@ -202,7 +210,7 @@ plot.linear.model(model, nonnegative.preds, ozone$Ozone[testset], test.only = TR
 # need to set type to &#39;response&#39; to get exponentiated predictions 
 pois.preds &lt;- predict(pois.model, newdata = ozone[testset,], type = &quot;response&quot;) 
 plot.linear.model(pois.model, pois.preds, ozone$Ozone[testset])</code></pre>
-<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>The <span class="math inline">\(R^2\)</span> value of 0.616 indicates that Poisson regression is slightly superior over ordinary least-squares (0.604). However, its performance is not superior to the model that truncates negative values to 0 (0.646).</p>
 </div>
 <div id="logarithm-transformation" class="section level3">
@@ -211,7 +219,7 @@ plot.linear.model(pois.model, pois.preds, ozone$Ozone[testset])</code></pre>
 <pre class="r"><code>log.model &lt;- lm(log(Ozone) ~ Solar.R + Temp + Wind, ozone, trainset)
 log.preds &lt;- predict(pois.model, newdata = ozone[testset,], type = &quot;response&quot;) 
 plot.linear.model(log.model, log.preds, ozone$Ozone[testset], test.only = TRUE)</code></pre>
-<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>Note that although the result is identical to the result via Poisson regression, the two methods are not identical in general.</p>
 </div>
 </div>
@@ -231,7 +239,7 @@ weights &lt;- get.weights(ozone)
 weight.model &lt;- lm(Ozone ~ Solar.R + Temp + Wind, ozone, trainset, weights = weights)
 weight.preds &lt;- predict(weight.model, newdata = ozone[testset,], type = &quot;response&quot;)
 plot.linear.model(weight.model, weight.preds, ozone$Ozone[testset])</code></pre>
-<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p>This model is definitely better than the ordinary least-squares model. Can we improve if further?</p>
 </div>
 <div id="weighted-poisson-regression" class="section level3">
@@ -315,13 +323,13 @@ fmi &lt;- fit.mult.impute(Ozone ~ Solar.R + Temp + Wind,
         # &quot;..2 used in an incorrect context, no ... to look in&quot;
 fmi.preds &lt;- predict.glm(fmi, newdata = ozone[testset,], type = &quot;response&quot;) 
 plot.linear.model(fmi, fmi.preds, ozone$Ozone[testset])</code></pre>
-<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
 <p>Let us use just a single imputation in order to specify the weights again:</p>
 <pre class="r"><code>w.pois.model &lt;- glm(Ozone ~ Solar.R + Temp + Wind, imputed.data, trainset, 
                     weights = weights, family = &quot;poisson&quot;)
 w.pois.preds &lt;- predict(w.pois.model, newdata = imputed.data[testset,], type = &quot;response&quot;) 
 plot.linear.model(w.pois.model, w.pois.preds, imputed.data$Ozone[testset])</code></pre>
-<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <p>In this case, the weighted Poisson model based on imputed data did not perform better than the model that simply excluded missing data. This indicates that imputation of the missing values rather introduces noise into the data than signal we can work with.</p>
 </div>
 </div>
@@ -329,9 +337,18 @@ plot.linear.model(w.pois.model, w.pois.preds, imputed.data$Ozone[testset])</code
 <h2>Summary</h2>
 <p>We started with an OLS regression model (<span class="math inline">\(R^2 = 0.604\)</span>) and tried to find a linear model with a better fit. The first idea was to truncate the predictions of the model at 0 (<span class="math inline">\(R^2 = 0.646\)</span>). To predict outliers more accurately, we trained a weighted linear regression model (<span class="math inline">\(R^2 = 0.621\)</span>). Next, to predict only positive values, we trained a weighted Poisson regression model (<span class="math inline">\(R^2 = 0.652\)</span>).</p>
 <p>Thereafter, we tried to further improve the model by imputing missing values with the <code>Hmisc</code> package. Although the resulting models were better than the initial OLS model, they did not obtain a higher performance than previously (<span class="math inline">\(R^2 = 0.627\)</span>).</p>
-<p>In conclusion, the weighted Poisson regression model seems to be the most appropriate model for the airquality data set, although simply truncating negative predictions from the ordinary least-squares model worked similarly well. Here are the visualizations of the OLS and weighted Poisson regression models in comparison:</p>
+<p>In conclusion, the weighted Poisson regression model seems to be the most appropriate model for the airquality data set, although simply truncating negative predictions from the ordinary least-squares model worked similarly well. You may ask: was all this work worth the effort? Indeed, the difference in the predictions between the initial model and the weighted Poisson model is significant at the 5% significance level:</p>
+<pre class="r"><code># does the new model predict significantly different values?
+wilcox.test(test.preds, w.pois.preds, paired = TRUE)</code></pre>
+<pre><code>## 
+##  Wilcoxon signed rank test
+## 
+## data:  test.preds and w.pois.preds
+## V = 1, p-value = 4.657e-10
+## alternative hypothesis: true location shift is not equal to 0</code></pre>
+<p>The difference between the models becomes clear when we compare them side-by-side:</p>
 <pre class="r"><code>library(gridExtra) # for grid.arrange
 library(grid) # for textGrob function
 grid.arrange(p.OLS, p.w.pois, nrow = 1, top=textGrob(&quot;Ordinary least squares vs weighted Poisson regression&quot;,gp=gpar(fontsize=20,font=3)))</code></pre>
-<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-20-1.png" width="1152" /></p>
+<p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-22-1.png" width="1152" /></p>
 </div>

@@ -301,9 +301,9 @@ The predictions from a linear model can be turned into intervals by providing th
 
 ```{r}
 # compute confidence intervals (CI) for predictions:
-preds.ci <- predict(model, newdata = ozone[trainset,], interval = "confidence")
+preds.ci <- predict(model, newdata = ozone[testset,], interval = "confidence")
 # compute prediction intervals (PI) for predictions:
-preds.pred <- predict(model, newdata = ozone[trainset,], interval = "prediction")
+preds.pred <- predict(model, newdata = ozone[testset,], interval = "prediction")
 # note that the values differ:
 cbind(rbind(preds.ci[1,], preds.pred[2,]), "Method" = c("CI", "PI"))
 ```
