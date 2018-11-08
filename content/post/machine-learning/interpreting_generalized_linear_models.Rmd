@@ -39,7 +39,9 @@ summary(model.pois)
 # Residuals:
 https://stackoverflow.com/questions/2531489/understanding-glmresiduals-and-residglm
 http://people.stat.sfu.ca/~raltman/stat402/402L11.pdf
+http://data.princeton.edu/wws509/notes/c3s8.html
 
 # Null deviance:
 
 https://www.youtube.com/watch?v=JC56jS2gVUE
+https://stats.stackexchange.com/questions/108995/interpreting-residual-and-null-deviance-in-glm-r
