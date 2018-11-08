@@ -5,7 +5,7 @@ date: 2018-10-26
 description: "Do you want to share your experience as a data scientist or talk about a project that you are excited about? Start contributing now!"
 authorbox: false
 sidebar: true
-disable_comments: false
+disable_comments: true
 ---
 <img src="/img/agreement-business-businessman-872957.jpg"/>
 
@@ -15,3 +15,6 @@ I'm always looking for original and high-quality contributions to this blog. If 
 * **Interviews** with data scientists and companies that utilize data science
 * **Presentations** of projects/startups/companies related to data science
 
+## Interested? 
+
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfIvUFE7Yz3Qlu6DPCtYq9Xi6_oJtU-e4aih243818Fi-5x5w/viewform?embedded=true" width="640" height="751" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
