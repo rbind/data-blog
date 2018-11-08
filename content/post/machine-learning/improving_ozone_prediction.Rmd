@@ -216,7 +216,14 @@ pois.preds <- predict(pois.model, newdata = ozone[testset,], type = "response")
 plot.linear.model(pois.model, pois.preds, ozone$Ozone[testset])
 ```
 
-The $R^2$ value of 0.616 indicates that Poisson regression is slightly superior over ordinary least-squares (0.604). However, its performance is not superior to the model that truncates negative values to 0 (0.646).
+The $R^2$ value of 0.616 indicates that Poisson regression is slightly superior over ordinary least-squares (0.604). However, its performance is not superior to the model that truncates negative values to 0 (0.646). This is probably because the variance of the ozone level is much larger than what the Poisson model assumes:
+
+```{r}
+# mean and variance should be the same for Poisson distribution
+mean(ozone$Ozone)
+var(ozone$Ozone)
+
+```
 
 ### Logarithm transformation
 
@@ -378,3 +385,11 @@ library(gridExtra) # for grid.arrange
 library(grid) # for textGrob function
 grid.arrange(p.OLS, p.w.pois, nrow = 1, top=textGrob("Ordinary least squares vs weighted Poisson regression",gp=gpar(fontsize=20,font=3)))
 ```
+<!--
+```{r}
+library(MASS)
+model.nb <- glm.nb(Ozone ~ Solar.R + Temp + Wind, data = ozone, subset = trainset, weights = weights)
+preds.nb <- predict(model.nb, newdata = ozone[testset,], type = "response")
+plot.linear.model(model.nb, preds.nb, test.labels)
+```
+-->
