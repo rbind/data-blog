@@ -118,9 +118,9 @@ body {
 }
 
 input,
-button,
 select,
 optgroup,
+button,
 textarea {
 	margin: 0;
 	font-family: inherit;
@@ -129,10 +129,9 @@ textarea {
 }
 
 .button {
-	padding: 10px 10px 10px 0px;
+	padding: 10px 10px 10px 10px;
 	font-weight: 700;
 	color: #fff;
-	white-space: pre-line;
 	background: DodgerBlue;
     text-align: center;
     font-size: 16px;
