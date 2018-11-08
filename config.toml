@@ -1,5 +1,5 @@
 baseurl = "https://www.datascienceblog.net"
-title = "datascienceblog.net: R for Data Science "
+title = "datascienceblog.net: R for Data Science"
 languageCode = "en-us"
 paginate = "10" # Number of posts per page
 theme = "Mainroad"
