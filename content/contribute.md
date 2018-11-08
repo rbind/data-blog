@@ -1,5 +1,5 @@
 ---
-title: "How can I contribute to this blog?"
+title: "How Can I Contribute to This Blog?"
 slug: "/contribute-to-datascienceblog/"
 date: 2018-10-26
 description: "Do you want to share your experience as a data scientist or talk about a project that you are excited about? Start contributing now!"
