@@ -1,6 +1,7 @@
 ---
 title: "Finding a Suitable Linear Model for Ozone Prediction"
 author: Matthias Döring
+downloadRmd: true
 date: '2018-11-07T15:00:00Z'
 description: "Although ordinary least-squares regression is often used, it is not appropriate for all types of data. Using the airquality data set, I try to find a generalized linear model that fits the data better. For this purpose, I use the following methods: weighted regression, Poisson regression, and imputation."
 categories:

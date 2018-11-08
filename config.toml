@@ -18,6 +18,8 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   url = "https://matthias-doering.netlify.com/"
 
 [Params]
+  downloadRmd = true
+  contentPath = "https://www.github.com/matdoering/data-blog/raw/master/content/"
   subtitle = "Understand. Implement. Succeed." # Subtitle of your site
   description = "Blog about data science with a focus on applications in R. Topics include statistical testing, machine learning, and data visualization. Find the answers to your questions!"
   opengraph = true # for social media links to blog

@@ -31,9 +31,13 @@
 	</article>
 </main>
 {{ partial "authorbox.html" . }}
+<div style = "text-align:right">
 {{ if isset .Params "author" }}
-    {{print "Author: " .Params.author}}
+    <p>Author: {{.Params.author}}</p>
 {{ end }}
+{{ partial "post_download_Rmd.html" . }}
+</div>
+<br>
 {{ partial "post_nav.html" . }}
 {{ partial "comments.html" . }}
 {{ end }}
