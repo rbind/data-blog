@@ -14,7 +14,7 @@ thumbnail: "/post/machine-learning/improving_ozone_prediction_cover.png"
 
 ---
 
-In a previous post, I have [introduced the airquality data set](/post/machine-learning/linear_models/) in order to demonstrate how linear models are interpreted. The goal of this post is to find a suitable linear model for the prediction of ozone levels given the features in the data set.
+In a previous post, I have [introduced the airquality data set](/post/machine-learning/linear_models/) in order to demonstrate how linear models are interpreted. In this post, I will start with a basic linear model and, from there, try to find a linear model with a better fit.
 
 ## Data preprocessing
 
