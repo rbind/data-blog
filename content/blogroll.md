@@ -15,6 +15,8 @@ disable_comments: false
 * [The Stats Geek](http://thestatsgeek.com/): a blog on statistics
 * [Cross Validated](https://stats.stackexchange.com): probably the largest forum for discussing anything related to statistics and machine learning
 * [Data Camp](https://www.datacamp.com): a great resource for training in data science
+* [Data Science Reader](https://rushter.com/dsreader/): an aggregator for data science content
+* [DataTau](http://www.datatau.com/]): a data science forum
 
 
 ## R
@@ -35,5 +37,8 @@ develOverflow
 * [Stack Overflow](https://stats.stackexchange.com): if you have a programming problem, you'll probably find the solution here
 * [Introduction to Algorithms](https://mitpress.mit.edu/books/introduction-algorithms-third-edition]): a book providing a theoretical, comprehensive introduction to algorithms and data structures
 
+## Other
+
+* [Awesome Blogdown](https://awesome-blogdown.com/): A curated list of static websuites built using the blogdown R package
 
 Is your favorite resource for data science missing? Let me know in the comments!
