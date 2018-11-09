@@ -135,7 +135,10 @@ textarea {
 	background: DodgerBlue;
     text-align: center;
     font-size: 16px;
+    text-decoration: none;
+    margin: 5px;
 }
+
 /* Button */
 .btn {
 	padding: 5px 10px;
@@ -143,6 +146,7 @@ textarea {
 	color: #fff;
 	white-space: pre-line;
 	background: #2a2a2a;
+
 }
 
 .btn:hover {
@@ -629,6 +633,7 @@ select {
 	font-weight: 700;
 	color: #e64946;
 }
+
 
 .content a:hover,
 .warning a:hover {
@@ -1303,3 +1308,22 @@ textarea {
 .dialog:target {
   display: block;
 }
+.button a:hover {
+	text-decoration: none;
+	color: white;
+}
+#copyButton {
+  width: 150px;
+  height: 50px;
+}
+    
+#copyButton svg {
+  width: 25px;
+  height: 25px;
+}
+
+.svg-icon {
+  display: inline-flex;
+  align-self: center;
+}
+
