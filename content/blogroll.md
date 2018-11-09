@@ -26,6 +26,7 @@ develOverflow
 * [Bioconductor](https://bioconductor.org): the repository for R packages relating to bioinformatics
 * [R-bloggers](https://www.r-bloggers.com): an aggregator blog for anything related to R
 * [Tidyverse](https://www.tidyverse.org/): a highly useful collection of R package designed for data science of which ggplot2 and dplyr are probably the most notable members
+* [Awesome R](https://awesome-r.com/): ever wondered what great R packages are out there that you are not using? This curated list of R packages shows an overview of popular packages for various tasks.
 
 ## Machine Learning
 
