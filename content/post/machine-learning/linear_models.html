@@ -6,6 +6,7 @@ description: "Linear machine learning models are very convenient for interpretat
 categories:
   - machine-learning
 tags:
+    - linear model
 thumbnail: "/post/machine-learning/linear_models_cover.png"
 
 ---
@@ -94,10 +95,10 @@ print(model.summary)</code></pre>
 <div id="the-residuals" class="section level3">
 <h3>The residuals</h3>
 <p>The first piece of information we obtain is on the residuals. The term <em>residual</em> comes from the residual sum of squares (RSS), which is defined as</p>
-<span class="math display">\[\begin{align*}
+<p><span class="math display">\[\begin{align*}
 r_i &amp;= y_i - f(x_i) \\
 \text{RSS} &amp;= \sum_{i=1}^n r_i^2
-\end{align*}\]</span>
+\end{align*}\]</span></p>
 <p>where the residual <span class="math inline">\(r_i\)</span> is defined as the difference between observed and predicted values, <span class="math inline">\(f(x_i)\)</span>, from the observed value, <span class="math inline">\(y_i\)</span>.</p>
 <p>The residual median value suggest that the model generally predicts slightly higher values of ozone than observed. The large maximum value, however, indicates that some outlier predictions are also much too low. Looking at a numbers can be a bit abstract, so let us plot the predictions of the model against the observed values:</p>
 <pre class="r"><code>res &lt;- residuals(model)
@@ -188,7 +189,9 @@ print(t.vals)</code></pre>
 <h4>The p-value</h4>
 <p>The p-value is computed under the assumption that <span class="math inline">\(\beta_i = 0\)</span> for all coefficients. The t-values follow a t-distribution with</p>
 <pre class="r"><code>model.df &lt;- df.residual(model)</code></pre>
-<p>degrees of freedom. The degrees of freedom of a linear model is defined as <span class="math display">\[\text{df} = n - p\]</span> where <span class="math inline">\(n\)</span> is the number of samples and <span class="math inline">\(p\)</span> is the number of features (including the inctercept). The p-value indicates the likelihood that the obtained coefficient estimates are different from zero purely by chance. Thus, a low p-value suggests that there is a significant association between a variable and the outcome.</p>
+<p>degrees of freedom. The degrees of freedom of a linear model is defined as
+<span class="math display">\[\text{df} = n - p\]</span>
+where <span class="math inline">\(n\)</span> is the number of samples and <span class="math inline">\(p\)</span> is the number of features (including the inctercept). The p-value indicates the likelihood that the obtained coefficient estimates are different from zero purely by chance. Thus, a low p-value suggests that there is a significant association between a variable and the outcome.</p>
 </div>
 </div>
 <div id="further-statistics" class="section level3">
@@ -241,7 +244,8 @@ print(null.model)</code></pre>
 ##       36.76</code></pre>
 <pre class="r"><code># plot the incercept-only prediction function
 plot(ozone$Ozone[trainset], null.model$fitted.values)</code></pre>
-<p><img src="/post/machine-learning/linear_models_files/figure-html/unnamed-chunk-17-1.png" width="672" /> Hence, the null hypothesis of the test is that the fit of the intercept-only model and the specified model is equal. If the null hypothesis can be rejected, this implies that the specified model has a better fit than the null model.</p>
+<p><img src="/post/machine-learning/linear_models_files/figure-html/unnamed-chunk-17-1.png" width="672" />
+Hence, the null hypothesis of the test is that the fit of the intercept-only model and the specified model is equal. If the null hypothesis can be rejected, this implies that the specified model has a better fit than the null model.</p>
 <p>Let’s calculate this by hand to show the idea:</p>
 <pre class="r"><code>rss &lt;- function(model) {
     return(sum(model$residuals^2))
@@ -292,7 +296,8 @@ cbind(rbind(preds.ci[1,], preds.pred[2,]), &quot;Method&quot; = c(&quot;CI&quot;
 ## [2,] &quot;-22.0446990408131&quot; &quot;-61.0004555440645&quot; &quot;16.9110574624383&quot; &quot;PI&quot;</code></pre>
 <p>The confidence intervals are narrow intervals, while the prediction (tolerance) intervals are wide intervals. Their values are based on the provided tolerance/significance level, as specified by the <code>level</code> parameter (default: 0.95).</p>
 <p>Their definitions are slightly different. Given a new observation <span class="math inline">\(x\)</span>, CIs and PIs are defined as follows</p>
-<p><span class="math display">\[\hat{y}_{\text{CI}} \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(\frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span> <span class="math display">\[\hat{y}_{\text{PI}}  \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(1 + \frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span></p>
+<p><span class="math display">\[\hat{y}_{\text{CI}} \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(\frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span>
+<span class="math display">\[\hat{y}_{\text{PI}}  \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(1 + \frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span></p>
 <p>where <span class="math inline">\(t_{\alpha/2, \text{df}}\)</span> is the t-value with <span class="math inline">\(\text{df} = 2\)</span> degrees of freedom and a significance level of <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\sigma_{\text{err}}\)</span> is the standard error of the residual, <span class="math inline">\({\sigma}_x^2\)</span> is the variance of the independent features, and <span class="math inline">\(\overline{x}\)</span> indicates the mean value of the features. More detailed <a href="https://rpubs.com/aaronsc32/regression-confidence-prediction-intervals">explanations for calculating CIs and PIs are available at RPubs</a> and <a href="https://www.youtube.com/watch?feature=player_embedded&amp;v=qVCQi0KPR0s">through this video</a>.</p>
 <p>With regard to their interpretation, <a href="https://www.graphpad.com/support/faq/the-distinction-between-confidence-intervals-prediction-intervals-and-tolerance-intervals/">the difference between the two intervals is further discussed at GraphPad</a>.</p>
 </div>

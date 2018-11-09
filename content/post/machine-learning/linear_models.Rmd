@@ -6,6 +6,7 @@ description: "Linear machine learning models are very convenient for interpretat
 categories:
   - machine-learning
 tags:
+    - linear model
 thumbnail: "/post/machine-learning/linear_models_cover.png"
 
 ---

@@ -1,26 +1,27 @@
 ---
 title: "Interpreting Generalized Linear Models"
 author: Matthias Döring
-date: '2018-11-08T15:00:00Z'
-draft: true
-description: "TODO"
+date: '2018-11-09T23:00:00Z'
+draft: false
+description: "Generalized linear models (GLMs) are related to conventional linear models but there are some important differences. For example, GLMs are based on the deviance rather than the conventional residuals and they enable the use of different distributions and linker functions. This post investigates how these aspects influence the interpretation of GLMs."
 categories:
   - machine-learning
 tags:
-thumbnail: "/post/machine-learning/linear_models_cover.png"
+    - linear model
+thumbnail: "/post/machine-learning/interpreting_generalized_linear_models_cover.png"
 
 ---
 
 
 
-<p>Interpreting generalized linear models (GLM) obtained through <code>glm</code> is similar to <a href="/post/machine-learning/linear_models/">interpreting conventional linear models</a>. Still, there are some differences, which we will discuss here.</p>
-<div id="introduction-to-glms" class="section level2">
-<h2>Introduction to GLMs</h2>
-<p>GLMs enable the use of linear models in cases where the response variable has an error distribution that is non-normal. Each distribution is associated with a specific canonical link function. A link function <span class="math inline">\(g(x)\)</span> fulfills <span class="math inline">\(X \beta = g(\mu)\)</span>. For example, for a Poisson distribution, the canonical link function is <span class="math inline">\(g(\mu) = \text{ln}(\mu)\)</span>. This means that estimates on the original scale can be obtained by taking the inverse of the link function, in this case, the exponential function: <span class="math inline">\(\mu = \exp(X \beta)\)</span>.</p>
+<p>Interpreting generalized linear models (GLM) obtained through <code>glm</code> is similar to <a href="/post/machine-learning/linear_models/">interpreting conventional linear models</a>. Here, we will discuss the differences that need to be considered.</p>
+<div id="basics-of-glms" class="section level2">
+<h2>Basics of GLMs</h2>
+<p>GLMs enable the use of linear models in cases where the response variable has an error distribution that is non-normal. Each distribution is associated with a specific canonical link function. A link function <span class="math inline">\(g(x)\)</span> fulfills <span class="math inline">\(X \beta = g(\mu)\)</span>. For example, for a Poisson distribution, the canonical link function is <span class="math inline">\(g(\mu) = \text{ln}(\mu)\)</span>. Estimates on the original scale can be obtained by taking the inverse of the link function, in this case, the exponential function: <span class="math inline">\(\mu = \exp(X \beta)\)</span>.</p>
 </div>
 <div id="data-preparation" class="section level2">
 <h2>Data preparation</h2>
-<p>We will take 70% of samples for training and 30% for testing:</p>
+<p>We will take 70% of the airquality samples for training and 30% for testing:</p>
 <pre class="r"><code>data(airquality)
 ozone &lt;- subset(na.omit(airquality), 
         select = c(&quot;Ozone&quot;, &quot;Solar.R&quot;, &quot;Wind&quot;, &quot;Temp&quot;))
@@ -62,21 +63,19 @@ summary(model.pois)</code></pre>
 ## AIC: 863.48
 ## 
 ## Number of Fisher Scoring iterations: 4</code></pre>
-<p>In terms of the GLM output, there are four main aspects that are different to the output of <code>lm</code>:</p>
+<p>In terms of the GLM summary output, there are the following differences to the output obtained from the <code>lm</code> summary function:</p>
 <ul>
 <li>Deviance (deviance of residuals / null deviance / residual deviance)</li>
-<li>Dispersion parameter</li>
-<li>AIC</li>
-<li>Fisher Scoring iterations</li>
+<li>Other outputs: dispersion parameter, AIC, Fisher Scoring iterations</li>
 </ul>
-<p>Let us investigate these aspects in more detail.</p>
+<p>Moreover, the prediction function of GLMs is also a bit different. We will start with investigating the deviance.</p>
 </div>
 <div id="deviance-residuals" class="section level2">
 <h2>Deviance residuals</h2>
 <p>We already know <a href="/post/machine-learning/linear_models/">residuals</a> from the <code>lm</code> function. But what are deviance residuals? In ordinary least-squares, the residual associated with the <span class="math inline">\(i\)</span>-th observation is defined as</p>
 <p><span class="math display">\[r_i = y_i - \hat{f}(x_i)\]</span></p>
-<p>where <span class="math inline">\(\hat{f}(x) = \beta_0 + x^T \beta\)</span> is the prediction function the fitted model.
-For GLMs, there are <a href="https://stackoverflow.com/questions/2531489/understanding-glmresiduals-and-residglm">several ways for specifying residuals</a>. To understand deviance residuals, it is worthwhile to look at the other types of residuals first. For this, we will first make the following definitions:</p>
+<p>where <span class="math inline">\(\hat{f}(x) = \beta_0 + x^T \beta\)</span> is the prediction function of the fitted model.</p>
+<p>For GLMs, there are <a href="https://stackoverflow.com/questions/2531489/understanding-glmresiduals-and-residglm">several ways for specifying residuals</a>. To understand deviance residuals, it is worthwhile to look at the other types of residuals first. For this, we define a few variables first:</p>
 <pre class="r"><code>expected &lt;- ozone$Ozone[trainset]
 g &lt;- family(model.pois)$linkfun # log function
 g.inv &lt;- family(model.pois)$linkinv # exp function
@@ -84,23 +83,22 @@ estimates.log &lt;- model.pois$linear.predictors # estimates on log scale
 estimates &lt;- fitted(model.pois) # estimates on response scale (exponentiated)
 all.equal(g.inv(estimates.log), estimates)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
-<p>We will discuss four types of residuals: response residuals, working residuals, Pearson residuals, and, finally, deviance residuals. There is also another type of residual called <em>partial residual</em>, which is formed by determining residuals from models where individual features are excluded. This residual is not discussed here.</p>
+<p>We will cover four types of residuals: response residuals, working residuals, Pearson residuals, and, deviance residuals. There is also another type of residual called <em>partial residual</em>, which is formed by determining residuals from models where individual features are excluded. This residual is not discussed here.</p>
 <div id="response-residuals" class="section level3">
 <h3>Response residuals</h3>
 <p>For <code>type = &quot;response&quot;</code>, the <em>conventional</em> residual on the response level is computed, that is,
-<span class="math display">\[r_i = y_i - \hat{f}(x_i)\]</span>
+<span class="math display">\[r_i = y_i - \hat{f}(x_i)\,.\]</span>
 This means that the fitted residuals are transformed by taking the inverse of the link function:</p>
 <pre class="r"><code># type = &quot;response&quot;
 res.response1 &lt;- residuals(model.pois, type = &quot;response&quot;)
-# note: fitted() returns the exponentiated estimates
 res.response2 &lt;- expected - estimates
 all.equal(res.response1, res.response2)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="working-residuals" class="section level3">
 <h3>Working residuals</h3>
-<p>For <code>type = &quot;working&quot;</code>, the <em>response residuals</em> are normalized by the estimates:</p>
-<p><span class="math display">\[r_i = \frac{y_i - \hat{f}(x_i)}{\hat{f}(x_i)}\]</span></p>
+<p>For <code>type = &quot;working&quot;</code>, the residuals are normalized by the estimates <span class="math inline">\(\hat{f}(x_i)\)</span>:</p>
+<p><span class="math display">\[r_i = \frac{y_i - \hat{f}(x_i)}{\hat{f}(x_i)}\,.\]</span></p>
 <pre class="r"><code># type = &quot;working&quot;
 res.working1 &lt;- residuals(model.pois, type=&quot;working&quot;)
 res.working2 &lt;- (expected - estimates) / estimates
@@ -109,8 +107,8 @@ all.equal(res.working1, res.working2)</code></pre>
 </div>
 <div id="pearson-residuals" class="section level3">
 <h3>Pearson residuals</h3>
-<p>For <code>type = &quot;pearson&quot;</code>, the Pearson residuals are computed. They are defined as
-<span class="math display">\[r_i = \frac{y_i - \hat{f}(x_i)}{\sqrt{\hat{f}(x_i)}}\]</span></p>
+<p>For <code>type = &quot;pearson&quot;</code>, the Pearson residuals are computed. They are obtained by normalizing the residuals by the square root of the estimate:</p>
+<p><span class="math display">\[r_i = \frac{y_i - \hat{f}(x_i)}{\sqrt{\hat{f}(x_i)}}\,.\]</span></p>
 <pre class="r"><code># type = &quot;pearson&quot;
 res.pearson1 &lt;- residuals(model.pois, type=&quot;pearson&quot;)
 res.pearson2 &lt;- (expected - estimates) / sqrt(estimates)
@@ -119,17 +117,16 @@ all.equal(res.pearson1, res.pearson2)</code></pre>
 </div>
 <div id="deviance-residuals-1" class="section level3">
 <h3>Deviance residuals</h3>
-<p>Deviance residuals are defined by considering the deviance. The deviance of a model is defined by</p>
+<p>Deviance residuals are defined by the deviance. The deviance of a model is given by</p>
 <p><span class="math display">\[{D(y,{\hat {\mu }})=2{\Big (}\log {\big (}p(y\mid {\hat {\theta }}_{s}){\big )}-\log {\big (}p(y\mid {\hat {\theta }}_{0}){\big )}{\Big )}.\,}\]</span></p>
 <p>where</p>
 <ul>
 <li><span class="math inline">\(y\)</span> is the outcome</li>
 <li><span class="math inline">\(\hat{\mu}\)</span> is the estimate of the model</li>
-<li><span class="math inline">\(\hat{\theta}_s\)</span> and <span class="math inline">\(\hat{\theta}_0\)</span> are the parameters of the fitted <em>saturated</em> and <em>proposed models</em>, respectively</li>
+<li><span class="math inline">\(\hat{\theta}_s\)</span> and <span class="math inline">\(\hat{\theta}_0\)</span> are the parameters of the fitted <em>saturated</em> and <em>proposed models</em>, respectively. A saturated model has as many parameters as it has training points, that is, <span class="math inline">\(p = n\)</span>. Thus, it has a perfect fit. The proposed model can be the any other model.</li>
 <li><span class="math inline">\(p(y | \theta)\)</span> is the likelihood of data given the model</li>
 </ul>
-<p>So, what is a saturated model? A saturated model has as many parameters as it has training points, that is, <span class="math inline">\(p = n\)</span>. The proposed model can be any other type of model. For the residual deviance, this is the model that you have trained.</p>
-<p>This means that the deviance indicates the extent to which the likelihood of the saturated model exceeds the likelihood of the proposed model. If the proposed model has a good fit, the deviance will be small. If the proposed model has a bad fit, the deviance will be high. For example, for the Poisson model, the deviance is</p>
+<p>The deviance indicates the extent to which the likelihood of the saturated model exceeds the likelihood of the proposed model. If the proposed model has a good fit, the deviance will be small. If the proposed model has a bad fit, the deviance will be high. For example, for the Poisson model, the deviance is</p>
 <p><span class="math display">\[D = 2 \cdot \sum_{i = 1}^n y_i \cdot \log \left(\frac{y_i}{\hat{\mu}_i}\right) − (y_i − \hat{\mu}_i)\,.\]</span></p>
 <p>In R, the deviance residuals represent the contributions of individual samples to the deviance <span class="math inline">\(D\)</span>. More specifically, they are defined as the signed <a href="https://www.youtube.com/watch?v=JC56jS2gVUE">square roots of the unit deviances</a>. Thus, the deviance residuals are analogous to the conventional residuals: when they are squared, we obtain the sum of squares that we use for assessing the fit of the model. However, while the sum of squares is the residual sum of
 squares for linear models, for GLMs, this is the deviance.</p>
@@ -147,7 +144,10 @@ res.dev3 &lt;- sqrt(poisson.dev(expected, estimates)) *
 all.equal(res.dev1, res.dev2, res.dev3)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <p>Note that, for ordinary least-squares models, the <a href="http://people.stat.sfu.ca/~raltman/stat402/402L11.pdf">deviance residual is identical to the conventional residual</a>.</p>
-<p>Now, how do these values look for our model?</p>
+</div>
+<div id="deviance-residuals-in-practice" class="section level3">
+<h3>Deviance residuals in practice</h3>
+<p>We can obtain the deviance residuals of our model using the <code>residuals</code> function:</p>
 <pre class="r"><code>summary(residuals(model.pois))</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ## -5.3137 -2.0913 -0.6163 -0.1642  1.7141  6.0361</code></pre>
@@ -156,29 +156,134 @@ all.equal(res.dev1, res.dev2, res.dev3)</code></pre>
 </div>
 <div id="null-and-residual-deviance" class="section level2">
 <h2>Null and residual deviance</h2>
-<p>Since we have already introduced the deviance, <a href="https://stats.stackexchange.com/questions/108995/interpreting-residual-and-null-deviance-in-glm-r">understanding the null and residual deviance</a> is not a challenge anymore. Remember the definition of the deviance?</p>
+<p>Since we have already introduced the deviance, <a href="https://stats.stackexchange.com/questions/108995/interpreting-residual-and-null-deviance-in-glm-r">understanding the null and residual deviance</a> is not a challenge anymore. Let us repeat the definition of the deviance once again:</p>
 <p><span class="math display">\[{D(y,{\hat {\mu }})=2{\Big (}\log {\big (}p(y\mid {\hat {\theta }}_{s}){\big )}-\log {\big (}p(y\mid {\hat {\theta }}_{0}){\big )}{\Big )}.\,}\]</span></p>
-<p>If, <span class="math inline">\(\theta_0\)</span> refers to the null model (i.e. an intercept-only model), this gives rise to the <em>null deviance</em>.
-If, however, <span class="math inline">\(\theta_0\)</span> refers to the trained model, this gives rise to the <em>residual deviance</em>. So, how can we interpret these two quantities?</p>
+<p>The null and residual deviance differ in <span class="math inline">\(\theta_0\)</span>:</p>
+<ul>
+<li>Null deviance: <span class="math inline">\(\theta_0\)</span> refers to the null model (i.e. an intercept-only model)</li>
+<li>Residual deviance: <span class="math inline">\(\theta_0\)</span> refers to the trained model</li>
+</ul>
+<p>How can we interpret these two quantities?</p>
 <ul>
 <li>Null deviance: A low null deviance implies that the data can be modeled well merely using the intercept. If the null deviance is low, you should consider using few features for modeling the data.</li>
 <li>Residual deviance: A low residual deviance implies that the model you have trained is appropriate. Congratulations!</li>
 </ul>
-<p>How does this look for our model?</p>
+<div id="null-deviance-and-residual-deviance-in-practice" class="section level3">
+<h3>Null deviance and residual deviance in practice</h3>
+<p>Let us investigate the null and residual deviance of our model:</p>
 <pre class="r"><code>paste0(c(&quot;Null deviance: &quot;, &quot;Residual deviance: &quot;),
        round(c(model.pois$null.deviance, deviance(model.pois)), 2))</code></pre>
 <pre><code>## [1] &quot;Null deviance: 1464.87&quot;    &quot;Residual deviance: 453.25&quot;</code></pre>
-<p>These results are somehow reassuring. First, the null deviance is high, which means it makes sense to use more than a single parameter. Second, the residual deviance is relatively low, which indicates that the log likelihood of our model is close to the log likelihood of the saturated model. However, for a well-fitting model, the residual deviance should be close to the degrees of freedom (74), which is not the case. For example, this could be a result of
-overdispersion where the variation is greater than predicted by the model. This can happen for a Poisson model, if the actual variance exceeds the mean, although <span class="math inline">\(Var(Y) = \mu\)</span> is assumed by the model.</p>
+<p>These results are somehow reassuring. First, the null deviance is high, which means it makes sense to use more than a single parameter for fitting the model. Second, the residual deviance is relatively low, which indicates that the log likelihood of our model is close to the log likelihood of the saturated model.</p>
+<p>However, for a well-fitting model, <a href="https://stats.stackexchange.com/questions/37732/when-someone-says-residual-deviance-df-should-1-for-a-poisson-model-how-appro">the residual deviance should be close to the degrees of freedom</a> (74), which is not the case here. For example, this could be a result of overdispersion where the variation is greater than predicted by the model. This can happen for a Poisson model when the actual variance exceeds the assumed mean of <span class="math inline">\(\mu = Var(Y)\)</span>.</p>
 </div>
-<div id="dispersion-parameter" class="section level2">
-<h2>Dispersion parameter</h2>
-<p>To understand the dispersion parameter, we have to understand the concept of dispersion first. Dispersion (variability/scatter/spread) simply indicates whether a distribution is wide or narrow.</p>
-<p>For likelihood-based model, the dispersion parameter is always fixed to 1. It is adjusted only for methods that are based on quasi-likelihood estimation such as <code>quasipoisson</code> or <code>quasibinomial</code>. These methods can deal with overdispersion.</p>
 </div>
-<div id="aic" class="section level2">
-<h2>AIC</h2>
+<div id="other-outputs-of-the-summary-function" class="section level2">
+<h2>Other outputs of the summary function</h2>
+<p>Here, I deal with the other outputs of the GLM summary fuction: the dispersion parameter, the AIC, and the statement about Fisher scoring iterations.</p>
+<div id="dispersion-parameter" class="section level3">
+<h3>Dispersion parameter</h3>
+<p>Dispersion (variability/scatter/spread) simply indicates whether a distribution is wide or narrow. The GLM function can use a dispersion parameter to model the variability.</p>
+<p>However, for likelihood-based model, the dispersion parameter is always fixed to 1. It is adjusted only for methods that are based on quasi-likelihood estimation such as when <code>family = &quot;quasipoisson&quot;</code> or <code>family = &quot;quasibinomial&quot;</code>. These methods are particularly suited for dealing with overdispersion.</p>
 </div>
-<div id="fisher-scoring-iterations" class="section level2">
-<h2>Fisher scoring iterations</h2>
+<div id="aic" class="section level3">
+<h3>AIC</h3>
+<p>The Akaike information criterion (AIC) is an information-theoretic measure that describes the quality of a model. It is defined as</p>
+<p><span class="math display">\[\text{AIC} = 2p - 2 \ln(\hat{L})\]</span></p>
+<p>where <span class="math inline">\(p\)</span> is the number of model parameters and <span class="math inline">\(\hat{L}\)</span> is the maximum of the likelihood function. A model with a low AIC is characterized by low complexity (minimizes <span class="math inline">\(p\)</span>) and a good fit (maximizes <span class="math inline">\(\hat{L}\)</span>).</p>
+</div>
+<div id="fisher-scoring-iterations" class="section level3">
+<h3>Fisher scoring iterations</h3>
+<p>The information about <em>Fisher scoring iterations</em> is just verbose output of <a href="https://hal.archives-ouvertes.fr/hal-01577698">iterative weighted least squares</a>. A high number of iterations may be a cause for concern indicating that the algorithm is not converging properly.</p>
+</div>
+</div>
+<div id="the-prediction-function-of-glms" class="section level2">
+<h2>The prediction function of GLMs</h2>
+<p>The GLM <code>predict</code> function has some peculiarities that should be noted.</p>
+<div id="the-type-argument" class="section level3">
+<h3>The type argument</h3>
+<p>Since models obtained via <code>lm</code> do not use a linker function, the predictions from <code>predict.lm</code> are always on the scale of the outcome (except if you have transformed the outcome earlier). For <code>predict.glm</code> this is not generally true. Here, the <code>type</code> parameter determines the scale on which the estimates are returned. The following two settings are important:</p>
+<ul>
+<li><code>type = &quot;link&quot;</code>: the default setting returns the estimates on the scale of the link function. For example, for Poisson regression, the estimates would represent the logarithms of the outcomes. Given the estimates on the link scale, you can transform them to the estimates on the response scale by taking the inverse link function.</li>
+<li><code>type = &quot;response&quot;</code>: returns estimates on the level of the outcomes. This is the option you need if you want to evaluate predictive performance.</li>
+</ul>
+<p>Let us see how the returned estimates differ depending on the <code>type</code> argument:</p>
+<pre class="r"><code># prediction on link scale (log)
+pred.l &lt;- predict(model.pois, newdata = ozone[testset, ])
+summary(pred.l)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   1.688   3.217   3.744   3.695   4.220   4.864</code></pre>
+<pre class="r"><code># prediction on respone scale
+pred.r &lt;- predict(model.pois, newdata = ozone[testset, ], type = &quot;response&quot;)
+summary(pred.r)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    5.41   24.95   42.25   50.12   68.01  129.61</code></pre>
+<p>Using the link and inverse link functions, we can transform the estimates into each other:</p>
+<pre class="r"><code>link &lt;- family(model.pois)$linkfun # link function: log for Poisson
+ilink &lt;- family(model.pois)$linkinv # inverse link function: exp for Poisson
+all.equal(ilink(pred.l), pred.r)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>all.equal(pred.l, link(pred.r))</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>There is also the <code>type = &quot;terms&quot;</code> setting but this one is rarely used an also available in <code>predict.lm</code>.</p>
+</div>
+<div id="obtaining-confidence-intervals" class="section level3">
+<h3>Obtaining confidence intervals</h3>
+<p>The predict function of GLMs does not support the output of confidence intervals via <code>interval = &quot;confidence&quot;</code> as for <code>predict.lm</code>. We can still obtain confidence intervals for predictions by accessing the standard errors of the fit by predicting with <code>se.fit = TRUE</code>:</p>
+<pre class="r"><code>predict.confidence &lt;- function(object, newdata, level = 0.95, ...) {
+    if (!is(object, &quot;glm&quot;)) {
+        stop(&quot;Model should be a glm&quot;)
+    }
+    if (!is(newdata, &quot;data.frame&quot;)) {
+        stop(&quot;Plase input a data frame for newdata&quot;)
+    }
+    if (!is.numeric(level) | level &lt; 0 | level &gt; 1) {
+        stop(&quot;level should be numeric and between 0 and 1&quot;)
+    }
+    ilink &lt;- family(object)$linkinv
+    ci.factor &lt;- qnorm(1 - (1 - level)/2)
+    # calculate CIs:
+    fit &lt;- predict(object, newdata = newdata, level = level, 
+                    type = &quot;link&quot;, se.fit = TRUE, ...)
+    lwr &lt;- ilink(fit$fit - ci.factor * fit$se.fit)
+    upr &lt;- ilink(fit$fit + ci.factor * fit$se.fit)
+    df &lt;- data.frame(&quot;fit&quot; = ilink(fit$fit), &quot;lwr&quot; = lwr, &quot;upr&quot; = upr)
+    return(df)
+}</code></pre>
+<p>Using this function, we get the following confidence intervals for the Poisson model:</p>
+<pre class="r"><code>conf.df &lt;- predict.confidence(model.pois, ozone[testset,])
+head(conf.df, 2)</code></pre>
+<pre><code>##        fit      lwr       upr
+## 8 9.073256 8.141969 10.111065
+## 9 5.409964 4.619623  6.335518</code></pre>
+<p>Using the confidence data, we can create a function for plotting the confidence of the estimates in relation to individual features:</p>
+<pre class="r"><code>plot.confidence &lt;- function(df, feature) {
+    library(ggplot2)
+    p &lt;- ggplot(df, aes_string(x = feature, 
+                       y = &quot;fit&quot;)) + 
+      geom_line(colour = &quot;blue&quot;) + 
+      geom_point() + 
+      geom_ribbon(aes(ymin = lwr, ymax = upr), 
+                    alpha = 0.5) 
+      return(p)
+}
+plot.confidence.features &lt;- function(data, features) {
+    plots &lt;- list()
+    for (feature in features) {
+        p &lt;- plot.confidence(data, feature)
+        plots[[feature]] &lt;- p
+    }
+    library(gridExtra)
+    #grid.arrange(plots[[1]], plots[[2]], plots[[3]])
+    do.call(grid.arrange, plots)
+}</code></pre>
+<p>Using these functions, we can generate the following plot:</p>
+<pre class="r"><code>data &lt;- cbind(ozone[testset,], conf.df)
+plot.confidence.features(data, colnames(ozone))</code></pre>
+<p><img src="/post/machine-learning/interpreting_generalized_linear_models_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+</div>
+<div id="where-to-go-from-here" class="section level2">
+<h2>Where to go from here?</h2>
+<p>Having covered the fundamentals of GLMs, you may want to dive deeper into their practical application by taking a look at <a href="/post/machine-learning/improving_ozone_prediction/">this post where I investigate different types of GLMs for improving the prediction of ozone levels</a>.</p>
 </div>
