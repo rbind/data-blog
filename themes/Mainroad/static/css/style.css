@@ -1325,5 +1325,22 @@ textarea {
 .svg-icon {
   display: inline-flex;
   align-self: center;
+  height: 20px;
+  width: 20px;
 }
 
+.textComment {
+    float: left;
+}
+.expand {
+    cursor: pointer;
+    float: right;
+    margin: 0px;
+    padding: 0px;
+}
+.collapse {
+    cursor: pointer;
+    float: right;
+    margin: 0px;
+    padding: 0px;
+}

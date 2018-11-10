@@ -13,7 +13,9 @@
             <img class="post-comment-avatar" src="https://www.gravatar.com/avatar/{{ .email }}?s=40">
             <p class="post-comment-info"><strong>{{ .name }}</strong><br>{{ dateFormat "02 Jan 06 15:04 MST" .date }}</p>
           </div>
+          <div class = "commentText">
           {{ .message | markdownify }}
+          </div>
         </div>
     {{ end }}
   {{ end }}
