@@ -49,15 +49,11 @@ $(document).ready(function () {
             if (len > charLimit) {
                 // if already above char limit, hide all subsequent p's
                 $p.hide();
-                //$p.data('originalText', $p.html()); // store the original HTML
                 return;
             }
-			// trim text above the char limit within current paragraph:
-            //var pText = $p.html().trim();
-            
+            $p.data('originalText', pHtml); // store the original HTML
             if (len + pText.length > charLimit) {
 				// need to truncate now!
-                $p.data('originalText', pHtml); // store the original HTML
 				// when we would like to truncate, need to look into html children
 				// and truncate the text there. that's it.
 				// if there's none: truncate here. otherwise there
@@ -68,7 +64,10 @@ $(document).ready(function () {
 					var htmlSplit = pHtml.split("/>\s*</");
 					//console.log(htmlSplit);
 					var tag = ($p)[0].tagName;
-					newHtml = "<" + tag + ">" + pText.substring(0, charLimit - len) + "</" + tag + ">";
+					//newHtml = "<" + tag + ">" + pText.substring(0, charLimit - len);
+					newHtml = pText.substring(0, charLimit - len);
+
+					//newHtml = pText.substring(0, charLimit - len);
 				} else {
 					newHtml = pHtml;
 					/* this doesn't work because we would again need to truncate the raw HTML
@@ -85,44 +84,50 @@ $(document).ready(function () {
 					})
 					*/
 				}
-				//newHtml = newHtml + " ...";
                 $p.html(newHtml);  // set text to truncated string
-                $('<p>...</p><br><svg class="expand svg-icon" viewBox="0 0 20 20"><path d="M13.962,8.885l-3.736,3.739c-0.086,0.086-0.201,0.13-0.314,0.13S9.686,12.71,9.6,12.624l-3.562-3.56C5.863,8.892,5.863,8.611,6.036,8.438c0.175-0.173,0.454-0.173,0.626,0l3.25,3.247l3.426-3.424c0.173-0.172,0.451-0.172,0.624,0C14.137,8.434,14.137,8.712,13.962,8.885 M18.406,10c0,4.644-3.763,8.406-8.406,8.406S1.594,14.644,1.594,10S5.356,1.594,10,1.594S18.406,5.356,18.406,10 M17.521,10c0-4.148-3.373-7.521-7.521-7.521c-4.148,0-7.521,3.374-7.521,7.521c0,4.147,3.374,7.521,7.521,7.521C14.148,17.521,17.521,14.147,17.521,10"></path></svg>').appendTo($p); // add the expand link
+				//$p.outerHTML = "<span>" + newHtml + "</span>";
+				// add link for expansion: this is within the current p element, which will be replaced when expanding
+				if ($p.find(".expand").length == 0) {
+                	$('<span> ...</span><svg class="expand svg-icon" viewBox="0 0 20 20"><path d="M13.962,8.885l-3.736,3.739c-0.086,0.086-0.201,0.13-0.314,0.13S9.686,12.71,9.6,12.624l-3.562-3.56C5.863,8.892,5.863,8.611,6.036,8.438c0.175-0.173,0.454-0.173,0.626,0l3.25,3.247l3.426-3.424c0.173-0.172,0.451-0.172,0.624,0C14.137,8.434,14.137,8.712,13.962,8.885 M18.406,10c0,4.644-3.763,8.406-8.406,8.406S1.594,14.644,1.594,10S5.356,1.594,10,1.594S18.406,5.356,18.406,10 M17.521,10c0-4.148-3.373-7.521-7.521-7.521c-4.148,0-7.521,3.374-7.521,7.521c0,4.147,3.374,7.521,7.521,7.521C14.148,17.521,17.521,14.147,17.521,10"></path></svg>').appendTo($p);
+				}
             }
             len += pText.length;
         });
-	
     };
-	
     $('.post-comments').on('click', '.expand', function (e) {
 		// show all html elements of the comment:
-        var $p = $(e.target).parent(''); 
-		//var children = $p.parents('.post-comment').children();
+		// selected $p is not always correct. sometimes it's the svg path rather than the last elemnt
+		/*
+		console.log("Click on Expand");
+		console.log($(e));
+		console.log($(e.currentTarget)); // NB: don't use target. this is the clicked element (e.g. path, not the svg necessarily)
+		*/
+        var $p = $(e.currentTarget).parent(); 
 		var children = $p.parents('.commentText').children();
-        $p.html($p.data('originalText')); // restore text
-
+		children.show().children().show();	
+		if ($p.data('originalText')) {
+			// restore text that was truncated
+        	$p.html($p.data('originalText')); // restore text
+		} else {
+			return;
+		}
+		// show children again
         var $lastP = children
             .show() // show all siblings
             .last(); // get the last
-
 		if ($lastP.find(".collapse").length == 0) {
 			// only append collapse button once
-        	$('<br><svg class="collapse svg-icon" viewBox="0 0 20 20"><path d="M13.889,11.611c-0.17,0.17-0.443,0.17-0.612,0l-3.189-3.187l-3.363,3.36c-0.171,0.171-0.441,0.171-0.612,0c-0.172-0.169-0.172-0.443,0-0.611l3.667-3.669c0.17-0.17,0.445-0.172,0.614,0l3.496,3.493C14.058,11.167,14.061,11.443,13.889,11.611 M18.25,10c0,4.558-3.693,8.25-8.25,8.25c-4.557,0-8.25-3.692-8.25-8.25c0-4.557,3.693-8.25,8.25-8.25C14.557,1.75,18.25,5.443,18.25,10 M17.383,10c0-4.07-3.312-7.382-7.383-7.382S2.618,5.93,2.618,10S5.93,17.381,10,17.381S17.383,14.07,17.383,10"></path></svg>').appendTo($lastP);
-		}
-
+			//console.log("Appending collapse button!");
+        	$('<svg class="collapse svg-icon" viewBox="0 0 20 20"><path d="M13.889,11.611c-0.17,0.17-0.443,0.17-0.612,0l-3.189-3.187l-3.363,3.36c-0.171,0.171-0.441,0.171-0.612,0c-0.172-0.169-0.172-0.443,0-0.611l3.667-3.669c0.17-0.17,0.445-0.172,0.614,0l3.496,3.493C14.058,11.167,14.061,11.443,13.889,11.611 M18.25,10c0,4.558-3.693,8.25-8.25,8.25c-4.557,0-8.25-3.692-8.25-8.25c0-4.557,3.693-8.25,8.25-8.25C14.557,1.75,18.25,5.443,18.25,10 M17.383,10c0-4.07-3.312-7.382-7.383-7.382S2.618,5.93,2.618,10S5.93,17.381,10,17.381S17.383,14.07,17.383,10"></path></svg>').appendTo($lastP);
+		} 
     });
-
     $('.post-comments').on('click', '.collapse', function (e) {
-        var $anchor = $(e.target);
-
+        var $anchor = $(e.currentTarget);
         collapseComment($anchor.parents('.post-comment'));
-
         $anchor.remove();
     });
-
     // by default, collapse all comments
     $('.post-comment').each(function (i, comment) {
         collapseComment($(comment));
     });
-
 });

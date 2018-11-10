@@ -1335,12 +1335,12 @@ textarea {
 .expand {
     cursor: pointer;
     float: right;
-    margin: 0px;
+    margin: 1px;
     padding: 0px;
 }
 .collapse {
     cursor: pointer;
     float: right;
-    margin: 0px;
+    margin: 1px;
     padding: 0px;
 }
