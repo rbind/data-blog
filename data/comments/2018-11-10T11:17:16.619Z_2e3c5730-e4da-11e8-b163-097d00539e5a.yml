@@ -1,0 +1,6 @@
+_id: 2e3c5730-e4da-11e8-b163-097d00539e5a
+path: post/other/staticman_comments.html
+name: Matthias Döring
+email: e90d48aac6bcd47b2bcf84b337a118d2
+message: "Thanks for checking this. I just read the documentation about [Staticman V3 on GitHub](https://github.com/eduardoboucas/staticman/pull/219), so it should not be a problem to use the V3 instance. I just didn't know that the config/format for API requests had changed.\r\n\r\nI also didn't know the limitations of the free Heroku dynos before. Actually, I was noticing the idling and wondering why this happens. Now it makes sense to me since they are going to sleep if they are inactive. I don't really think this is a problem though because the dyno usually wakes up within a couple of seconds, which is not limiting the usability of Staticman for commenting too much.\r\n\r\nKeep up the good work :-)"
+date: '2018-11-10T11:17:16.619Z'
