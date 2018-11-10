@@ -2,7 +2,7 @@
 title: "Staticman: An Alternative to Disqus for Comments on Static Sites"
 author: Matthias Döring
 date: '2018-11-01'
-lastmod: '2018-11-05'
+lastmod: '2018-11-10'
 downloadRmd: false
 description: "Staticman is an API that can be used to implement a commenting system for static websites. Here, I discuss how I managed to set up my own instance of the Staticman API and how it can be integrated into a Hugo site."
 thumbnail: "/post/other/staticman_comments_avatar.png"
@@ -56,6 +56,14 @@ To host my own version of the Staticman API, I've followed [this great tutorial]
 10. Deploy the API:
    ```git push heroku production:master```
 11. After the API has been built successfully, you should be greeted with *Hello from Staticman version 3.0.0!* when visiting your API instance at ```https://{nameOfYourStaticmanApp}.herokuapp.com```.
+
+## Limitations of Heroku apps
+
+Free Heroku apps come with some limitations. The most important limitation is that [the number of free dyno hours is limited](https://devcenter.heroku.com/articles/free-dyno-hours). A dyno is the isolated container in which your application is running. A free dyno begins to sleep after 30 mins of inactivity. Otherwise, it is always on as long as you still have [remaining dyno hours](https://dashboard.heroku.com/account/billing) (currently 550 free dyno hours per month). 
+
+When your free dyno hours are exhausted, all of your free dynos start sleeping. You will receive a notification from Heroku before this happens though. If the only app that you are running is Staticman, however, it is unlikely that you will use up you free dyno hours because this would mean that you are receiving comments for more than 18 hours per day, which would be quite a lot.
+
+So, the main disadvantage of free dynos when is that posting comments will be slow (delay of a few seconds) when no one has posted anything within a while (30 minutes). In my opinion, this limitation is sufferable for a free service. If you want to get rid of this limitation or if you need more dyno hours, you can always upgrade to a paid dyno.
 
 ## Reconfiguring your theme
 
