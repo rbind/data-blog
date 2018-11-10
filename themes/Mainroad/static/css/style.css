@@ -1329,6 +1329,14 @@ textarea {
   width: 20px;
 }
 
+.comment-icon {
+  display: inline-flex;
+  align-self: center;
+  height: 30px;
+  width: 30px;
+}
+
+
 .textComment {
     float: left;
 }
