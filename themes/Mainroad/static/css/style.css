@@ -132,11 +132,23 @@ textarea {
 	padding: 10px 10px 10px 10px;
 	font-weight: 700;
 	color: #fff;
-	background: DodgerBlue;
+	background: #4693e6;
     text-align: center;
     font-size: 16px;
     text-decoration: none;
     margin: 5px;
+    cursor: pointer;
+}
+
+.button:active {
+  transform: translateY(1px);
+  filter: saturate(150%);
+}
+.button:hover {
+  border: 2px solid #4693e6 !important;
+  background-color: #f2f2f2;
+  color: #4693e6;
+  text-decoration: none;
 }
 
 /* Button */
@@ -146,14 +158,12 @@ textarea {
 	color: #fff;
 	white-space: pre-line;
 	background: #2a2a2a;
-
 }
 
-.btn:hover {
-	color: #fff;
-	background: #e64946;
+.btn:active {
+  transform: translateY(1px);
+  filter: saturate(150%);
 }
-
 /* Animation */
 .menu__item,
 .btn {
@@ -211,7 +221,7 @@ a {
 	text-decoration: none;
 }
 
-a:hover {
+a:not(.button):hover {
 	color: #e64946;
 }
 
@@ -1286,7 +1296,7 @@ textarea {
 
 .btn:hover {
   border: 2px solid #F76C5E !important;
-  background-color: white;
+  background-color: #d1d1d1;
   color: #F76C5E;
   text-decoration: none;
 }
@@ -1307,10 +1317,6 @@ textarea {
 
 .dialog:target {
   display: block;
-}
-.button a:hover {
-	text-decoration: none;
-	color: white;
 }
 #copyButton {
   width: 150px;
@@ -1336,6 +1342,16 @@ textarea {
   width: 30px;
 }
 
+.comment-icon:active {
+    /* this breaks stuff */
+}
+/* inverse colors on mouse-over */
+.comment-icon:focus,
+.comment-icon:hover {
+  background-color: rgba(230, 73, 70, 0.55);
+  border-radius: 100%;
+  opacity: 50%;
+}
 
 .textComment {
     float: left;
