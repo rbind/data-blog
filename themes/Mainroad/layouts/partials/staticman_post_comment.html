@@ -27,6 +27,7 @@
   <h3 style = "margin-top:20px">Leave a comment</h3>
 
   <form class="post-comment" method="POST" action="{{ .Site.Params.staticman_api }}">
+    Please enter your information. Your email address will not be published.
     <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#comment-submitted">
     <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#post-error">
     <input type="hidden" name="options[entryId]" value="{{ .UniqueID }}">
