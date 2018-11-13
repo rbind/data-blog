@@ -50,36 +50,34 @@ Note: some regions are much larger than other. For example, Highlands and Lowlan
 Let us see where the distilleries are located by plotting their latitude and longitude coordinates: 
 
 ```{r}
-library(ggmap)
 # transform UTM coordinates to longitude/latitude in degrees
 geo.df <- df[, c("Latitude", "Longitude")]
+colnames(geo.df) <- c("lat", "long") # switch for plotting
 # REF: https://rstudio-pubs-static.s3.amazonaws.com/375481_d2605e8726364d30a5b20c6974710cf5.html
 # create 'SpatialPoints' object
 library(raster)
-coordinates(geo.df) <-  ~Latitude + Longitude
+coordinates(geo.df) <-  ~lat + long
 # add coordinate reference system (CRS) for UK
 proj4string(geo.df) <- CRS("+init=epsg:27700")
 # transform again:
-if (FALSE) {
-library(rgdal) # need to install libgdal-dev; TODO: NOTEBOOK upgrade!
+# NB: getting rgdal working on old systems is tough due to libgdal dependency
+library(rgdal)
 geo.df <- spTransform(geo.df, CRS("+init=epsg:4326"))
-map <- get_map(location = c(lon = 749680, lat = 286580)) # doesn't work
-map.df <- data.frame(df[, "Distillery"], geo.df)
+map.df <- data.frame("Distillery" = df[, "Distillery"], geo.df)
 ###########
 # VISUALIZE
-library(maps)
-world.map <- map_data ("world")
-UK.map <- world.map %>% filter(region == "UK")
-UK.map %>%
-  filter(subregion == "Scotland") %>% 
-  ggplot() + 
-  geom_map(map = UK.map, 
-           aes(x = long, y = lat, map_id = region),
-           fill="white", colour = "black") + 
-  coord_map() + 
-  geom_point(data = map.df, 
-             aes(x=lat, y = long, colour = "red", alpha = .9))
-}
+#library(maps)
+library(ggplot2)
+uk.map <- map_data ("world", region = "UK") 
+scotland.map <- uk.map[uk.map$subregion == "Scotland",]
+p <- ggplot(data = scotland.map, aes(x = long, y = lat)) + 
+geom_map(map = uk.map, 
+       aes(map_id = region),
+       fill="white", colour = "black") +
+coord_map() + 
+geom_point(data = map.df, aes(y = long, x = lat),
+    colour = "blue", alpha = .75)
+p
 ```
 
 ## Clustering distilleries by location
@@ -91,7 +89,7 @@ K <- 6
 C <- kmeans(df[, c("Longitude", "Latitude")], K)
 df <- cbind(df, "Cluster" = as.factor(C$cluster))
 library(ggplot2)
-ggplot(df, aes(x = Latitude, y = Longitude)) +
+ggplot(df, aes(x = Longitude, y = Latitude)) +
     geom_point(aes(color = Cluster))
     
 ```

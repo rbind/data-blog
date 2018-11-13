@@ -59,38 +59,44 @@ feat.df &lt;- df[, c(&quot;Distillery&quot;, features)]</code></pre>
 <div id="geographical-locations-of-the-distilleries" class="section level2">
 <h2>Geographical locations of the distilleries</h2>
 <p>Let us see where the distilleries are located by plotting their latitude and longitude coordinates:</p>
-<pre class="r"><code>library(ggmap)</code></pre>
-<pre><code>## Loading required package: ggplot2</code></pre>
 <pre class="r"><code># transform UTM coordinates to longitude/latitude in degrees
 geo.df &lt;- df[, c(&quot;Latitude&quot;, &quot;Longitude&quot;)]
+colnames(geo.df) &lt;- c(&quot;lat&quot;, &quot;long&quot;) # switch for plotting
 # REF: https://rstudio-pubs-static.s3.amazonaws.com/375481_d2605e8726364d30a5b20c6974710cf5.html
 # create &#39;SpatialPoints&#39; object
 library(raster)</code></pre>
 <pre><code>## Loading required package: sp</code></pre>
-<pre class="r"><code>coordinates(geo.df) &lt;-  ~Latitude + Longitude
+<pre class="r"><code>coordinates(geo.df) &lt;-  ~lat + long
 # add coordinate reference system (CRS) for UK
 proj4string(geo.df) &lt;- CRS(&quot;+init=epsg:27700&quot;)
 # transform again:
-if (FALSE) {
-library(rgdal) # need to install libgdal-dev; TODO: NOTEBOOK upgrade!
-geo.df &lt;- spTransform(geo.df, CRS(&quot;+init=epsg:4326&quot;))
-map &lt;- get_map(location = c(lon = 749680, lat = 286580)) # doesn&#39;t work
-map.df &lt;- data.frame(df[, &quot;Distillery&quot;], geo.df)
+# NB: getting rgdal working on old systems is tough due to libgdal dependency
+library(rgdal)</code></pre>
+<pre><code>## rgdal: version: 1.3-6, (SVN revision 773)
+##  Geospatial Data Abstraction Library extensions to R successfully loaded
+##  Loaded GDAL runtime: GDAL 2.3.2, released 2018/09/21
+##  Path to GDAL shared files: /usr/share/gdal
+##  GDAL binary built with GEOS: TRUE 
+##  Loaded PROJ.4 runtime: Rel. 5.2.0, September 15th, 2018, [PJ_VERSION: 520]
+##  Path to PROJ.4 shared files: (autodetected)
+##  Linking to sp version: 1.3-1</code></pre>
+<pre class="r"><code>geo.df &lt;- spTransform(geo.df, CRS(&quot;+init=epsg:4326&quot;))
+map.df &lt;- data.frame(&quot;Distillery&quot; = df[, &quot;Distillery&quot;], geo.df)
 ###########
 # VISUALIZE
-library(maps)
-world.map &lt;- map_data (&quot;world&quot;)
-UK.map &lt;- world.map %&gt;% filter(region == &quot;UK&quot;)
-UK.map %&gt;%
-  filter(subregion == &quot;Scotland&quot;) %&gt;% 
-  ggplot() + 
-  geom_map(map = UK.map, 
-           aes(x = long, y = lat, map_id = region),
-           fill=&quot;white&quot;, colour = &quot;black&quot;) + 
-  coord_map() + 
-  geom_point(data = map.df, 
-             aes(x=lat, y = long, colour = &quot;red&quot;, alpha = .9))
-}</code></pre>
+#library(maps)
+library(ggplot2)
+uk.map &lt;- map_data (&quot;world&quot;, region = &quot;UK&quot;) 
+scotland.map &lt;- uk.map[uk.map$subregion == &quot;Scotland&quot;,]
+p &lt;- ggplot(data = scotland.map, aes(x = long, y = lat)) + 
+geom_map(map = uk.map, 
+       aes(map_id = region),
+       fill=&quot;white&quot;, colour = &quot;black&quot;) +
+coord_map() + 
+geom_point(data = map.df, aes(y = long, x = lat),
+    colour = &quot;blue&quot;, alpha = .75)
+p</code></pre>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
 <div id="clustering-distilleries-by-location" class="section level2">
 <h2>Clustering distilleries by location</h2>
@@ -99,7 +105,7 @@ UK.map %&gt;%
 C &lt;- kmeans(df[, c(&quot;Longitude&quot;, &quot;Latitude&quot;)], K)
 df &lt;- cbind(df, &quot;Cluster&quot; = as.factor(C$cluster))
 library(ggplot2)
-ggplot(df, aes(x = Latitude, y = Longitude)) +
+ggplot(df, aes(x = Longitude, y = Latitude)) +
     geom_point(aes(color = Cluster))</code></pre>
 <p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>

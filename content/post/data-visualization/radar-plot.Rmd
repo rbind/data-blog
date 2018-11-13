@@ -18,7 +18,7 @@ Some of you may already know that [radar plots are well-suited for visualizing w
 
 For this purpose, I have retrieved a [data set on whiskey flavor profile from the University of Strathclyde](http://outreach.mathstat.strath.ac.uk/outreach/nessie/nessie_whisky.html). To load the data from the web, we will use the RCurl library:
 
-```{r}
+```{r, message = FALSE}
 library(RCurl)
 # load data as character
 f <- getURL('https://www.datascienceblog.net/data-sets/whiskies.txt')
@@ -114,7 +114,8 @@ p <- ggRadar(df, aes(group = Distillery),
 And finally, stored the plot with:
 
 ```{r, eval = f, echo = T}
-ggsave("whiskey-tasting-characteristics.png", p, units = "cm", height = 250, width = 50, limitsize = FALSE)
+ggsave("whiskey-tasting-characteristics.png", p, units = "cm", 
+       height = 250, width = 50, limitsize = FALSE)
 ```
 
 Voila: [an overview of whiskey characteristics](/post/data-visualization/whiskey-tasting-characteristics.png). 

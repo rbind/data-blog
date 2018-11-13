@@ -102,6 +102,7 @@ print(p)</code></pre>
     theme(plot.title = element_text(size = 40, hjust = 0.5),
           strip.text.x = element_text(size = 20))</code></pre>
 <p>And finally, stored the plot with:</p>
-<pre class="r"><code>ggsave(&quot;whiskey-tasting-characteristics.png&quot;, p, units = &quot;cm&quot;, height = 250, width = 50, limitsize = FALSE)</code></pre>
+<pre class="r"><code>ggsave(&quot;whiskey-tasting-characteristics.png&quot;, p, units = &quot;cm&quot;, 
+       height = 250, width = 50, limitsize = FALSE)</code></pre>
 <p>Voila: <a href="/post/data-visualization/whiskey-tasting-characteristics.png">an overview of whiskey characteristics</a>.</p>
 </div>
