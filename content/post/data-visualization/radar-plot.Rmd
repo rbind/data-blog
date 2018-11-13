@@ -1,0 +1,103 @@
+---
+title: "Radar plots"
+author: Matthias Döring
+date: '2018-11-13'
+description: "TODO"
+draft: true
+categories:
+  - data-visualization
+tags:
+  - plot
+thumbnail: "post/data-visualization/histogram_cover.png"
+
+---
+Introduction
+
+## A data set on whiskey
+
+Some of you may already know that [radar plots are well-suited for visualizing whiskey flavors previously]. I saw this type of visualization first, when I visited the Talisker distillery on Islay. Here, we will try to reproduce this type of whiskey visualization. For this purpose, I have retrieved a [data set on whiskey flavor profile from the University of Strathclyde](http://outreach.mathstat.strath.ac.uk/outreach/nessie/nessie_whisky.html). To load the data from the web, we will use the RCurl library:
+
+```{r}
+library(RCurl)
+# load data as character
+f <- getURL('https://www.datascienceblog.net/data-sets/whiskies.txt')
+# read table from text connection
+df <- read.csv(textConnection(f), header=T)
+```
+
+Next, we take a look at a sample of the data:
+```{r}
+head(df)
+```
+
+The data looks fine, except for the tab characters and spaces in the Postcode. Let us clean those up:
+
+```{r}
+df$Postcode <- gsub(" *\t*", "", df$Postcode)
+```
+
+Next, we need to select some features for plotting. Since radar plots become unclear for large numbers of features, we will limit ourselves to five whiskey characteristics. To select those, we investigate the variances of the features. The idea is to select chracteristics that differentiate different types of whiskey the most.
+
+```{r}
+features <- c("Body", "Sweetness", "Smoky", 
+            "Medicinal", "Tobacco", "Honey",
+            "Spicy", "Winey", "Nutty",
+            "Malty", "Fruity", "Floral")
+var.matrix <- var(df[, features])
+nbr.features <- 5
+sel.features <- NULL
+for (i in seq(nbr.features)) {
+    # select highest variance feature
+    idx <- which(diag(var.matrix) == max(var.matrix))[1]
+    sel.feature <- names(idx)[1]
+    sel.features <- c(sel.features, sel.feature)
+    # remove from feature from var matrix
+    var.matrix <- var.matrix[-idx, -idx]
+}
+print(sel.features)
+df <- df[, c("Distillery", sel.features)]
+```
+
+So, we end up using ```Medicinal```, ```Winey```, ```Body```, ```Smoky```, and ```Floral``` to create the radar plots.
+## Creating a radar plot in R
+
+To create a radar plot, we will use ```ggiraphExtra``` as well as ```ggplot2```.
+
+```{r}
+library(ggiraphExtra)
+library(ggplot2)
+#p <- ggRadar(df, 
+     #aes_string(group = "Distillery"), rescale = FALSE,
+     #legend.position = "none",
+     #ylim = c(0, 1), size = 2) +
+     #facet_wrap(~Distillery)
+```
+
+
+```{r}
+plot_constraint_signature <- function(primer.data, template.data, 
+                                constraint.settings, plot.p.vals = FALSE,
+                                ncol = NULL) {
+     new.df <- prepare.constraint.plot(primer.data, constraint.settings, plot.p.vals) 
+     new.df <- new.df[, c("Run", "Constraint", "Ratio")]
+     constraint.names <- unlist(constraints_to_unit(levels(new.df$Constraint), FALSE))
+     # need to get this from long to wide format
+     plot.df <- reshape2::dcast(new.df, Run ~ ..., value.var = "Ratio")
+      p <- ggiraphExtra::ggRadar(data = plot.df, 
+             aes_string(colour = "Run"), rescale = FALSE,
+             legend.position = "none",
+             ylim = c(0, 1), size = 2) +
+        scale_y_continuous(labels = scales::percent) +
+        scale_x_discrete(labels = constraint.names) +
+        # change size of labels for the constraints:
+        theme(axis.text.x = element_text(size = 5)) +  # size should be adjusted manually ..
+        ggtitle("Percentage of fulfilled primer constraints")
+        #theme(plot.margin = grid::unit(c(0,0,0,0), "cm")) # ("left", "right", "bottom", "top")
+    if (length(ncol) != 0 && length(primer.data) > 1) {
+        p <- p + facet_wrap(~Run, ncol = ncol) 
+    } else if (length(primer.data) > 1) {
+        p <- p + facet_wrap(~Run)
+    }
+    return(p)
+}
+```
