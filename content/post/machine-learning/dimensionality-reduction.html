@@ -55,15 +55,24 @@ feat.df &lt;- df[, c(&quot;Distillery&quot;, features)]</code></pre>
 <div id="assumptions-about-the-results" class="section level2">
 <h2>Assumptions about the results</h2>
 <p>Before we begin reducing the dimensionality of the data, we should think about what kind of results we would like to obtain. For the whiskey data, we would like that whiskeys with similar properties are close to each other in the reduced space.</p>
-<p>Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. Thus, clustering the data by <code>Latitude</code> and <code>Longitude</code> should give us an idea of how the results of a reasonable dimnsionality reduction should look like. The scotch whiskey regions are the following:</p>
+<p>Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. To validate this assumptions, we are going to test whether the mean whiskey characteristics differ between distilleries from different regions. So, let us run a MANOVA test:</p>
+<pre class="r"><code>m &lt;- manova(as.matrix(df[, features]) ~ Region, df)
+summary(m)</code></pre>
+<pre><code>##           Df Pillai approx F num Df den Df    Pr(&gt;F)    
+## Region     5 1.2582   2.0455     60    365 3.352e-05 ***
+## Residuals 80                                            
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The test statistic seems to be significant, so we can reject the null hypothesis (there is no effect of region on the characteristics).</p>
+</div>
+<div id="geographical-locations-of-the-distilleries" class="section level2">
+<h2>Geographical locations of the distilleries</h2>
+<p>Thus, if we plot the distilleries by <code>Latitude</code> and <code>Longitude</code>, this should give us some idea of how a reasonable dimensionality reduction should look like. The scotch whiskey regions are the following:</p>
 <div class="figure">
 <img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Scotch_regions.svg" alt="Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from https://commons.wikimedia.org/wiki/File:Scotch_regions.svg)" />
 <p class="caption">Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from <a href="https://commons.wikimedia.org/wiki/File:Scotch_regions.svg" class="uri">https://commons.wikimedia.org/wiki/File:Scotch_regions.svg</a>)</p>
 </div>
-<p>Note: some regions are much larger than other. For example, Highlands and Lowlands are quite large, while the islands are small. Thus, the variance of the coordinates will be higher or lower for these two regions, respectively.</p>
-</div>
-<div id="geographical-locations-of-the-distilleries" class="section level2">
-<h2>Geographical locations of the distilleries</h2>
+<p>We will replicate this plot with our data set.</p>
 <p>Let us see where the distilleries are located by plotting their latitude and longitude coordinates:</p>
 <pre class="r"><code>library(ggplot2)
 library(ggrepel) # for geom_text_repel: smart text labels
@@ -81,17 +90,84 @@ ggtitle (&quot;Locations of Scottish Whiskey Distilleries&quot;)
 #geom_text_repel(data = map.df, aes(y = long, x = lat, label = Distillery)) 
 # ggsave(file.path(&quot;distillery_map.png&quot;), p, units = &quot;cm&quot;, height = 80, width = 80)
 p</code></pre>
-<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-2-1.png" width="960" /></p>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-3-1.png" width="960" /></p>
 <p>I also created a <a href="/post/machine-learning/distillery_map.png">high-resolution version of the distillery map</a> where the labels of the distilleries are annotated.</p>
 </div>
-<div id="clustering-distilleries-by-location" class="section level2">
-<h2>Clustering distilleries by location</h2>
-<p>Since we know that the data set represents Islay, Island (Jura, Isle of Skye, Orkney), Isle of Skye, the Highlands, the Lowlands, as well as Speyside, we will use <span class="math inline">\(K\)</span>-means with <span class="math inline">\(K = 6\)</span>. Note that Island whiskeys will not cluster well because the locations of these distilleries are all over the place.</p>
-<pre class="r"><code>K &lt;- 6
-C &lt;- kmeans(df[, c(&quot;Longitude&quot;, &quot;Latitude&quot;)], K)
-df &lt;- cbind(df, &quot;Cluster&quot; = as.factor(C$cluster))
-library(ggplot2)
-ggplot(df, aes(x = Longitude, y = Latitude)) +
-    geom_point(aes(color = Cluster))</code></pre>
-<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<div id="pca" class="section level2">
+<h2>PCA</h2>
+<div id="results-of-pca" class="section level3">
+<h3>Results of PCA</h3>
+<p>Using PCA, I would assign three clusters to the data:</p>
+<pre class="r"><code>library(cluster)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;cluster&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:maps&#39;:
+## 
+##     votes.repub</code></pre>
+<pre class="r"><code>library(ggfortify)
+data &lt;- df[,features]
+rownames(data) &lt;- df$Distillery
+cl &lt;- pam(data, 3)
+autoplot(cl, frame = TRUE, frame.type = &#39;norm&#39;, label = TRUE)</code></pre>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
+<p>The principal components seem to reflect the following characteristics:</p>
+<ul>
+<li>PC1 seems to indicate a notion of a <em>heavy taste</em>: i.e. full body, smokiness, medicinal taste (e.g. Laphroaig, Ardbeg, or Lagavulin vs Auchentoshan or Abelour)</li>
+<li>PC2 seems to indicate a <em>balanced taste</em>: i.e. a well-rounded taste profile where no characteristic stands out (e.g. Glenfiddich or Auchentoshan vs Glendronach or Macallan)</li>
+</ul>
+<p>Let us check whether the clusters overrepresent certain regions:</p>
+<pre class="r"><code>tabs &lt;- vector(&quot;list&quot;, 3)
+for (i in seq(3)) {
+    idx &lt;- which(cl$clustering == i)
+    regions &lt;- df$Region[idx]
+    tabs[[i]] &lt;- table(regions)
+}
+print(tabs)</code></pre>
+<pre><code>## [[1]]
+## regions
+## Campbeltown   Highlands     Islands       Islay    Lowlands    Speyside 
+##           2          17           2           2           0          19 
+## 
+## [[2]]
+## regions
+## Campbeltown   Highlands     Islands       Islay    Lowlands    Speyside 
+##           0           8           2           1           3          22 
+## 
+## [[3]]
+## regions
+## Campbeltown   Highlands     Islands       Islay    Lowlands    Speyside 
+##           0           2           2           4           0           0</code></pre>
+<p>From these data, we can interpret the clustering in the following way:</p>
+<ul>
+<li>Cluster 1: Whiskeys with a more complex taste, mostly from the Highlands/Speyside</li>
+<li>Cluster 2: Well-balanced/mild Whiskeys, mostly from Speyside and Highlands</li>
+<li>Cluster 3: Smoky whiskeys, highly overrepresented for whiskeys from Islay</li>
+</ul>
+</div>
+<div id="multi-dimensional-scaling" class="section level3">
+<h3>Multi-Dimensional Scaling</h3>
+<p>This is basically the same as PCA, so cut it?</p>
+<pre class="r"><code>autoplot(cmdscale(daisy(data), eig = TRUE), label = TRUE, label.size = 3)</code></pre>
+<pre><code>## Warning in daisy(data): binary variable(s) 5 treated as interval scaled</code></pre>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+</div>
+<div id="t-sne" class="section level2">
+<h2>t-SNE</h2>
+<p>t-SNE can be performed in the following way:</p>
+<pre class="r"><code>library(Rtsne)
+set.seed(1211) # fix seed for reproducibility of t-SNE
+tsne &lt;- Rtsne(data, dims = 2, perplexity = 5)
+t.df &lt;- as.data.frame(tsne$Y)
+colnames(t.df) &lt;- c(&quot;V1&quot;, &quot;V2&quot;)
+t.df &lt;- cbind(t.df, Cluster = factor(cl$clustering))
+t.df$Distillery &lt;- rownames(t.df)
+ggplot(t.df, aes(x = V1, y = V2, color = Cluster, label = Distillery)) +
+    geom_point() + geom_text()</code></pre>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>The result is a bit more clearer with t-SNE than with PCA and the two dimensions have slightly different interpretations than with PCA:</p>
+<ul>
+<li>V1 seems to indicate how balanced/intense the taste is. The outliers here are the smoky Island/Islay whiskeys on the left (e.g. Lagavulin) as well as some of the richer Highland whiskeys on the right (e.g. Macallan). The whiskeys in the middle such as Glenfiddich have a very balanced taste profile.</li>
+<li>V2: I cannot figure that out.</li>
+</ul>
 </div>

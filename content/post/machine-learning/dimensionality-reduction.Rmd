@@ -37,14 +37,23 @@ feat.df <- df[, c("Distillery", features)]
 
 Before we begin reducing the dimensionality of the data, we should think about what kind of results we would like to obtain. For the whiskey data, we would like that whiskeys with similar properties are close to each other in the reduced space.
 
-Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. Thus, clustering the data by ```Latitude``` and ```Longitude``` should give us an idea of how the results of a reasonable dimnsionality reduction should look like. The scotch whiskey regions are the following:
+Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. To validate this assumptions, we are going to test whether the mean whiskey characteristics differ between distilleries from different regions. So, let us run a MANOVA test:
+
+```{r}
+m <- manova(as.matrix(df[, features]) ~ Region, df)
+summary(m)
+```
+
+The test statistic seems to be significant, so we can reject the null hypothesis (there is no effect of region on the characteristics).
+
+## Geographical locations of the distilleries
+
+Thus, if we plot the distilleries by ```Latitude``` and ```Longitude```, this should give us some idea of how a reasonable dimensionality reduction should look like. The scotch whiskey regions are the following:
 
 ![Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from https://commons.wikimedia.org/wiki/File:Scotch_regions.svg)](https://upload.wikimedia.org/wikipedia/commons/f/fd/Scotch_regions.svg)
 
+We will replicate this plot with our data set.
 
-Note: some regions are much larger than other. For example, Highlands and Lowlands are quite large, while the islands are small. Thus, the variance of the coordinates will be higher or lower for these two regions, respectively.
-
-## Geographical locations of the distilleries
 
 Let us see where the distilleries are located by plotting their latitude and longitude coordinates: 
 
@@ -69,17 +78,70 @@ p
 
 I also created a [high-resolution version of the distillery map](/post/machine-learning/distillery_map.png) where the labels of the distilleries are annotated.
 
-## Clustering distilleries by location
+## PCA
 
-Since we know that the data set represents Islay, Island (Jura, Isle of Skye, Orkney), Isle of Skye, the Highlands, the Lowlands, as well as Speyside, we will use $K$-means with $K = 6$. Note that Island whiskeys will not cluster well because the locations of these distilleries are all over the place.
 
-```{r}
-K <- 6
-C <- kmeans(df[, c("Longitude", "Latitude")], K)
-df <- cbind(df, "Cluster" = as.factor(C$cluster))
-library(ggplot2)
-ggplot(df, aes(x = Longitude, y = Latitude)) +
-    geom_point(aes(color = Cluster))
-    
+### Results of PCA
+
+Using PCA, I would assign three clusters to the data:
+
+```{r, fig.width = 10, fig.height = 10}
+library(cluster)
+library(ggfortify)
+data <- df[,features]
+rownames(data) <- df$Distillery
+cl <- pam(data, 3)
+autoplot(cl, frame = TRUE, frame.type = 'norm', label = TRUE)
 ```
 
+The principal components seem to reflect the following characteristics:
+
+* PC1 seems to indicate a notion of a *heavy taste*: i.e. full body, smokiness, medicinal taste (e.g. Laphroaig, Ardbeg, or Lagavulin vs Auchentoshan or Abelour)
+* PC2 seems to indicate a *balanced taste*: i.e. a well-rounded taste profile where no characteristic stands out (e.g. Glenfiddich or Auchentoshan vs Glendronach or Macallan)
+
+Let us check whether the clusters overrepresent certain regions:
+
+```{r}
+tabs <- vector("list", 3)
+for (i in seq(3)) {
+    idx <- which(cl$clustering == i)
+    regions <- df$Region[idx]
+    tabs[[i]] <- table(regions)
+}
+print(tabs)
+```
+
+From these data, we can interpret the clustering in the following way:
+
+* Cluster 1: Whiskeys with a more complex taste, mostly from the Highlands/Speyside
+* Cluster 2: Well-balanced/mild Whiskeys, mostly from Speyside and Highlands
+* Cluster 3: Smoky whiskeys, highly overrepresented for whiskeys from Islay
+
+### Multi-Dimensional Scaling
+
+This is basically the same as PCA, so cut it?
+
+```{r}
+autoplot(cmdscale(daisy(data), eig = TRUE), label = TRUE, label.size = 3)
+```
+
+## t-SNE
+
+t-SNE can be performed in the following way:
+
+```{r, message = FALSE}
+library(Rtsne)
+set.seed(1211) # fix seed for reproducibility of t-SNE
+tsne <- Rtsne(data, dims = 2, perplexity = 5)
+t.df <- as.data.frame(tsne$Y)
+colnames(t.df) <- c("V1", "V2")
+t.df <- cbind(t.df, Cluster = factor(cl$clustering))
+t.df$Distillery <- rownames(t.df)
+ggplot(t.df, aes(x = V1, y = V2, color = Cluster, label = Distillery)) +
+    geom_point() + geom_text()
+```
+
+The result is a bit more clearer with t-SNE than with PCA and the two dimensions have slightly different interpretations than with PCA:
+
+* V1 seems to indicate how balanced/intense the taste is. The outliers here are the smoky Islay whiskeys on the left (e.g. Lagavulin) as well as some of the richer Highland whiskeys on the right (e.g. Macallan). The whiskeys in the middle such as Glenfiddich have a very balanced taste profile.
+* V2: I cannot figure that out.
