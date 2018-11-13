@@ -49,7 +49,7 @@ Note: some regions are much larger than other. For example, Highlands and Lowlan
 
 Let us see where the distilleries are located by plotting their latitude and longitude coordinates: 
 
-```{r}
+```{r, message = FALSE, fig.width = 10, fig.height = 10}
 # transform UTM coordinates to longitude/latitude in degrees
 geo.df <- df[, c("Latitude", "Longitude")]
 colnames(geo.df) <- c("lat", "long") # switch for plotting
@@ -64,10 +64,11 @@ proj4string(geo.df) <- CRS("+init=epsg:27700")
 library(rgdal)
 geo.df <- spTransform(geo.df, CRS("+init=epsg:4326"))
 map.df <- data.frame("Distillery" = df[, "Distillery"], geo.df)
+df <- cbind(df, map.df[, c("lat", "long")])
 ###########
 # VISUALIZE
-#library(maps)
 library(ggplot2)
+library(ggrepel) # for geom_text_repel: smart text labels
 uk.map <- map_data ("world", region = "UK") 
 scotland.map <- uk.map[uk.map$subregion == "Scotland",]
 p <- ggplot(data = scotland.map, aes(x = long, y = lat)) + 
@@ -76,9 +77,16 @@ geom_map(map = uk.map,
        fill="white", colour = "black") +
 coord_map() + 
 geom_point(data = map.df, aes(y = long, x = lat),
-    colour = "blue", alpha = .75)
+    colour = "blue", alpha = .75) +
+ggtitle ("Locations of Scottish Whiskey Distilleries")
+# for storing the map with labels:
+#geom_text_repel(data = map.df, aes(y = long, x = lat, label = Distillery)) 
+# stretch the x-axis for better visability
+# ggsave(file.path("distillery_map.png"), p, units = "cm", height = 80, width = 80)
 p
 ```
+
+I also created a [high-resolution version of the distillery map](/post/machine-learning/distillery_map.png) where the labels of the distilleries are annotated.
 
 ## Clustering distilleries by location
 
