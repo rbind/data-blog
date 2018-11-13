@@ -8,7 +8,7 @@ Humans are visual creatures. Thus, visualization is one of the most important to
 
 ## Which plot is appropriate?
 
-A common problem is that of choosing an appropriate plot for certain type of measurements. To learn which types of plots are available and how they are used, just [click here](/tags/plot/).
+Choosing an appropriate plot for a given set of data can be hard because there are so many types of plots such as scatter plots, box plots, and histograms. Fortunately, I have created an [overview of the most important plots, when they are appropriate, and how they can be used in R](/tags/plot/).
 
 ## Posts about data visualization
 
