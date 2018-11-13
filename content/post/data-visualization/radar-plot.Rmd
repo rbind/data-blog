@@ -32,11 +32,7 @@ Next, we take a look at the data:
 head(df)
 ```
 
-The most important observation is that the caracteristics of whiskeys are identified by numbers ranging from 0 (low expression of a characteristic) to 4 (high expression of a characteristic). Since there are tab characters and spaces in the Postcode, we will clean those up, although we will not use this field later.
-
-```{r}
-df$Postcode <- gsub(" *\t*", "", df$Postcode)
-```
+The most important observation is that the caracteristics of whiskeys are identified by numbers ranging from 0 (low expression of a characteristic) to 4 (high expression of a characteristic). 
 
 Next, we need to select some features for plotting. Here, we simply specify all of the whiskey characteristics stored in the data set:
 
