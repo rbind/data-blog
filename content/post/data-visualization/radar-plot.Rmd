@@ -2,20 +2,21 @@
 title: "Radar plots"
 author: Matthias Döring
 date: '2018-11-13'
-description: "TODO"
-draft: true
+description: "Radar plots are exceptional for visualizing the properties of individual objects. Here, I demonstrate how to draw radar plots in R by plotting the properties of whiskeys from several distilleries."
 categories:
   - data-visualization
 tags:
   - plot
-thumbnail: "post/data-visualization/histogram_cover.png"
+thumbnail: "/post/data-visualization/radar-plot_cover.png"
 
 ---
-Introduction
+Radar plots visualize several variables using a radial layout. This plot is most suitable for visualizing and comparing the properties associated with individual objects. In the following, we will use a radar plot for comparing the characteristics of whiskeys from different distilleries.
 
 ## A data set on whiskey
 
-Some of you may already know that [radar plots are well-suited for visualizing whiskey flavors previously]. I saw this type of visualization first, when I visited the Talisker distillery on Islay. Here, we will try to reproduce this type of whiskey visualization. For this purpose, I have retrieved a [data set on whiskey flavor profile from the University of Strathclyde](http://outreach.mathstat.strath.ac.uk/outreach/nessie/nessie_whisky.html). To load the data from the web, we will use the RCurl library:
+Some of you may already know that [radar plots are well-suited for visualizing whiskey flavors previously]. I saw this type of visualization first, when I visited the Talisker distillery, the only whiskey distillery on the Isle of Skye. Here, we will try to reproduce this type of visualization. 
+
+For this purpose, I have retrieved a [data set on whiskey flavor profile from the University of Strathclyde](http://outreach.mathstat.strath.ac.uk/outreach/nessie/nessie_whisky.html). To load the data from the web, we will use the RCurl library:
 
 ```{r}
 library(RCurl)
@@ -25,79 +26,95 @@ f <- getURL('https://www.datascienceblog.net/data-sets/whiskies.txt')
 df <- read.csv(textConnection(f), header=T)
 ```
 
-Next, we take a look at a sample of the data:
+Next, we take a look at the data:
+
 ```{r}
 head(df)
 ```
 
-The data looks fine, except for the tab characters and spaces in the Postcode. Let us clean those up:
+The most important observation is that the caracteristics of whiskeys are identified by numbers ranging from 0 (low expression of a characteristic) to 4 (high expression of a characteristic). Since there are tab characters and spaces in the Postcode, we will clean those up, although we will not use this field later.
 
 ```{r}
 df$Postcode <- gsub(" *\t*", "", df$Postcode)
 ```
 
-Next, we need to select some features for plotting. Since radar plots become unclear for large numbers of features, we will limit ourselves to five whiskey characteristics. To select those, we investigate the variances of the features. The idea is to select chracteristics that differentiate different types of whiskey the most.
+Next, we need to select some features for plotting. Here, we simply specify all of the whiskey characteristics stored in the data set:
 
 ```{r}
 features <- c("Body", "Sweetness", "Smoky", 
             "Medicinal", "Tobacco", "Honey",
             "Spicy", "Winey", "Nutty",
             "Malty", "Fruity", "Floral")
-var.matrix <- var(df[, features])
-nbr.features <- 5
-sel.features <- NULL
-for (i in seq(nbr.features)) {
-    # select highest variance feature
-    idx <- which(diag(var.matrix) == max(var.matrix))[1]
-    sel.feature <- names(idx)[1]
-    sel.features <- c(sel.features, sel.feature)
-    # remove from feature from var matrix
-    var.matrix <- var.matrix[-idx, -idx]
-}
-print(sel.features)
-df <- df[, c("Distillery", sel.features)]
+df <- df[, c("Distillery", features)]
 ```
 
-So, we end up using ```Medicinal```, ```Winey```, ```Body```, ```Smoky```, and ```Floral``` to create the radar plots.
 ## Creating a radar plot in R
 
-To create a radar plot, we will use ```ggiraphExtra``` as well as ```ggplot2```.
+To create a radar plot, we will use ```ggiraphExtra``` as well as ```ggplot2```. For ggiraphExtra to work, we need to have udunits2 installed. If apt-get is your package manager, you can install the udunits2 library via
 
-```{r}
+```
+apt-get install libudunits2-dev
+```
+
+Once libudunits2 is available and ggiraphExtra is successfully installed, we can create the radar plot:
+
+```{r, fig.width = 11, fig.height = 7}
 library(ggiraphExtra)
 library(ggplot2)
-#p <- ggRadar(df, 
-     #aes_string(group = "Distillery"), rescale = FALSE,
-     #legend.position = "none",
-     #ylim = c(0, 1), size = 2) +
-     #facet_wrap(~Distillery)
+# select a random sample of whiskeys
+i <- sample(seq_len(nrow(df)), 6)
+# select some whiskeys I know
+my.whiskeys <- c("Aultmore", "Loch Lomond", "Lagavulin", "Tomatin", "Laphroig", "Macallan")
+plot.df <- df[which(df$Distillery %in% my.whiskeys),]
+mycolor <- "#1c6193"
+p <- ggRadar(plot.df, aes(group = Distillery), 
+     rescale = FALSE, legend.position = "none",
+     size = 1, interactive = FALSE) +
+     facet_wrap(~Distillery) + 
+     scale_y_discrete(breaks = NULL) + # don't show ticks 
+    theme(axis.text.x = element_text(size = 10)) + # larger label sizes
+    # adjust colors of radar charts to uniform colors
+    scale_fill_manual(values = rep(mycolor, nrow(plot.df))) +
+    scale_color_manual(values = rep(mycolor, nrow(plot.df))) +
+    ggtitle("Whiskey Tasting Characteristics")
+print(p)
 ```
 
+## Interpreting the radar plot
 
-```{r}
-plot_constraint_signature <- function(primer.data, template.data, 
-                                constraint.settings, plot.p.vals = FALSE,
-                                ncol = NULL) {
-     new.df <- prepare.constraint.plot(primer.data, constraint.settings, plot.p.vals) 
-     new.df <- new.df[, c("Run", "Constraint", "Ratio")]
-     constraint.names <- unlist(constraints_to_unit(levels(new.df$Constraint), FALSE))
-     # need to get this from long to wide format
-     plot.df <- reshape2::dcast(new.df, Run ~ ..., value.var = "Ratio")
-      p <- ggiraphExtra::ggRadar(data = plot.df, 
-             aes_string(colour = "Run"), rescale = FALSE,
-             legend.position = "none",
-             ylim = c(0, 1), size = 2) +
-        scale_y_continuous(labels = scales::percent) +
-        scale_x_discrete(labels = constraint.names) +
-        # change size of labels for the constraints:
-        theme(axis.text.x = element_text(size = 5)) +  # size should be adjusted manually ..
-        ggtitle("Percentage of fulfilled primer constraints")
-        #theme(plot.margin = grid::unit(c(0,0,0,0), "cm")) # ("left", "right", "bottom", "top")
-    if (length(ncol) != 0 && length(primer.data) > 1) {
-        p <- p + facet_wrap(~Run, ncol = ncol) 
-    } else if (length(primer.data) > 1) {
-        p <- p + facet_wrap(~Run)
-    }
-    return(p)
-}
+Using the radar plot we created, we can compare the characteristics of the six whiskeys that are visualized. Whiskeys from a similar region often share a similar taste profile. The six selected whiskeys comoe from the following regions:
+
+* **Speyside:** Aultmore, Macallan
+* **Islay:** Lagavulin, Laphroig
+* **Highlands:** Loch Lomond, Tomatin
+
+For example, whiskeys from Islay are characterized by their smokiness and their medicinal taste, which is a result of excessive use of peat during the malting process. As a consequence, whiskeys from the Laphroig and and Lagavulin distilleries have similarly radar profiles for these characteristics.
+
+We can also the size of the radar surface area to gauge the quality of whiskeys. For example, Loch Lomond is known for producing rather cheap whiskey that do not have a very distinct flavor profile. The other distilleries are known for a greater quality, which becomes evident from their rather distinct flavor profiles. For example, Mcallan has a strong body that is characterized by fruitiness, sweetness, and a resemblance of wine.
+
+## Creating an overview of all whiskeys
+
+To visualize all of the available `r nrow(df)` whiskeys, I slightly adjusted the code:
+
+```{r, eval = FALSE, echo = TRUE}
+p <- ggRadar(df, aes(group = Distillery), 
+     rescale = FALSE, legend.position = "none",
+     size = 1, interactive = FALSE) +
+     facet_wrap(~Distillery, ncol = 4) + 
+     scale_y_discrete(breaks = NULL) +
+    theme(axis.text.x = element_text(size = 10)) + 
+    scale_fill_manual(values = rep(mycolor, nrow(df))) +
+    scale_color_manual(values = rep(mycolor, nrow(df))) + 
+    ggtitle("Whiskey Tasting Characteristics") + 
+    # center title, increase facet strip text size, increase title size
+    theme(plot.title = element_text(size = 40, hjust = 0.5),
+          strip.text.x = element_text(size = 20))
 ```
+
+And finally, stored the plot with:
+
+```{r, eval = f, echo = T}
+ggsave("whiskey-tasting-characteristics.png", p, units = "cm", height = 250, width = 50, limitsize = FALSE)
+```
+
+Voila: [an overview of whiskey characteristics](/post/data-visualization/whiskey-tasting-characteristics.png). 

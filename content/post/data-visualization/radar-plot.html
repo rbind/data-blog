@@ -1,0 +1,107 @@
+---
+title: "Radar plots"
+author: Matthias Döring
+date: '2018-11-13'
+description: "Radar plots are exceptional for visualizing the properties of individual objects. Here, I demonstrate how to draw radar plots in R by plotting the properties of whiskeys from several distilleries."
+categories:
+  - data-visualization
+tags:
+  - plot
+thumbnail: "/post/data-visualization/radar-plot_cover.png"
+
+---
+
+
+
+<p>Radar plots visualize several variables using a radial layout. This plot is most suitable for visualizing and comparing the properties associated with individual objects. In the following, we will use a radar plot for comparing the characteristics of whiskeys from different distilleries.</p>
+<div id="a-data-set-on-whiskey" class="section level2">
+<h2>A data set on whiskey</h2>
+<p>Some of you may already know that [radar plots are well-suited for visualizing whiskey flavors previously]. I saw this type of visualization first, when I visited the Talisker distillery, the only whiskey distillery on the Isle of Skye. Here, we will try to reproduce this type of visualization.</p>
+<p>For this purpose, I have retrieved a <a href="http://outreach.mathstat.strath.ac.uk/outreach/nessie/nessie_whisky.html">data set on whiskey flavor profile from the University of Strathclyde</a>. To load the data from the web, we will use the RCurl library:</p>
+<pre class="r"><code>library(RCurl)</code></pre>
+<pre><code>## Loading required package: bitops</code></pre>
+<pre class="r"><code># load data as character
+f &lt;- getURL(&#39;https://www.datascienceblog.net/data-sets/whiskies.txt&#39;)
+# read table from text connection
+df &lt;- read.csv(textConnection(f), header=T)</code></pre>
+<p>Next, we take a look at the data:</p>
+<pre class="r"><code>head(df)</code></pre>
+<pre><code>##   RowID  Distillery Body Sweetness Smoky Medicinal Tobacco Honey Spicy
+## 1     1   Aberfeldy    2         2     2         0       0     2     1
+## 2     2    Aberlour    3         3     1         0       0     4     3
+## 3     3      AnCnoc    1         3     2         0       0     2     0
+## 4     4      Ardbeg    4         1     4         4       0     0     2
+## 5     5     Ardmore    2         2     2         0       0     1     1
+## 6     6 ArranIsleOf    2         3     1         1       0     1     1
+##   Winey Nutty Malty Fruity Floral    Postcode Latitude Longitude
+## 1     2     2     2      2      2  \tPH15 2EB   286580    749680
+## 2     2     2     3      3      2  \tAB38 9PJ   326340    842570
+## 3     0     2     2      3      2   \tAB5 5LI   352960    839320
+## 4     0     1     2      1      0  \tPA42 7EB   141560    646220
+## 5     1     2     3      1      1  \tAB54 4NH   355350    829140
+## 6     1     0     1      1      2    KA27 8HJ   194050    649950</code></pre>
+<p>The most important observation is that the caracteristics of whiskeys are identified by numbers ranging from 0 (low expression of a characteristic) to 4 (high expression of a characteristic). Since there are tab characters and spaces in the Postcode, we will clean those up, although we will not use this field later.</p>
+<pre class="r"><code>df$Postcode &lt;- gsub(&quot; *\t*&quot;, &quot;&quot;, df$Postcode)</code></pre>
+<p>Next, we need to select some features for plotting. Here, we simply specify all of the whiskey characteristics stored in the data set:</p>
+<pre class="r"><code>features &lt;- c(&quot;Body&quot;, &quot;Sweetness&quot;, &quot;Smoky&quot;, 
+            &quot;Medicinal&quot;, &quot;Tobacco&quot;, &quot;Honey&quot;,
+            &quot;Spicy&quot;, &quot;Winey&quot;, &quot;Nutty&quot;,
+            &quot;Malty&quot;, &quot;Fruity&quot;, &quot;Floral&quot;)
+df &lt;- df[, c(&quot;Distillery&quot;, features)]</code></pre>
+</div>
+<div id="creating-a-radar-plot-in-r" class="section level2">
+<h2>Creating a radar plot in R</h2>
+<p>To create a radar plot, we will use <code>ggiraphExtra</code> as well as <code>ggplot2</code>. For ggiraphExtra to work, we need to have udunits2 installed. If apt-get is your package manager, you can install the udunits2 library via</p>
+<pre><code>apt-get install libudunits2-dev</code></pre>
+<p>Once libudunits2 is available and ggiraphExtra is successfully installed, we can create the radar plot:</p>
+<pre class="r"><code>library(ggiraphExtra)
+library(ggplot2)
+# select a random sample of whiskeys
+i &lt;- sample(seq_len(nrow(df)), 6)
+# select some whiskeys I know
+my.whiskeys &lt;- c(&quot;Aultmore&quot;, &quot;Loch Lomond&quot;, &quot;Lagavulin&quot;, &quot;Tomatin&quot;, &quot;Laphroig&quot;, &quot;Macallan&quot;)
+plot.df &lt;- df[which(df$Distillery %in% my.whiskeys),]
+mycolor &lt;- &quot;#1c6193&quot;
+p &lt;- ggRadar(plot.df, aes(group = Distillery), 
+     rescale = FALSE, legend.position = &quot;none&quot;,
+     size = 1, interactive = FALSE) +
+     facet_wrap(~Distillery) + 
+     scale_y_discrete(breaks = NULL) + # don&#39;t show ticks 
+    theme(axis.text.x = element_text(size = 10)) + # larger label sizes
+    # adjust colors of radar charts to uniform colors
+    scale_fill_manual(values = rep(mycolor, nrow(plot.df))) +
+    scale_color_manual(values = rep(mycolor, nrow(plot.df))) +
+    ggtitle(&quot;Whiskey Tasting Characteristics&quot;)
+print(p)</code></pre>
+<p><img src="/post/data-visualization/radar-plot_files/figure-html/unnamed-chunk-5-1.png" width="1056" /></p>
+</div>
+<div id="interpreting-the-radar-plot" class="section level2">
+<h2>Interpreting the radar plot</h2>
+<p>Using the radar plot we created, we can compare the characteristics of the six whiskeys that are visualized. Whiskeys from a similar region often share a similar taste profile. The six selected whiskeys comoe from the following regions:</p>
+<ul>
+<li><strong>Speyside:</strong> Aultmore, Macallan</li>
+<li><strong>Islay:</strong> Lagavulin, Laphroig</li>
+<li><strong>Highlands:</strong> Loch Lomond, Tomatin</li>
+</ul>
+<p>For example, whiskeys from Islay are characterized by their smokiness and their medicinal taste, which is a result of excessive use of peat during the malting process. As a consequence, whiskeys from the Laphroig and and Lagavulin distilleries have similarly radar profiles for these characteristics.</p>
+<p>We can also the size of the radar surface area to gauge the quality of whiskeys. For example, Loch Lomond is known for producing rather cheap whiskey that do not have a very distinct flavor profile. The other distilleries are known for a greater quality, which becomes evident from their rather distinct flavor profiles. For example, Mcallan has a strong body that is characterized by fruitiness, sweetness, and a resemblance of wine.</p>
+</div>
+<div id="creating-an-overview-of-all-whiskeys" class="section level2">
+<h2>Creating an overview of all whiskeys</h2>
+<p>To visualize all of the available 86 whiskeys, I slightly adjusted the code:</p>
+<pre class="r"><code>p &lt;- ggRadar(df, aes(group = Distillery), 
+     rescale = FALSE, legend.position = &quot;none&quot;,
+     size = 1, interactive = FALSE) +
+     facet_wrap(~Distillery, ncol = 4) + 
+     scale_y_discrete(breaks = NULL) +
+    theme(axis.text.x = element_text(size = 10)) + 
+    scale_fill_manual(values = rep(mycolor, nrow(df))) +
+    scale_color_manual(values = rep(mycolor, nrow(df))) + 
+    ggtitle(&quot;Whiskey Tasting Characteristics&quot;) + 
+    # center title, increase facet strip text size, increase title size
+    theme(plot.title = element_text(size = 40, hjust = 0.5),
+          strip.text.x = element_text(size = 20))</code></pre>
+<p>And finally, stored the plot with:</p>
+<pre class="r"><code>ggsave(&quot;whiskey-tasting-characteristics.png&quot;, p, units = &quot;cm&quot;, height = 250, width = 50, limitsize = FALSE)</code></pre>
+<p>Voila: <a href="/post/data-visualization/whiskey-tasting-characteristics.png">an overview of whiskey characteristics</a>.</p>
+</div>
