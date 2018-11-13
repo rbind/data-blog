@@ -46,8 +46,60 @@ features &lt;- c(&quot;Body&quot;, &quot;Sweetness&quot;, &quot;Smoky&quot;,
             &quot;Malty&quot;, &quot;Fruity&quot;, &quot;Floral&quot;)
 feat.df &lt;- df[, c(&quot;Distillery&quot;, features)]</code></pre>
 </div>
-<div id="assumptions-about-results" class="section level2">
-<h2>Assumptions about results</h2>
+<div id="assumptions-about-the-results" class="section level2">
+<h2>Assumptions about the results</h2>
 <p>Before we begin reducing the dimensionality of the data, we should think about what kind of results we would like to obtain. For the whiskey data, we would like that whiskeys with similar properties are close to each other in the reduced space.</p>
-<p>Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. Thus, clustering the data by <code>Latitude</code> and `<code>Longitude</code> should give us an idea of how the results of a reasonable dimnsionality reduction should look like. * Generally,</p>
+<p>Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. Thus, clustering the data by <code>Latitude</code> and <code>Longitude</code> should give us an idea of how the results of a reasonable dimnsionality reduction should look like. The scotch whiskey regions are the following:</p>
+<div class="figure">
+<img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Scotch_regions.svg" alt="Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from https://commons.wikimedia.org/wiki/File:Scotch_regions.svg)" />
+<p class="caption">Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from <a href="https://commons.wikimedia.org/wiki/File:Scotch_regions.svg" class="uri">https://commons.wikimedia.org/wiki/File:Scotch_regions.svg</a>)</p>
+</div>
+<p>Note: some regions are much larger than other. For example, Highlands and Lowlands are quite large, while the islands are small. Thus, the variance of the coordinates will be higher or lower for these two regions, respectively.</p>
+</div>
+<div id="geographical-locations-of-the-distilleries" class="section level2">
+<h2>Geographical locations of the distilleries</h2>
+<p>Let us see where the distilleries are located by plotting their latitude and longitude coordinates:</p>
+<pre class="r"><code>library(ggmap)</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre class="r"><code># transform UTM coordinates to longitude/latitude in degrees
+geo.df &lt;- df[, c(&quot;Latitude&quot;, &quot;Longitude&quot;)]
+# REF: https://rstudio-pubs-static.s3.amazonaws.com/375481_d2605e8726364d30a5b20c6974710cf5.html
+# create &#39;SpatialPoints&#39; object
+library(raster)</code></pre>
+<pre><code>## Loading required package: sp</code></pre>
+<pre class="r"><code>coordinates(geo.df) &lt;-  ~Latitude + Longitude
+# add coordinate reference system (CRS) for UK
+proj4string(geo.df) &lt;- CRS(&quot;+init=epsg:27700&quot;)
+# transform again:
+if (FALSE) {
+library(rgdal) # need to install libgdal-dev; TODO: NOTEBOOK upgrade!
+geo.df &lt;- spTransform(geo.df, CRS(&quot;+init=epsg:4326&quot;))
+map &lt;- get_map(location = c(lon = 749680, lat = 286580)) # doesn&#39;t work
+map.df &lt;- data.frame(df[, &quot;Distillery&quot;], geo.df)
+###########
+# VISUALIZE
+library(maps)
+world.map &lt;- map_data (&quot;world&quot;)
+UK.map &lt;- world.map %&gt;% filter(region == &quot;UK&quot;)
+UK.map %&gt;%
+  filter(subregion == &quot;Scotland&quot;) %&gt;% 
+  ggplot() + 
+  geom_map(map = UK.map, 
+           aes(x = long, y = lat, map_id = region),
+           fill=&quot;white&quot;, colour = &quot;black&quot;) + 
+  coord_map() + 
+  geom_point(data = map.df, 
+             aes(x=lat, y = long, colour = &quot;red&quot;, alpha = .9))
+}</code></pre>
+</div>
+<div id="clustering-distilleries-by-location" class="section level2">
+<h2>Clustering distilleries by location</h2>
+<p>Since we know that the data set represents Islay, Island (Jura, Isle of Skye, Orkney), Isle of Skye, the Highlands, the Lowlands, as well as Speyside, we will use <span class="math inline">\(K\)</span>-means with <span class="math inline">\(K = 6\)</span>. Note that Island whiskeys will not cluster well because the locations of these distilleries are all over the place.</p>
+<pre class="r"><code>K &lt;- 6
+C &lt;- kmeans(df[, c(&quot;Longitude&quot;, &quot;Latitude&quot;)], K)
+df &lt;- cbind(df, &quot;Cluster&quot; = as.factor(C$cluster))
+library(ggplot2)
+ggplot(df, aes(x = Latitude, y = Longitude)) +
+    geom_point(aes(color = Cluster))</code></pre>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>

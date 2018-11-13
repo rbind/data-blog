@@ -38,28 +38,61 @@ feat.df <- df[, c("Distillery", features)]
 
 Before we begin reducing the dimensionality of the data, we should think about what kind of results we would like to obtain. For the whiskey data, we would like that whiskeys with similar properties are close to each other in the reduced space.
 
-Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. Thus, clustering the data by ```Latitude``` and ```Longitude`` should give us an idea of how the results of a reasonable dimnsionality reduction should look like.
+Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. Thus, clustering the data by ```Latitude``` and ```Longitude``` should give us an idea of how the results of a reasonable dimnsionality reduction should look like. The scotch whiskey regions are the following:
 
-## Geographical clustering of the data 
+![Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from https://commons.wikimedia.org/wiki/File:Scotch_regions.svg)](https://upload.wikimedia.org/wikipedia/commons/f/fd/Scotch_regions.svg)
 
-Before clustering the data, we will plot the latitude and longitude data to see their distribution:
+
+Note: some regions are much larger than other. For example, Highlands and Lowlands are quite large, while the islands are small. Thus, the variance of the coordinates will be higher or lower for these two regions, respectively.
+
+## Geographical locations of the distilleries
+
+Let us see where the distilleries are located by plotting their latitude and longitude coordinates: 
 
 ```{r}
 library(ggmap)
 # transform UTM coordinates to longitude/latitude in degrees
 geo.df <- df[, c("Latitude", "Longitude")]
+# REF: https://rstudio-pubs-static.s3.amazonaws.com/375481_d2605e8726364d30a5b20c6974710cf5.html
 # create 'SpatialPoints' object
 library(raster)
 coordinates(geo.df) <-  ~Latitude + Longitude
 # add coordinate reference system (CRS) for UK
 proj4string(geo.df) <- CRS("+init=epsg:27700")
 # transform again:
-library(rgdal)
+if (FALSE) {
+library(rgdal) # need to install libgdal-dev; TODO: NOTEBOOK upgrade!
 geo.df <- spTransform(geo.df, CRS("+init=epsg:4326"))
-#map <- get_map(location = c(lon = 749680, lat = 286580))
+map <- get_map(location = c(lon = 749680, lat = 286580)) # doesn't work
+map.df <- data.frame(df[, "Distillery"], geo.df)
+###########
+# VISUALIZE
+library(maps)
+world.map <- map_data ("world")
+UK.map <- world.map %>% filter(region == "UK")
+UK.map %>%
+  filter(subregion == "Scotland") %>% 
+  ggplot() + 
+  geom_map(map = UK.map, 
+           aes(x = long, y = lat, map_id = region),
+           fill="white", colour = "black") + 
+  coord_map() + 
+  geom_point(data = map.df, 
+             aes(x=lat, y = long, colour = "red", alpha = .9))
+}
 ```
 
+## Clustering distilleries by location
+
+Since we know that the data set represents Islay, Island (Jura, Isle of Skye, Orkney), Isle of Skye, the Highlands, the Lowlands, as well as Speyside, we will use $K$-means with $K = 6$. Note that Island whiskeys will not cluster well because the locations of these distilleries are all over the place.
+
 ```{r}
-#library(ggplot2)
-#ggplot(df, aes(x = Longitude, y = Latitude))  + geom_point()
+K <- 6
+C <- kmeans(df[, c("Longitude", "Latitude")], K)
+df <- cbind(df, "Cluster" = as.factor(C$cluster))
+library(ggplot2)
+ggplot(df, aes(x = Latitude, y = Longitude)) +
+    geom_point(aes(color = Cluster))
+    
 ```
+
