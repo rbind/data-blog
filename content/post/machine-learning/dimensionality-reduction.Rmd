@@ -21,11 +21,10 @@ I have previously used a data set describing the characteristics of whiskeys to 
 ```{r, message = FALSE}
 library(RCurl)
 # load data as character
-f <- getURL('https://www.datascienceblog.net/data-sets/whiskies.txt')
+f <- getURL('https://www.datascienceblog.net/data-sets/whiskies.csv')
 # read table from text connection
 df <- read.csv(textConnection(f), header=T)
 head(df)
-df$Postcode <- gsub(" *\t*", "", df$Postcode)
 # select characterics of the whiskeys
 features <- c("Body", "Sweetness", "Smoky",
             "Medicinal", "Tobacco", "Honey",
@@ -50,23 +49,6 @@ Note: some regions are much larger than other. For example, Highlands and Lowlan
 Let us see where the distilleries are located by plotting their latitude and longitude coordinates: 
 
 ```{r, message = FALSE, fig.width = 10, fig.height = 10}
-# transform UTM coordinates to longitude/latitude in degrees
-geo.df <- df[, c("Latitude", "Longitude")]
-colnames(geo.df) <- c("lat", "long") # switch for plotting
-# REF: https://rstudio-pubs-static.s3.amazonaws.com/375481_d2605e8726364d30a5b20c6974710cf5.html
-# create 'SpatialPoints' object
-library(raster)
-coordinates(geo.df) <-  ~lat + long
-# add coordinate reference system (CRS) for UK
-proj4string(geo.df) <- CRS("+init=epsg:27700")
-# transform again:
-# NB: getting rgdal working on old systems is tough due to libgdal dependency
-library(rgdal)
-geo.df <- spTransform(geo.df, CRS("+init=epsg:4326"))
-map.df <- data.frame("Distillery" = df[, "Distillery"], geo.df)
-df <- cbind(df, map.df[, c("lat", "long")])
-###########
-# VISUALIZE
 library(ggplot2)
 library(ggrepel) # for geom_text_repel: smart text labels
 uk.map <- map_data ("world", region = "UK") 
@@ -76,12 +58,11 @@ geom_map(map = uk.map,
        aes(map_id = region),
        fill="white", colour = "black") +
 coord_map() + 
-geom_point(data = map.df, aes(y = long, x = lat),
-    colour = "blue", alpha = .75) +
+geom_point(data = df, aes(y = long, x = lat, color = Region),
+     alpha = .75) +
 ggtitle ("Locations of Scottish Whiskey Distilleries")
 # for storing the map with labels:
 #geom_text_repel(data = map.df, aes(y = long, x = lat, label = Distillery)) 
-# stretch the x-axis for better visability
 # ggsave(file.path("distillery_map.png"), p, units = "cm", height = 80, width = 80)
 p
 ```

@@ -20,26 +20,32 @@ thumbnail: "/post/machine-learning/linear_models_cover.png"
 <p>I have previously used a data set describing the characteristics of whiskeys to <a href="/post/data-visualization/radar-plot/">draw radar plots</a>. Here, we will the whiskey data set to identify how different dimensionality reduction techniques perform on this data set.</p>
 <pre class="r"><code>library(RCurl)
 # load data as character
-f &lt;- getURL(&#39;https://www.datascienceblog.net/data-sets/whiskies.txt&#39;)
+f &lt;- getURL(&#39;https://www.datascienceblog.net/data-sets/whiskies.csv&#39;)
 # read table from text connection
 df &lt;- read.csv(textConnection(f), header=T)
 head(df)</code></pre>
-<pre><code>##   RowID  Distillery Body Sweetness Smoky Medicinal Tobacco Honey Spicy
-## 1     1   Aberfeldy    2         2     2         0       0     2     1
-## 2     2    Aberlour    3         3     1         0       0     4     3
-## 3     3      AnCnoc    1         3     2         0       0     2     0
-## 4     4      Ardbeg    4         1     4         4       0     0     2
-## 5     5     Ardmore    2         2     2         0       0     1     1
-## 6     6 ArranIsleOf    2         3     1         1       0     1     1
-##   Winey Nutty Malty Fruity Floral    Postcode Latitude Longitude
-## 1     2     2     2      2      2  \tPH15 2EB   286580    749680
-## 2     2     2     3      3      2  \tAB38 9PJ   326340    842570
-## 3     0     2     2      3      2   \tAB5 5LI   352960    839320
-## 4     0     1     2      1      0  \tPA42 7EB   141560    646220
-## 5     1     2     3      1      1  \tAB54 4NH   355350    829140
-## 6     1     0     1      1      2    KA27 8HJ   194050    649950</code></pre>
-<pre class="r"><code>df$Postcode &lt;- gsub(&quot; *\t*&quot;, &quot;&quot;, df$Postcode)
-# select characterics of the whiskeys
+<pre><code>##   X RowID Distillery    Region Body Sweetness Smoky Medicinal Tobacco
+## 1 1     1  Aberfeldy Highlands    2         2     2         0       0
+## 2 2     2   Aberlour  Speyside    3         3     1         0       0
+## 3 3     3     AnCnoc Highlands    1         3     2         0       0
+## 4 4     4     Ardbeg     Islay    4         1     4         4       0
+## 5 5     5    Ardmore Highlands    2         2     2         0       0
+## 6 6     6      Arran   Islands    2         3     1         1       0
+##   Honey Spicy Winey Nutty Malty Fruity Floral Postcode Latitude Longitude
+## 1     2     1     2     2     2      2      2  PH152EB   286580    749680
+## 2     4     3     2     2     3      3      2  AB389PJ   326340    842570
+## 3     2     0     0     2     2      3      2   AB55LI   352960    839320
+## 4     0     2     0     1     2      1      0  PA427EB   141560    646220
+## 5     1     1     1     2     3      1      1  AB544NH   355350    829140
+## 6     1     1     1     0     1      1      2  KA278HJ   194050    649950
+##         lat     long
+## 1 -3.850199 56.62519
+## 2 -3.229644 57.46739
+## 3 -2.785295 57.44175
+## 4 -6.108503 55.64061
+## 5 -2.743629 57.35056
+## 6 -5.278895 55.69915</code></pre>
+<pre class="r"><code># select characterics of the whiskeys
 features &lt;- c(&quot;Body&quot;, &quot;Sweetness&quot;, &quot;Smoky&quot;,
             &quot;Medicinal&quot;, &quot;Tobacco&quot;, &quot;Honey&quot;,
             &quot;Spicy&quot;, &quot;Winey&quot;, &quot;Nutty&quot;,
@@ -59,24 +65,7 @@ feat.df &lt;- df[, c(&quot;Distillery&quot;, features)]</code></pre>
 <div id="geographical-locations-of-the-distilleries" class="section level2">
 <h2>Geographical locations of the distilleries</h2>
 <p>Let us see where the distilleries are located by plotting their latitude and longitude coordinates:</p>
-<pre class="r"><code># transform UTM coordinates to longitude/latitude in degrees
-geo.df &lt;- df[, c(&quot;Latitude&quot;, &quot;Longitude&quot;)]
-colnames(geo.df) &lt;- c(&quot;lat&quot;, &quot;long&quot;) # switch for plotting
-# REF: https://rstudio-pubs-static.s3.amazonaws.com/375481_d2605e8726364d30a5b20c6974710cf5.html
-# create &#39;SpatialPoints&#39; object
-library(raster)
-coordinates(geo.df) &lt;-  ~lat + long
-# add coordinate reference system (CRS) for UK
-proj4string(geo.df) &lt;- CRS(&quot;+init=epsg:27700&quot;)
-# transform again:
-# NB: getting rgdal working on old systems is tough due to libgdal dependency
-library(rgdal)
-geo.df &lt;- spTransform(geo.df, CRS(&quot;+init=epsg:4326&quot;))
-map.df &lt;- data.frame(&quot;Distillery&quot; = df[, &quot;Distillery&quot;], geo.df)
-df &lt;- cbind(df, map.df[, c(&quot;lat&quot;, &quot;long&quot;)])
-###########
-# VISUALIZE
-library(ggplot2)
+<pre class="r"><code>library(ggplot2)
 library(ggrepel) # for geom_text_repel: smart text labels
 uk.map &lt;- map_data (&quot;world&quot;, region = &quot;UK&quot;) 
 scotland.map &lt;- uk.map[uk.map$subregion == &quot;Scotland&quot;,]
@@ -85,12 +74,11 @@ geom_map(map = uk.map,
        aes(map_id = region),
        fill=&quot;white&quot;, colour = &quot;black&quot;) +
 coord_map() + 
-geom_point(data = map.df, aes(y = long, x = lat),
-    colour = &quot;blue&quot;, alpha = .75) +
+geom_point(data = df, aes(y = long, x = lat, color = Region),
+     alpha = .75) +
 ggtitle (&quot;Locations of Scottish Whiskey Distilleries&quot;)
 # for storing the map with labels:
 #geom_text_repel(data = map.df, aes(y = long, x = lat, label = Distillery)) 
-# stretch the x-axis for better visability
 # ggsave(file.path(&quot;distillery_map.png&quot;), p, units = &quot;cm&quot;, height = 80, width = 80)
 p</code></pre>
 <p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-2-1.png" width="960" /></p>
