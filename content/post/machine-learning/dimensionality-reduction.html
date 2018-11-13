@@ -1,5 +1,5 @@
 ---
-title: "Interpreting Linear Prediction Models"
+title: "Dimensionality reduction techniques"
 author: Matthias Döring
 date: '2018-11-13T15:00:00Z'
 description: "TODO"
@@ -15,3 +15,39 @@ thumbnail: "/post/machine-learning/linear_models_cover.png"
 
 
 <p>Dimensionality reduction has two primary use cases: data exploration and machine learning. It is useful for data exploration because dimensionality reduction to few dimensions (e.g. 2 or 3 dimensions) allows for visualizing the samples. Such a visualization can then be used to obtain insights from the data (e.g. detect clusters and identify outliers). For machine learning, dimensionality reduction is relevant when there are many features, particularly when there are more features than samples. By reducing the size of the feature space, it is possible to obtain models that generalize better since the signal-to-noise ratio is improved.</p>
+<div id="loading-a-whiskey-data-set" class="section level2">
+<h2>Loading a whiskey data set</h2>
+<p>I have previously used a data set describing the characteristics of whiskeys to <a href="/post/data-visualization/radar-plot/">draw radar plots</a>. Here, we will the whiskey data set to identify how different dimensionality reduction techniques perform on this data set.</p>
+<pre class="r"><code>library(RCurl)
+# load data as character
+f &lt;- getURL(&#39;https://www.datascienceblog.net/data-sets/whiskies.txt&#39;)
+# read table from text connection
+df &lt;- read.csv(textConnection(f), header=T)
+head(df)</code></pre>
+<pre><code>##   RowID  Distillery Body Sweetness Smoky Medicinal Tobacco Honey Spicy
+## 1     1   Aberfeldy    2         2     2         0       0     2     1
+## 2     2    Aberlour    3         3     1         0       0     4     3
+## 3     3      AnCnoc    1         3     2         0       0     2     0
+## 4     4      Ardbeg    4         1     4         4       0     0     2
+## 5     5     Ardmore    2         2     2         0       0     1     1
+## 6     6 ArranIsleOf    2         3     1         1       0     1     1
+##   Winey Nutty Malty Fruity Floral    Postcode Latitude Longitude
+## 1     2     2     2      2      2  \tPH15 2EB   286580    749680
+## 2     2     2     3      3      2  \tAB38 9PJ   326340    842570
+## 3     0     2     2      3      2   \tAB5 5LI   352960    839320
+## 4     0     1     2      1      0  \tPA42 7EB   141560    646220
+## 5     1     2     3      1      1  \tAB54 4NH   355350    829140
+## 6     1     0     1      1      2    KA27 8HJ   194050    649950</code></pre>
+<pre class="r"><code>df$Postcode &lt;- gsub(&quot; *\t*&quot;, &quot;&quot;, df$Postcode)
+# select characterics of the whiskeys
+features &lt;- c(&quot;Body&quot;, &quot;Sweetness&quot;, &quot;Smoky&quot;,
+            &quot;Medicinal&quot;, &quot;Tobacco&quot;, &quot;Honey&quot;,
+            &quot;Spicy&quot;, &quot;Winey&quot;, &quot;Nutty&quot;,
+            &quot;Malty&quot;, &quot;Fruity&quot;, &quot;Floral&quot;)
+feat.df &lt;- df[, c(&quot;Distillery&quot;, features)]</code></pre>
+</div>
+<div id="assumptions-about-results" class="section level2">
+<h2>Assumptions about results</h2>
+<p>Before we begin reducing the dimensionality of the data, we should think about what kind of results we would like to obtain. For the whiskey data, we would like that whiskeys with similar properties are close to each other in the reduced space.</p>
+<p>Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. Thus, clustering the data by <code>Latitude</code> and `<code>Longitude</code> should give us an idea of how the results of a reasonable dimnsionality reduction should look like. * Generally,</p>
+</div>

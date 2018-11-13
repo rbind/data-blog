@@ -1,5 +1,5 @@
 ---
-title: "Interpreting Linear Prediction Models"
+title: "Dimensionality reduction techniques"
 author: Matthias Döring
 date: '2018-11-13T15:00:00Z'
 description: "TODO"
@@ -14,3 +14,52 @@ thumbnail: "/post/machine-learning/linear_models_cover.png"
 
 Dimensionality reduction has two primary use cases: data exploration and machine learning. It is useful for data exploration because dimensionality reduction to few dimensions (e.g. 2 or 3 dimensions) allows for visualizing the samples. Such a visualization can then be used to obtain insights from the data (e.g. detect clusters and identify outliers). For machine learning, dimensionality reduction is relevant when there are many features, particularly when there are more features than samples. By reducing the size of the feature space, it is possible to obtain models that generalize better since the signal-to-noise ratio is improved. 
 
+## Loading a whiskey data set
+
+I have previously used a data set describing the characteristics of whiskeys to [draw radar plots](/post/data-visualization/radar-plot/). Here, we will the whiskey data set to identify how different dimensionality reduction techniques perform on this data set.
+
+```{r, message = FALSE}
+library(RCurl)
+# load data as character
+f <- getURL('https://www.datascienceblog.net/data-sets/whiskies.txt')
+# read table from text connection
+df <- read.csv(textConnection(f), header=T)
+head(df)
+df$Postcode <- gsub(" *\t*", "", df$Postcode)
+# select characterics of the whiskeys
+features <- c("Body", "Sweetness", "Smoky",
+            "Medicinal", "Tobacco", "Honey",
+            "Spicy", "Winey", "Nutty",
+            "Malty", "Fruity", "Floral")
+feat.df <- df[, c("Distillery", features)]
+```
+
+## Assumptions about the results
+
+Before we begin reducing the dimensionality of the data, we should think about what kind of results we would like to obtain. For the whiskey data, we would like that whiskeys with similar properties are close to each other in the reduced space.
+
+Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. Thus, clustering the data by ```Latitude``` and ```Longitude`` should give us an idea of how the results of a reasonable dimnsionality reduction should look like.
+
+## Geographical clustering of the data 
+
+Before clustering the data, we will plot the latitude and longitude data to see their distribution:
+
+```{r}
+library(ggmap)
+# transform UTM coordinates to longitude/latitude in degrees
+geo.df <- df[, c("Latitude", "Longitude")]
+# create 'SpatialPoints' object
+library(raster)
+coordinates(geo.df) <-  ~Latitude + Longitude
+# add coordinate reference system (CRS) for UK
+proj4string(geo.df) <- CRS("+init=epsg:27700")
+# transform again:
+library(rgdal)
+geo.df <- spTransform(geo.df, CRS("+init=epsg:4326"))
+#map <- get_map(location = c(lon = 749680, lat = 286580))
+```
+
+```{r}
+#library(ggplot2)
+#ggplot(df, aes(x = Longitude, y = Latitude))  + geom_point()
+```
