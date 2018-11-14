@@ -95,16 +95,13 @@ p</code></pre>
 </div>
 <div id="pca" class="section level2">
 <h2>PCA</h2>
+<p>PCA computes a rotation matrix <span class="math inline">\(W \in \mathbb{R}^{p \times p}\)</span> from the matrix of features <span class="math inline">\(X \in \mathbb{R}^{N \times p}\)</span>. <span class="math inline">\(W\)</span> can be understood as a mapping function that transforms the observations in <span class="math inline">\(X\)</span> to a rotated space. The coordinates of observations in <span class="math inline">\(X\)</span> are transformed to their new form, <span class="math inline">\(Z\)</span>, via</p>
+<p><span class="math display">\[Z = XW\,.\]</span></p>
 <div id="results-of-pca" class="section level3">
 <h3>Results of PCA</h3>
 <p>Using PCA, I would assign three clusters to the data:</p>
-<pre class="r"><code>library(cluster)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;cluster&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:maps&#39;:
-## 
-##     votes.repub</code></pre>
-<pre class="r"><code>library(ggfortify)
+<pre class="r"><code>library(cluster)
+library(ggfortify)
 data &lt;- df[,features]
 rownames(data) &lt;- df$Distillery
 cl &lt;- pam(data, 3)
@@ -143,6 +140,11 @@ print(tabs)</code></pre>
 <li>Cluster 2: Well-balanced/mild Whiskeys, mostly from Speyside and Highlands</li>
 <li>Cluster 3: Smoky whiskeys, highly overrepresented for whiskeys from Islay</li>
 </ul>
+<p>There are some interesting observations to make according to the visualization:</p>
+<ul>
+<li>Oban and Clynelish are the only Highlands distilleries that produce tastes resembling those from distilleries on Islay.</li>
+<li>Highland and Speyside whiskeys differ mainly in one dimension. At one extreme are smooth, well-balaned whiskeys such as Glenfiddich. At the other extreme, are whiskeys with a more characteristic tase profile such as Macallan.</li>
+</ul>
 </div>
 <div id="multi-dimensional-scaling" class="section level3">
 <h3>Multi-Dimensional Scaling</h3>
@@ -164,10 +166,127 @@ t.df &lt;- cbind(t.df, Cluster = factor(cl$clustering))
 t.df$Distillery &lt;- rownames(t.df)
 ggplot(t.df, aes(x = V1, y = V2, color = Cluster, label = Distillery)) +
     geom_point() + geom_text()</code></pre>
-<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
 <p>The result is a bit more clearer with t-SNE than with PCA and the two dimensions have slightly different interpretations than with PCA:</p>
 <ul>
-<li>V1 seems to indicate how balanced/intense the taste is. The outliers here are the smoky Island/Islay whiskeys on the left (e.g. Lagavulin) as well as some of the richer Highland whiskeys on the right (e.g. Macallan). The whiskeys in the middle such as Glenfiddich have a very balanced taste profile.</li>
+<li>V1 seems to indicate how balanced/intense the taste is. The outliers here are the smoky Islay whiskeys on the left (e.g. Lagavulin) as well as some of the richer Highland whiskeys on the right (e.g. Macallan). The whiskeys in the middle such as Glenfiddich have a very balanced taste profile.</li>
 <li>V2: I cannot figure that out.</li>
 </ul>
+</div>
+<div id="using-pca-for-machine-learning" class="section level2">
+<h2>Using PCA for machine learning</h2>
+<p>When validating a machine learning that is fitted to data that has been transformed using PCA, it is crucial that PCA is done independently for the training and test data sets. Why? If PCA were performed on the whole data set, the orthogonal projection obtained via PCA would be influenced by the test data. Thus, when testing the performance of the model on the test data, the performance of the model would be overestimated since the projection is tuned to the space in which the test samples reside. Thus, the following approach needs to be followed:</p>
+<ol style="list-style-type: decimal">
+<li>Perform PCA on the test data set and train the model on the transformed data.</li>
+<li>Apply the learned PCA transformation from the training data on the test data set and evaluate the performance of the model on the transformed data.</li>
+</ol>
+<p>To exemplify the workflow, let us predict the region that a whiskey originates from given its taste profile. For this purpose, we will use the <span class="math inline">\(k\)</span>-nearest neighbor model because we the few features we have (p = 12) will be further reduced by PCA. Moreover, the feature space is small because all variables are in <span class="math inline">\([0,4]\)</span>. Since we have to optimize the value of <span class="math inline">\(k\)</span>, we also set aside a validation set for determining this parameter.</p>
+<div id="obtaining-the-pca-transformation" class="section level3">
+<h3>Obtaining the PCA transformation</h3>
+<p>First, we write some funtions for validating the performance of the prediction. We will simply use the accuracy here, although another performance measure may be more appropriate because it is likely that the regions for which few samples are available are confused more often. Moreover, we assign 50% of the observations to the training set, 25% for the validation set (for tuning <span class="math inline">\(k\)</span>), and 25% for testing the performance of the selected model.</p>
+<pre class="r"><code># split data into 3 parts: training, validation, and testing
+get.accuracy &lt;- function(preds, labels) {
+    correct.idx &lt;- which(preds == labels)
+    accuracy &lt;- length(correct.idx) / length(labels)
+    return(accuracy)
+}
+select.k &lt;- function(K, training.data, test.data, labels, test.labels) {
+    performance &lt;- vector(&quot;list&quot;, length(K))
+    for (i in seq_along(K)) {
+        k &lt;- K[i]
+        preds &lt;- knn(train = training.data, test = test.data, 
+                     cl = labels, k = k)
+        validation.df &lt;- cbind(&quot;Pred&quot; = as.character(preds), &quot;Ref&quot; = as.character(test.labels))
+        #print(k)
+        #print(validation.df)
+        accuracy &lt;- get.accuracy(preds, test.labels)
+        performance[[i]] &lt;- accuracy
+    }
+    # select best performing k
+    k.sel &lt;- K[which.max(performance)]
+    return(k.sel)
+}
+set.seed(1234)
+samp.train &lt;- sample(nrow(data), nrow(data)*0.50) # 50 % for training
+df.train &lt;- data[samp.train,,]
+# 25% for validation
+samp.test &lt;- sample(setdiff(seq(nrow(data)), samp.train), length(setdiff(seq(nrow(data)), samp.train)) * 0.5)
+df.test &lt;- data[samp.test,]
+samp.val &lt;- setdiff(seq_len(nrow(data)), c(samp.train, samp.test))
+df.val &lt;- data[samp.val, ]</code></pre>
+<p>Having prepared the evaluation functions and the data, we can transform the data using PCA. Note that the PCA is only run on the training data and not on the other data sets. Rather, we use the <code>predict</code> function to apply the rotation matrix obtained from the training data onto the other data sets.</p>
+<pre class="r"><code># PCA on training data
+pca &lt;- prcomp(df.train, retx=TRUE, center = TRUE, scale = FALSE) # scale unnecessary: all variables on same scale
+expl.var &lt;- round(pca$sdev^2/sum(pca$sdev^2)*100) # percent explained variance
+# make a choice about the number of dimensions to use. we select 3 dimensions only.
+n.dims &lt;- 3
+# transform all data using PCA projection from training data
+# NB: predict.princomp(pca, newdata) is equivalent to: as.matrix(newdata) %*% pca$rotation
+df.train.p &lt;- predict(pca, newdata = df.train)[, 1:n.dims]
+df.val.p &lt;- predict(pca, newdata = df.val)[, 1:n.dims]
+df.test.p &lt;- predict(pca, newdata = df.test)[, 1:n.dims]</code></pre>
+<p>Now that we have transformed the training, validation, and test sets into PCA space, we can use <span class="math inline">\(k\)</span>-nearest neighbors. Since some regions such as Islands and Lowlands are underrepresented it is important that we do not select a value of <span class="math inline">\(k\)</span> that is too large. For example, if we select <span class="math inline">\(k = 6\)</span> although there are only two samples from Islands in the training data, we would probably predict another region even if the two islands were the closest to a new input sample.</p>
+<pre class="r"><code># train k-nearest neighbor models to find ideal value of k
+library(class) # load knn function
+K &lt;- 3:10 # number of nearest neighbors to consider 
+k.sel.pca &lt;- select.k(K, df.train.p, df.val.p, df[samp.train, &quot;Region&quot;], 
+                      df[samp.val, &quot;Region&quot;])
+# determine performance on test set
+test.preds.pca &lt;- knn(train = df.train.p, test = df.test.p, 
+                      cl = df$Region[samp.train], k = k.sel.pca)
+accuracy.pca.knn &lt;- get.accuracy(test.preds.pca, df[samp.test, &quot;Region&quot;])
+print(paste0(&quot;PCA+KNN accuracy for k = &quot;, k.sel.pca, &quot; is: &quot;, 
+             round(accuracy.pca.knn, 3)))</code></pre>
+<pre><code>## [1] &quot;PCA+KNN accuracy for k = 9 is: 0.571&quot;</code></pre>
+<p>Let us investigate whether the model that uses PCA outperforms the model based on the raw data:</p>
+<pre class="r"><code># compare with accuracy of non-PCA model
+k.sel &lt;- select.k(K, df.train, df.val, df[samp.train, &quot;Region&quot;], 
+                  df[samp.val, &quot;Region&quot;])
+test.preds &lt;- knn(train = df.train, test = df.test, 
+                  cl = df$Region[samp.train], k = k.sel)
+accuracy.knn &lt;- get.accuracy(test.preds, df[samp.test, &quot;Region&quot;])
+print(paste0(&quot;KNN accuracy for k = &quot;, k.sel, &quot; is: &quot;,
+             round(accuracy.knn, 3)))</code></pre>
+<pre><code>## [1] &quot;KNN accuracy for k = 7 is: 0.524&quot;</code></pre>
+<p>So, using <span class="math inline">\(k\)</span>-nearest neighbors, PCA indeed boosts the prediction accuracy from 52.4% to 57.1%.</p>
+<p>This means that, given the 12 whiskey characteristics, we can identify the six Scotch regions with an accuracy close to 60%. That is not bad at all. But can we do better if we limit ourselves to fewer regions? We know that some regions are underrepresented. From the PCA analysis, we could regroup the labels in the following way:</p>
+<ul>
+<li>Island whiskeys are grouped with Islay whiskeys</li>
+<li>Lowland/Campbeltown whiskeys are grouped with Highland whiskeys</li>
+</ul>
+<p>In this way, the problem is reduced to three regions: Island/Islay whiskeys, Highland/Lowland/Campbeltown whiskeys, and Speyside whiskeys.</p>
+<pre class="r"><code># regroup labels
+labels &lt;- df$Region
+labels[which(labels == &quot;Islands&quot;)] &lt;- &quot;Islay&quot;
+labels[which(labels == &quot;Lowlands&quot;)] &lt;- &quot;Highlands&quot;
+labels[which(labels == &quot;Campbeltown&quot;)] &lt;- &quot;Highlands&quot;
+# rename groups
+labels &lt;- factor(labels)
+levels(labels) &lt;- c(&quot;Highlands/Lowlands/Campbeltown&quot;, &quot;Islay/Islands&quot;, &quot;Speyside&quot;)
+k.sel.pca &lt;- select.k(3:20, df.train.p, df.val.p, labels[samp.train],
+                      labels[samp.val])
+test.preds.pca &lt;- knn(train = df.train.p, test = df.test.p, 
+                      cl = labels[samp.train], k = k.sel.pca)
+accuracy.pca.knn &lt;- get.accuracy(test.preds.pca, labels[samp.test])
+print(paste0(&quot;PCA+KNN accuracy for k = &quot;, k.sel.pca, &quot; is: &quot;, 
+             round(accuracy.pca.knn, 3)))</code></pre>
+<pre><code>## [1] &quot;PCA+KNN accuracy for k = 13 is: 0.619&quot;</code></pre>
+<p>Apparently this approach did not work too well. That is probably because the whiskeys from the different groups are too different to be merged. Thus, the merged problem is actually harder than before, as evident from the poorer performance.</p>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+</div>
+<div id="remaining-questions" class="section level2">
+<h2>Remaining questions</h2>
+<p>I find it interesting that the twodimensional projection of whiskeys has so many large empty areas. This could indicate one of two things:</p>
+<ol style="list-style-type: decimal">
+<li>There is still a lot of potential for experimenting with new, exciting types of whiskeys</li>
+<li>There are just so many taste combinations that go well.</li>
+</ol>
+<p>I am inclined to go with the second option. Why? In the PCA plot, the lower right is the largest region in which no samples reside. Looking at the whiskeys that come close to this region, we find that those are Macallan on the y-axis and Lagavulin on the x-axis. Macallan is known for its complex taste and Lagavulin is known for its smoky taste. So, a whiskey that comes to lie on the lower right of the 2-dimensional PCA space would have both properties: a complex taste plus a very smoky taste. I would assume that both tastes would be just too much for the palate to handle. For lack of better worlds, I term this unexplored region of whiskey taste, the <em>whiskey twillight zone</em>, as exemplified by this plot:</p>
+<div class="figure">
+<img src="https://www.datascienceblog.net/post/machine-learning/whiskeypca.png" alt="Whiskey twillight zone" />
+<p class="caption">Whiskey twillight zone</p>
+</div>
 </div>

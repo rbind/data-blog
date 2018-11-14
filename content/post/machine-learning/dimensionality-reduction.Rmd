@@ -80,12 +80,15 @@ I also created a [high-resolution version of the distillery map](/post/machine-l
 
 ## PCA
 
+PCA computes a rotation matrix $W \in \mathbb{R}^{p \times p}$ from the matrix of features $X \in \mathbb{R}^{N \times p}$. $W$ can be understood as a mapping function that transforms the observations in $X$ to a rotated space. The coordinates of observations in $X$ are transformed to their new form, $Z$, via
+
+\[Z = XW\,.\]
 
 ### Results of PCA
 
 Using PCA, I would assign three clusters to the data:
 
-```{r, fig.width = 10, fig.height = 10}
+```{r, message = FALSE, fig.width = 10, fig.height = 10}
 library(cluster)
 library(ggfortify)
 data <- df[,features]
@@ -117,11 +120,17 @@ From these data, we can interpret the clustering in the following way:
 * Cluster 2: Well-balanced/mild Whiskeys, mostly from Speyside and Highlands
 * Cluster 3: Smoky whiskeys, highly overrepresented for whiskeys from Islay
 
+There are some interesting observations to make according to the visualization:
+
+* Oban and Clynelish are the only Highlands distilleries that produce tastes resembling those from distilleries on Islay.
+* Highland and Speyside whiskeys differ mainly in one dimension. At one extreme are smooth, well-balaned whiskeys such as Glenfiddich. At the other extreme, are whiskeys with a more characteristic tase profile such as Macallan.
+
+
 ### Multi-Dimensional Scaling
 
 This is basically the same as PCA, so cut it?
 
-```{r}
+```{r, warn = FALSE}
 autoplot(cmdscale(daisy(data), eig = TRUE), label = TRUE, label.size = 3)
 ```
 
@@ -129,7 +138,7 @@ autoplot(cmdscale(daisy(data), eig = TRUE), label = TRUE, label.size = 3)
 
 t-SNE can be performed in the following way:
 
-```{r, message = FALSE}
+```{r, message = FALSE, fig.width = 10, fig.height = 10}
 library(Rtsne)
 set.seed(1211) # fix seed for reproducibility of t-SNE
 tsne <- Rtsne(data, dims = 2, perplexity = 5)
@@ -145,3 +154,136 @@ The result is a bit more clearer with t-SNE than with PCA and the two dimensions
 
 * V1 seems to indicate how balanced/intense the taste is. The outliers here are the smoky Islay whiskeys on the left (e.g. Lagavulin) as well as some of the richer Highland whiskeys on the right (e.g. Macallan). The whiskeys in the middle such as Glenfiddich have a very balanced taste profile.
 * V2: I cannot figure that out.
+
+## Using PCA for machine learning
+
+When validating a machine learning that is fitted to data that has been transformed using PCA, it is crucial that PCA is done independently for the training and test data sets. Why? If PCA were performed on the whole data set, the orthogonal projection obtained via PCA would be influenced by the test data. Thus, when testing the performance of the model on the test data, the performance of the model would be overestimated since the projection is tuned to the space in which the test samples reside. Thus, the following approach needs to be followed:
+
+1. Perform PCA on the test data set and train the model on the transformed data.
+2. Apply the learned PCA transformation from the training data on the test data set and evaluate the performance of the model on the transformed data.
+
+To exemplify the workflow, let us predict the region that a whiskey originates from given its taste profile. For this purpose, we will use the $k$-nearest neighbor model because we the few features we have (p = `r length(features)`) will be further reduced by PCA. Moreover, the feature space is small because all variables are in $[0,4]$. Since we have to optimize the value of $k$, we also set aside a validation set for determining this parameter.
+
+### Obtaining the PCA transformation
+
+First, we write some funtions for validating the performance of the prediction. We will simply use the accuracy here, although another performance measure may be more appropriate because it is likely that the regions for which few samples are available are confused more often. Moreover, we assign 50% of the observations to the training set, 25% for the validation set (for tuning $k$), and 25% for testing the performance of the selected model.
+
+```{r}
+# split data into 3 parts: training, validation, and testing
+get.accuracy <- function(preds, labels) {
+    correct.idx <- which(preds == labels)
+    accuracy <- length(correct.idx) / length(labels)
+    return(accuracy)
+}
+select.k <- function(K, training.data, test.data, labels, test.labels) {
+    performance <- vector("list", length(K))
+    for (i in seq_along(K)) {
+        k <- K[i]
+        preds <- knn(train = training.data, test = test.data, 
+                     cl = labels, k = k)
+        validation.df <- cbind("Pred" = as.character(preds), "Ref" = as.character(test.labels))
+        #print(k)
+        #print(validation.df)
+        accuracy <- get.accuracy(preds, test.labels)
+        performance[[i]] <- accuracy
+    }
+    # select best performing k
+    k.sel <- K[which.max(performance)]
+    return(k.sel)
+}
+set.seed(1234)
+samp.train <- sample(nrow(data), nrow(data)*0.50) # 50 % for training
+df.train <- data[samp.train,,]
+# 25% for validation
+samp.test <- sample(setdiff(seq(nrow(data)), samp.train), length(setdiff(seq(nrow(data)), samp.train)) * 0.5)
+df.test <- data[samp.test,]
+samp.val <- setdiff(seq_len(nrow(data)), c(samp.train, samp.test))
+df.val <- data[samp.val, ]
+```
+
+Having prepared the evaluation functions and the data, we can transform the data using PCA. Note that the PCA is only run on the training data and not on the other data sets. Rather, we use the ```predict``` function to apply the rotation matrix obtained from the training data onto the other data sets.
+
+```{r}
+# PCA on training data
+pca <- prcomp(df.train, retx=TRUE, center = TRUE, scale = FALSE) # scale unnecessary: all variables on same scale
+expl.var <- round(pca$sdev^2/sum(pca$sdev^2)*100) # percent explained variance
+# make a choice about the number of dimensions to use. we select 3 dimensions only.
+n.dims <- 3
+# transform all data using PCA projection from training data
+# NB: predict.princomp(pca, newdata) is equivalent to: as.matrix(newdata) %*% pca$rotation
+df.train.p <- predict(pca, newdata = df.train)[, 1:n.dims]
+df.val.p <- predict(pca, newdata = df.val)[, 1:n.dims]
+df.test.p <- predict(pca, newdata = df.test)[, 1:n.dims]
+```
+
+Now that we have transformed the training, validation, and test sets into PCA space, we can use $k$-nearest neighbors. Since some regions such as Islands and Lowlands are underrepresented it is important that we do not select a value of $k$ that is too large. For example, if we select $k = 6$ although there are only two samples from Islands in the training data, we would probably predict another region even if the two islands were the closest to a new input sample. 
+
+```{r}
+# train k-nearest neighbor models to find ideal value of k
+library(class) # load knn function
+K <- 3:10 # number of nearest neighbors to consider 
+k.sel.pca <- select.k(K, df.train.p, df.val.p, df[samp.train, "Region"], 
+                      df[samp.val, "Region"])
+# determine performance on test set
+test.preds.pca <- knn(train = df.train.p, test = df.test.p, 
+                      cl = df$Region[samp.train], k = k.sel.pca)
+accuracy.pca.knn <- get.accuracy(test.preds.pca, df[samp.test, "Region"])
+print(paste0("PCA+KNN accuracy for k = ", k.sel.pca, " is: ", 
+             round(accuracy.pca.knn, 3)))
+```
+
+Let us investigate whether the model that uses PCA outperforms the model based on the raw data:
+
+```{r}
+# compare with accuracy of non-PCA model
+k.sel <- select.k(K, df.train, df.val, df[samp.train, "Region"], 
+                  df[samp.val, "Region"])
+test.preds <- knn(train = df.train, test = df.test, 
+                  cl = df$Region[samp.train], k = k.sel)
+accuracy.knn <- get.accuracy(test.preds, df[samp.test, "Region"])
+print(paste0("KNN accuracy for k = ", k.sel, " is: ",
+             round(accuracy.knn, 3)))
+```
+
+So, using $k$-nearest neighbors, PCA indeed boosts the prediction accuracy from `r paste0(round(accuracy.knn, 3)*100, "%")` to `r paste0(round(accuracy.pca.knn, 3) * 100, "%")`.
+
+This means that, given the 12 whiskey characteristics, we can identify the six Scotch regions with an accuracy close to 60%. That is not bad at all. But can we do better if we limit ourselves to fewer regions? We know that some regions are underrepresented. From the PCA analysis, we could regroup the labels in the following way:
+
+* Island whiskeys are grouped with Islay whiskeys 
+* Lowland/Campbeltown whiskeys are grouped with Highland whiskeys
+
+In this way, the problem is reduced to three regions: Island/Islay whiskeys, Highland/Lowland/Campbeltown whiskeys, and Speyside whiskeys. 
+
+```{r}
+# regroup labels
+labels <- df$Region
+labels[which(labels == "Islands")] <- "Islay"
+labels[which(labels == "Lowlands")] <- "Highlands"
+labels[which(labels == "Campbeltown")] <- "Highlands"
+# rename groups
+labels <- factor(labels)
+levels(labels) <- c("Highlands/Lowlands/Campbeltown", "Islay/Islands", "Speyside")
+k.sel.pca <- select.k(3:20, df.train.p, df.val.p, labels[samp.train],
+                      labels[samp.val])
+test.preds.pca <- knn(train = df.train.p, test = df.test.p, 
+                      cl = labels[samp.train], k = k.sel.pca)
+accuracy.pca.knn <- get.accuracy(test.preds.pca, labels[samp.test])
+print(paste0("PCA+KNN accuracy for k = ", k.sel.pca, " is: ", 
+             round(accuracy.pca.knn, 3)))
+```
+
+Apparently this approach did not work too well. That is probably because the whiskeys from the different groups are too different to be merged. Thus, the merged problem is actually harder than before, as evident from the poorer performance.
+
+## Summary
+
+## Remaining questions
+
+I find it interesting that the twodimensional projection of whiskeys has so many large empty areas. This could indicate one of two things:
+
+1. There is still a lot of potential for experimenting with new, exciting types of whiskeys
+2. There are just so many taste combinations that go well.
+
+I am inclined to go with the second option. Why? In the PCA plot, the lower right is the largest region in which no samples reside. Looking at the whiskeys that come close to this region, we find that those are Macallan on the y-axis and Lagavulin on the x-axis. Macallan is known for its complex taste and Lagavulin is known for its smoky taste. So, a whiskey that comes to lie on the lower right of the 2-dimensional PCA space would have both properties: a complex taste plus a very smoky taste. I would assume that both tastes would be just too much for the palate to handle. For lack of better worlds, I term this unexplored region of whiskey taste, the *whiskey twillight zone*, as exemplified by this plot:
+
+![Whiskey twillight zone](https://www.datascienceblog.net/post/machine-learning/whiskeypca.png)
+
