@@ -318,7 +318,13 @@ print(paste0(&quot;PCA+KNN accuracy for k = &quot;, k.sel.pca, &quot; is: &quot;
 </div>
 <div id="kpca-for-prediction" class="section level3">
 <h3>KPCA for Prediction</h3>
-<pre class="r"><code>W &lt;- pca.k@rotated # the transformed input matrix</code></pre>
+<p>Applying KPCA for prediction is not as straight-forward as applying PCA. In PCA, the eigentvector are computed in the input space but in KPCA, the eigenvectors come from kernel Hilbert space. Thus, it is not simply possible to transform new data points when we do not know the explicit mapping function <span class="math inline">\(\phi\)</span> that is used.</p>
+<p>What is easily possible is to create a model from the transformed data. However, this approach is not helpful for doing validation because this would mean that we include the test set in the PCA. So, the approach in the following approach <strong>should not be used for validating a model</strong>:</p>
+<pre class="r"><code>Z &lt;- pca.k@rotated[,1:20] # the transformed input matrix
+preds.kpca &lt;- knn(train = Z[samp.train,], test = Z[samp.test,], 
+                     cl = df$Region[samp.train], k = k.sel.pca)
+# NB: this would overestimate the actual performance
+accuracy &lt;- get.accuracy(preds.kpca, df$Region[samp.test])</code></pre>
 </div>
 </div>
 <div id="summary" class="section level2">
