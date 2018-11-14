@@ -16,8 +16,8 @@ disable_comments: false
 * [Cross Validated](https://stats.stackexchange.com): probably the largest forum for discussing anything related to statistics and machine learning
 * [Data Camp](https://www.datacamp.com): a great resource for training in data science
 * [Data Science Reader](https://rushter.com/dsreader/): an aggregator for data science content
-* [DataTau](http://www.datatau.com/]): a data science forum
-
+* [DataTau](http://www.datatau.com/): a data science forum
+* [Analisted](https://www.analisted.com): a data science aggregator
 
 ## R
 
@@ -41,5 +41,6 @@ develOverflow
 ## Other
 
 * [Awesome Blogdown](https://awesome-blogdown.com/): A curated list of static websuites built using the blogdown R package
+* [rbind](https://support.rbind.io/): A network of R bloggers
 
 Is your favorite resource for data science missing? Let me know in the comments!

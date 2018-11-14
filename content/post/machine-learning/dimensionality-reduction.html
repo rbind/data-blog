@@ -25,8 +25,7 @@ thumbnail: "/post/machine-learning/whiskey-twilight-zone.png"
 <div id="loading-a-whiskey-data-set" class="section level2">
 <h2>Loading a whiskey data set</h2>
 <p>I have previously used a data set describing the characteristics of whiskeys to <a href="/post/data-visualization/radar-plot/">draw radar plots</a>. Here, we will the whiskey data set to identify how different dimensionality reduction techniques perform on this data set.</p>
-<pre class="r"><code>set.seed(1234) # reproducibility
-library(RCurl)
+<pre class="r"><code>library(RCurl)
 # load data as character
 f &lt;- getURL(&#39;https://www.datascienceblog.net/data-sets/whiskies.csv&#39;)
 # read table from text connection
@@ -106,7 +105,7 @@ p</code></pre>
 <p>PCA computes a rotation matrix <span class="math inline">\(W \in \mathbb{R}^{p \times p}\)</span> from the matrix of features <span class="math inline">\(X \in \mathbb{R}^{N \times p}\)</span>. <span class="math inline">\(W\)</span> can be understood as a mapping function that transforms the observations in <span class="math inline">\(X\)</span> to a rotated space. The coordinates of observations in <span class="math inline">\(X\)</span> are transformed to their new form, <span class="math inline">\(Z\)</span>, via</p>
 <p><span class="math display">\[Z = XW\,.\]</span></p>
 <p>The rotation matrix <span class="math inline">\(W\)</span> is constructed through orthogonal linear transformations. Each of these transformations is performed such that it maximizes the variance in the unexplained variance in the data, resulting in individual <em>principal components</em>, which provide a new coordinate system.</p>
-<p>The reason why PCA is so popular is that it is very interpretable.</p>
+<p>One of the reasons why PCA is so popular is that it is a very interpretable method. Each principal component (PC) is well-defined as we know that it is a dimension orthogonal to the other dimensions. Since PCA maximizes the variance with each PC, we can obtain the variance that is explained by each PC in order to select an appropriate number of dimensions.</p>
 <div id="results-of-pca" class="section level3">
 <h3>Results of PCA</h3>
 <p>Using PCA, I would assign three clusters to the data:</p>
@@ -159,11 +158,35 @@ print(cluster.df)</code></pre>
 <p>In KPCA, observations are transformed to a kernel matrix via</p>
 <p><span class="math display">\[K = k(x,y) = \phi(x)^T \phi(y)\]</span></p>
 <p>where <span class="math inline">\(k(x,y)\)</span> is the kernel function for observations <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> and <span class="math inline">\(\phi\)</span> is the corresponding function that maps the observations into reproducing kernel Hilbert space and does not need to be explicitly computed due to the <em>kernel trick</em>. According to the kernel trick, we just need to compute the kernel function.</p>
+<div id="using-kpca-in-r" class="section level3">
+<h3>Using KPCA in R</h3>
+<p>The <code>kpca</code> is made available through the <code>kernlab</code> package. By default, the radial basis function kernel is used for matrix input. It is defined by</p>
+<p><span class="math display">\[K (x, y) = \exp \left(- \frac{-||x − t||^2}{2 \sigma^2}\right)\]</span></p>
+<p>where <span class="math inline">\(\sigma\)</span> is the inverse kernel width.</p>
+<pre class="r"><code>library(kernlab) # for kpca function
+# use the default of sigma = 0.1 because it works well
+pca.k &lt;- kpca(as.matrix(data), kpar = list(sigma = 0.1))
+plot(pca.k@eig) # eigenvalues</code></pre>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code># select 20 dimensions for prediction according to eigenvalues
+n.dim.model &lt;- 20
+pc &lt;- pca.k@pcv</code></pre>
+<p>Let us plot the data:</p>
+<pre class="r"><code>library(ggrepel) # for geom_text_repel
+kpca.df &lt;- data.frame(&quot;Label&quot; = df$Distillery, &quot;Region&quot; = df$Region,
+                      &quot;PC1&quot; = pc[,1], &quot;PC2&quot; = pc[,2])
+ggplot(kpca.df, aes(label = Label, x = PC1, y = PC2, color = Region)) + 
+    geom_text_repel()</code></pre>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
+<p>In terms of the visualization, the results are similar to what we obtained with conventional PCA. The whiskeys from Islay are well-separated and we can see a cluster of Speyside whiskeys, while the Highlands whiskeys are rather spread throughout.</p>
+<p>A disdavantage of KPCA is that you need to deal with the hyperparameters of the kernel functions, which should be tuned in accordance with the data. Moreover, KPCA is not as interpretable as PCA because it is not possible to determine how much variance is explained by individual dimensions.</p>
+</div>
 </div>
 <div id="t-sne" class="section level2">
 <h2>t-SNE</h2>
 <p>t-SNE can be performed in the following way:</p>
 <pre class="r"><code>library(Rtsne)
+set.seed(1234) # reproducibility
 tsne &lt;- Rtsne(data, dims = 2, perplexity = 5)
 t.df &lt;- as.data.frame(tsne$Y)
 colnames(t.df) &lt;- c(&quot;V1&quot;, &quot;V2&quot;)
@@ -171,7 +194,7 @@ t.df &lt;- cbind(t.df, Cluster = factor(cl$clustering))
 t.df$Distillery &lt;- rownames(t.df)
 ggplot(t.df, aes(x = V1, y = V2, color = Cluster, label = Distillery)) +
     geom_point() + geom_text()</code></pre>
-<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
 <p>The result is a bit more clearer with t-SNE than with PCA and the two dimensions have slightly different interpretations than with PCA:</p>
 <ul>
 <li>V1 seems to indicate how balanced/intense the taste is. The outliers here are the smoky Islay whiskeys on the left (e.g. Lagavulin) as well as some of the richer Highland whiskeys on the right (e.g. Macallan). The whiskeys in the middle such as Glenfiddich have a very balanced taste profile.</li>
@@ -211,6 +234,7 @@ select.k &lt;- function(K, training.data, test.data, labels, test.labels) {
     k.sel &lt;- K[which.max(performance)]
     return(k.sel)
 }
+set.seed(1234) # reproducibility
 samp.train &lt;- sample(nrow(data), nrow(data)*0.50) # 50 % for training
 df.train &lt;- data[samp.train,,]
 # 25% for validation
@@ -222,13 +246,14 @@ df.val &lt;- data[samp.val, ]</code></pre>
 <pre class="r"><code># PCA on training data
 # NB: scale is FALSE since all variables are on the same scale
 pca &lt;- prcomp(df.train, retx=TRUE, center = TRUE, scale = FALSE) 
+# find explained variance per PC:
 expl.var &lt;- round(pca$sdev^2/sum(pca$sdev^2)*100)
 var.df &lt;- data.frame(&quot;N_dim&quot; = seq_along(expl.var), &quot;Cum_Var&quot; = cumsum(expl.var))
 # cumulative explained variance:
 print(t(var.df))</code></pre>
 <pre><code>##         [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12]
 ## N_dim      1    2    3    4    5    6    7    8    9    10    11    12
-## Cum_Var   24   45   57   66   74   81   87   91   94    96    98    99</code></pre>
+## Cum_Var   22   41   52   63   72   79   85   90   94    97    99   100</code></pre>
 <pre class="r"><code># select 3 dimensions (&gt; 50% variance is sufficient)
 n.dims &lt;- 3
 # transform all data using PCA projection from training data
@@ -248,7 +273,7 @@ test.preds.pca &lt;- knn(train = df.train.p, test = df.test.p,
 accuracy.pca.knn &lt;- get.accuracy(test.preds.pca, df[samp.test, &quot;Region&quot;])
 print(paste0(&quot;PCA+KNN accuracy for k = &quot;, k.sel.pca, &quot; is: &quot;, 
              round(accuracy.pca.knn, 3)))</code></pre>
-<pre><code>## [1] &quot;PCA+KNN accuracy for k = 4 is: 0.429&quot;</code></pre>
+<pre><code>## [1] &quot;PCA+KNN accuracy for k = 9 is: 0.571&quot;</code></pre>
 <p>Let us investigate whether the model that uses PCA outperforms the model based on the raw data:</p>
 <pre class="r"><code># compare with accuracy of non-PCA model
 k.sel &lt;- select.k(K, df.train, df.val, df[samp.train, &quot;Region&quot;], 
@@ -258,8 +283,8 @@ test.preds &lt;- knn(train = df.train, test = df.test,
 accuracy.knn &lt;- get.accuracy(test.preds, df[samp.test, &quot;Region&quot;])
 print(paste0(&quot;KNN accuracy for k = &quot;, k.sel, &quot; is: &quot;,
              round(accuracy.knn, 3)))</code></pre>
-<pre><code>## [1] &quot;KNN accuracy for k = 10 is: 0.476&quot;</code></pre>
-<p>So, using <span class="math inline">\(k\)</span>-nearest neighbors, PCA does not seem to boost the prediction accuracy for this data set. This is because there are few features to begin with, so the dimensionality reduction does not help much. Moreover, there are few low-variance features in the data set (e.g. <code>Tobacco</code> or <code>Malty</code>):</p>
+<pre><code>## [1] &quot;KNN accuracy for k = 7 is: 0.524&quot;</code></pre>
+<p>So, using <span class="math inline">\(k\)</span>-nearest neighbors, PCA does indeem seem to boost the prediction accuracy for this data set although there are few features to begin with. However, there are some low-variance features in the data set (e.g. <code>Tobacco</code> or <code>Malty</code>):</p>
 <pre class="r"><code># variances of whiskeys characteristics
 print(diag(var(data)))</code></pre>
 <pre><code>##      Body Sweetness     Smoky Medicinal   Tobacco     Honey     Spicy 
@@ -288,8 +313,12 @@ test.preds.pca &lt;- knn(train = df.train.p, test = df.test.p,
 accuracy.pca.knn &lt;- get.accuracy(test.preds.pca, labels[samp.test])
 print(paste0(&quot;PCA+KNN accuracy for k = &quot;, k.sel.pca, &quot; is: &quot;, 
              round(accuracy.pca.knn, 3)))</code></pre>
-<pre><code>## [1] &quot;PCA+KNN accuracy for k = 18 is: 0.429&quot;</code></pre>
-<p>With an accuracy of 42.9%, we can conclude that, it is indeed worthwhile to group the whiskey regions for which we have fewer samples.</p>
+<pre><code>## [1] &quot;PCA+KNN accuracy for k = 13 is: 0.619&quot;</code></pre>
+<p>With an accuracy of 61.9%, we can conclude that, it is indeed worthwhile to group the whiskey regions for which we have fewer samples.</p>
+</div>
+<div id="kpca-for-prediction" class="section level3">
+<h3>KPCA for Prediction</h3>
+<pre class="r"><code>W &lt;- pca.k@rotated # the transformed input matrix</code></pre>
 </div>
 </div>
 <div id="summary" class="section level2">

@@ -27,7 +27,6 @@ The difference between these approaches is that PCA outputs a rotation matrix, w
 I have previously used a data set describing the characteristics of whiskeys to [draw radar plots](/post/data-visualization/radar-plot/). Here, we will the whiskey data set to identify how different dimensionality reduction techniques perform on this data set.
 
 ```{r, message = FALSE}
-set.seed(1234) # reproducibility
 library(RCurl)
 # load data as character
 f <- getURL('https://www.datascienceblog.net/data-sets/whiskies.csv')
@@ -94,7 +93,7 @@ PCA computes a rotation matrix $W \in \mathbb{R}^{p \times p}$ from the matrix o
 
 The rotation matrix $W$ is constructed through orthogonal linear transformations. Each of these transformations is performed such that it maximizes the variance in the unexplained variance in the data, resulting in individual *principal components*, which provide a new coordinate system.
 
-The reason why PCA is so popular is that it is very interpretable.
+One of the reasons why PCA is so popular is that it is a very interpretable method. Each principal component (PC) is well-defined as we know that it is a dimension orthogonal to the other dimensions. Since PCA maximizes the variance with each PC, we can obtain the variance that is explained by each PC in order to select an appropriate number of dimensions. 
 
 ### Results of PCA
 
@@ -152,6 +151,37 @@ In KPCA, observations are transformed to a kernel matrix via
 
 where $k(x,y)$ is the kernel function for observations $x$ and $y$ and $\phi$ is the corresponding function that maps the observations into reproducing kernel Hilbert space and does not need to be explicitly computed due to the *kernel trick*. According to the kernel trick, we just need to compute the kernel function.
 
+### Using KPCA in R
+
+The ```kpca``` is made available through the ```kernlab``` package. By default, the radial basis function kernel is used for matrix input. It is defined by
+
+\[K (x, y) = \exp \left(- \frac{-||x − t||^2}{2 \sigma^2}\right)\]
+
+where $\sigma$ is the inverse kernel width. 
+
+```{r, message = FALSE}
+library(kernlab) # for kpca function
+# use the default of sigma = 0.1 because it works well
+pca.k <- kpca(as.matrix(data), kpar = list(sigma = 0.1))
+plot(pca.k@eig) # eigenvalues
+# select 20 dimensions for prediction according to eigenvalues
+n.dim.model <- 20
+pc <- pca.k@pcv
+```
+
+Let us plot the data:
+
+```{r, fig.width = 10, fig.height = 10}
+library(ggrepel) # for geom_text_repel
+kpca.df <- data.frame("Label" = df$Distillery, "Region" = df$Region,
+                      "PC1" = pc[,1], "PC2" = pc[,2])
+ggplot(kpca.df, aes(label = Label, x = PC1, y = PC2, color = Region)) + 
+    geom_text_repel()
+```
+
+In terms of the visualization, the results are similar to what we obtained with conventional PCA. The whiskeys from Islay are well-separated and we can see a cluster of Speyside whiskeys, while the Highlands whiskeys are rather spread throughout.
+
+A disdavantage of KPCA is that you need to deal with the hyperparameters of the kernel functions, which should be tuned in accordance with the data. Moreover, KPCA is not as interpretable as PCA because it is not possible to determine how much variance is explained by individual dimensions.
 
 ## t-SNE
 
@@ -159,6 +189,7 @@ t-SNE can be performed in the following way:
 
 ```{r, message = FALSE, fig.width = 10, fig.height = 10}
 library(Rtsne)
+set.seed(1234) # reproducibility
 tsne <- Rtsne(data, dims = 2, perplexity = 5)
 t.df <- as.data.frame(tsne$Y)
 colnames(t.df) <- c("V1", "V2")
@@ -209,6 +240,7 @@ select.k <- function(K, training.data, test.data, labels, test.labels) {
     k.sel <- K[which.max(performance)]
     return(k.sel)
 }
+set.seed(1234) # reproducibility
 samp.train <- sample(nrow(data), nrow(data)*0.50) # 50 % for training
 df.train <- data[samp.train,,]
 # 25% for validation
@@ -224,6 +256,7 @@ Having prepared the evaluation functions and the data, we can transform the data
 # PCA on training data
 # NB: scale is FALSE since all variables are on the same scale
 pca <- prcomp(df.train, retx=TRUE, center = TRUE, scale = FALSE) 
+# find explained variance per PC:
 expl.var <- round(pca$sdev^2/sum(pca$sdev^2)*100)
 var.df <- data.frame("N_dim" = seq_along(expl.var), "Cum_Var" = cumsum(expl.var))
 # cumulative explained variance:
@@ -266,7 +299,7 @@ print(paste0("KNN accuracy for k = ", k.sel, " is: ",
              round(accuracy.knn, 3)))
 ```
 
-So, using $k$-nearest neighbors, PCA does not seem to boost the prediction accuracy for this data set. This is because there are few features to begin with, so the dimensionality reduction does not help much. Moreover, there are few low-variance features in the data set (e.g. ```Tobacco``` or ```Malty```):
+So, using $k$-nearest neighbors, PCA does indeem seem to boost the prediction accuracy for this data set although there are few features to begin with. However, there are some low-variance features in the data set (e.g. ```Tobacco``` or ```Malty```):
 
 ```{r}
 # variances of whiskeys characteristics
@@ -300,6 +333,12 @@ print(paste0("PCA+KNN accuracy for k = ", k.sel.pca, " is: ",
 ```
 
 With an accuracy of `r paste0(round(accuracy.pca.knn, 3)*100, "%")`, we can conclude that, it is indeed worthwhile to group the whiskey regions for which we have fewer samples. 
+
+### KPCA for Prediction
+
+```{r}
+W <- pca.k@rotated # the transformed input matrix
+```
 
 ## Summary
 
