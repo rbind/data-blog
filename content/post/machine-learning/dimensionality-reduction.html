@@ -325,6 +325,7 @@ preds.kpca &lt;- knn(train = Z[samp.train,], test = Z[samp.test,],
                      cl = df$Region[samp.train], k = k.sel.pca)
 # NB: this would overestimate the actual performance
 accuracy &lt;- get.accuracy(preds.kpca, df$Region[samp.test])</code></pre>
+<p>Besides this property, KPCA may not always actually reduce the number of features. This is because the kernel functions actually lead to an increase in the number of parameters. Thus, in some instances, it may not be possible to find a projection with fewer dimensions than initially.</p>
 </div>
 </div>
 <div id="summary" class="section level2">
