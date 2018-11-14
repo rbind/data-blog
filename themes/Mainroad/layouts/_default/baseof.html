@@ -17,6 +17,9 @@
 	{{ with .OutputFormats.Get "rss" -}}
 	{{ printf `<link rel="%s" type="%s" href="%s" title="%s">` .Rel .MediaType.Type .RelPermalink $.Site.Title | safeHTML }}
 	{{ end -}}
+    <link rel="stylesheet" href="{{"css/highlighting-theme.css" | absURL}}" rel="stylesheet" id="theme-stylesheet">
+    <script src="{{ "js/highlight.pack.js" | absURL }}"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
 	<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
     <script src="https://code.jquery.com/jquery-latest.js"> </script>

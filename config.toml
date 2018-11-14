@@ -31,6 +31,12 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   mathjax = true # Enable MathJax
   staticman_api = "https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/comments"
 
+  # options for highlight.js (version, additional languages, and theme)
+  highlightjsVersion = "9.11.0"
+  highlightjsCDN = "//cdn.bootcss.com"
+  highlightjsLang = ["r", "yaml", "tex"]
+  highlightjsTheme = "github"
+
 [Params.sidebar]
   home = "right"   # Configure layout for home page
   list = "right"   # Configure layout for list pages
