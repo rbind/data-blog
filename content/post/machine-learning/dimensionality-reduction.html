@@ -1,14 +1,14 @@
 ---
-title: "Dimensionality reduction techniques"
+title: "Dimensionality Reduction for Visualization and Prediction"
 author: Matthias Döring
-date: '2018-11-13T15:00:00Z'
-description: "TODO"
+date: '2018-11-14T15:00:00Z'
+description: "Dimensionality reductions is primarily used for exploring data and for reducing the feature space in machine learning applications. In this post, I investigate techniques such as PCA to obtain insights from a whiskey data set and show how predictive performance can be improved by reducing the number of features."
 draft: true
 categories:
   - machine-learning
 tags:
     - dimensionality reduction
-thumbnail: "/post/machine-learning/linear_models_cover.png"
+thumbnail: "/post/machine-learning/whiskey-twilight-zone.png"
 
 ---
 
@@ -54,8 +54,7 @@ feat.df &lt;- df[, c(&quot;Distillery&quot;, features)]</code></pre>
 </div>
 <div id="assumptions-about-the-results" class="section level2">
 <h2>Assumptions about the results</h2>
-<p>Before we begin reducing the dimensionality of the data, we should think about what kind of results we would like to obtain. For the whiskey data, we would like that whiskeys with similar properties are close to each other in the reduced space.</p>
-<p>Distilleries that are in proximity to one another should produce whiskeys that exhibit some similaries. To validate this assumptions, we are going to test whether the mean whiskey characteristics differ between distilleries from different regions. So, let us run a MANOVA test:</p>
+<p>Before we begin reducing the dimensionality of the data, we should think about what kind of results we would like to obtain. For the whiskey data, we would expect that whiskeys with similar taste profiles are close to each other in the reduced space. Since whiskeys from distilleries that are in proximity to another use similar distilling techniques and resources, their whiskeys are also often similar. Thus, a reasonable dimensionality reduction should cluster whiskeys from similar regions. To validate this assumption, we are going to test whether the mean expression of whiskey characteristics differ between distilleries from different regions. For this, we will run a MANOVA test:</p>
 <pre class="r"><code>m &lt;- manova(as.matrix(df[, features]) ~ Region, df)
 summary(m)</code></pre>
 <pre><code>##           Df Pillai approx F num Df den Df    Pr(&gt;F)    
@@ -63,18 +62,17 @@ summary(m)</code></pre>
 ## Residuals 80                                            
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>The test statistic seems to be significant, so we can reject the null hypothesis (there is no effect of region on the characteristics).</p>
+<p>The test statistic is significant at the 5% level, so we can reject the null hypothesis (there is no effect of region on the characteristics).</p>
 </div>
 <div id="geographical-locations-of-the-distilleries" class="section level2">
 <h2>Geographical locations of the distilleries</h2>
-<p>Thus, if we plot the distilleries by <code>Latitude</code> and <code>Longitude</code>, this should give us some idea of how a reasonable dimensionality reduction should look like. The scotch whiskey regions are the following:</p>
+<p>Since regionality seems to be an important element, we will explore where the distilleries in the data set are located by ploting their latitude and longitude. The following Scotch whiskey regions exist:</p>
 <div class="figure">
 <img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Scotch_regions.svg" alt="Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from https://commons.wikimedia.org/wiki/File:Scotch_regions.svg)" />
 <p class="caption">Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from <a href="https://commons.wikimedia.org/wiki/File:Scotch_regions.svg" class="uri">https://commons.wikimedia.org/wiki/File:Scotch_regions.svg</a>)</p>
 </div>
-<p>We will replicate this plot with our data set.</p>
-<p>Let us see where the distilleries are located by plotting their latitude and longitude coordinates:</p>
-<pre class="r"><code>library(ggplot2)
+<p>Having transformed the <code>Latitude</code> and <code>Longitude</code> features <a href="/post/other/whiskey-data-annotation/">from UTM coordinates to degrees</a>, we can localize the distilleries:</p>
+<pre class="r"><code>library(ggplot2) # for map_data and ggplot functions
 library(ggrepel) # for geom_text_repel: smart text labels
 uk.map &lt;- map_data (&quot;world&quot;, region = &quot;UK&quot;) 
 scotland.map &lt;- uk.map[uk.map$subregion == &quot;Scotland&quot;,]
@@ -248,13 +246,20 @@ accuracy.knn &lt;- get.accuracy(test.preds, df[samp.test, &quot;Region&quot;])
 print(paste0(&quot;KNN accuracy for k = &quot;, k.sel, &quot; is: &quot;,
              round(accuracy.knn, 3)))</code></pre>
 <pre><code>## [1] &quot;KNN accuracy for k = 7 is: 0.524&quot;</code></pre>
-<p>So, using <span class="math inline">\(k\)</span>-nearest neighbors, PCA indeed boosts the prediction accuracy from 52.4% to 57.1%.</p>
-<p>This means that, given the 12 whiskey characteristics, we can identify the six Scotch regions with an accuracy close to 60%. That is not bad at all. But can we do better if we limit ourselves to fewer regions? We know that some regions are underrepresented. From the PCA analysis, we could regroup the labels in the following way:</p>
+<p>So, using <span class="math inline">\(k\)</span>-nearest neighbors, PCA indeed boosts the prediction accuracy from 52.4% to 57.1%. Why does PCA help for learning from this data set? This is because there are some features that are not very helpful for differentiating the whiskeys. Let us look of the feature variances:</p>
+<pre class="r"><code># variances of whiskeys characteristics
+print(diag(var(data)))</code></pre>
+<pre><code>##      Body Sweetness     Smoky Medicinal   Tobacco     Honey     Spicy 
+## 0.8656635 0.5145007 0.7458276 0.9801642 0.1039672 0.7279070 0.6157319 
+##     Winey     Nutty     Malty    Fruity    Floral 
+## 0.8700410 0.6752394 0.3957592 0.6075239 0.7310534</code></pre>
+<p>For example, <code>Tobacco</code> has a very low variance because most whiskeys do not exhibit this trait (mean value of 0.12.</p>
+<p>Now that we are able to identify the six regions of Scottish whiskey with an accuracy close to 60% by considering 12 whiskey taste characteristics, the question is if we can still do better. We know that it is hard to predict the underrepresented regions correctly. So, can we do better if we limit ourselves to fewer regions? From the PCA analysis, we could regroup the labels in the following way:</p>
 <ul>
 <li>Island whiskeys are grouped with Islay whiskeys</li>
 <li>Lowland/Campbeltown whiskeys are grouped with Highland whiskeys</li>
 </ul>
-<p>In this way, the problem is reduced to three regions: Island/Islay whiskeys, Highland/Lowland/Campbeltown whiskeys, and Speyside whiskeys.</p>
+<p>In this way, the problem is reduced to three regions: Island/Islay whiskeys, Highland/Lowland/Campbeltown whiskeys, and Speyside whiskeys. Let us run the analysis again:</p>
 <pre class="r"><code># regroup labels
 labels &lt;- df$Region
 labels[which(labels == &quot;Islands&quot;)] &lt;- &quot;Islay&quot;
@@ -271,22 +276,23 @@ accuracy.pca.knn &lt;- get.accuracy(test.preds.pca, labels[samp.test])
 print(paste0(&quot;PCA+KNN accuracy for k = &quot;, k.sel.pca, &quot; is: &quot;, 
              round(accuracy.pca.knn, 3)))</code></pre>
 <pre><code>## [1] &quot;PCA+KNN accuracy for k = 13 is: 0.619&quot;</code></pre>
-<p>Apparently this approach did not work too well. That is probably because the whiskeys from the different groups are too different to be merged. Thus, the merged problem is actually harder than before, as evident from the poorer performance.</p>
+<p>With an accuracy of 61.9%, we can conclude that this approach did not work too well. That is probably because the whiskeys from different groups are too dissimilar to be merged.</p>
 </div>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
+<p>TODO</p>
 </div>
-<div id="remaining-questions" class="section level2">
-<h2>Remaining questions</h2>
-<p>I find it interesting that the twodimensional projection of whiskeys has so many large empty areas. This could indicate one of two things:</p>
+<div id="outlook" class="section level2">
+<h2>Outlook</h2>
+<p>I find it interesting that the two-dimensional projection of whiskeys has so many large empty areas. This could indicate one of two things:</p>
 <ol style="list-style-type: decimal">
 <li>There is still a lot of potential for experimenting with new, exciting types of whiskeys</li>
 <li>There are just so many taste combinations that go well.</li>
 </ol>
-<p>I am inclined to go with the second option. Why? In the PCA plot, the lower right is the largest region in which no samples reside. Looking at the whiskeys that come close to this region, we find that those are Macallan on the y-axis and Lagavulin on the x-axis. Macallan is known for its complex taste and Lagavulin is known for its smoky taste. So, a whiskey that comes to lie on the lower right of the 2-dimensional PCA space would have both properties: a complex taste plus a very smoky taste. I would assume that both tastes would be just too much for the palate to handle. For lack of better worlds, I term this unexplored region of whiskey taste, the <em>whiskey twillight zone</em>, as exemplified by this plot:</p>
+<p>I am inclined to go with the second option. Why? In the PCA plot, the lower right is the largest region in which no samples reside. Looking at the whiskeys that come close to this region, we find that those are Macallan on the y-axis and Lagavulin on the x-axis. Macallan is known for its complex taste and Lagavulin is known for its smoky taste. So, a whiskey that comes to lie on the lower right of the 2-dimensional PCA space would have both properties: a complex taste plus a very smoky taste. I would assume that both tastes would be just too much for the palate to handle (i.e. smokiness masks complexity). Thus, this unexplored region of taste can be considered to be <em>the whiskey twilight zone</em>, as exemplified by this plot:</p>
 <div class="figure">
-<img src="https://www.datascienceblog.net/post/machine-learning/whiskeypca.png" alt="Whiskey twillight zone" />
-<p class="caption">Whiskey twillight zone</p>
+<img src="https://www.datascienceblog.net/post/machine-learning/whiskey-twilight-zone.png" alt="Whiskey twilight zone" />
+<p class="caption">Whiskey twilight zone</p>
 </div>
 </div>

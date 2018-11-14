@@ -42,24 +42,27 @@ df &lt;- read.csv(textConnection(f), header=T)</code></pre>
 </div>
 <div id="annotating-the-locations-of-the-distilleries" class="section level2">
 <h2>Annotating the locations of the distilleries</h2>
-<p>Now, we will retrieve the locations of the distilleries:</p>
+<p>A blog post by Koki Ando gives a nice <a href="https://rstudio-pubs-static.s3.amazonaws.com/375481_d2605e8726364d30a5b20c6974710cf5.html">overview of how UTM data can be handled</a>. In the following code snippet, we use the <code>raster</code> and <code>sp</code> packages to create a <code>SpatialPoints</code> object from latitude/longitude coordinates in UTM format. Then, we add UK as a reference point system by specifying <em>+init=epsg:27700&quot;</em> (<a href="https://epsg.io">see epsg.io for other reference coordinates</a>). Finally, we call <code>spTransform</code> with WGS84 (<em>+init=epsg:4326</em>) in order to set the <a href="https://epsg.io/4326">world geodetic system, which is used for GPS</a>.</p>
 <pre class="r"><code># transform UTM coordinates to longitude/latitude in degrees
 geo.df &lt;- df[, c(&quot;Latitude&quot;, &quot;Longitude&quot;)]
 colnames(geo.df) &lt;- c(&quot;lat&quot;, &quot;long&quot;) # switch for plotting
-# REF: https://rstudio-pubs-static.s3.amazonaws.com/375481_d2605e8726364d30a5b20c6974710cf5.html
-# create &#39;SpatialPoints&#39; object
 library(raster)
+# create &#39;SpatialPoints&#39; object
 coordinates(geo.df) &lt;-  ~lat + long
 # add coordinate reference system (CRS) for UK
 proj4string(geo.df) &lt;- CRS(&quot;+init=epsg:27700&quot;)
-# transform again:
+# transform to new coordinate system
 # NB: getting rgdal working on old systems is tough due to libgdal dependency
 library(rgdal)
 geo.df &lt;- spTransform(geo.df, CRS(&quot;+init=epsg:4326&quot;))
 map.df &lt;- data.frame(&quot;Distillery&quot; = df[, &quot;Distillery&quot;], geo.df)
 df &lt;- cbind(df, map.df[, c(&quot;lat&quot;, &quot;long&quot;)])</code></pre>
 </div>
-<div id="annotation-of-regions" class="section level2">
-<h2>Annotation of regions</h2>
-<p>To annotate the regions in which the distilleries are situaded, I relied on a <a href="https://en.wikipedia.org/wiki/List_of_whisky_distilleries_in_Scotland">list of Scottisch distilleries available at Wikipedia</a>.</p>
+<div id="other-annotations" class="section level2">
+<h2>Other annotations</h2>
+<p>To annotate the regions in which the distilleries are situated, I manually assigned regions by relying on a <a href="https://en.wikipedia.org/wiki/List_of_whisky_distilleries_in_Scotland">list of Scottisch distilleries available at Wikipedia</a>. I also fixed some spelling errors in the distillery names.</p>
+</div>
+<div id="the-improved-whiskey-data-set" class="section level2">
+<h2>The improved whiskey data set</h2>
+<p>The improved whiskey data set is <a href="https://www.datascienceblog.net/data-sets/whiskies.csv">available here</a>.</p>
 </div>
