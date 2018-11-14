@@ -1,58 +1,36 @@
 ---
 title: "Dimensionality Reduction for Visualization and Prediction"
 author: Matthias Döring
-date: '2018-11-14T15:00:00Z'
-description: "Dimensionality reductions is primarily used for exploring data and for reducing the feature space in machine learning applications. In this post, I investigate techniques such as PCA to obtain insights from a whiskey data set and show how predictive performance can be improved by reducing the number of features."
-draft: true
+date: '2018-11-14'
+description: "Dimensionality reductions is primarily used for exploring data and for reducing the feature space in machine learning applications. In this post, I investigate techniques such as PCA to obtain insights from a whiskey data set and show how PCA can be used to improve supervised approaches. Finally, I introduce the notion of the whiskey twilight zone."
 categories:
   - machine-learning
 tags:
-    - dimensionality reduction
+    - unsupervised learning
+    - supervised learning
 thumbnail: "/post/machine-learning/whiskey-twilight-zone.png"
 
 ---
 
 
 
-<p>Dimensionality reduction has two primary use cases: data exploration and machine learning. It is useful for data exploration because dimensionality reduction to few dimensions (e.g. 2 or 3 dimensions) allows for visualizing the samples. Such a visualization can then be used to obtain insights from the data (e.g. detect clusters and identify outliers). For machine learning, dimensionality reduction is useful for reducing the feature space, which can lead to models that generalize better.</p>
+<p>Dimensionality reduction has two primary use cases: data exploration and machine learning. It is useful for data exploration because dimensionality reduction to few dimensions (e.g. 2 or 3 dimensions) allows for visualizing the samples. Such a visualization can then be used to obtain insights from the data (e.g. detect clusters and identify outliers). For machine learning, dimensionality reduction is useful because oftentimes models generalize better when fewer features are used during the fitting process.</p>
 <p>In this post, we will investigate three dimensionality reduction techniques:</p>
 <ul>
-<li>Principal components analysis (PCA): the most popular dimensionality reduction method</li>
-<li>Kernel PCA (KPCA): a variant of PCA that allows for nonlinearity</li>
-<li>t-distributed stochastic neighbor embedding(t-SNE): a recently developed nonlinear dimensionality reduction technique</li>
+<li><strong>Principal components analysis (PCA):</strong> the most popular dimensionality reduction method</li>
+<li><strong>Kernel PCA:</strong> a variant of PCA that allows for nonlinearity</li>
+<li><strong>t-distributed stochastic neighbor embedding:</strong> a recently developed nonlinear dimensionality reduction technique</li>
 </ul>
-<p>The difference between these approaches is that PCA outputs a rotation matrix, which can be applied on any other matrix in order to transform the data. Neighborhood-based techniques such as t-SNE, on the other hand, do not enable the transformation of new data.</p>
+<p>A key difference between these approaches is that PCA outputs a rotation matrix, which can be applied on any other matrix in order to transform the data. Neighborhood-based techniques such as t-distributed stochastic neighbor embedding (t-SNE), on the other hand, cannot be used for this purpose.</p>
 <div id="loading-a-whiskey-data-set" class="section level2">
 <h2>Loading a whiskey data set</h2>
-<p>I have previously used a data set describing the characteristics of whiskeys to <a href="/post/data-visualization/radar-plot/">draw radar plots</a>. Here, we will the whiskey data set to identify how different dimensionality reduction techniques perform on this data set.</p>
+<p>I have <a href="/post/data-visualization/radar-plot/">previously described a data set on whiskeys</a>. We can load the data set in the following way:</p>
 <pre class="r"><code>library(RCurl)
 # load data as character
 f &lt;- getURL(&#39;https://www.datascienceblog.net/data-sets/whiskies.csv&#39;)
 # read table from text connection
 df &lt;- read.csv(textConnection(f), header=T)
-head(df)</code></pre>
-<pre><code>##   X RowID Distillery    Region Body Sweetness Smoky Medicinal Tobacco
-## 1 1     1  Aberfeldy Highlands    2         2     2         0       0
-## 2 2     2   Aberlour  Speyside    3         3     1         0       0
-## 3 3     3     AnCnoc Highlands    1         3     2         0       0
-## 4 4     4     Ardbeg     Islay    4         1     4         4       0
-## 5 5     5    Ardmore Highlands    2         2     2         0       0
-## 6 6     6      Arran   Islands    2         3     1         1       0
-##   Honey Spicy Winey Nutty Malty Fruity Floral Postcode Latitude Longitude
-## 1     2     1     2     2     2      2      2  PH152EB   286580    749680
-## 2     4     3     2     2     3      3      2  AB389PJ   326340    842570
-## 3     2     0     0     2     2      3      2   AB55LI   352960    839320
-## 4     0     2     0     1     2      1      0  PA427EB   141560    646220
-## 5     1     1     1     2     3      1      1  AB544NH   355350    829140
-## 6     1     1     1     0     1      1      2  KA278HJ   194050    649950
-##         lat     long
-## 1 -3.850199 56.62519
-## 2 -3.229644 57.46739
-## 3 -2.785295 57.44175
-## 4 -6.108503 55.64061
-## 5 -2.743629 57.35056
-## 6 -5.278895 55.69915</code></pre>
-<pre class="r"><code># select characterics of the whiskeys
+# select characterics of the whiskeys
 features &lt;- c(&quot;Body&quot;, &quot;Sweetness&quot;, &quot;Smoky&quot;,
             &quot;Medicinal&quot;, &quot;Tobacco&quot;, &quot;Honey&quot;,
             &quot;Spicy&quot;, &quot;Winey&quot;, &quot;Nutty&quot;,
@@ -61,9 +39,9 @@ feat.df &lt;- df[, c(&quot;Distillery&quot;, features)]</code></pre>
 </div>
 <div id="assumptions-about-the-results" class="section level2">
 <h2>Assumptions about the results</h2>
-<p>Before we begin reducing the dimensionality of the data, we should think about what kind of results we would like to obtain. For the whiskey data, we would expect that whiskeys with similar taste profiles are close to each other in the reduced space.</p>
-<p>Since whiskeys from distilleries that are in proximity to another use similar distilling techniques and resources, their whiskeys are also often similar. Thus, a reasonable dimensionality reduction should cluster whiskeys from similar regions.</p>
-<p>To validate this assumption, we are going to test whether the mean expression of whiskey characteristics differ between distilleries from different regions. For this, we will run a MANOVA test:</p>
+<p>Before we begin reducing the dimensionality of the data, we should think about the data. We would expect that whiskeys with similar taste profiles are close to each other in the reduced space.</p>
+<p>Since whiskeys from distilleries that are in proximity to another use similar distilling techniques and resources, their whiskeys also share similarities.<br />
+To validate this assumption, we are going to test whether the mean expression of whiskey characteristics differ between distilleries from different regions. For this, we will run a MANOVA test:</p>
 <pre class="r"><code>m &lt;- manova(as.matrix(df[, features]) ~ Region, df)
 summary(m)</code></pre>
 <pre><code>##           Df Pillai approx F num Df den Df    Pr(&gt;F)    
@@ -71,16 +49,16 @@ summary(m)</code></pre>
 ## Residuals 80                                            
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>The test statistic is significant at the 5% level, so we can reject the null hypothesis (there is no effect of region on the characteristics).</p>
+<p>The test statistic is significant at the 5% level, so we can reject the null hypothesis (there is no effect of region on the characteristics). This means that an appropriate dimensionality reduction should preserve the geographical proximity of the distilleries to some extent.</p>
 </div>
 <div id="geographical-locations-of-the-distilleries" class="section level2">
 <h2>Geographical locations of the distilleries</h2>
-<p>Since regionality seems to be an important element, we will explore where the distilleries in the data set are located by ploting their latitude and longitude. The following Scotch whiskey regions exist:</p>
+<p>Since regionality plays an important role for whiskeys, we will explore where the distilleries in the data set are located by plotting their latitude and longitude. The following Scotch whiskey regions exist:</p>
 <div class="figure">
 <img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Scotch_regions.svg" alt="Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from https://commons.wikimedia.org/wiki/File:Scotch_regions.svg)" />
 <p class="caption">Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from <a href="https://commons.wikimedia.org/wiki/File:Scotch_regions.svg" class="uri">https://commons.wikimedia.org/wiki/File:Scotch_regions.svg</a>)</p>
 </div>
-<p>Having transformed the <code>Latitude</code> and <code>Longitude</code> features <a href="/post/other/whiskey-data-annotation/">from UTM coordinates to degrees</a>, we can localize the distilleries:</p>
+<p>Fortunately, we have already mapped <code>Latitude</code> and <code>Longitude</code> <a href="/post/other/whiskey-data-annotation/">from UTM coordinates to degrees before</a>. Therefore, we can now directly plot the locations of the distilleries using the <code>lat</code> and <code>long</code> variables:</p>
 <pre class="r"><code>library(ggplot2) # for map_data and ggplot functions
 library(ggrepel) # for geom_text_repel: smart text labels
 uk.map &lt;- map_data (&quot;world&quot;, region = &quot;UK&quot;) 
@@ -104,29 +82,32 @@ p</code></pre>
 <h2>PCA</h2>
 <p>PCA computes a rotation matrix <span class="math inline">\(W \in \mathbb{R}^{p \times p}\)</span> from the matrix of features <span class="math inline">\(X \in \mathbb{R}^{N \times p}\)</span>. <span class="math inline">\(W\)</span> can be understood as a mapping function that transforms the observations in <span class="math inline">\(X\)</span> to a rotated space. The coordinates of observations in <span class="math inline">\(X\)</span> are transformed to their new form, <span class="math inline">\(Z\)</span>, via</p>
 <p><span class="math display">\[Z = XW\,.\]</span></p>
-<p>The rotation matrix <span class="math inline">\(W\)</span> is constructed through orthogonal linear transformations. Each of these transformations is performed such that it maximizes the variance in the unexplained variance in the data, resulting in individual <em>principal components</em>, which provide a new coordinate system.</p>
-<p>One of the reasons why PCA is so popular is that it is a very interpretable method. Each principal component (PC) is well-defined as we know that it is a dimension orthogonal to the other dimensions. Since PCA maximizes the variance with each PC, we can obtain the variance that is explained by each PC in order to select an appropriate number of dimensions.</p>
-<div id="results-of-pca" class="section level3">
-<h3>Results of PCA</h3>
-<p>Using PCA, I would assign three clusters to the data:</p>
-<pre class="r"><code>library(cluster)
-library(ggfortify)
+<p>The rotation matrix <span class="math inline">\(W\)</span> is constructed through orthogonal linear transformations. Each of these transformations is performed in order to maximize the variance in the data that has not been explained yet. This procedure leads to a new coordinate system in terms of <em>principal components</em>.</p>
+<p>One of the reasons why PCA is so popular is that it is a very interpretable method. Each principal component (PC) is well-defined as we know that it is orthogonal to the other dimensions. Moreover, we can obtain the variance that is explained by each PC in order to select an appropriate number of dimensions.</p>
+<div id="visualizing-the-whiskey-data-set-using-pca" class="section level3">
+<h3>Visualizing the whiskey data set using PCA</h3>
+<p>PCA is normally performed using the <code>prcomp</code> function. Here, we use <code>autoplot</code> instead because we are primarily interested in the visualization. In addition to PCA, we call the <code>pam</code> function, which performs partitioning around medoids, which is a more robust version of <span class="math inline">\(k\)</span>-means. In the first plot we create, we will draw the loadings of PCA, which are defined as</p>
+<p><span class="math display">\[ L = v \sqrt{\lambda}\]</span></p>
+<p>where <span class="math inline">\(L\)</span> are the loadings, <span class="math inline">\(v\)</span> are the eigenvectors, and <span class="math inline">\(\lambda\)</span> are the eigenvalues. The loadings indicate the directions of variance from the original features:</p>
+<pre class="r"><code>library(ggfortify) # for autplot support for the clustering
+library(cluster) # for pam
 data &lt;- df[,features]
 rownames(data) &lt;- paste0(df$Distillery, &quot; (&quot;, df$Region, &quot;)&quot;)
 cl &lt;- pam(data, 3)
 # learn about the interpretation of the principal componenets:
 autoplot(cl, frame = TRUE, frame.type = &#39;norm&#39;, loadings.label = TRUE,
          loadings.colour = &quot;black&quot;, loadings.label.colour = &quot;black&quot;)</code></pre>
-<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-4-1.png" width="1536" /></p>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>In the second plot, we will draw the labels of the distilleries such that we can interpret the clustering in more detail.</p>
 <pre class="r"><code>autoplot(cl, frame = TRUE, frame.type = &#39;norm&#39;, label.repel = TRUE,
          label = TRUE, label.colour = &quot;black&quot;, shape = FALSE)</code></pre>
-<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-4-2.png" width="1536" /></p>
-<p>The principal components seem to reflect the following characteristics:</p>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-5-1.png" width="1536" /></p>
+<p>Taken together, the principal components seem to reflect the following characteristics:</p>
 <ul>
-<li>PC1 seems to indicate the <em>intensity of the taste</em>: i.e. a smoky, medicinal taste (e.g. Laphroaig or Lagavulin) vs a smoother experience (e.g. Auchentoshan or Abelour)</li>
-<li>PC2 seems to indicate the <em>complexity of the taste</em>: i.e. an extremely balanced taste profile (e.g. Glenfiddich or Auchentoshan) vs a more characteristic taste profile (e.g. Glendronach or Macallan)</li>
+<li><strong>PC1 indicates the <em>intensity of the taste</em>:</strong> i.e. a smoky, medicinal taste (e.g. Laphroaig or Lagavulin) vs a smooth taste (e.g. Auchentoshan or Aberlour)</li>
+<li><strong>PC2 indicates the <em>complexity of the taste</em>:</strong> i.e. a well-balanced taste profile (e.g. Glenfiddich or Auchentoshan) vs a more characteristic taste profile (e.g. Glendronach or Macallan)</li>
 </ul>
-<p>Let us verify whether the clusters indeed overrepresent certain regions:</p>
+<p>Let us verify whether the clusters actually overrepresent certain regions:</p>
 <pre class="r"><code>tabs &lt;- vector(&quot;list&quot;, 3)
 for (i in seq(3)) {
     idx &lt;- which(cl$clustering == i)
@@ -139,52 +120,74 @@ print(cluster.df)</code></pre>
 ## 1       1           2        17       2     2        0       19
 ## 2       2           0         8       2     1        3       22
 ## 3       3           0         2       2     4        0        0</code></pre>
-<p>Indeed, certain regions are overrepresented in the three clusters. In summary, the interpretation of the clusters is as follows:</p>
+<p>Indeed, each cluster exhibits one region that is overrepresented. A reasonable interpretation of the clusters is as follows:</p>
 <ul>
 <li><strong>Cluster 1:</strong> <em>Complex whiskeys</em>, mostly from the Highlands/Speyside</li>
 <li><strong>Cluster 2:</strong> <em>Well-balanced whiskeys</em>, mostly from Speyside and Highlands</li>
 <li><strong>Cluster 3:</strong> <em>Smoky whiskeys</em>, mainly from Islay</li>
 </ul>
-<p>There are some interesting observations to make from the visualization:</p>
+<p>There are two interesting observations to be made from the visualization:</p>
 <ul>
 <li>Oban and Clynelish are the only Highlands distilleries that produce tastes resembling those from distilleries on Islay.</li>
-<li>Highland and Speyside whiskeys differ mainly in one dimension. At one extreme are smooth, well-balaned whiskeys such as Glenfiddich. At the other extreme, are whiskeys with a more characteristic tase profile such as Macallan.</li>
+<li>Highland and Speyside whiskeys differ mainly in one dimension. At the one extreme are the smooth, well-balanced whiskeys such as Glenfiddich. At the other extreme, are the whiskeys with a more characteristic taste such as Macallan.</li>
 </ul>
+<p>This wraps up our investigation of PCA for visualization. We will investigate the use of PCA for prediction at the end of this post.</p>
 </div>
 </div>
 <div id="kernel-pca" class="section level2">
 <h2>Kernel PCA</h2>
-<p>KPCA is an extension of PCA that makes use of kernel functions, which are the most prominent characteristc of support vector machines. By mapping the data into a reproducing kernel Hilbert space, it is possible to separate data even if they are not linearly separable.</p>
+<p>Kernel PCA (KPCA) is an extension of PCA that makes use of kernel functions, which are well known from support vector machines. By mapping the data into a reproducing kernel Hilbert space, it is possible to separate data even if they are not linearly separable.</p>
 <p>In KPCA, observations are transformed to a kernel matrix via</p>
 <p><span class="math display">\[K = k(x,y) = \phi(x)^T \phi(y)\]</span></p>
-<p>where <span class="math inline">\(k(x,y)\)</span> is the kernel function for observations <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> and <span class="math inline">\(\phi\)</span> is the corresponding function that maps the observations into reproducing kernel Hilbert space and does not need to be explicitly computed due to the <em>kernel trick</em>. According to the kernel trick, we just need to compute the kernel function.</p>
+<p>where <span class="math inline">\(k(x,y)\)</span> is the kernel function for observations <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>. The function <span class="math inline">\(\phi\)</span> maps the observations into reproducing kernel Hilbert space. This function does not need to be explicitly computed due to the <em>kernel trick</em>, according to which only the kernel function needs to be computed.</p>
 <div id="using-kpca-in-r" class="section level3">
 <h3>Using KPCA in R</h3>
-<p>The <code>kpca</code> is made available through the <code>kernlab</code> package. By default, the radial basis function kernel is used for matrix input. It is defined by</p>
-<p><span class="math display">\[K (x, y) = \exp \left(- \frac{-||x − t||^2}{2 \sigma^2}\right)\]</span></p>
-<p>where <span class="math inline">\(\sigma\)</span> is the inverse kernel width.</p>
+<p>To perform KPCA, we use the <code>kpca</code> function from the <code>kernlab</code> package. By default, <code>kpca</code> uses a radial basis function (RBF) as a kernel when a matrix is provided although other kernel functions are available as well. The RBF kernel that is used by kernlab is defined as</p>
+<p><span class="math display">\[K (x, y) = \exp \left(-\sigma -||x − y||^2 \right)\]</span></p>
+<p>where <span class="math inline">\(\sigma\)</span> is the inverse kernel width. Using this kernel, the dimensionality reduction can be done as follows:</p>
 <pre class="r"><code>library(kernlab) # for kpca function
 # use the default of sigma = 0.1 because it works well
 pca.k &lt;- kpca(as.matrix(data), kpar = list(sigma = 0.1))
 plot(pca.k@eig) # eigenvalues</code></pre>
-<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <pre class="r"><code># select 20 dimensions for prediction according to eigenvalues
 n.dim.model &lt;- 20
+# retrieve PCs
 pc &lt;- pca.k@pcv</code></pre>
-<p>Let us plot the data:</p>
+<p>Having retrieved the new dimensions, we can now visualize the data in the transformed space:</p>
 <pre class="r"><code>library(ggrepel) # for geom_text_repel
 kpca.df &lt;- data.frame(&quot;Label&quot; = df$Distillery, &quot;Region&quot; = df$Region,
                       &quot;PC1&quot; = pc[,1], &quot;PC2&quot; = pc[,2])
 ggplot(kpca.df, aes(label = Label, x = PC1, y = PC2, color = Region)) + 
     geom_text_repel()</code></pre>
-<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
-<p>In terms of the visualization, the results are similar to what we obtained with conventional PCA. The whiskeys from Islay are well-separated and we can see a cluster of Speyside whiskeys, while the Highlands whiskeys are rather spread throughout.</p>
-<p>A disdavantage of KPCA is that you need to deal with the hyperparameters of the kernel functions, which should be tuned in accordance with the data. Moreover, KPCA is not as interpretable as PCA because it is not possible to determine how much variance is explained by individual dimensions.</p>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
+<p>In terms of the visualization, the results are a bit coarser than what we have obtained with conventional PCR. Still, the whiskeys from Islay are well-separated and we can see a cluster of Speyside whiskeys, while the Highlands whiskeys are highly spread throughout.</p>
+<p>A disadvantage of KPCA is that you need to deal with the hyperparameters of the kernel functions: these need to be tuned to the data. Moreover, KPCA is not as interpretable as PCA because it is not possible to determine how much variance is explained by individual dimensions.</p>
 </div>
 </div>
 <div id="t-sne" class="section level2">
 <h2>t-SNE</h2>
-<p>t-SNE can be performed in the following way:</p>
+<p>t-SNE was introduced in 2008. Since then it has established itself as a very popular method for visualizing data.
+t-SNE performs two algorithmic steps. First, a probability distribution <span class="math inline">\(P\)</span> over pairs of samples is constructed. This distribution assigns high probabilities of selection to similar pairs and low probabilities to dissimilar pairs.</p>
+<p>The <span class="math inline">\(P\)</span> distribution is constructed in the following way. Given two feature vectors <span class="math inline">\(x_i\)</span> and <span class="math inline">\(x_j\)</span>, the probability of <span class="math inline">\(x_j\)</span> given <span class="math inline">\(x_i\)</span> is defined by</p>
+<p><span class="math display">\[p_{j\mid i}={\frac {\exp(-\lVert \mathbf {x} _{i}-\mathbf {x} _{j}\rVert ^{2}/2\sigma _{i}^{2})}{\sum _{k\neq i}\exp(-\lVert \mathbf {x} _{i}-\mathbf {x} _{k}\rVert ^{2}/2\sigma _{i}^{2})}}\]</span></p>
+<p>such that the probability of selecting the pair <span class="math inline">\(x_i\)</span>, <span class="math inline">\(x_j\)</span> is</p>
+<p><span class="math display">\[p_{ij}={\frac{p_{j\mid i} + p_{i\mid j}}{2N}}\,.\]</span></p>
+<p>The probabilities for <span class="math inline">\(i = j\)</span> are set to <span class="math inline">\(p_{ij} = 0\)</span>.</p>
+<p>The bandwidth of the Gaussian kernel <span class="math inline">\(\sigma\)</span> is set such that the perplexity of the conditional distribution assumes a predefined value.
+Here, <em>perplexity</em> indicates how well a probability distribution predicts a sample. You can think of perplexity as a measure of surprise. If a model is not appropriate for a test sample, it will be perplexed (it does not fit the sample), while a model that fits well will have low perplexity. To reach the target perplexity, the bandwidth <span class="math inline">\(\sigma_i\)</span> is adjusted to the density of the data.</p>
+<p>To construct a <span class="math inline">\(d\)</span>-dimensional map <span class="math inline">\(y_i, \ldots, y_N\)</span> where <span class="math inline">\(y_i \in \mathbb{R}^d\)</span>, the second phase of the algorithm defines the second distribution <span class="math inline">\(Q\)</span> through similarities <span class="math inline">\(q_{ij}\)</span> between two points <span class="math inline">\(y_i\)</span>, <span class="math inline">\(y_j\)</span> in the map:</p>
+<p><span class="math display">\[q_{ij}={\frac {(1+\lVert \mathbf {y} _{i}-\mathbf {y} _{j}\rVert ^{2})^{-1}}{\sum _{k\neq l}(1+\lVert \mathbf {y} _{k}-\mathbf {y} _{l}\rVert ^{2})^{-1}}}\,.\]</span></p>
+<p>The <span class="math inline">\(q_{ij}\)</span> follow Student’s t-distribution. Again, <span class="math inline">\(q_{ij} = 0\)</span> for <span class="math inline">\(i = j\)</span>.</p>
+<p>To determine the <span class="math inline">\(y_i\)</span>, the Kullback Leibler divergence between the distributions <span class="math inline">\(Q\)</span> (<span class="math inline">\(y\)</span> similarities) and <span class="math inline">\(P\)</span> (<span class="math inline">\(x\)</span> similarities) is minimized:</p>
+<p><span class="math display">\[KL(P||Q)=\sum _{i\neq j}p_{ij}\log {\frac {p_{ij}}{q_{ij}}}\]</span></p>
+<div id="selecting-a-perplexity" class="section level3">
+<h3>Selecting a perplexity</h3>
+<p>In t-SNE, perplexity balances local and global aspects of the data. It can be interpreted as the number of close neighbors associated with each point. The suggested range for perplexity is 5 to 50. Since t-SNE is probabilistic and also has the perplexity parameter, it is a very flexible method. However, <a href="https://distill.pub/2016/misread-tsne/">this may make one a bit suspicious about the results</a>. Note that t-SNE is not suitable for settings such as supervised learning because the resulting dimensions lack interpretability.</p>
+</div>
+<div id="visualizing-data-using-t-sne" class="section level3">
+<h3>Visualizing data using t-SNE</h3>
+<p>Using R, t-SNE can be performed by loading the <code>Rtsne</code> function from the package with the same name. Here, we reduce the dimensionality of the whiskey data set to two dimensions:</p>
 <pre class="r"><code>library(Rtsne)
 set.seed(1234) # reproducibility
 tsne &lt;- Rtsne(data, dims = 2, perplexity = 5)
@@ -193,25 +196,27 @@ colnames(t.df) &lt;- c(&quot;V1&quot;, &quot;V2&quot;)
 t.df &lt;- cbind(t.df, Cluster = factor(cl$clustering))
 t.df$Distillery &lt;- rownames(t.df)
 ggplot(t.df, aes(x = V1, y = V2, color = Cluster, label = Distillery)) +
-    geom_point() + geom_text()</code></pre>
-<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
-<p>The result is a bit more clearer with t-SNE than with PCA and the two dimensions have slightly different interpretations than with PCA:</p>
+    geom_text_repel()</code></pre>
+<p><img src="/post/machine-learning/dimensionality-reduction_files/figure-html/unnamed-chunk-9-1.png" width="960" /></p>
+<p>The result of the dimensionality reduction obtained with t-SNE is impressive. The separation of the clusters is even clearer than with PCA, particularly for clusters 1 and 2.</p>
+<p>Interpretation, however, is a bit more tedious with t-SNE. Using PCA, we made use of the loadings to gain insights about the principal components. For t-SNE dimensions, we have to do the interpretation manually:</p>
 <ul>
-<li>V1 seems to indicate how balanced/intense the taste is. The outliers here are the smoky Islay whiskeys on the left (e.g. Lagavulin) as well as some of the richer Highland whiskeys on the right (e.g. Macallan). The whiskeys in the middle such as Glenfiddich have a very balanced taste profile.</li>
-<li>V2: I cannot figure that out.</li>
+<li>V1 indicates taste complexity. The outliers here are the smoky Islay whiskeys on the right hand side (e.g. Lagavulin) and the complex Highland whiskeys on the left (e.g. Macallan).</li>
+<li>V2 indicates smokiness/medicinal taste. Again, the whiskeys from Islay are the the smoky extreme, while some Highlands/Speyside whiskeys (e.g. Tullibardine or Old Fettercairne) are the other extreme.</li>
 </ul>
 </div>
-<div id="using-pca-for-machine-learning" class="section level2">
-<h2>Using PCA for machine learning</h2>
-<p>When validating a machine learning that is fitted to data that has been transformed using PCA, it is crucial that PCA is done independently for the training and test data sets. Why? If PCA were performed on the whole data set, the orthogonal projection obtained via PCA would be influenced by the test data. Thus, when testing the performance of the model on the test data, the performance of the model would be overestimated since the projection is tuned to the space in which the test samples reside. Thus, the following approach needs to be followed:</p>
+</div>
+<div id="using-pca-for-supervised-learning" class="section level2">
+<h2>Using PCA for supervised learning</h2>
+<p>It is crucial that PCA is done independently for the training and test data sets. Why? If PCA were performed on the whole data set, the orthogonal projection obtained via PCA would be influenced by the test data. Thus, when testing the performance of the model on the test data, the performance of the model would be overestimated since the projection is tuned to the space in which the test samples reside. Thus, the following approach needs to be followed:</p>
 <ol style="list-style-type: decimal">
 <li>Perform PCA on the test data set and train the model on the transformed data.</li>
 <li>Apply the learned PCA transformation from the training data on the test data set and evaluate the performance of the model on the transformed data.</li>
 </ol>
-<p>To exemplify the workflow, let us predict the region that a whiskey originates from given its taste profile. For this purpose, we will use the <span class="math inline">\(k\)</span>-nearest neighbor model because we the few features we have (p = 12) will be further reduced by PCA. Moreover, the feature space is small because all variables are in <span class="math inline">\([0,4]\)</span>. Since we have to optimize the value of <span class="math inline">\(k\)</span>, we also set aside a validation set for determining this parameter.</p>
+<p>To exemplify the workflow, let us <strong>predict the region that a whiskey originates from given its taste profile</strong>. For this purpose, we will use the <span class="math inline">\(k\)</span>-nearest neighbor model because the few features we have (p = 12) will be further reduced by PCA. Moreover, the feature space is small because all variables are in <span class="math inline">\([0,4]\)</span>. Since we have to optimize <span class="math inline">\(k\)</span>, we also set aside a validation set for determining this parameter.</p>
 <div id="obtaining-the-pca-transformation" class="section level3">
 <h3>Obtaining the PCA transformation</h3>
-<p>First, we write some funtions for validating the performance of the prediction. We will simply use the accuracy here, although another performance measure may be more appropriate because it is likely that the regions for which few samples are available are confused more often. Moreover, we assign 50% of the observations to the training set, 25% for the validation set (for tuning <span class="math inline">\(k\)</span>), and 25% for testing the performance of the selected model.</p>
+<p>First, we write some functions for validating the performance of the prediction. We will simply use the accuracy here, although another performance measure may be more appropriate because it is likely that the regions for which few samples are available are confused more often. Moreover, we assign 50% of the observations to the training set, 25% to the validation set (for tuning <span class="math inline">\(k\)</span>), and 25% to the testing set (for reporting the performance).</p>
 <pre class="r"><code># split data into 3 parts: training, validation, and testing
 get.accuracy &lt;- function(preds, labels) {
     correct.idx &lt;- which(preds == labels)
@@ -219,6 +224,7 @@ get.accuracy &lt;- function(preds, labels) {
     return(accuracy)
 }
 select.k &lt;- function(K, training.data, test.data, labels, test.labels) {
+    # report best performing value of k
     performance &lt;- vector(&quot;list&quot;, length(K))
     for (i in seq_along(K)) {
         k &lt;- K[i]
@@ -242,26 +248,27 @@ samp.test &lt;- sample(setdiff(seq(nrow(data)), samp.train), length(setdiff(seq(
 df.test &lt;- data[samp.test,]
 samp.val &lt;- setdiff(seq_len(nrow(data)), c(samp.train, samp.test))
 df.val &lt;- data[samp.val, ]</code></pre>
-<p>Having prepared the evaluation functions and the data, we can transform the data using PCA. Note that the PCA is only run on the training data and not on the other data sets. Rather, we use the <code>predict.princomp</code> function to apply the rotation matrix obtained from the training data onto the other data sets. Note that the name of this function is misleading because it does not really predict anything.</p>
+<p>In the following code, we will perform PCA on the training data and study the explained variance to select a suitable number of dimensions</p>
 <pre class="r"><code># PCA on training data
 # NB: scale is FALSE since all variables are on the same scale
 pca &lt;- prcomp(df.train, retx=TRUE, center = TRUE, scale = FALSE) 
 # find explained variance per PC:
 expl.var &lt;- round(pca$sdev^2/sum(pca$sdev^2)*100)
-var.df &lt;- data.frame(&quot;N_dim&quot; = seq_along(expl.var), &quot;Cum_Var&quot; = cumsum(expl.var))
+var.df &lt;- data.frame(&quot;N_dim&quot; = seq_along(expl.var), 
+                     &quot;Cum_Var&quot; = cumsum(expl.var))
 # cumulative explained variance:
 print(t(var.df))</code></pre>
 <pre><code>##         [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12]
 ## N_dim      1    2    3    4    5    6    7    8    9    10    11    12
 ## Cum_Var   22   41   52   63   72   79   85   90   94    97    99   100</code></pre>
-<pre class="r"><code># select 3 dimensions (&gt; 50% variance is sufficient)
-n.dims &lt;- 3
+<p>Since a sufficient percentage of the variance is explained with 3 dimensions, we will go with that value to set up training, test, and validation data sets. Here, we use the <code>predict.princomp</code> function to apply the rotation matrix obtained from the training data onto the other data sets. Note that the name of this function is misleading because it does not really predict anything.</p>
+<pre class="r"><code>n.dims &lt;- 3 # use 3 PCs as new features
 # transform all data using PCA projection from training data
 # NB: predict.princomp(pca, newdata) &lt;=&gt; as.matrix(newdata) %*% pca$rotation
 df.train.p &lt;- predict(pca, newdata = df.train)[, 1:n.dims]
 df.val.p &lt;- predict(pca, newdata = df.val)[, 1:n.dims]
 df.test.p &lt;- predict(pca, newdata = df.test)[, 1:n.dims]</code></pre>
-<p>Now that we have transformed the training, validation, and test sets into PCA space, we can use <span class="math inline">\(k\)</span>-nearest neighbors. Note that this prediction scenario is challenging because some regions such as Islands and Lowlands are underrepresented. If we would select <span class="math inline">\(k\)</span> with a very large value (e.g. 30), then most samples would be assigned to the overrepresented regions. Since we are using accuracy as a performance measure, such a classifier would unfortunately actually perform well. Thus, we conservatively limit the range of <span class="math inline">\(k\)</span> in order to prevent this from happening.</p>
+<p>Now that we have transformed the training, validation, and test sets into PCA space, we can use <span class="math inline">\(k\)</span>-nearest neighbors. Note that this prediction scenario is challenging because some regions such as Islands and Lowlands are underrepresented. If we would select <span class="math inline">\(k\)</span> with a very large value (e.g. k = 30), then most samples would be assigned to the overrepresented regions. Since we are using accuracy as a performance measure, such a classifier may actually perform well. Thus, we conservatively limit the range of <span class="math inline">\(k\)</span> in order to avoid choosing such a model.</p>
 <pre class="r"><code># train k-nearest neighbor models to find ideal value of k
 library(class) # for knn classifier
 K &lt;- 3:10 # conservative number of nearest neighbors to consider 
@@ -284,14 +291,14 @@ accuracy.knn &lt;- get.accuracy(test.preds, df[samp.test, &quot;Region&quot;])
 print(paste0(&quot;KNN accuracy for k = &quot;, k.sel, &quot; is: &quot;,
              round(accuracy.knn, 3)))</code></pre>
 <pre><code>## [1] &quot;KNN accuracy for k = 7 is: 0.524&quot;</code></pre>
-<p>So, using <span class="math inline">\(k\)</span>-nearest neighbors, PCA does indeem seem to boost the prediction accuracy for this data set although there are few features to begin with. However, there are some low-variance features in the data set (e.g. <code>Tobacco</code> or <code>Malty</code>):</p>
+<p>So, using <span class="math inline">\(k\)</span>-nearest neighbors, PCA does indeed seem to boost the prediction accuracy for this data set although there are few features to begin with. However, there are some low-variance features in the data set (e.g. <code>Tobacco</code> or <code>Malty</code>):</p>
 <pre class="r"><code># variances of whiskeys characteristics
 print(diag(var(data)))</code></pre>
 <pre><code>##      Body Sweetness     Smoky Medicinal   Tobacco     Honey     Spicy 
 ## 0.8656635 0.5145007 0.7458276 0.9801642 0.1039672 0.7279070 0.6157319 
 ##     Winey     Nutty     Malty    Fruity    Floral 
 ## 0.8700410 0.6752394 0.3957592 0.6075239 0.7310534</code></pre>
-<p>Now that we are able to identify the six regions of Scottish whiskey with a respectable accuracy only by their taste, the question is if we can still obtain a better performane. We know that it is hard to predict the Scotch regions that are underrepresented in the data set. So, what would happen if we limit ourselves to fewer regions? The PCA analysis suggest that we could regroup the labels in the following way:</p>
+<p>Now that we are able to identify the six regions of Scottish whiskey with a respectable accuracy only by their taste, the question is if we can still obtain a better performance. We know that it is hard to predict the Scotch regions that are underrepresented in the data set. So, what would happen if we limit ourselves to fewer regions? The PCA analysis suggest that we could regroup the labels in the following way:</p>
 <ul>
 <li>Island whiskeys are grouped with Islay whiskeys</li>
 <li>Lowland/Campbeltown whiskeys are grouped with Highland whiskeys</li>
@@ -316,30 +323,33 @@ print(paste0(&quot;PCA+KNN accuracy for k = &quot;, k.sel.pca, &quot; is: &quot;
 <pre><code>## [1] &quot;PCA+KNN accuracy for k = 13 is: 0.619&quot;</code></pre>
 <p>With an accuracy of 61.9%, we can conclude that, it is indeed worthwhile to group the whiskey regions for which we have fewer samples.</p>
 </div>
-<div id="kpca-for-prediction" class="section level3">
-<h3>KPCA for Prediction</h3>
-<p>Applying KPCA for prediction is not as straight-forward as applying PCA. In PCA, the eigentvector are computed in the input space but in KPCA, the eigenvectors come from kernel Hilbert space. Thus, it is not simply possible to transform new data points when we do not know the explicit mapping function <span class="math inline">\(\phi\)</span> that is used.</p>
-<p>What is easily possible is to create a model from the transformed data. However, this approach is not helpful for doing validation because this would mean that we include the test set in the PCA. So, the approach in the following approach <strong>should not be used for validating a model</strong>:</p>
-<pre class="r"><code>Z &lt;- pca.k@rotated[,1:20] # the transformed input matrix
+<div id="kpca-for-supervised-learning" class="section level3">
+<h3>KPCA for supervised learning</h3>
+<p>Applying KPCA for prediction is not as straight-forward as applying PCA. In PCA, the eigenvectors are computed in the input space but in KPCA, the eigenvectors come from kernel Hilbert space. Thus, it is not simply possible to transform new data points when we do not know the explicit mapping function <span class="math inline">\(\phi\)</span> that is used.</p>
+<p>What is easily possible is to create a model from the transformed data. However, this approach is not helpful for validation because this would mean that we include the test set in the PCA. So, the approach in the following approach <strong>should not be used for validating a model</strong>:</p>
+<pre class="r"><code>library(class) # for knn
+Z &lt;- pca.k@rotated[,1:(n.dim.model)] # the transformed input matrix
 preds.kpca &lt;- knn(train = Z[samp.train,], test = Z[samp.test,], 
                      cl = df$Region[samp.train], k = k.sel.pca)
 # NB: this would overestimate the actual performance
 accuracy &lt;- get.accuracy(preds.kpca, df$Region[samp.test])</code></pre>
-<p>Besides this property, KPCA may not always actually reduce the number of features. This is because the kernel functions actually lead to an increase in the number of parameters. Thus, in some instances, it may not be possible to find a projection with fewer dimensions than initially.</p>
+<p>Besides this property, KPCA may not always reduce the number of features. This is because the kernel functions actually lead to an increase in the number of parameters. Thus, in some instances, it may not be possible to find a projection with fewer dimensions than initially.</p>
 </div>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
-<p>TODO</p>
+<p>Here, we saw how PCA, KPCA, and t-SNE can be used for reducing the dimensionality of a data set. PCA is a linear method that is suitable both for visualization and supervised learning. KPCA is a non-linear dimensionality reduction technique. t-SNE is a more recent non-linear method that excels for visualizing data but lacks the interpretability and robustness of PCA.</p>
 </div>
 <div id="outlook" class="section level2">
 <h2>Outlook</h2>
-<p>I find it interesting that the two-dimensional projection of whiskeys has so many large empty areas. This could indicate one of two things:</p>
+<p>I find it interesting that the two-dimensional projection of whiskeys contains large open areas. This could indicate one of two things:</p>
 <ol style="list-style-type: decimal">
-<li>There is still a lot of potential for experimenting with new, exciting types of whiskeys</li>
-<li>There are just so many taste combinations that go well.</li>
+<li>There is still a lot of potential for experimenting with new, exciting types of whiskeys.</li>
+<li>There are just so many combinations of taste that are possible and go well together.</li>
 </ol>
-<p>I am inclined to go with the second option. Why? In the PCA plot, the lower right is the largest region in which no samples reside. Looking at the whiskeys that come close to this region, we find that those are Macallan on the y-axis and Lagavulin on the x-axis. Macallan is known for its complex taste and Lagavulin is known for its smoky taste. So, a whiskey that comes to lie on the lower right of the 2-dimensional PCA space would have both properties: a complex taste plus a very smoky taste. I would assume that both tastes would be just too much for the palate to handle (i.e. smokiness masks complexity). Thus, this unexplored region of taste can be considered to be <em>the whiskey twilight zone</em>, as exemplified by this plot:</p>
+<p>I am inclined to go with the second option. Why? In the PCA plot, the lower right is the largest region in which no samples reside. Looking at the whiskeys that come close to this region, we find that those are Macallan on the y-axis and Lagavulin on the x-axis. Macallan is known for its complex taste and Lagavulin is known for its smoky taste.</p>
+<p>A whiskey that comes to lie on the lower right of the 2-dimensional PCA space would have both properties: it would be complex and smoky at the same time. I guess that a whiskey exhibiting both characteristics would be just too much for the palate to handle (i.e. smokiness masks complexity).</p>
+<p>This unexplored region of taste can be considered to be <em>the whiskey twilight zone</em>. Regarding the twilight zone there are two questions. First, would it be possible to produce whiskeys to fill that void and, second, and probably more important, how would these whiskeys taste?</p>
 <div class="figure">
 <img src="https://www.datascienceblog.net/post/machine-learning/whiskey-twilight-zone.png" alt="Whiskey twilight zone" />
 <p class="caption">Whiskey twilight zone</p>

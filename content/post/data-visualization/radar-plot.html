@@ -16,7 +16,7 @@ thumbnail: "/post/data-visualization/radar-plot_cover.png"
 <p>Radar plots visualize several variables using a radial layout. This plot is most suitable for visualizing and comparing the properties associated with individual objects. In the following, we will use a radar plot for comparing the characteristics of whiskeys from different distilleries.</p>
 <div id="a-data-set-on-whiskey" class="section level2">
 <h2>A data set on whiskey</h2>
-<p>Some of you may already know that [radar plots are well-suited for visualizing whiskey flavors previously]. I saw this type of visualization first, when I visited the Talisker distillery, the only whiskey distillery on the Isle of Skye. Here, we will try to reproduce this type of visualization.</p>
+<p>Some of you may already know that <a href="/post/data-visualization/radar-plot/">radar plots are well-suited for visualizing whiskey flavors</a>. I saw this type of visualization first, when I visited the Talisker distillery, the only whiskey distillery on the Isle of Skye. Here, we will try to reproduce this type of visualization.</p>
 <p>For this purpose, I have retrieved a <a href="http://outreach.mathstat.strath.ac.uk/outreach/nessie/nessie_whisky.html">data set on whiskey flavor profile from the University of Strathclyde</a>. To load the data from the web, we will use the RCurl library:</p>
 <pre class="r"><code>library(RCurl)
 # load data as character
@@ -41,10 +41,10 @@ df &lt;- read.csv(textConnection(f), header=T)</code></pre>
 ## 6     1     0     1      1      2    KA27 8HJ   194050    649950</code></pre>
 <p>The most important observation is that the caracteristics of whiskeys are identified by numbers ranging from 0 (low expression of a characteristic) to 4 (high expression of a characteristic).</p>
 <p>Next, we need to select some features for plotting. Here, we simply specify all of the whiskey characteristics stored in the data set:</p>
-<pre class="r"><code>features &lt;- c(&quot;Body&quot;, &quot;Sweetness&quot;, &quot;Smoky&quot;, 
-            &quot;Medicinal&quot;, &quot;Tobacco&quot;, &quot;Honey&quot;,
-            &quot;Spicy&quot;, &quot;Winey&quot;, &quot;Nutty&quot;,
-            &quot;Malty&quot;, &quot;Fruity&quot;, &quot;Floral&quot;)
+<pre class="r"><code>features &lt;- c(&quot;Sweetness&quot;, &quot;Honey&quot;, &quot;Fruity&quot;,
+              &quot;Winey&quot;, &quot;Spicy&quot;, &quot;Nutty&quot;, &quot;Malty&quot;,
+              &quot;Floral&quot;, &quot;Tobacco&quot;, &quot;Medicinal&quot;,
+              &quot;Smoky&quot;, &quot;Body&quot;)
 df &lt;- df[, c(&quot;Distillery&quot;, features)]</code></pre>
 </div>
 <div id="creating-a-radar-plot-in-r" class="section level2">
@@ -62,7 +62,7 @@ plot.df &lt;- df[which(df$Distillery %in% my.whiskeys),]
 mycolor &lt;- &quot;#1c6193&quot;
 p &lt;- ggRadar(plot.df, aes(group = Distillery), 
      rescale = FALSE, legend.position = &quot;none&quot;,
-     size = 1, interactive = FALSE) +
+     size = 1, interactive = FALSE, use.label = TRUE) +
      facet_wrap(~Distillery) + 
      scale_y_discrete(breaks = NULL) + # don&#39;t show ticks 
     theme(axis.text.x = element_text(size = 10)) + # larger label sizes

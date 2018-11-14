@@ -14,7 +14,7 @@ Radar plots visualize several variables using a radial layout. This plot is most
 
 ## A data set on whiskey
 
-Some of you may already know that [radar plots are well-suited for visualizing whiskey flavors previously]. I saw this type of visualization first, when I visited the Talisker distillery, the only whiskey distillery on the Isle of Skye. Here, we will try to reproduce this type of visualization. 
+Some of you may already know that [radar plots are well-suited for visualizing whiskey flavors](/post/data-visualization/radar-plot/). I saw this type of visualization first, when I visited the Talisker distillery, the only whiskey distillery on the Isle of Skye. Here, we will try to reproduce this type of visualization. 
 
 For this purpose, I have retrieved a [data set on whiskey flavor profile from the University of Strathclyde](http://outreach.mathstat.strath.ac.uk/outreach/nessie/nessie_whisky.html). To load the data from the web, we will use the RCurl library:
 
@@ -37,10 +37,10 @@ The most important observation is that the caracteristics of whiskeys are identi
 Next, we need to select some features for plotting. Here, we simply specify all of the whiskey characteristics stored in the data set:
 
 ```{r}
-features <- c("Body", "Sweetness", "Smoky", 
-            "Medicinal", "Tobacco", "Honey",
-            "Spicy", "Winey", "Nutty",
-            "Malty", "Fruity", "Floral")
+features <- c("Sweetness", "Honey", "Fruity",
+              "Winey", "Spicy", "Nutty", "Malty",
+              "Floral", "Tobacco", "Medicinal",
+              "Smoky", "Body")
 df <- df[, c("Distillery", features)]
 ```
 
@@ -65,7 +65,7 @@ plot.df <- df[which(df$Distillery %in% my.whiskeys),]
 mycolor <- "#1c6193"
 p <- ggRadar(plot.df, aes(group = Distillery), 
      rescale = FALSE, legend.position = "none",
-     size = 1, interactive = FALSE) +
+     size = 1, interactive = FALSE, use.label = TRUE) +
      facet_wrap(~Distillery) + 
      scale_y_discrete(breaks = NULL) + # don't show ticks 
     theme(axis.text.x = element_text(size = 10)) + # larger label sizes
