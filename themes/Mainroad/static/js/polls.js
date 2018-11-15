@@ -42,26 +42,18 @@ function getUserIP(onNewIP) { //  onNewIp - your listener function for new IPs
 }
 
 $(document).ready(function () {
-    /*
     getUserIP(function(ip){
         //alert("Got ip: " + ip);
         $('#poll').find('input[name="fields[ipAddress]"]').val(ip);
         return true;
     });
-    */
-    // NB: staticman call does not work when getting the IP like this
+       // NB: staticman call does not work when getting the IP like this
     
-    /*
-    $("#poll").on("submit", function(event){
+      $("#poll").on("submit", function(event){
         var selectedOption = $('input[name=poll]:checked').val();
         $('#poll input[name="fields[option]"]').val(selectedOption);
-        //$('#poll').find('input[name="fields[IP]"]').val(json.ip);
-        //$('#poll input[name="fields[IP]"]').val(IP);
         //$('#poll input[name="fields[ipAddress]"]').val(IP);
-
-
         //alert("Submit function called!");
         return true; // do the post request
     });
-    */
 });
