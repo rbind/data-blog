@@ -12,7 +12,6 @@
   {{ end }}
   {{ $ipMap := $.Scratch.Get "ipMap" }} 
   {{ range $index, $element := $ipMap }}
-    {{ print $element }} 
      {{ $.Scratch.Add "optionCounter" 1 }}
      {{ $.Scratch.SetInMap "optionMap" $element (add (index ($.Scratch.Get "optionMap") $element) 1) }}
   {{- end }}
