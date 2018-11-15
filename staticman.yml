@@ -20,7 +20,7 @@ comments:
     email: "md5" # encrypt email addresses
 
 polls:
-  allowedFields: ["path", "pollID", "option"]
+  allowedFields: ["path", "pollID", "option", "ipAddress"]
   branch: "master"
   commitMessage: "Someone just participated in a poll!"
   filename: "{fields.date}_{@id}"
@@ -35,6 +35,6 @@ polls:
   notifications:
     enabled: false
   path: "data/polls"
-  requiredFields: ["path", "pollID", "option"]
+  requiredFields: ["path", "pollID", "option", "ipAddress"]
   transforms:
-    body: "frontmatterContent"
+    
