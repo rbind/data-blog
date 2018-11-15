@@ -1,20 +1,23 @@
 {{ $mypolls := .Site.Data.polls }}
 {{ $.Scratch.Add "optionCounter" 0 }} 
 {{ $.Scratch.Add "totalCounter" 0 }} 
-
+{{ $.Scratch.Set "ipMap" (dict )}}
 {{ $.Scratch.Set "optionMap" (dict ) }}
-<!--{{ $totalNbr := 0 }} -->
   {{ range $index, $element := $mypolls }}
   <!--{{ printf "%#v" $.File.Path }}-->
     {{ if in $element.path $.File.Path }} <!-- TODO: don't require path but pollID instead! -->
-        {{ $.Scratch.Add "optionCounter" 1 }}
-        {{ $.Scratch.SetInMap "optionMap" .option ($.Scratch.Get "optionCounter") }} <!-- this is wrong..-->
-        <!-- increment total nbr of votes -->
+        {{ $.Scratch.SetInMap "ipMap" $element.ipAddress $element.option }}
+        {{ $.Scratch.SetInMap "optionMap" $element.option 0 }}
     {{ end }}
   {{ end }}
+  {{ $ipMap := $.Scratch.Get "ipMap" }} 
+  {{ range $index, $element := $ipMap }}
+    {{ print $element }} 
+     {{ $.Scratch.Add "optionCounter" 1 }}
+     {{ $.Scratch.SetInMap "optionMap" $element (add (index ($.Scratch.Get "optionMap") $element) 1) }}
+  {{- end }}
 <div id="poll-container">
     <h3>Poll</h3>
-
     <form id='poll' action="{{ .Site.Params.staticman_polls_api }}" method="post" accept-charset="utf-8">
         <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#poll-submitted">
         <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#poll-error">
@@ -34,7 +37,6 @@
     </form>
     <button id = "poll_view_button" onclick="copyToClipboard()">View poll results</button>
 </div>
-
 <!--
 <div id='poll-results'><h3>Poll Results</h3>
 <dl class='graph'>
@@ -43,12 +45,12 @@
     {{ $.Scratch.Set "totalCounter" (add ($.Scratch.Get "totalCounter") $val) }}
 {{- end }}
 {{ range $key, $val := $optionMap }}
-    {{ $val = math.Round (mul (div (float $val) ($.Scratch.Get "totalCounter")) 100) }}
-    <dt class='bar-title'>{{ $key }}
-    <dd class='bar-container'>
+    {{ $val = div (math.Round (mul (div (float $val) ($.Scratch.Get "totalCounter")) 1000)) 10 }}
+    <dt class='bar-title' style="list-style-type: none">{{ $key }}</dt>
+    <dd class='bar-container' style="list-style-type: none">
     <div id= {{ print "bar" $key }} style= {{ print "width:" $val "%" }}>&nbsp;</div>
     <strong>{{ print $val "%" }}</strong>
-    </dd></dt>
+    </dd>
 {{- end }}
 -->
 <div id="poll-submitted" class="dialog">
