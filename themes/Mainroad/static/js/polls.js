@@ -41,75 +41,17 @@ function getUserIP(onNewIP) { //  onNewIp - your listener function for new IPs
     };
 }
 
-// Usage
-
-//getUserIP(function(ip){
- //   alert("Got IP! :" + ip);
-//});
-
-/*
-function storePollOption  (staticmanAPI) {
-var text = $('#DynamicValueAssignedHere').find('input[name="FirstName"]').val();
-    var selectedOption = $('input[name=poll]:checked').val();
-    console.log(selectedOption);
-    $('#poll').append('<input type="hidden" name="fields[option]" value="blank"/>');
-    $('#poll input[name="fields[option]"]').val(selectedOption); // set value
-    console.log($('#poll input[name="fields[option]"]').val());
-    var jqxhr = $.post(staticmanAPI, function(result) {
-      alert(result);
-    })
-        .done(function() {
-        alert( "second success" );
-    })
-        .fail(function() {
-        alert( "error" );
-    })
-        .always(function() {
-        alert( "finished" );
-    }); // TODO: send data as well?
-
-    //jqxhr.always(function() {
-     // alert( "second finished" );
-    //});
-    console.log(jqxhr);
-}
-*/
-/*
-$("#poll").submit(function( event ) {
-    // set value hidden field before submitting the poll form
-    alert("Submit function called!");
-    var selectedOption = $('input[name=poll]:checked').val();
-    console.log(selectedOption);
-    $(this).append('<input type="hidden" name="fields[option]" value="blank"/>');
-    //$('#poll input[name="fields[option]"]').val(selectedOption); // set value
-    console.log($('#poll input[name="fields[option]"]').val());
-    event.preventDefault(); // dont do the POST request
-
-});
-*/
-/*
-// onsubmit tag at submit: "return pollSubmit()" doesnt't work
-function pollSubmit() {
-   alert("Submit function called!");
-    var selectedOption = $('input[name=poll]:checked').val();
-    console.log(selectedOption);
-    $(this).append('<input type="hidden" name="fields[option]" value="blank"/>');
-    //$('#poll input[name="fields[option]"]').val(selectedOption); // set value
-    console.log($('#poll input[name="fields[option]"]').val());
-}
-*/
- 
-
 $(document).ready(function () {
-
+    /*
     getUserIP(function(ip){
         //alert("Got ip: " + ip);
         $('#poll').find('input[name="fields[ipAddress]"]').val(ip);
         return true;
     });
+    */
     // NB: staticman call does not work when getting the IP like this
     
-
+    /*
     $("#poll").on("submit", function(event){
         var selectedOption = $('input[name=poll]:checked').val();
         $('#poll input[name="fields[option]"]').val(selectedOption);
@@ -121,27 +63,5 @@ $(document).ready(function () {
         //alert("Submit function called!");
         return true; // do the post request
     });
+    */
 });
-
-/*
-$(function() { 
-    // set IP for storing poll option once page is ready
-    getUserIP(function(ip){
-        //alert("Got ip: " + ip);
-        $('#poll').find('input[name="fields[IP]"]').val(ip);
-        //self['fields[IP]'].value = ip;
-        //$('#poll input[name="fields[IP]"]').val(ip);
-    });
-});
-*/
-/*
-$(function() { //shorthand document.ready function
- $("#poll").on("submit", function(event){
-    //alert("Submit function called!");
-    var selectedOption = $('input[name=poll]:checked').val();
-    console.log(selectedOption);
-    $('#poll input[name="fields[option]"]').val(selectedOption);
-    return true; // do the post request
- });
-});
-*/

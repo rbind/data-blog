@@ -1,22 +1,17 @@
-{{ $originPage := .Permalink}}
-{{ if ne .Permalink "/"}} 
-    {{ $originPage = .Permalink }}
-{{- end }}
-{{ print $originPage }}
 <div id="poll-container">
     <h3>Poll</h3>
     <form id='poll' action="{{ .Site.Params.staticman_polls_api }}" method="post" accept-charset="utf-8">
-    <input type="hidden" name="options[redirect]" value="{{ $originPage }}#poll-submitted">
-    <input type="hidden" name="options[redirectError]" value="{{ $originPage }}#poll-error">
+    <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#poll-submitted">
+    <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#poll-error">
     <input type="hidden" name="options[entryId]" value="{{ .UniqueID }}">
+   <input name="fields[path]" type="hidden" value="{{ .File.Path }}">
    <input name="fields[pollID]" type="hidden" value="best_javascript_framework">
-   <input name="fields[option]" type="hidden" value="">
-   <input name="fields[ipAddress]" type="hidden" value="">
-
+   <input name="fields[option]" type="hidden" value="A">
+   <input name="fields[ipAddress]" type="hidden" value="1.1.1">
         <p>Pick your favorite Javascript framework:</p>
         <p>
         <label><input type="radio" name="poll" value="A"> A</label><br/>
-        <label><input type="radio" name="poll" value="B" checked> B</label><br/>
+        <label><input type="radio" name="poll" value="B"> B</label><br/>
         <label><input type="radio" name="poll" value="C"> C</label><br/>
         <input id = "poll_submit_button" type="submit" value="Vote &rarr;"/></p>
     </form>

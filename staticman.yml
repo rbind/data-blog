@@ -19,6 +19,27 @@ comments:
     body: "frontmatterContent"
     email: "md5" # encrypt email addresses
 
+
+poll:
+  allowedFields: ["path"]
+  branch: "master"
+  commitMessage: "Someone just participated in a poll!"
+  filename: "{fields.date}_{@id}"
+  format: "yml"
+  generatedFields:
+    date:
+      type: date
+      options:
+        format: "iso8601"
+  moderation: false
+  name: "www.datascienceblog.net"
+  notifications:
+    enabled: false
+  path: "data/polls"
+  requiredFields: ["path"]
+  transforms:
+    ipAddress: "md5"
+    
 polls:
   allowedFields: ["path", "pollID", "option", "ipAddress"]
   branch: "master"
@@ -37,4 +58,5 @@ polls:
   path: "data/polls"
   requiredFields: ["path", "pollID", "option", "ipAddress"]
   transforms:
+    ipAddress: "md5"
     
