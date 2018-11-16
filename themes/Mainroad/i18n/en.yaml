@@ -43,6 +43,10 @@
 - id: recent_title
   translation: Recent Posts
 
+# Poll widget
+- id: poll_title
+  translation: Poll
+
 # Social widget
 - id: social_title
   translation: Social

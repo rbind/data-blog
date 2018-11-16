@@ -1,36 +1,35 @@
 .graph {
-  width: 250px;
+  /*width: 250px;
   position: relative;
-  right: 30px;
+  right: 30px;*/
+  height: 20px:
+  overflow: hidden;
+}
+
+
+.row {
+    display: table;
+    align: left;
+    width: 100%;
+    padding: 10px;
+    table-layout: fixed;
+}
+
+/* Create two equal columns that sits next to each other */
+.column {
+    display: table-cell;
 }
 .bar-title {
-  position: relative;
-  float: left;
-  width: 104px;
-  line-height: 20px;
-  margin-right: 17px;
   font-weight: bold;
-  text-align: right;
 }
 .bar-container {
-  position: relative;
-  float: left;
-  width: 110px;
-  height: 10px;
   margin: 0px 0px 15px;
-}
- 
-.bar-container div {
-  background-color:#cc4400;
+  background-color: #cc4440;
+  text-align: left;
   height: 20px;
-}
-.bar-container strong {
-  position: absolute;
-  right: -32px;
-  top: 0px;
-  overflow: hidden;
 }
 
 fieldset {
     border: 0;
 }
+

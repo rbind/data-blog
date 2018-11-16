@@ -1,0 +1,5 @@
+poll_text = "What is your favorite supervised learning model?"
+poll_options = ["Support vector machines", "Neural networks", "Linear regression"]
+poll_id = "favorite_supervised_learning_model"
+show_poll = true
+poll_active = true

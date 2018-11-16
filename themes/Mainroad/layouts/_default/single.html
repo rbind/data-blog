@@ -24,6 +24,9 @@
             {{ end}}
 		{{- end }}
 		{{- partial "post_toc.html" . -}}
+        {{ if .Params.pollID }}
+            {{ partial "widgets/poll.html" . }}
+        {{ end }}
 		<div class="content post__content clearfix">
 			{{ .Content }}
 		</div>

@@ -514,7 +514,7 @@ select {
 }
 
 .menu__item:hover {
-	background: #e64946;
+	background: inherit;
 }
 
 .menu__item--active {
