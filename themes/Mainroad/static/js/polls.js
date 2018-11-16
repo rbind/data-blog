@@ -61,6 +61,11 @@ function changeToggleText() {
     }
 }
 
+function disablePoll(isPollActive) {
+    $("#poll").prop('disabled', !isPollActive);
+    $("#poll_fieldset").prop("disabled", !isPollActive);
+    return true;
+}
 $(document).ready(function () {
     getUserIP(function(ip){
         //alert("Got ip: " + ip);
@@ -70,9 +75,8 @@ $(document).ready(function () {
     });
 
     isPollActive = $('#poll input[name="pollActive"]').val() == "true";
-    $("#poll").prop('disabled', !isPollActive);
-    $("#poll_fieldset").prop("disabled", !isPollActive);
-    if (isPollActive) {
+    disablePoll(isPollActive);
+        if (isPollActive) {
         // hide results if poll is active
         $("#poll-results").hide();
     } else {
@@ -80,9 +84,7 @@ $(document).ready(function () {
         $("#poll").hide();  
         $("#poll_view_button").hide();
     }
-
-      $("#poll").on("submit", function(event){
-
+    $("#poll").on("submit", function(event){
         var selectedOption = $('input[name=poll]:checked').val();
         if (!selectedOption) {
             // nothing selected:
@@ -101,8 +103,9 @@ $(document).ready(function () {
             }
         }
         $('#poll input[name="fields[option]"]').val(selectedOption);
-        //switchPollView();
         togglePollView();
+        // this doesn't work with postman:
+        //disablePoll(false); // disable clicking the poll again after vote
         //alert("Submit function called!");
         return true; // do the post request
     });
