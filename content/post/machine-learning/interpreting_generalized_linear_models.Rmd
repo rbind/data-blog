@@ -10,7 +10,6 @@ tags:
 thumbnail: "/post/machine-learning/interpreting_generalized_linear_models_cover.png"
 
 ---
-
 Interpreting generalized linear models (GLM) obtained through ```glm``` is similar to [interpreting conventional linear models](/post/machine-learning/linear_models/). Here, we will discuss the differences that need to be considered.
 
 ## Basics of GLMs

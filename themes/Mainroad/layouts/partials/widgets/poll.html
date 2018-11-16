@@ -14,20 +14,17 @@
 {{ end }}
 {{ if ne $pollInfo ""}}
     {{ $pollOptions := sort $pollInfo.poll_options }}
+    {{ $activePollID := $pollInfo.poll_id }} 
+    {{ $pollQuestion := $pollInfo.poll_text }}
     <!-- initialize optionMap -->
     {{ range $pollOptions }}
         {{ $.Scratch.SetInMap "optionMap" . 0 }}
     {{ end }}
-
-    {{ $activePollID := $pollInfo.poll_id }} 
-    {{ $pollQuestion := $pollInfo.poll_text }}
-    {{ $.Scratch.Add "optionCounter" 0 }} 
     {{ $.Scratch.Add "totalCounter" 0 }} 
     {{ range $index, $element := $pollData }}
         <!--{{ printf "%#v" $.File.Path }}-->
         {{ if eq $element.pollID $activePollID }}
             {{ $.Scratch.Add "IPs" (print $element.ipAddress ",")}}
-            {{ $.Scratch.Add "optionCounter" 1 }}
             {{ $curCount := default 0 (index ($.Scratch.Get "optionMap") ($element.option)) }}
             {{ if in $pollOptions $element.option }}
                 <!-- only consider options that are allowed -->

@@ -85,9 +85,7 @@ all.equal(g.inv(estimates.log), estimates)</code></pre>
 <p>We will cover four types of residuals: response residuals, working residuals, Pearson residuals, and, deviance residuals. There is also another type of residual called <em>partial residual</em>, which is formed by determining residuals from models where individual features are excluded. This residual is not discussed here.</p>
 <div id="response-residuals" class="section level3">
 <h3>Response residuals</h3>
-<p>For <code>type = &quot;response&quot;</code>, the <em>conventional</em> residual on the response level is computed, that is,
-<span class="math display">\[r_i = y_i - \hat{f}(x_i)\,.\]</span>
-This means that the fitted residuals are transformed by taking the inverse of the link function:</p>
+<p>For <code>type = &quot;response&quot;</code>, the <em>conventional</em> residual on the response level is computed, that is, <span class="math display">\[r_i = y_i - \hat{f}(x_i)\,.\]</span> This means that the fitted residuals are transformed by taking the inverse of the link function:</p>
 <pre class="r"><code># type = &quot;response&quot;
 res.response1 &lt;- residuals(model.pois, type = &quot;response&quot;)
 res.response2 &lt;- expected - estimates
@@ -127,8 +125,7 @@ all.equal(res.pearson1, res.pearson2)</code></pre>
 </ul>
 <p>The deviance indicates the extent to which the likelihood of the saturated model exceeds the likelihood of the proposed model. If the proposed model has a good fit, the deviance will be small. If the proposed model has a bad fit, the deviance will be high. For example, for the Poisson model, the deviance is</p>
 <p><span class="math display">\[D = 2 \cdot \sum_{i = 1}^n y_i \cdot \log \left(\frac{y_i}{\hat{\mu}_i}\right) − (y_i − \hat{\mu}_i)\,.\]</span></p>
-<p>In R, the deviance residuals represent the contributions of individual samples to the deviance <span class="math inline">\(D\)</span>. More specifically, they are defined as the signed <a href="https://www.youtube.com/watch?v=JC56jS2gVUE">square roots of the unit deviances</a>. Thus, the deviance residuals are analogous to the conventional residuals: when they are squared, we obtain the sum of squares that we use for assessing the fit of the model. However, while the sum of squares is the residual sum of
-squares for linear models, for GLMs, this is the deviance.</p>
+<p>In R, the deviance residuals represent the contributions of individual samples to the deviance <span class="math inline">\(D\)</span>. More specifically, they are defined as the signed <a href="https://www.youtube.com/watch?v=JC56jS2gVUE">square roots of the unit deviances</a>. Thus, the deviance residuals are analogous to the conventional residuals: when they are squared, we obtain the sum of squares that we use for assessing the fit of the model. However, while the sum of squares is the residual sum of squares for linear models, for GLMs, this is the deviance.</p>
 <p>How does such a deviance look like in practice? For example, for the Poisson distribution, the deviance residuals are defined as:</p>
 <p><span class="math display">\[r_i = \text{sgn}(y - \hat{\mu}_i) \cdot \sqrt{2 \cdot y_i \cdot \log \left(\frac{y_i}{\hat{\mu}_i}\right) − (y_i − \hat{\mu}_i)}\,.\]</span></p>
 <p>Let us verify this in R:</p>

@@ -45,6 +45,7 @@ var MD5 = function(d){result = M(V(Y(X(d),8*d.length)));return result.toLowerCas
 
 function togglePollView() {
     if (isPollActive) {
+        console.log("toggline poll view!");
         $("#poll-results").toggle();
         $("#poll-container").toggle();
         changeToggleText();
@@ -76,8 +77,10 @@ $(document).ready(function () {
 
     isPollActive = $('#poll input[name="pollActive"]').val() == "true";
     disablePoll(isPollActive);
-        if (isPollActive) {
+    if (isPollActive) {
         // hide results if poll is active
+        console.log("Hiding poll results!")
+        //setTimeout(function() {$("#poll-results").hide();}, 500);
         $("#poll-results").hide();
     } else {
         // hide poll if result is inactive
