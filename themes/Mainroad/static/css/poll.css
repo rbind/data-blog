@@ -31,4 +31,6 @@
   overflow: hidden;
 }
 
-
+fieldset {
+    border: 0;
+}

@@ -1,23 +1,20 @@
 {{ $mypolls := .Site.Data.polls }}
 {{ $.Scratch.Add "optionCounter" 0 }} 
 {{ $.Scratch.Add "totalCounter" 0 }} 
-{{ $.Scratch.Set "ipMap" (dict )}}
 {{ $.Scratch.Set "optionMap" (dict ) }}
   {{ range $index, $element := $mypolls }}
   <!--{{ printf "%#v" $.File.Path }}-->
     {{ if in $element.path $.File.Path }} <!-- TODO: don't require path but pollID instead! -->
-        {{ $.Scratch.SetInMap "ipMap" $element.ipAddress $element.option }}
-        {{ $.Scratch.SetInMap "optionMap" $element.option 0 }}
+        {{ $.Scratch.Add "IPs" (print $element.ipAddress ",")}}
+        {{ $.Scratch.Add "optionCounter" 1 }}
+        {{ $curCount := default 0 (index ($.Scratch.Get "optionMap") ($element.option)) }}
+        {{ $.Scratch.SetInMap "optionMap" ($element.option) (add ($curCount) 1) }}
     {{ end }}
   {{ end }}
-  {{ $ipMap := $.Scratch.Get "ipMap" }} 
-  {{ range $index, $element := $ipMap }}
-     {{ $.Scratch.Add "optionCounter" 1 }}
-     {{ $.Scratch.SetInMap "optionMap" $element (add (index ($.Scratch.Get "optionMap") $element) 1) }}
-  {{- end }}
 <div id="poll-container">
     <h3>Poll</h3>
     <form id='poll' action="{{ .Site.Params.staticman_polls_api }}" method="post" accept-charset="utf-8">
+        <input type="hidden" name="knownIPs" value="{{ $.Scratch.Get "IPs" }}">
         <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#poll-submitted">
         <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#poll-error">
         <input type="hidden" name="options[entryId]" value="{{ .UniqueID }}">
@@ -27,16 +24,12 @@
         <input name="fields[ipAddress]" type="hidden" value="">
 
         <p>Pick your favorite Javascript framework:</p>
-        <p>
             <label><input type="radio" name="poll" value="A"> A</label><br/>
             <label><input type="radio" name="poll" value="B"> B</label><br/>
             <label><input type="radio" name="poll" value="C"> C</label><br/>
             <input id = "poll_submit_button" type="submit" value="Vote &rarr;"/>
-        </p>
     </form>
-    <button id = "poll_view_button" onclick="copyToClipboard()">View poll results</button>
 </div>
-<!--
 <div id='poll-results'><h3>Poll Results</h3>
 <dl class='graph'>
 {{ $optionMap := $.Scratch.Get "optionMap" }}
@@ -51,7 +44,11 @@
     <strong>{{ print $val "%" }}</strong>
     </dd>
 {{- end }}
--->
+</dl>
+<br><br><br><br>
+<p>Total number of votes: {{ $.Scratch.Get "totalCounter" }}</p>
+</div>
+<button id = "poll_view_button" class = "btn" onclick="viewPollResults()">View results</button>
 <div id="poll-submitted" class="dialog">
 <h3>Thank you</h3>
   <p>Thank you for participating in the poll!</p>
