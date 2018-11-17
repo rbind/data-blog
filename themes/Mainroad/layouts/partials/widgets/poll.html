@@ -75,7 +75,7 @@
          <br>
          <div>
          <span style="float:left">{{ print $outVal "%" }}</span>
-         <div class='bar-container' id="{{ print "bar" $key }}" style= "{{ print "width:" $outVal "%" }}"></div>
+         <div class='bar-container' style= "{{ print "width:" $outVal "%" }}"></div>
          </div>
     {{- end }}
     <p>Total number of votes: {{ $.Scratch.Get "totalCounter" }}</p>
