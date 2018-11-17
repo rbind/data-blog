@@ -73,10 +73,10 @@
          {{ $key | markdownify }}
          </div>
          <br>
-         <span>
+         <div>
          <span style="float:left">{{ print $outVal "%" }}</span>
-         <div class='bar-container' id= {{ print "bar" $key }} style= {{ print "width:" $outVal "%" }}></div>
-         </span>
+         <div class='bar-container' id="{{ print "bar" $key }}" style= "{{ print "width:" $outVal "%" }}"></div>
+         </div>
     {{- end }}
     <p>Total number of votes: {{ $.Scratch.Get "totalCounter" }}</p>
     </div>

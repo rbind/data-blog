@@ -2,12 +2,13 @@
 title: "Dimensionality Reduction for Visualization and Prediction"
 author: Matthias Döring
 date: '2018-11-14'
-description: "Dimensionality reductions is primarily used for exploring data and for reducing the feature space in machine learning applications. In this post, I investigate techniques such as PCA to obtain insights from a whiskey data set and show how PCA can be used to improve supervised approaches. Finally, I introduce the notion of the whiskey twilight zone."
+description: "Dimensionality reduction is primarily used for exploring data and for reducing the feature space in machine learning applications. In this post, I investigate techniques such as PCA to obtain insights from a whiskey data set and show how PCA can be used to improve supervised approaches. Finally, I introduce the notion of the whiskey twilight zone."
 categories:
   - machine-learning
 tags:
     - unsupervised learning
     - supervised learning
+    - analysis
 thumbnail: "/post/machine-learning/whiskey-twilight-zone.png"
 
 ---
