@@ -2,7 +2,7 @@
 title: "Linear Prediction Models"
 description: "Linear prediction models are among the most simple types of models. Despity their simplicity, these models can be very useful when certain conditions are met."
 ---
-Linear predition models assume that there is a linear relationship between the independent variables and the dependent variable. Therefore, these models exhibit high bias and low variance. 
+Linear prediction models assume that there is a linear relationship between the independent variables and the dependent variable. Therefore, these models exhibit high bias and low variance. 
 
 The high bias of these models is due to the assumption of nonlinearity. If this assumption does not sufficiently represent the data, then linear models will be inaccurate. 
 
