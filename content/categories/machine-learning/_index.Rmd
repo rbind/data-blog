@@ -3,3 +3,13 @@ title: "Machine Learning"
 thumbnail: "/categories/machine-learning/machine_learning_cover.jpg"
 ---
 <script src="https://infograph.venngage.com/js/embed/v1/embed.js" data-vg-id="u34x7Gx704" data-title="A Brief History of Machine Learning" data-w="816" data-h="1056" data-multipage="true"></script>
+
+Machine learning is a field of artificial intelligence (AI) that is concerned with learning from data. Machine learning has three components:
+
+* [Supervised learning](/tags/supervised-learning/): Fitting predictive models using data for which outcomes are available.
+* [Unsupervised learning](/tags/unsupervised-learning/): Transforming and partitioning data where outcomes are not available.
+* Reinforcement learning: on-line learning in environments where not all events are observable. Reinforcement learning is frequently applied in robotics.
+
+## Posts on machine learning
+
+In the following posts, machine learning is applied to solve problems using R.

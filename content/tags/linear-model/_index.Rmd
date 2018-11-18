@@ -22,12 +22,12 @@ Linear models excel under the following circumstances:
 
 The following linear models are frequently used:
 
-* Linear regression: the most basic linear model for regression.
+* [Linear regression](/post/machine-learning/linear_models/): the most basic linear model for regression.
 * Logistic regression: a linear model that is suitable for classification.
+* [Generalized linear models](/post/machine-learning/interpreting_generalized_linear_models/): for specific applications other linear models such as Poisson regression may be appropriate.
 * Ridge regression: a linear model for regression that is regularized using an $L_2$ norm.
 * Lasso regression: a linear model for regression that is regularized using an $L_1$ norm.
 * Support vector machines (SVMs): SVMs based on linear kernel functions correspond to linear, $L_2$ regularized models relying on a hinge loss.
-* Generalized linear models: for specific applications linear models such as Poisson regression may be appropriate.
 
 ## Posts about linear models
 

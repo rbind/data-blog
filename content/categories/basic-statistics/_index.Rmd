@@ -1,10 +1,10 @@
 ---
-title: "Statistical Significance Tests"
+title: "Basic Statistical Concepts for Data Science"
 thumbnail: "/categories/basic-statistics/book-calculate-calculator-5775.jpg"
 ---
 <img src="book-calculate-calculator-5775.jpg"/>
 
-As a data scientist, it is important to have a deep understanding of statistics. Here, I'll introduce basic statistical concepts and quantities.
+As a data scientist, it is important to have a deep understanding of statistics. Here, I introduce basic statistical concepts and quantities.
 
 ## Types of measurements and variables
 
