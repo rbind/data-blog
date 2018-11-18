@@ -13,17 +13,17 @@ There are several performance measures for describing the quality of a machine l
 
 ### The coefficient of determination
 
-For regression, the coefficient of determination, $R^2$, is the performance metric of choice. This measure is based on Pearson's correlation coefficient. Let $\hat{Y}$ indicate the model estimates and $Y$ the observed outcomes. Then, $R^2$ is defined as:
+For regression, the coefficient of determination, $R^2$, is the performance metric of choice. This measure is based on Pearson's correlation coefficient. Let $\hat{Y}$ indicate the model estimates and $Y$ the observed outcomes. Then, the correlation coefficient is defined as
 
-\[R^2 = \rho_{\hat{Y}, Y} = \frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y} \]
+\[\rho_{\hat{Y}, Y} = \frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y} \]
 
-where $\rho$ indicates the correlation coefficient, $\text{Cov}(\cdot,\cdot) \in \mathbb{R}$ is the covariance and $\sigma$ is the standard deviation. The covariance is defined as
+where $\text{Cov}(\cdot,\cdot) \in \mathbb{R}$ is the covariance and $\sigma$ is the standard deviation. The covariance is defined as
 
 \[\text{Cov}(\hat{Y}, Y) = E[ (\hat{Y} - \mu_{\hat{Y}}) (Y - \mu_Y)] \]
 
 where $\mu$ indicates the mean. In discrete settings, this can be computed as
 
-\[\text{Cov}(\hat{Y}, Y) = \sum_{i=1}^N (\hat{y}_i - \overline{\hat{y}}) (y_i - \overline{y})\,.\]
+\[\text{Cov}(\hat{Y}, Y) = \sum_{i=1}^N (\hat{y}_i - \bar{\hat{y}}) (y_i - \bar{y})\,.\]
 
 This means that the coveriance of predictions and outcomes will be positive if they exhibit similar deviations from the mean and negative if they exhibit contrasting deviations from the mean. 
 
@@ -33,7 +33,7 @@ The standard deviation is defined as
 
 which, in discrete settings, can be computed as
 
-\[\sigma_Y = \sqrt{\frac{1}{N} \sum_{i = 1}^N (y_i - \overline{y})^2}\,. \]
+\[\sigma_Y = \sqrt{\frac{1}{N} \sum_{i = 1}^N (y_i - \bar{y})^2}\,. \]
 
 Note that the R function ```sd``` computes the population standard deviation, which uses $\frac{1}{N-1}$ to obtain an unbiased estimator. $\sigma$ is high if the distribution is wide (wide spread around the mean) and $\sigma$ is small if the distribution is narrow (little spread around the mean).
 
@@ -109,12 +109,97 @@ df.high <- data.frame(Y = y, Y_Hat = y.hat)
 Thus, the covariance by itself does not allow conclusions about the correlation of two variables. This is why Pearson's correlation coefficient normalizes the covariance by the standard deviations of the two variables. Since this standardizes correlations to the range $[-1,1]$, this makes correlations comparable even though the variables have different variances. 
 A value of -1 indicates a perfect negative correlation and a value of 1 indicates a perfect positive correlation, while a value of 0 indicates no correlation. 
 
+### The coefficient of determination
+
+The coefficient of determination, $R^2$, is defined as
+
+\[R^2 = 1- \frac{SS_{\rm {res}}}{SS_{\rm {tot}}}\,\]
+
+where $SS_{\rm{res}} = \sum_{i=1}^N (y_i - \hat{y}_i)^2$ is the residual sum of squares and $SS_{\rm{tot}} = \sum_{i=1}^N (y_i - \bar{y})^2$ is the total sum of squares. 
+
+#### Interpretation in terms of the correlation coefficient
+
+R squared is usually positive since models with an intercept produce predictions $\hat{Y}$ with $SS_{\rm{res}} < SS_{\rm{tot}}$ because the preditions of the model are closer to the outcomes than the mean outcome. So, as long as an intercept is present, the coefficient of determination is
+the square of the correlation coefficient:
+
+\[R^2 = \rho_{\hat{Y}, Y}^2\,.\]
+
+#### Interpteration in terms of explained variance
+
+In cases where the total sum of squares decomposes into residual and regression sum of squares, 
+$SS_{\text{reg}}=\sum _{i}^N(\hat{y}_{i}-{\bar {y}})^{2}$, such that
+
+\[SS_{\text{res}} + SS_{\text{reg}} = SS_{\text{tot}}\,,\]
+
+then 
+
+\[R^{2}={\frac {SS_{\text{reg}}}{SS_{\text{tot}}}}\,.\]
+
+This means that $R^2$ indicates the ratio of variance that is explained by the model. Therefore, a model with $R^2 = 0.7$ would explain $70\%$ of the variance, leaving $30\%$ of the variance unexplained.
 
 ### Intuition for the coefficient of determination
 
+```{r}
+rsquared <- function(test.preds, test.labels) {
+    return(round(cor(test.preds, test.labels)^2, 3))
+}
+plot.linear.model <- function(model, test.preds = NULL, test.labels = NULL, 
+                            test.only = FALSE) {
+    # ensure that model is interpreted as a GLM
+    pred <- model$fitted.values
+    obs <- model$model[,1]
+    if (test.only) {
+        # plot only the results for the test set
+        plot.df <- NULL
+        plot.res.df <- NULL
+    } else {
+        plot.df <- data.frame("Prediction" = pred, "Outcome" = obs, 
+                                "DataSet" = "training")
+        model.residuals <- obs - pred
+        plot.res.df <- data.frame("x" = obs, "y" = pred, 
+                        "x1" = obs, "y2" = pred + model.residuals,
+                        "DataSet" = "training")
+    }
+    r.squared <- NULL
+    if (!is.null(test.preds) && !is.null(test.labels)) {
+        # store predicted points: 
+        test.df <- data.frame("Prediction" = test.preds, 
+                            "Outcome" = test.labels, "DataSet" = "test")
+        # store residuals for predictions on the test data
+        test.residuals <- test.labels - test.preds
+        test.res.df <- data.frame("x" = test.labels, "y" = test.preds,
+                        "x1" = test.labels, "y2" = test.preds + test.residuals,
+                         "DataSet" = "test")
+        # append to existing data
+        plot.df <- rbind(plot.df, test.df)
+        plot.res.df <- rbind(plot.res.df, test.res.df)
+        # annotate model with R^2 value
+        r.squared <- rsquared(test.preds, test.labels)
+    }
+    #######
+    library(ggplot2)
+    p <- ggplot() + 
+        # plot training samples
+        geom_point(data = plot.df, 
+            aes(x = Outcome, y = Prediction, color = DataSet)) +
+        # plot residuals
+        geom_segment(data = plot.res.df, alpha = 0.2,
+            aes(x = x, y = y, xend = x1, yend = y2, group = DataSet)) +
+        # plot optimal regressor
+        geom_abline(color = "red", slope = 1)
+    if (!is.null(r.squared)) {
+        # plot r squared of predictions
+        max.val <- max(plot.df$Outcome, plot.df$Prediction)
+        x.pos <- 0.2 * max.val
+        y.pos <- 0.9 * max.val
+        label <- paste0("R^2: ", r.squared)
+        p <- p + annotate("text", x = x.pos, y = y.pos, label = label, size = 5)
+    }
+    return(p)
+}
+```
 
-
-
+Let us plot some stuff
 
 - Others: model-specific metrics, e.g. mean squared errors
 
