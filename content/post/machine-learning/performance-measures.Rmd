@@ -1,0 +1,121 @@
+---
+title: "Performance Measures for Machine Learning"
+author: Matthias Döring
+date: '2018-11-18'
+description: "TODO"
+draft: true
+categories:
+  - machine-learning
+---
+There are several performance measures for describing the quality of a machine learning model. 
+
+## Performance measures for regression
+
+### The coefficient of determination
+
+For regression, the coefficient of determination, $R^2$, is the performance metric of choice. This measure is based on Pearson's correlation coefficient. Let $\hat{Y}$ indicate the model estimates and $Y$ the observed outcomes. Then, $R^2$ is defined as:
+
+\[R^2 = \rho_{\hat{Y}, Y} = \frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y} \]
+
+where $\rho$ indicates the correlation coefficient, $\text{Cov}(\cdot,\cdot) \in \mathbb{R}$ is the covariance and $\sigma$ is the standard deviation. The covariance is defined as
+
+\[\text{Cov}(\hat{Y}, Y) = E[ (\hat{Y} - \mu_{\hat{Y}}) (Y - \mu_Y)] \]
+
+where $\mu$ indicates the mean. In discrete settings, this can be computed as
+
+\[\text{Cov}(\hat{Y}, Y) = \sum_{i=1}^N (\hat{y}_i - \overline{\hat{y}}) (y_i - \overline{y})\,.\]
+
+This means that the coveriance of predictions and outcomes will be positive if they exhibit similar deviations from the mean and negative if they exhibit contrasting deviations from the mean. 
+
+The standard deviation is defined as
+
+\[\sigma_Y = \sqrt{\text{Var}(Y)} = \sqrt{E[(Y - \mu_Y)^2}]\,,\]
+
+which, in discrete settings, can be computed as
+
+\[\sigma_Y = \sqrt{\frac{1}{N} \sum_{i = 1}^N (y_i - \overline{y})^2}\,. \]
+
+Note that the R function ```sd``` computes the population standard deviation, which uses $\frac{1}{N-1}$ to obtain an unbiased estimator. $\sigma$ is high if the distribution is wide (wide spread around the mean) and $\sigma$ is small if the distribution is narrow (little spread around the mean).
+
+### Intuition for correlations: covariance and standard deviations
+
+To understand covariance better, we create a function that plots the deviation of measurements from the mean:
+
+```{r}
+plot.mean.deviation <- function(y, y.hat, label) {
+    means <- c(mean(y), mean(y.hat))
+    y.deviation <- y - mean(y)
+    y.hat.deviation <- y.hat - mean(y.hat)
+    prod <- y.deviation * y.hat.deviation
+    df <- data.frame("N" = c(seq_along(y), seq_along(y)), 
+                     "Deviation" = c(y.deviation, y.hat.deviation),
+                     "Variable" = c(rep("Y", length(y)), 
+                                   rep("Y_Hat", length(y.hat))))
+    pos.neg <- ifelse(sign(prod) >= 0, "Positive", "Negative")
+    segment.df <- data.frame("N" = c(seq_along(y), seq_along(y)),
+                             "Y" = y.deviation, "Yend" = y.hat.deviation,
+                             "Sign" = pos.neg, "Contribution" = prod)
+    library(ggplot2)
+    covariance <- round(cov(y, y.hat), 2)
+    correlation <- round(cor(y, y.hat), 2)
+    title <- paste0(label, " (Cov: ", covariance, ", Cor: ", correlation, ")")
+    ggplot() + 
+        geom_segment(size = 2, data = segment.df, 
+                    aes(x = N, xend = N, y = Y, yend = Yend, color = Contribution))  +
+        geom_point(data = df, alpha = 0.9,
+                          aes(x = N, y = Deviation, shape = Variable)) +
+            xlab("Measurement i of N") + ylab("Deviation from mean value") +
+            ggtitle(title) +
+     scale_color_gradient2(mid = "grey60")
+}
+```
+
+We then generate data representing three types of covariance: positive covariance, negative covariance, and no covariance:
+
+```{r, fig.height = 10}
+# covariance
+set.seed(1501)
+N <- 50
+y <- rnorm(N)
+set.seed(1001)
+# high covariance: similar spread around mean
+y.hat <- y + runif(N, -1, 1)
+df.low <- data.frame(Y = y, Y_Hat = y.hat)
+p1 <- plot.mean.deviation(y, y.hat, label = "Positive Covariance")
+# negative covariance: contrasting spread around mean
+y.mean <- mean(y)
+noise <- rnorm(N, sd = 0.5)
+y.hat <- y - 2 * (y - y.mean) + noise
+p2 <- plot.mean.deviation(y, y.hat, "Negative Covariance")
+# no covariance
+y.hat <- runif(N, -0.1, 0.1)
+p3 <- plot.mean.deviation(y, y.hat, "No Covariance")
+library(gridExtra)
+grid.arrange(p1, p2, p3, nrow = 3)
+```
+
+Note that outliers (high deviations from the mean) have a greater impact on the covariance than values close to the mean. Moreover, note that a covariance close to 0 indicates that there does not seem to be an association between variables in any direction (i.e. individual contribution terms cancel out).
+
+Since the covariance depends on the spread of the data, the absolute covariance between two variables with high standard deviations is typically higher than the absolute covariance between variables with low variance. Let us visualize this property:
+
+```{r}
+# high variance data
+y <- rnorm(N, sd = 10)
+y.hat <- y + runif(N, -10, 10)
+plot.mean.deviation(y, y.hat, label = "Positive Covariance")
+df.high <- data.frame(Y = y, Y_Hat = y.hat)
+```
+
+Thus, the covariance by itself does not allow conclusions about the correlation of two variables. This is why Pearson's correlation coefficient normalizes the covariance by the standard deviations of the two variables. Since this standardizes correlations to the range $[-1,1]$, this makes correlations comparable even though the variables have different variances. 
+A value of -1 indicates a perfect negative correlation and a value of 1 indicates a perfect positive correlation, while a value of 0 indicates no correlation. 
+
+
+### Intuition for the coefficient of determination
+
+
+
+
+
+- Others: model-specific metrics, e.g. mean squared errors
+
+## Performance measures for clasification
