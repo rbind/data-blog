@@ -1,0 +1,18 @@
+---
+title: "Supervised Learning"
+description: "Supervised learning is the aspect of machine learning that is concernd with models for prediction. These models are trained using data sets in which each observation is labeled with an outcome."
+---
+Supervised learning is concerned with models for predicting the outcome for new data points.
+
+## Models for supervised learning
+
+The following supervised learning models are important:
+
+* [Linear models](/tags/linear-model): models that assume the existence of a linear relationship between the independent variables and the outcome.
+* Support vector machines: models that deal with non-linear associations by transforming the data to another space via kernel functions.
+* Neural networks: models that emulate the interaction of neurons in the nervous system.
+* $k$-nearest neighbors: a model that classifies a new data point according to its $k$ nearest neighbors in the training data.
+
+## Posts on supervised learning
+
+The following posts discuss the use of supervised learning in R.
