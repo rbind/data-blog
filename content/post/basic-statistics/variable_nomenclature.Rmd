@@ -1,0 +1,53 @@
+---
+title: "Statistical Nomenclature for Variables"
+author: Matthias Döring
+date: '2018-11-19'
+description: "Variables can be identified by their value as well as their role. Variables are categorized into quantitative, categorical, and ordinal variables, depending on their values. Moreover, when variables are used in statistical models, additional terms are used to indicate their role such as dependent, independent, and confounding variable."
+downloadRmd: false
+categories:
+  - basic-statistics
+---
+
+Variables can be differentiated by two characteristics. The first characteristic is the scale of the variable (i.e. the values that the variable can assume). The second is the role that the variable fulfills in a statistical model.
+
+## Measurements scales of variables
+
+Variables can be on the following scales:
+
+* **Quantitative variables:** Variables indicating numeric values for which pairwise differences are meaningful.
+* **Categorical variables:** Variables representing a discrete set of groups. Categorical values are also called nominal variables. 
+* **Ordinal variables:** Variables that represent a discrete set of values in which there is an ordering to the variables.
+
+Examples for a quantitative variable would include the height or the weight of a person. A characteristic such as the eye color of a person, on the other hand, gives rise to a categorical variable because there is only a discrete set of colors and there is no associated ordering. A person's fitness, on the other hand, could be modeled using a variable on the ordinal scale that can take values from 1 to 5, where a value of 1 indicates the smallest possible fitness and a value of 5 the largest possible fitness.
+
+### Interval and ratio variables
+
+Quantitative variables are sometimes further divided into interval and ratio variables. Ratio variables possess a clearly defined value of 0 where 0 corresponds to the absence of a quantity. Typical measurements on the ratio scale are concentrations or counts. For example, a conentration of 5 grams per liter is 5 times greater than a concentration of 1 gram per liter. An example for a variable that is on the interval scale is the temperature in Celsius. For example, a temperature of 20 degrees is not 20 times hotter than a temperature of 1 degrees.
+
+### Different models for different outcomes
+
+In supervised learning, the scale of the outcome identifies the type of task. If the outcome is a quantitative, the task is called regression and if it is categorical, the task is called classification. If the outcome is ordinal, the task is called ordinal regression. 
+
+It is important to select a model that respects the properties of the dependent variables. For example, a model that interprets a categorical variable with possibles values of $\{1, 2, 3\}$ as a
+quantitative variable would implicitly assume that the classes $1$ and $3$ are further apart than the classes $2$ and $3$, although this is probably not the case. If the outcome is ordinal, for example, the expression of a trait in terms of $\{\text{Low}, \text{Medium}, \text{High}\}$, then a categorical interpretation would be incorrect because this would mean that $\text{High}$ is equally distant to $\text{Medium}$ as to $\text{Low}$, although $\text{High}$ is in fact much closer to
+$\text{Medium}$ than to $\text{Low}$.
+
+
+## Roles of variables
+
+Variables can also be identified according to the role they play in a statistical model
+
+### Dependent and independent variables
+
+In supervised learning, one differentiates between two variables: the independent variable(s) and the dependent variable. Let us assume the following model specification:
+
+\[ X \sim Y \]
+
+Then, $X$ is the independent variable and Y is the dependent variable. Independent variables, which are also called features, make up the left-hand side of the model. These are the variables that are used to model the outcome $Y$, which is also called the dependent variable because its value depends on the values of the other variables. 
+
+### Confounding variables
+
+In statistical modeling, the concept of confounding is frequently used. Assume that there are two dependent variables $X_1$ and $X_2$ that are both associated with $Y$. If $X_1$ also influences $X_2$, then $X_1$ is considered to be a confounding variable. It is important to adjust (i.e. include) confounding variables in a model in order to prevent spurious interpretations of the model. 
+
+Confounding is of critical concern in clinical studies. Assume that a study investigates the beneficial effect of a new weight-loss drug. The researchers identify that the group that the drug works best on female subjects whose age ranges from 12 to 20. So, they may conclude that the drug should be particularly targeted to this group of persons. This, however, would be a false conclusion because the researchers did not consider that the frequency of anorexia is particularly
+high in this demographic. If the model had been adjusted for the presence of weight-influencing conditions, they would not have attributed increased weight loss to age and gender but rather to the true reason, e.g. anorexia, which would have prevented this false conclusion.
