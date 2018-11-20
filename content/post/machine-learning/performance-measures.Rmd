@@ -7,6 +7,8 @@ slug: "performance-measures-model-selection"
 thumbnail: "/post/machine-learning/auc_performance.png"
 categories:
   - machine-learning
+tags:
+    - performance-measure
 ---
 There are several performance measures for describing the quality of a machine learning model. However, the question is, which is the right measure for which problem? Here, I discuss the most important performance measures for selecting regression and classification models. Note that the performance measures introduced here should not be used for feature selection as they do not take model complexity into account.
 

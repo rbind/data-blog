@@ -7,6 +7,8 @@ slug: "performance-measures-model-selection"
 thumbnail: "/post/machine-learning/auc_performance.png"
 categories:
   - machine-learning
+tags:
+    - performance-measure
 ---
 
 
@@ -99,7 +101,8 @@ y.hat &lt;- y + runif(N, -10, 10)
 plot.mean.deviation(y, y.hat, label = &quot;Positive Covariance&quot;)</code></pre>
 <p><img src="/post/machine-learning/performance-measures_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <pre class="r"><code>df.high &lt;- data.frame(Y = y, Y_Hat = y.hat)</code></pre>
-<p>Thus, the covariance by itself does not allow conclusions about the correlation of two variables. This is why Pearson’s correlation coefficient normalizes the covariance by the standard deviations of the two variables. Since this standardizes correlations to the range <span class="math inline">\([-1,1]\)</span>, this makes correlations comparable even though the variables have different variances. A value of -1 indicates a perfect negative correlation and a value of 1 indicates a perfect positive correlation, while a value of 0 indicates no correlation.</p>
+<p>Thus, the covariance by itself does not allow conclusions about the correlation of two variables. This is why Pearson’s correlation coefficient normalizes the covariance by the standard deviations of the two variables. Since this standardizes correlations to the range <span class="math inline">\([-1,1]\)</span>, this makes correlations comparable even though the variables have different variances.
+A value of -1 indicates a perfect negative correlation and a value of 1 indicates a perfect positive correlation, while a value of 0 indicates no correlation.</p>
 </div>
 <div id="the-coefficient-of-determination" class="section level3">
 <h3>The coefficient of determination</h3>
@@ -109,12 +112,14 @@ plot.mean.deviation(y, y.hat, label = &quot;Positive Covariance&quot;)</code></p
 <p>The coefficient of determination can be interpreted in terms of the correlation coefficient or in terms of the explained variance.</p>
 <div id="interpretation-in-terms-of-the-correlation-coefficient" class="section level4">
 <h4>Interpretation in terms of the correlation coefficient</h4>
-<p>R squared is usually positive since models with an intercept produce predictions <span class="math inline">\(\hat{Y}\)</span> with <span class="math inline">\(SS_{\rm{res}} &lt; SS_{\rm{tot}}\)</span> because the predictions of the model are closer to the outcomes than the mean outcome. So, as long as an intercept is present, the coefficient of determination is the square of the correlation coefficient:</p>
+<p>R squared is usually positive since models with an intercept produce predictions <span class="math inline">\(\hat{Y}\)</span> with <span class="math inline">\(SS_{\rm{res}} &lt; SS_{\rm{tot}}\)</span> because the predictions of the model are closer to the outcomes than the mean outcome. So, as long as an intercept is present, the coefficient of determination is
+the square of the correlation coefficient:</p>
 <p><span class="math display">\[R^2 = \rho_{\hat{Y}, Y}^2\,.\]</span></p>
 </div>
 <div id="interpretation-in-terms-of-explained-variance" class="section level4">
 <h4>Interpretation in terms of explained variance</h4>
-<p>In cases where the total sum of squares decomposes into residual and regression sum of squares, <span class="math inline">\(SS_{\text{reg}}=\sum _{i}^N(\hat{y}_{i}-{\bar {y}})^{2}\)</span>, such that</p>
+<p>In cases where the total sum of squares decomposes into residual and regression sum of squares,
+<span class="math inline">\(SS_{\text{reg}}=\sum _{i}^N(\hat{y}_{i}-{\bar {y}})^{2}\)</span>, such that</p>
 <p><span class="math display">\[SS_{\text{res}} + SS_{\text{reg}} = SS_{\text{tot}}\,,\]</span></p>
 <p>then</p>
 <p><span class="math display">\[R^{2}={\frac {SS_{\text{reg}}}{SS_{\text{tot}}}}\,.\]</span></p>
@@ -251,11 +256,11 @@ print(paste0(&quot;R squared: &quot;, summary(model)$r.squared,
 <div id="accuracy-vs-sensitivity-and-specificity" class="section level3">
 <h3>Accuracy vs sensitivity and specificity</h3>
 <p>Based on the confusion matrix, accuracy, sensitivity (true positive rate, TPR) and specificity (1 - false positive rate, FPR) can be computed:</p>
-<span class="math display">\[\begin{align*}
+<p><span class="math display">\[\begin{align*}
 \text{accuracy} &amp;= \frac{TP + TN}{FP + TP + FN + TN} \\
 \text{sensitivity} &amp;= TPR = \frac{TP}{TP + FN} \\
 \text{specificity} &amp;= 1 - FPR = 1 - \frac{FP}{FP + TN} \\
-\end{align*}\]</span>
+\end{align*}\]</span></p>
 <p>Accuracy indicates the overall ratio of correct predictions. Accuracy has a bad reputation because it is unsuitable if the class labels are imbalanced. For example, imagine you want to predict the presence of rare tumors (class 1) versus their absence (class 0). Let us assume that only 10% of the data points belong to the positive class and 90% belong to the positive class. What would be the accuracy of a classifer that always predicts the negative class (i.e. that no tumor was found)? It would be 90%. However, this is probably not a very helpful classifier. Therefore, sensitivity and specificity are usually preferred over mere accuracy.</p>
 <p>Sensitivity indicates the ratio of observed positive outcomes that were correctly predicted, while specificity indicates the ratio of observed negative outcomes that were confused with the positive class. These two quantities answer the following questions:</p>
 <ul>

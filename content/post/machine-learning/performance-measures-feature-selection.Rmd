@@ -1,23 +1,29 @@
 ---
 title: "Performance Measures for Feature Selection"
 author: Matthias Döring
-date: '2018-11-19'
+date: '2018-11-20'
 draft: true
-description: "One of the main criteria of machine learning models is their predictive performance. However, suitable preformances measures differ depending on the specific prediction tasks. This post investigates the most common measures for regression and classification."
+description: "TODO"
 categories:
   - machine-learning
+tags:
+    - performance-measure
 ---
+In a recent post, I have discussed [performance measures for model selection](/post/machine-learning/performance-measures-model-selection/). This time, I write about a related topic: performance measures that are suitable for selecting models when performing feature selection. Since feature selection is concerned with reducing the number of dependent variables, suitable performance measures evaluate the trade-off between the number of features, $p$, and the fit of the model. 
 
 ## Performance measures for regression
 
-Suitable performance measures for regression depend on the task at hand. Most importantly, we need to differentiate model selection where the number of features $p$ of the compared models is identical to feature selection, where the number of features differ between the models. 
+The mean squared error (MSE) and $R^2$ are unsuited for comparing models during feature selection. This is because, according to these measures, models with more features will always outperform models with fewer features. Instead, the adjusted $R^2$ or Mallow's Cp statistic should be used.
 
-When comparing models with the same set of features, you can use the mean-squared error (MSE) or $R^2$. When a model giving a suitable tradeoff between fit and number of features should be found, the adjusted $R^2$ or Cp statistic should be used.
-### Measures for models with subsets of features
+### Adjusted R squared
 
-When selecting models that use feature subsets, other measures than the RMSE or coefficient of determination should be used because increasing the number of features always leads to a reduction in RMSE, or, equivalently, an increase in $R^2$. Thus, it is necessary to consider the number of features $p$ in addition to its fit. Two measures that can be used for this purpose are the adjusted $R^2$ and Mallow's Cp statistic.
+Given estimates of the outcome $\hat{Y}$ and observed outcomes $Y$, the coefficient of determination can be defined as the square of Pearson's correlation coefficient $\rho$:
 
-#### Adjusted R squared
+\[R^2  = \rho_{\hat{Y}, Y} = \frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y}\]
+
+For models with an intercept, $R^2$ is in the range $[0,1]$. The idea of the adjusted R squared is to adjust $R^2$ according to the number of features $p$. 
+
+!A model with n -p - 1 is the degrees of freedom!
 
 \[R^2_{\rm{adj}} = 1 - \frac{(1 - R^2) (n-1)}{n - p -1} \]
 
