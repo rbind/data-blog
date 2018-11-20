@@ -1,0 +1,304 @@
+---
+title: "Performance Measures for Model Selection"
+author: Matthias Döring
+date: '2018-11-19'
+description: "One of the main criteria indicating the quality of a machine learning models is its predictive performance. However, suitable performances measures differ depending on the prediction task. This post investigates the most commonly used quantities that are used for selecting regression and classification models."
+slug: "performance-measures-model-selection"
+thumbnail: "/post/machine-learning/auc_performance.png"
+categories:
+  - machine-learning
+---
+
+
+
+<p>There are several performance measures for describing the quality of a machine learning model. However, the question is, which is the right measure for which problem? Here, I discuss the most important performance measures for selecting regression and classification models. Note that the performance measures introduced here should not be used for feature selection as they do not take model complexity into account.</p>
+<div id="performance-measures-for-regression" class="section level2">
+<h2>Performance measures for regression</h2>
+<p>For models that are based on the same set of features, RMSE and <span class="math inline">\(R^2\)</span> are typically used for model selection.</p>
+<div id="the-mean-squared-error" class="section level3">
+<h3>The mean-squared error</h3>
+<p>The mean-squared error is determined by the residual sum of squares resulting from comparing the predictions <span class="math inline">\(\hat{y}\)</span> with the observed outcomes <span class="math inline">\(y\)</span>:</p>
+<p><span class="math display">\[MSE = \sum_{i=1}^N (y_i - \hat{y}_i)^2 \]</span></p>
+<p>Since the MSE is based on squared residuals, it is on the scale of the squared outcomes. Thus, the root of the MSE, which is on the scale of the outcome, is often used to report model fit:</p>
+<p><span class="math display">\[RMSE = \sqrt{MSE} \]</span></p>
+<p>A disadvantage of the mean-squared error is that it is not very interpretable because MSEs vary depending on the prediction task and thus cannot be compared across different tasks. Assume, for example, that one prediction task is concerned with estimating the weight of trucks and another is concerned with estimating the weight of apples. Then, in the first task, a good model may have an RMSE of 100 kg, while a good model for the second task may have an RMSE of 0,5 kg. Therefore, while RMSE is viable for model selection, it is rarely reported and <span class="math inline">\(R^2\)</span> is used instead.</p>
+</div>
+<div id="pearsons-correlation-coefficient" class="section level3">
+<h3>Pearson’s correlation coefficient</h3>
+<p>Since the coefficient of determination can be interpreted in terms of Pearson’s correlation coefficient, we will introduce this quantity first. Let <span class="math inline">\(\hat{Y}\)</span> indicate the model estimates and <span class="math inline">\(Y\)</span> the observed outcomes. Then, the correlation coefficient is defined as</p>
+<p><span class="math display">\[\rho_{\hat{Y}, Y} = \frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y} \]</span></p>
+<p>where <span class="math inline">\(\text{Cov}(\cdot,\cdot) \in \mathbb{R}\)</span> is the covariance and <span class="math inline">\(\sigma\)</span> is the standard deviation. The covariance is defined as</p>
+<p><span class="math display">\[\text{Cov}(\hat{Y}, Y) = E[ (\hat{Y} - \mu_{\hat{Y}}) (Y - \mu_Y)] \]</span></p>
+<p>where <span class="math inline">\(\mu\)</span> indicates the mean. In discrete settings, this can be computed as</p>
+<p><span class="math display">\[\text{Cov}(\hat{Y}, Y) = \sum_{i=1}^N (\hat{y}_i - \bar{\hat{y}}) (y_i - \bar{y})\,.\]</span></p>
+<p>This means that the covariance of predictions and outcomes will be positive if they exhibit similar deviations from the mean and negative if they exhibit contrasting deviations from the mean.</p>
+<p>The standard deviation is defined as</p>
+<p><span class="math display">\[\sigma_Y = \sqrt{\text{Var}(Y)} = \sqrt{E[(Y - \mu_Y)^2}]\,,\]</span></p>
+<p>which, in discrete settings, can be computed as</p>
+<p><span class="math display">\[\sigma_Y = \sqrt{\frac{1}{N} \sum_{i = 1}^N (y_i - \bar{y})^2}\,. \]</span></p>
+<p>Note that the R function <code>sd</code> computes the population standard deviation, which uses <span class="math inline">\(\frac{1}{N-1}\)</span> to obtain an unbiased estimator. <span class="math inline">\(\sigma\)</span> is high if the distribution is wide (wide spread around the mean) and <span class="math inline">\(\sigma\)</span> is small if the distribution is narrow (little spread around the mean).</p>
+</div>
+<div id="intuition-for-correlations-covariance-and-standard-deviations" class="section level3">
+<h3>Intuition for correlations: covariance and standard deviations</h3>
+<p>To understand covariance better, we create a function that plots the deviation of measurements from the mean:</p>
+<pre class="r"><code>plot.mean.deviation &lt;- function(y, y.hat, label) {
+    means &lt;- c(mean(y), mean(y.hat))
+    y.deviation &lt;- y - mean(y)
+    y.hat.deviation &lt;- y.hat - mean(y.hat)
+    prod &lt;- y.deviation * y.hat.deviation
+    df &lt;- data.frame(&quot;N&quot; = c(seq_along(y), seq_along(y)), 
+                     &quot;Deviation&quot; = c(y.deviation, y.hat.deviation),
+                     &quot;Variable&quot; = c(rep(&quot;Y&quot;, length(y)), 
+                                   rep(&quot;Y_Hat&quot;, length(y.hat))))
+    pos.neg &lt;- ifelse(sign(prod) &gt;= 0, &quot;Positive&quot;, &quot;Negative&quot;)
+    segment.df &lt;- data.frame(&quot;N&quot; = c(seq_along(y), seq_along(y)),
+                             &quot;Y&quot; = y.deviation, &quot;Yend&quot; = y.hat.deviation,
+                             &quot;Sign&quot; = pos.neg, &quot;Contribution&quot; = prod)
+    library(ggplot2)
+    covariance &lt;- round(cov(y, y.hat), 2)
+    correlation &lt;- round(cor(y, y.hat), 2)
+    title &lt;- paste0(label, &quot; (Cov: &quot;, covariance, &quot;, Cor: &quot;, correlation, &quot;)&quot;)
+    ggplot() + 
+        geom_segment(size = 2, data = segment.df, 
+                    aes(x = N, xend = N, y = Y, yend = Yend, color = Contribution))  +
+        geom_point(data = df, alpha = 0.8, size = 2,
+                          aes(x = N, y = Deviation, shape = Variable)) +
+            xlab(&quot;Measurement i of N&quot;) + ylab(&quot;Deviation from mean value&quot;) +
+            ggtitle(title) +
+     scale_color_gradient2(mid = &quot;grey60&quot;) + 
+     scale_shape_manual(values = 15:16, 
+        label = c(expression(Y), expression(hat(Y))))
+}</code></pre>
+<p>We then generate data representing three types of covariance: positive covariance, negative covariance, and no covariance:</p>
+<pre class="r"><code># covariance
+set.seed(1501)
+N &lt;- 50
+y &lt;- rnorm(N)
+set.seed(1001)
+# high covariance: similar spread around mean
+y.hat &lt;- y + runif(N, -1, 1)
+df.low &lt;- data.frame(Y = y, Y_Hat = y.hat)
+p1 &lt;- plot.mean.deviation(y, y.hat, label = &quot;Positive Covariance&quot;)
+# negative covariance: contrasting spread around mean
+y.mean &lt;- mean(y)
+noise &lt;- rnorm(N, sd = 0.5)
+y.hat &lt;- y - 2 * (y - y.mean) + noise
+p2 &lt;- plot.mean.deviation(y, y.hat, &quot;Negative Covariance&quot;)
+# no covariance
+y.hat &lt;- runif(N, -0.1, 0.1)
+df.no &lt;- data.frame(Y = y, Y_Hat = y.hat)
+p3 &lt;- plot.mean.deviation(y, y.hat, &quot;No Covariance&quot;)
+library(gridExtra)
+grid.arrange(p1, p2, p3, nrow = 3)</code></pre>
+<p><img src="/post/machine-learning/performance-measures_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Note that outliers (high deviations from the mean) have a greater impact on the covariance than values close to the mean. Moreover, note that a covariance close to 0 indicates that there does not seem to be an association between variables in any direction (i.e. individual contribution terms cancel out).</p>
+<p>Since the covariance depends on the spread of the data, the absolute covariance between two variables with high standard deviations is typically higher than the absolute covariance between variables with low variance. Let us visualize this property:</p>
+<pre class="r"><code># high variance data
+y &lt;- rnorm(N, sd = 10)
+y.hat &lt;- y + runif(N, -10, 10)
+plot.mean.deviation(y, y.hat, label = &quot;Positive Covariance&quot;)</code></pre>
+<p><img src="/post/machine-learning/performance-measures_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>df.high &lt;- data.frame(Y = y, Y_Hat = y.hat)</code></pre>
+<p>Thus, the covariance by itself does not allow conclusions about the correlation of two variables. This is why Pearson’s correlation coefficient normalizes the covariance by the standard deviations of the two variables. Since this standardizes correlations to the range <span class="math inline">\([-1,1]\)</span>, this makes correlations comparable even though the variables have different variances. A value of -1 indicates a perfect negative correlation and a value of 1 indicates a perfect positive correlation, while a value of 0 indicates no correlation.</p>
+</div>
+<div id="the-coefficient-of-determination" class="section level3">
+<h3>The coefficient of determination</h3>
+<p>The coefficient of determination, <span class="math inline">\(R^2\)</span>, is defined as</p>
+<p><span class="math display">\[R^2 = 1- \frac{SS_{\rm {res}}}{SS_{\rm {tot}}}\,\]</span></p>
+<p>where <span class="math inline">\(SS_{\rm{res}} = \sum_{i=1}^N (y_i - \hat{y}_i)^2\)</span> is the residual sum of squares and <span class="math inline">\(SS_{\rm{tot}} = \sum_{i=1}^N (y_i - \bar{y})^2\)</span> is the total sum of squares. For model selection, <span class="math inline">\(R^2\)</span> is equivalent to the RMSE because for models based on the same data, the model with minimal MSE will also have the maximal value of <span class="math inline">\(R^2\)</span> since <span class="math inline">\(SS_{\rm{res}}\)</span> is in the enumerator of <span class="math inline">\(R^2\)</span>.</p>
+<p>The coefficient of determination can be interpreted in terms of the correlation coefficient or in terms of the explained variance.</p>
+<div id="interpretation-in-terms-of-the-correlation-coefficient" class="section level4">
+<h4>Interpretation in terms of the correlation coefficient</h4>
+<p>R squared is usually positive since models with an intercept produce predictions <span class="math inline">\(\hat{Y}\)</span> with <span class="math inline">\(SS_{\rm{res}} &lt; SS_{\rm{tot}}\)</span> because the predictions of the model are closer to the outcomes than the mean outcome. So, as long as an intercept is present, the coefficient of determination is the square of the correlation coefficient:</p>
+<p><span class="math display">\[R^2 = \rho_{\hat{Y}, Y}^2\,.\]</span></p>
+</div>
+<div id="interpretation-in-terms-of-explained-variance" class="section level4">
+<h4>Interpretation in terms of explained variance</h4>
+<p>In cases where the total sum of squares decomposes into residual and regression sum of squares, <span class="math inline">\(SS_{\text{reg}}=\sum _{i}^N(\hat{y}_{i}-{\bar {y}})^{2}\)</span>, such that</p>
+<p><span class="math display">\[SS_{\text{res}} + SS_{\text{reg}} = SS_{\text{tot}}\,,\]</span></p>
+<p>then</p>
+<p><span class="math display">\[R^{2}={\frac {SS_{\text{reg}}}{SS_{\text{tot}}}}\,.\]</span></p>
+<p>This means that <span class="math inline">\(R^2\)</span> indicates the ratio of variance that is explained by the model. Therefore, a model with <span class="math inline">\(R^2 = 0.7\)</span> would explain <span class="math inline">\(70\%\)</span> of the variance, leaving <span class="math inline">\(30\%\)</span> of the variance unexplained.</p>
+</div>
+<div id="intuition-for-the-coefficient-of-determination" class="section level4">
+<h4>Intuition for the coefficient of determination</h4>
+<p>To obtain an intuition about <span class="math inline">\(R^2\)</span>, we define the following functions with which we can plot the fit of a linear model. The ideal model would lie on a diagonal through the plot and the residuals are indicated as the deviations from this diagonal.</p>
+<pre class="r"><code>rsquared &lt;- function(test.preds, test.labels) {
+    return(round(cor(test.preds, test.labels)^2, 3))
+}
+plot.linear.model &lt;- function(model, test.preds = NULL, test.labels = NULL, 
+                            test.only = FALSE) {
+    # ensure that model is interpreted as a GLM
+    pred &lt;- model$fitted.values
+    obs &lt;- model$model[,1]
+    if (test.only) {
+        # plot only the results for the test set
+        plot.df &lt;- NULL
+        plot.res.df &lt;- NULL
+    } else {
+        plot.df &lt;- data.frame(&quot;Prediction&quot; = pred, &quot;Outcome&quot; = obs, 
+                                &quot;DataSet&quot; = &quot;training&quot;)
+        model.residuals &lt;- obs - pred
+        plot.res.df &lt;- data.frame(&quot;x&quot; = obs, &quot;y&quot; = pred, 
+                        &quot;x1&quot; = obs, &quot;y2&quot; = pred + model.residuals,
+                        &quot;DataSet&quot; = &quot;training&quot;)
+    }
+    r.squared &lt;- NULL
+    if (!is.null(test.preds) &amp;&amp; !is.null(test.labels)) {
+        # store predicted points: 
+        test.df &lt;- data.frame(&quot;Prediction&quot; = test.preds, 
+                            &quot;Outcome&quot; = test.labels, &quot;DataSet&quot; = &quot;test&quot;)
+        # store residuals for predictions on the test data
+        test.residuals &lt;- test.labels - test.preds
+        test.res.df &lt;- data.frame(&quot;x&quot; = test.labels, &quot;y&quot; = test.preds,
+                        &quot;x1&quot; = test.labels, &quot;y2&quot; = test.preds + test.residuals,
+                         &quot;DataSet&quot; = &quot;test&quot;)
+        # append to existing data
+        plot.df &lt;- rbind(plot.df, test.df)
+        plot.res.df &lt;- rbind(plot.res.df, test.res.df)
+        # annotate model with R^2 value
+        r.squared &lt;- rsquared(test.preds, test.labels)
+    }
+    #######
+    library(ggplot2)
+    p &lt;- ggplot() + 
+        # plot training samples
+        geom_point(data = plot.df, 
+            aes(x = Outcome, y = Prediction, color = DataSet)) +
+        # plot residuals
+        geom_segment(data = plot.res.df, alpha = 0.2,
+            aes(x = x, y = y, xend = x1, yend = y2, group = DataSet)) +
+        # plot optimal regressor
+        geom_abline(color = &quot;red&quot;, slope = 1)
+    if (!is.null(r.squared)) {
+        # plot r squared of predictions
+        max.val &lt;- max(plot.df$Outcome, plot.df$Prediction)
+        x.pos &lt;- 0.2 * max.val
+        y.pos &lt;- 0.9 * max.val
+        label &lt;- paste0(&quot;R^2: &quot;, r.squared)
+        p &lt;- p + annotate(&quot;text&quot;, x = x.pos, y = y.pos, label = label, size = 5)
+    }
+    return(p)
+}</code></pre>
+<p>For example, compare the following models</p>
+<pre class="r"><code>model &lt;- lm(Y ~ Y_Hat, data = df.low)
+plot.linear.model(model) </code></pre>
+<p><img src="/post/machine-learning/performance-measures_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>model &lt;- lm(Y ~ Y_Hat, data = df.no)
+plot.linear.model(model)</code></pre>
+<p><img src="/post/machine-learning/performance-measures_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<p>While the model based on <code>df.low</code> has a sufficient fit (R squared of 0.584), <code>df.low</code> does not fit the data well (R squared of 0.009).</p>
+</div>
+<div id="limitations-of-r-squared" class="section level4">
+<h4>Limitations of R squared</h4>
+<p>Blindly selecting a model solely based on R squared is usually a bad idea. First, R squared does not necessarily tell us something about goodness of fit. For example, consider data with an exponential distribution:</p>
+<pre class="r"><code>x &lt;- rexp(50,rate=0.005)  # exponential
+y &lt;- (x + 2.5)^2 * runif(50, min=0.8, max=2) # non-linear relationship with x
+plot(x,y)   </code></pre>
+<p><img src="/post/machine-learning/performance-measures_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Let us compute <span class="math inline">\(R^2\)</span> for a linear model fitted on these data:</p>
+<pre class="r"><code>df &lt;- data.frame(&quot;x&quot; = x, &quot;y&quot; = y)
+model &lt;- lm(x ~ y, data = df)
+print(round(summary(model)$r.squared, 2))</code></pre>
+<pre><code>## [1] 0.9</code></pre>
+<p>As we can see, R squared is very high. Still, the model does not fit well because it does not respect the exponential distribution of the data.</p>
+<p>Another property of <span class="math inline">\(R^2\)</span> is that it depends on the value range. <span class="math inline">\(R^2\)</span> is typically larger for wide value ranges of <span class="math inline">\(X\)</span> because the increase in covariance is adjusted by the standard deviation, which scales more slowly than the covariance due to the <span class="math inline">\(\frac{1}{N}\)</span> term.</p>
+<pre class="r"><code># wide value range:
+x &lt;- seq(1,10,length.out = 100)
+y &lt;- 2 + 1.2*x + rnorm(100,0,sd = 0.9)
+model &lt;- lm(y ~ x)
+mse &lt;- sum((fitted(model) - y)^2)/100 
+print(paste0(&quot;R squared: &quot;, summary(model)$r.squared,
+        &quot;, MSE:&quot;, mse))</code></pre>
+<pre><code>## [1] &quot;R squared: 0.924115453794893, MSE:0.806898017781999&quot;</code></pre>
+<pre class="r"><code># narrow value range
+x &lt;- seq(1,2,length.out = 100)
+y &lt;- 2 + 1.2*x + rnorm(100,0,sd = 0.9)
+model &lt;- lm(y ~ x)
+mse &lt;- sum((fitted(model) - y)^2)/100 
+print(paste0(&quot;R squared: &quot;, summary(model)$r.squared,
+        &quot;, MSE:&quot;, mse))</code></pre>
+<pre><code>## [1] &quot;R squared: 0.0657969487417489, MSE:0.776376454723889&quot;</code></pre>
+<p>As we can see, even though both models have similar residual sum of squares, the first model has a superior <span class="math inline">\(R^2\)</span>.</p>
+</div>
+</div>
+</div>
+<div id="performance-measures-for-classification" class="section level2">
+<h2>Performance measures for classification</h2>
+<p>Many performance measures for binary classification rely on the confusion matrix. Assume that there are two classes, <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>, where <span class="math inline">\(1\)</span> indicates the presence of a trait (the positive class) and <span class="math inline">\(0\)</span> the absence of a trait (the negative class). The corresponding confusion matrix is a <span class="math inline">\(2 \times 2\)</span> table with the following structure:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Prediction/Reference</th>
+<th>0</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>TN</td>
+<td>FN</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>FP</td>
+<td>TP</td>
+</tr>
+</tbody>
+</table>
+<p>where TN indicates the number of true negatives (model predicts negative class correctly), FN indicates the number of false negatives (model incorrectly predicts negative class), FP indicates the number of false positives (model incorrectly predicts positive class), and TP indicates the number of true positives (model correctly predicts positive class).</p>
+<div id="accuracy-vs-sensitivity-and-specificity" class="section level3">
+<h3>Accuracy vs sensitivity and specificity</h3>
+<p>Based on the confusion matrix, accuracy, sensitivity (true positive rate, TPR) and specificity (1 - false positive rate, FPR) can be computed:</p>
+<span class="math display">\[\begin{align*}
+\text{accuracy} &amp;= \frac{TP + TN}{FP + TP + FN + TN} \\
+\text{sensitivity} &amp;= TPR = \frac{TP}{TP + FN} \\
+\text{specificity} &amp;= 1 - FPR = 1 - \frac{FP}{FP + TN} \\
+\end{align*}\]</span>
+<p>Accuracy indicates the overall ratio of correct predictions. Accuracy has a bad reputation because it is unsuitable if the class labels are imbalanced. For example, imagine you want to predict the presence of rare tumors (class 1) versus their absence (class 0). Let us assume that only 10% of the data points belong to the positive class and 90% belong to the positive class. What would be the accuracy of a classifer that always predicts the negative class (i.e. that no tumor was found)? It would be 90%. However, this is probably not a very helpful classifier. Therefore, sensitivity and specificity are usually preferred over mere accuracy.</p>
+<p>Sensitivity indicates the ratio of observed positive outcomes that were correctly predicted, while specificity indicates the ratio of observed negative outcomes that were confused with the positive class. These two quantities answer the following questions:</p>
+<ul>
+<li>Sensitivity: If an event happens, how likely is it that the model detects the event?</li>
+<li>Specificity: If no event happens, how likely is it that the model identifies that no event occurred?</li>
+</ul>
+<p>We always need to consider sensitivity and specificity together because, on their own, these quantities are not useful for model selection. For example, a model that always predicts the positive class would maximize sensitivity, while a model that always predicts the negative class would maximize specificity. However, the first model would suffer from low specificity, while the second model would suffer from low sensitivity. Thus, sensitivity and specificity can be interpreted as a seesaw since increases in sensitivity typically lead to decreases in specificity, and vice versa.</p>
+<p>Sensitivity and specificity can be combined into a single quantity by computing the balanced accuracy, which is defined as</p>
+<p>[ = \,.]</p>
+<p>The balanced accuracy is a more suitable measure for problems in which the classes are imbalanced.</p>
+</div>
+<div id="the-area-under-the-receiver-operating-characteristic-curve" class="section level3">
+<h3>The area under the receiver operating characteristic curve</h3>
+<p>Scoring classifiers are classifiers that assign a numeric value to every prediction, which can be used as a cutoff for differentiating the two classes. For example, binary support vector machines would assign values greater than 1 to the positive class and values less than -1 to the negative class. For scoring classifiers, we typically want to determine model performance not for a single cutoff but for many cutoffs.</p>
+<p>This is where the AUC (area under the receiver operating characteristic curve) comes in. This quantity indicates the trade-off between sensitivity and specificity for several cutoffs. This is because the receiver operating characteristic (ROC) curve is simply a plot of TPR vs FPR and the AUC is the area defined by this curve, which is in the range [0, and the AUC is the area defined by this curve, which is in the range [0,1].</p>
+<p>Using R, we can compute AUCs using the <code>ROCR</code> package. Let us first create a function for plotting the scores of a classifier as well as its AUC:</p>
+<pre class="r"><code>plot.scores.AUC &lt;- function(y, y.hat) {
+    par(mfrow=c(1,2))
+    hist(y.hat[y == 0], col=rgb(1,0,0,0.5), 
+         main = &quot;Score Distribution&quot;,
+         breaks=seq(min(y.hat),max(y.hat)+1, 1), xlab = &quot;Prediction&quot;)
+    hist(y.hat[y == 1], col = rgb(0,0,1,0.5), add=T, 
+            breaks=seq(min(y.hat),max(y.hat) + 1, 1))
+    legend(&quot;topleft&quot;, legend = c(&quot;Class 0&quot;, &quot;Class 1&quot;),  col=c(&quot;red&quot;, &quot;blue&quot;), lty=1, cex=1)
+    # plot ROC curve
+    library(ROCR)
+    pr &lt;- prediction(y.hat, y)
+    prf &lt;- performance(pr, measure = &quot;tpr&quot;, x.measure = &quot;fpr&quot;)
+    # get AUC
+    auc &lt;- performance(pr, measure = &quot;auc&quot;)@y.values[[1]]
+    plot(prf, main = paste0(&quot;ROC Curve (AUC: &quot;, round(auc, 2), &quot;)&quot;))
+}</code></pre>
+<p>Using the plot, we can now demonstrate how the AUC behaves when the scores of a classifier allow for perfect separation and when this is not the case.</p>
+<pre class="r"><code># create binary labels
+y &lt;- c(rep(0, 50), rep(1, 50))
+# simulate scoring classifier with two separated Gaussians
+y.hat &lt;- c(rnorm(50, -2, sd = 1), rnorm(50, 2, sd = 0.75))
+plot.scores.AUC(y, y.hat)</code></pre>
+<p><img src="/post/machine-learning/performance-measures_files/figure-html/unnamed-chunk-10-1.png" width="960" /></p>
+<pre class="r"><code># create slightly overlapping Gaussians
+y.hat &lt;- c(rnorm(50, -1, sd = 2), rnorm(50, 1, sd = 3))
+plot.scores.AUC(y, y.hat)</code></pre>
+<p><img src="/post/machine-learning/performance-measures_files/figure-html/unnamed-chunk-10-2.png" width="960" /></p>
+<p>The first example shows that a classifier, which allows for perfect separation, has an AUC of 1. Classifiers that do not afford perfect separation need to sacrifice specificity to increase their sensitivity. Thus, their AUC will be less than 1.</p>
+</div>
+</div>
