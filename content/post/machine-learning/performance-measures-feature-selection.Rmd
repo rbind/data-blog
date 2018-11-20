@@ -1,0 +1,43 @@
+---
+title: "Performance Measures for Feature Selection"
+author: Matthias Döring
+date: '2018-11-19'
+draft: true
+description: "One of the main criteria of machine learning models is their predictive performance. However, suitable preformances measures differ depending on the specific prediction tasks. This post investigates the most common measures for regression and classification."
+categories:
+  - machine-learning
+---
+
+## Performance measures for regression
+
+Suitable performance measures for regression depend on the task at hand. Most importantly, we need to differentiate model selection where the number of features $p$ of the compared models is identical to feature selection, where the number of features differ between the models. 
+
+When comparing models with the same set of features, you can use the mean-squared error (MSE) or $R^2$. When a model giving a suitable tradeoff between fit and number of features should be found, the adjusted $R^2$ or Cp statistic should be used.
+### Measures for models with subsets of features
+
+When selecting models that use feature subsets, other measures than the RMSE or coefficient of determination should be used because increasing the number of features always leads to a reduction in RMSE, or, equivalently, an increase in $R^2$. Thus, it is necessary to consider the number of features $p$ in addition to its fit. Two measures that can be used for this purpose are the adjusted $R^2$ and Mallow's Cp statistic.
+
+#### Adjusted R squared
+
+\[R^2_{\rm{adj}} = 1 - \frac{(1 - R^2) (n-1)}{n - p -1} \]
+
+The intuition behind $R^2$ is the following:
+
+* $R^2_{\rm{adj}}$ increases if the enumerator decreases, that is, if $R^2$ is large 
+* $R^2_{\rm{adj}}$ increases if the denominator increases, that is, if $p$ is small
+
+This means that $R^2_{\rm{adj}$ only increases when predictors that meaningfully increase $R^2$ are included in the model.
+
+#### Mallow's Cp
+
+Mallow's Cp statistic can be used to assess the fit of least-squares models during feature selection. For Gaussian models, it is identical to the Akaike Information Criterion. Small values of Cp are assigned to models with a good fit. 
+
+The Cp statistic assigns a value of $p+1$ for an ideal model, where $p$ is the number of independent variables. If  $C_p > p+1$, this means that the model is overspecified (i.e. contains too many variables). Assume that there are $k$ available features and you are evaluating a model with $p$ features, then the Cp statistic is defined as:
+
+\[C_p = \frac{SS_{\rm {res}}}{MSE_k} - N + 2 p \]
+
+where $SS_{\rm {res}}$ is the residual sum of squares from the model with $p$ features and $MSE_k$ is the mean-squared error of the model using all of the $k$ features.
+
+## Performance measures for classification
+
+AIC TODO

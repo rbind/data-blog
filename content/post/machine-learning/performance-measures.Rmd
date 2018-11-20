@@ -1,18 +1,34 @@
 ---
-title: "Performance Measures for Machine Learning"
+title: "Performance Measures for Model Selection"
 author: Matthias Döring
 date: '2018-11-19'
-description: "One of the main criteria of machine learning models is their predictive performance. However, suitable preformances measures differ depending on the specific prediction tasks. This post investigates the most common measures for regression and classification."
+description: "One of the main criteria indicating the quality of a machine learning models is its predictive performance. However, suitable performances measures differ depending on the prediction task. This post investigates the most commonly used quantities that are used for selecting regression and classification models."
+slug: "performance-measures-model-selection"
+thumbnail: "/post/machine-learning/auc_performance.png"
 categories:
   - machine-learning
 ---
-There are several performance measures for describing the quality of a machine learning model. 
+There are several performance measures for describing the quality of a machine learning model. However, the question is, which is the right measure for which problem? Here, I discuss the most important performance measures for selecting regression and classification models. Note that the performance measures introduced here should not be used for feature selection as they do not take model complexity into account.
 
 ## Performance measures for regression
 
-### The coefficient of determination
+For models that are based on the same set of features, RMSE and $R^2$ are typically used for model selection.
 
-For regression, the coefficient of determination, $R^2$, is the performance metric of choice. This measure is based on Pearson's correlation coefficient. Let $\hat{Y}$ indicate the model estimates and $Y$ the observed outcomes. Then, the correlation coefficient is defined as
+### The mean-squared error
+
+The mean-squared error is determined by the residual sum of squares resulting from comparing the predictions $\hat{y}$ with the observed outcomes $y$:
+
+\[MSE = \sum_{i=1}^N (y_i - \hat{y}_i)^2 \]
+
+Since the MSE is based on squared residuals, it is on the scale of the squared outcomes. Thus, the root of the MSE, which is on the scale of the outcome, is often used to report model fit:
+
+\[RMSE = \sqrt{MSE} \]
+
+A disadvantage of the mean-squared error is that it is not very interpretable because MSEs vary depending on the prediction task and thus cannot be compared across different tasks. Assume, for example, that one prediction task is concerned with estimating the weight of trucks and another is concerned with estimating the weight of apples. Then, in the first task, a good model may have an RMSE of 100 kg, while a good model for the second task may have an RMSE of 0,5 kg. Therefore, while RMSE is viable for model selection, it is rarely reported and $R^2$ is used instead.
+
+### Pearson's correlation coefficient
+
+Since the coefficient of determination can be interpreted in terms of Pearson's correlation coefficient, we will introduce this quantity first. Let $\hat{Y}$ indicate the model estimates and $Y$ the observed outcomes. Then, the correlation coefficient is defined as
 
 \[\rho_{\hat{Y}, Y} = \frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y} \]
 
@@ -24,7 +40,7 @@ where $\mu$ indicates the mean. In discrete settings, this can be computed as
 
 \[\text{Cov}(\hat{Y}, Y) = \sum_{i=1}^N (\hat{y}_i - \bar{\hat{y}}) (y_i - \bar{y})\,.\]
 
-This means that the coveriance of predictions and outcomes will be positive if they exhibit similar deviations from the mean and negative if they exhibit contrasting deviations from the mean. 
+This means that the covariance of predictions and outcomes will be positive if they exhibit similar deviations from the mean and negative if they exhibit contrasting deviations from the mean. 
 
 The standard deviation is defined as
 
@@ -117,16 +133,18 @@ The coefficient of determination, $R^2$, is defined as
 
 \[R^2 = 1- \frac{SS_{\rm {res}}}{SS_{\rm {tot}}}\,\]
 
-where $SS_{\rm{res}} = \sum_{i=1}^N (y_i - \hat{y}_i)^2$ is the residual sum of squares and $SS_{\rm{tot}} = \sum_{i=1}^N (y_i - \bar{y})^2$ is the total sum of squares. 
+where $SS_{\rm{res}} = \sum_{i=1}^N (y_i - \hat{y}_i)^2$ is the residual sum of squares and $SS_{\rm{tot}} = \sum_{i=1}^N (y_i - \bar{y})^2$ is the total sum of squares. For model selection, $R^2$ is equivalent to the RMSE because for models based on the same data, the model with minimal MSE will also have the maximal value of $R^2$ since $SS_{\rm{res}}$ is in the enumerator of $R^2$.
+
+The coefficient of determination can be interpreted in terms of the correlation coefficient or in terms of the explained variance.
 
 #### Interpretation in terms of the correlation coefficient
 
-R squared is usually positive since models with an intercept produce predictions $\hat{Y}$ with $SS_{\rm{res}} < SS_{\rm{tot}}$ because the preditions of the model are closer to the outcomes than the mean outcome. So, as long as an intercept is present, the coefficient of determination is
+R squared is usually positive since models with an intercept produce predictions $\hat{Y}$ with $SS_{\rm{res}} < SS_{\rm{tot}}$ because the predictions of the model are closer to the outcomes than the mean outcome. So, as long as an intercept is present, the coefficient of determination is
 the square of the correlation coefficient:
 
 \[R^2 = \rho_{\hat{Y}, Y}^2\,.\]
 
-#### Interpteration in terms of explained variance
+#### Interpretation in terms of explained variance
 
 In cases where the total sum of squares decomposes into residual and regression sum of squares, 
 $SS_{\text{reg}}=\sum _{i}^N(\hat{y}_{i}-{\bar {y}})^{2}$, such that
@@ -139,7 +157,7 @@ then
 
 This means that $R^2$ indicates the ratio of variance that is explained by the model. Therefore, a model with $R^2 = 0.7$ would explain $70\%$ of the variance, leaving $30\%$ of the variance unexplained.
 
-### Intuition for the coefficient of determination
+#### Intuition for the coefficient of determination
 
 To obtain an intuition about $R^2$, we define the following functions with which we can plot the fit of a linear model. The ideal model would lie on a diagonal through the plot and the residuals are indicated as the deviations from this diagonal.
 
@@ -214,7 +232,7 @@ plot.linear.model(model)
 
 While the model based on ```df.low``` has a sufficient fit (R squared of `r rsquared(df.low$Y, df.low$Y_Hat)`), ```df.low``` does not fit the data well (R squared of `r rsquared(df.no$Y, df.no$Y_Hat)`). 
 
-### Limitations of R squared
+#### Limitations of R squared
 
 Blindly selecting a model solely based on R squared is usually a bad idea. First, R squared does not necessarily tell us something about goodness of fit. For example, consider data with an exponential distribution:
 
@@ -234,35 +252,103 @@ print(round(summary(model)$r.squared, 2))
 
 As we can see, R squared is very high. Still, the model does not fit well because it does not respect the exponential distribution of the data.
 
-Another property of $R^2$ is that it depends on the value range. This is because the covariance is adjusted by the standard deviations of the variables, which is larger for variables with a greater range. 
+Another property of $R^2$ is that it depends on the value range. $R^2$ is typically larger for wide value ranges of $X$ because the increase in covariance is adjusted by the standard deviation, which scales more slowly than the covariance due to the $\frac{1}{N}$ term.
 
 ```{r}
 # wide value range:
 x <- seq(1,10,length.out = 100)
 y <- 2 + 1.2*x + rnorm(100,0,sd = 0.9)
-mod1 <- lm(y ~ x)
-mse <- sum((fitted(mod1) - y)^2)/100 
-print(summary(mod1)$r.squared)
-print(mse)
+model <- lm(y ~ x)
+mse <- sum((fitted(model) - y)^2)/100 
+print(paste0("R squared: ", summary(model)$r.squared,
+        ", MSE:", mse))
 # narrow value range
 x <- seq(1,2,length.out = 100)
 y <- 2 + 1.2*x + rnorm(100,0,sd = 0.9)
-mod1 <- lm(y ~ x)
-mse <- sum((fitted(mod1) - y)^2)/100 
-print(summary(mod1)$r.squared)
-print(mse)
+model <- lm(y ~ x)
+mse <- sum((fitted(model) - y)^2)/100 
+print(paste0("R squared: ", summary(model)$r.squared,
+        ", MSE:", mse))
 ```
 
 As we can see, even though both models have similar residual sum of squares, the first model has a superior $R^2$. 
 
-### Mean squared error
-
-### Mallow's Cp
-
-Mallow's Cp statistic can be used to assess the fit of linear models fitted using least squares. For Gaussian models, it is identical to the Akaike Information Criterion. Small values of Cp are assigned to models with a good fit. The Cp statistic assigns a value of $p+1$ for an ideal model, where $p$ is the number of independent variables. If  $C_p > p+1$, this means that the model is overspecified (i.e. contains too many variables). Assume that there are $k$ available features and you are evaluating a model with $p$ features, then the Cp statistic is defined as:
-
-\[C_p = \frac{SS_{\rm {res}}{MSE_k}} - N + 2 p \]
-
-where $SS_{\rm {res}}$ is the residual sum of squares from the model with $p$ features and $MSE_k$ is the mean-squared error of the model using all of the $k$ features.
-
 ## Performance measures for classification
+
+Many performance measures for binary classification rely on the confusion matrix. Assume that there are two classes, $0$ and $1$, where $1$ indicates the presence of a trait (the positive class) and $0$ the absence of a trait (the negative class). The corresponding confusion matrix is a $2 \times 2$ table with the following structure:
+
+| Prediction/Reference | 0  | 1  |
+|----------------------|----|----|
+| 0                    | TN | FN |
+| 1                    | FP | TP |
+
+where TN indicates the number of true negatives (model predicts negative class correctly), FN indicates the number of false negatives (model incorrectly predicts negative class), FP indicates the number of false positives (model incorrectly predicts positive class), and TP indicates the number of true positives (model correctly predicts positive class).
+
+### Accuracy vs sensitivity and specificity
+
+Based on the confusion matrix, accuracy, sensitivity (true positive rate, TPR) and specificity (1 - false positive rate, FPR) can be computed:
+
+\begin{align*}
+\text{accuracy} &= \frac{TP + TN}{FP + TP + FN + TN} \\
+\text{sensitivity} &= TPR = \frac{TP}{TP + FN} \\
+\text{specificity} &= 1 - FPR = 1 - \frac{FP}{FP + TN} \\
+\end{align*}
+
+Accuracy indicates the overall ratio of correct predictions. Accuracy has a bad reputation because it is unsuitable if the class labels are imbalanced. For example, imagine you want to predict the presence of rare tumors (class 1) versus their absence (class 0). Let us assume that only 10% of the data points belong to the positive class and 90% belong to the positive class. What would be the accuracy of a classifer that always predicts the negative class (i.e. that no tumor was found)? It would be 90%. However, this is probably not a very helpful classifier. Therefore, sensitivity and specificity are usually preferred over mere accuracy.
+
+Sensitivity indicates the ratio of observed positive outcomes that were correctly predicted, while specificity indicates the ratio of observed negative outcomes that were confused with the positive class. These two quantities answer the following questions:
+
+* Sensitivity: If an event happens, how likely is it that the model detects the event?
+* Specificity: If no event happens, how likely is it that the model identifies that no event occurred?
+
+We always need to consider sensitivity and specificity together because, on their own, these quantities are not useful for model selection. For example, a model that always predicts the positive class would maximize sensitivity, while a model that always predicts the negative class would maximize specificity. However, the first model would suffer from low specificity, while the second model would suffer from low sensitivity. Thus, sensitivity and specificity can be interpreted as a seesaw since increases in sensitivity typically lead to decreases in specificity, and vice versa.
+
+Sensitivity and specificity can be combined into a single quantity by computing the balanced accuracy, which is defined as
+
+\[\text{Balanced accuracy} = \frac{\text{sensitivity} + \text{specificity}} {2}\\,.]
+
+The balanced accuracy is a more suitable measure for problems in which the classes are imbalanced.
+
+### The area under the receiver operating characteristic curve
+
+Scoring classifiers are classifiers that assign a numeric value to every prediction, which can be used as a cutoff for differentiating the two classes. For example, binary support vector machines would assign values greater than 1 to the positive class and values less than -1 to the negative class. For scoring classifiers, we typically want to determine model performance not for a single cutoff but for many cutoffs.
+
+This is where the AUC (area under the receiver operating characteristic curve) comes in. This quantity indicates the trade-off between sensitivity and specificity for several cutoffs. This is because the receiver operating characteristic (ROC) curve is simply a plot of TPR vs FPR and the AUC is the area defined by this curve, which is in the range [0, and the AUC is the area defined by this curve, which is in the range [0,1].
+
+Using R, we can compute AUCs using the ```ROCR``` package. Let us first create a function for plotting the scores of a classifier as well as its AUC:
+
+```{r, message = FALSE}
+plot.scores.AUC <- function(y, y.hat) {
+    par(mfrow=c(1,2))
+    hist(y.hat[y == 0], col=rgb(1,0,0,0.5), 
+         main = "Score Distribution",
+         breaks=seq(min(y.hat),max(y.hat)+1, 1), xlab = "Prediction")
+    hist(y.hat[y == 1], col = rgb(0,0,1,0.5), add=T, 
+            breaks=seq(min(y.hat),max(y.hat) + 1, 1))
+    legend("topleft", legend = c("Class 0", "Class 1"),  col=c("red", "blue"), lty=1, cex=1)
+    # plot ROC curve
+    library(ROCR)
+    pr <- prediction(y.hat, y)
+    prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+    # get AUC
+    auc <- performance(pr, measure = "auc")@y.values[[1]]
+    plot(prf, main = paste0("ROC Curve (AUC: ", round(auc, 2), ")"))
+}
+```
+
+Using the plot, we can now demonstrate how the AUC behaves when the scores of a classifier allow for perfect separation and when this is not the case.
+
+```{r, message = FALSE, fig.width = 10}
+# create binary labels
+y <- c(rep(0, 50), rep(1, 50))
+# simulate scoring classifier with two separated Gaussians
+y.hat <- c(rnorm(50, -2, sd = 1), rnorm(50, 2, sd = 0.75))
+plot.scores.AUC(y, y.hat)
+# create slightly overlapping Gaussians
+y.hat <- c(rnorm(50, -1, sd = 2), rnorm(50, 1, sd = 3))
+plot.scores.AUC(y, y.hat)
+```
+
+The first example shows that a classifier, which allows for perfect separation, has an AUC of 1. Classifiers that do not afford perfect separation need to sacrifice specificity to increase their sensitivity. Thus, their AUC will be less than 1. 
+
+
