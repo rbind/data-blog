@@ -1,5 +1,6 @@
 baseurl = "https://www.datascienceblog.net"
 title = "datascienceblog.net: R for Data Science"
+
 languageCode = "en-us"
 paginate = "10" # Number of posts per page
 theme = "Mainroad"
@@ -18,8 +19,10 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   url = "https://matthias-doering.netlify.com/"
 
 [Params]
+  altTitle = "R for Data Science"
   downloadRmd = true
   contentPath = "https://www.github.com/rbind/data-blog/raw/master/content/"
+  logoPath = "/img/datascienceblog_logo.png"
   subtitle = "Understand. Implement. Succeed." # Subtitle of your site
   description = "Blog about data science with a focus on applications in R. Topics include statistical testing, machine learning, and data visualization. Find the answers to your questions!"
   opengraph = true # for social media links to blog
