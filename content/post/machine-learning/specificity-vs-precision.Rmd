@@ -1,0 +1,51 @@
+---
+title: "The Case Against Precision as a Model Selection Criterion"
+author: Matthias Döring
+date: '2018-11-20'
+draft: true
+description: "TODO"
+categories:
+  - machine-learning
+tags:
+    - performance-measure
+---
+Recently, I have introduced [sensitivity and specificity as performance measures for model selection](/post/machine-learning/performance-measures-model-selection/). Besides these measures, there is also the notion of recall and precision. These measures originate from information retrieval. This is why recall and precision are suitable measures for information retrieval tasks but can be problematic for other applications. In this post, I define all of these performance measures and contrast their properties in order to showcase the shortcomings of recall and precision compared to sensitivity and specificity.
+
+## Definitions
+
+For a binary classification problems with classes 0 and 1, the resulting contingency tables has the following structure:
+
+| Prediction/Reference | 0  | 1  |
+|----------------------|----|----|
+| 0                    | TN | FN |
+| 1                    | FP | TP |
+
+where TN indicates the number of true negatives (model predicts negative class correctly), FN indicates the number of false negatives (model incorrectly predicts negative class), FP indicates the number of false positives (model incorrectly predicts positive class), and TP indicates the number of true positives (model correctly predicts positive class). The definitions of sensitivity (recall), precision (positive predictive value, PPV), and specificity (true negative rate, TNV) are as follows:
+
+\begin{align*}
+\text{sensitivity} &= \text{recall} = TPR = \frac{TP}{TP + FN} \\
+\text{precision} &= PPV = \frac{TP}{TP + FP} \\
+\text{specificity} &= TNR = 1 - FPR = 1 - \frac{FP}{FP + TN} \\
+\end{align*}
+
+Sensitivity and precision are related in that they are both using TP in the enumerator. However, while sensitivity identifies the rate at which observations from the positive class are correctly predicted, precision indicates the rate at which positive predictions are correct. Specificity, on the other hand, is based on the rate of false positives and indicates the rate at which observations from the negative class are correctly predicted.
+
+## The advantage of sensitivity and specificity
+
+Evaluating a model based on both, sensitivity and specificity, is a generally valid approach because these measures consider all entries in the confusion matrix. While sensitivity deals with true positives and false negatives, specificity deals with false positives and true negatives. This means that the combination of sensitivity and specificity is a holistic measure when both true positives and true negatives should be considered.
+
+## The disadvantage of recall and precision
+
+Evaluating a model using recall and precision does not use all cells of the confusion matrix. Recall deals with true positives and false negatives and precision deals with true positives and false positives. Thus, using this pair of performance measures, true negatives are never taken into account. Thus, precision and recall should only be used in situations, where the correct identification of the negative class does not play a role. This is why these measures originate from information retrieval where precision can be defined as
+
+\[\text{precision} = {\frac {|\{{\text{relevant documents}}\}\cap \{{\text{retrieved documents}}\}|}{|\{{\text{retrieved documents}}\}|}}\,.\]
+
+Here, it does not matter at which rate irrelevant documents are correctly discarded (true negative rate) because it is of no consequence.
+
+## Example
+
+```{r}
+library(waffle)
+waffle(c(9, 1), rows = 1, use_glyph = "child", glyph_size = 6, 
+        title = "Patients")
+```

@@ -1,0 +1,57 @@
+---
+title: "The Case Against Precision as a Model Selection Criterion"
+author: Matthias Döring
+date: '2018-11-20'
+draft: true
+description: "TODO"
+categories:
+  - machine-learning
+tags:
+    - performance-measure
+---
+
+
+
+<p>Recently, I have introduced <a href="/post/machine-learning/performance-measures-model-selection/">sensitivity and specificity as performance measures for model selection</a>. Besides these measures, there is also the notion of recall and precision. These measures originate from information retrieval. This is why recall and precision are suitable measures for information retrieval tasks but can be problematic for other applications. In this post, I define all of these performance measures and contrast their properties in order to showcase the shortcomings of recall and precision compared to sensitivity and specificity.</p>
+<div id="definitions" class="section level2">
+<h2>Definitions</h2>
+<p>For a binary classification problems with classes 0 and 1, the resulting contingency tables has the following structure:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Prediction/Reference</th>
+<th>0</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>TN</td>
+<td>FN</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>FP</td>
+<td>TP</td>
+</tr>
+</tbody>
+</table>
+<p>where TN indicates the number of true negatives (model predicts negative class correctly), FN indicates the number of false negatives (model incorrectly predicts negative class), FP indicates the number of false positives (model incorrectly predicts positive class), and TP indicates the number of true positives (model correctly predicts positive class). The definitions of sensitivity (recall), precision (positive predictive value, PPV), and specificity (true negative rate, TNV) are as follows:</p>
+<span class="math display">\[\begin{align*}
+\text{sensitivity} &amp;= \text{recall} = TPR = \frac{TP}{TP + FN} \\
+\text{precision} &amp;= PPV = \frac{TP}{TP + FP} \\
+\text{specificity} &amp;= TNR = 1 - FPR = 1 - \frac{FP}{FP + TN} \\
+\end{align*}\]</span>
+<p>Sensitivity and precision are related in that they are both using TP in the enumerator. However, while sensitivity identifies the rate at which observations from the positive class are correctly predicted, precision indicates the rate at which positive predictions are correct. Specificity, on the other hand, is based on the rate of false positives and indicates the rate at which observations from the negative class are correctly predicted.</p>
+</div>
+<div id="the-advantage-of-sensitivity-and-specificity" class="section level2">
+<h2>The advantage of sensitivity and specificity</h2>
+<p>Evaluating a model based on both, sensitivity and specificity, is a generally valid approach because these measures consider all entries in the confusion matrix. While sensitivity deals with true positives and false negatives, specificity deals with false positives and true negatives. This means that the combination of sensitivity and specificity is a holistic measure of model performance that is generally useful</p>
+</div>
+<div id="the-disadvantage-of-recall-and-precision" class="section level2">
+<h2>The disadvantage of recall and precision</h2>
+<p>Evaluating a model using recall and precision does not use all cells of the confusion matrix. Recall deals with true positives and false negatives and precision deals with true positives and false positives. Thus, using this pair of performance measures, true negatives are never taken into account. Thus, precision and recall should only be used in situations, where the correct identification of the negative class does not play a role. This is why these measures originate from information retrieval where precision can be defined as</p>
+<p><span class="math display">\[\text{precision} = {\frac {|\{{\text{relevant documents}}\}\cap \{{\text{retrieved documents}}\}|}{|\{{\text{retrieved documents}}\}|}}\,.\]</span></p>
+<p>Here, it does not matter at which rate irrelevant documents are correctly discarded (true negative rate) because it is of no consequence.</p>
+</div>
