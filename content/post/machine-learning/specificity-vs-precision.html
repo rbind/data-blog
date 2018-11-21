@@ -1,9 +1,10 @@
 ---
 title: "The Case Against Precision as a Model Selection Criterion"
 author: Matthias Döring
-date: '2018-11-20'
-draft: true
-description: "TODO"
+date: '2018-11-21'
+description: "Precision and recall are frequently used for model selection. However, compared to sensitivity and recall, these performance metrics are not generally valid and should only be used in certain settings."
+thumbnail: "/post/machine-learning/sensitivity-vs-precision_cover.png"
+slug: "specificity-vs-precision"
 categories:
   - machine-learning
 tags:
@@ -12,46 +13,232 @@ tags:
 
 
 
-<p>Recently, I have introduced <a href="/post/machine-learning/performance-measures-model-selection/">sensitivity and specificity as performance measures for model selection</a>. Besides these measures, there is also the notion of recall and precision. These measures originate from information retrieval. This is why recall and precision are suitable measures for information retrieval tasks but can be problematic for other applications. In this post, I define all of these performance measures and contrast their properties in order to showcase the shortcomings of recall and precision compared to sensitivity and specificity.</p>
+<p>Recently, I have introduced <a href="/post/machine-learning/performance-measures-model-selection/">sensitivity and specificity as performance measures for model selection</a>. Besides these measures, there is also the notion of recall and precision. Precision and recall originate from information retrieval but are also used in machine learning settings. However, the use of precision and recall can be problematic in some situations. In this post, I discuss the shortcomings of recall and precision and show why sensitivity and specificity are generally more useful.</p>
 <div id="definitions" class="section level2">
 <h2>Definitions</h2>
-<p>For a binary classification problems with classes 0 and 1, the resulting contingency tables has the following structure:</p>
+<p>For a binary classification problems with classes 0 and 1, the resulting confusion matrix has the following structure:</p>
 <table>
 <thead>
 <tr class="header">
-<th>Prediction/Reference</th>
-<th>0</th>
-<th>1</th>
+<th align="left">Prediction/Reference</th>
+<th align="left">0</th>
+<th align="left">1</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>0</td>
-<td>TN</td>
-<td>FN</td>
+<td align="left">0</td>
+<td align="left">TN</td>
+<td align="left">FN</td>
 </tr>
 <tr class="even">
-<td>1</td>
-<td>FP</td>
-<td>TP</td>
+<td align="left">1</td>
+<td align="left">FP</td>
+<td align="left">TP</td>
 </tr>
 </tbody>
 </table>
 <p>where TN indicates the number of true negatives (model predicts negative class correctly), FN indicates the number of false negatives (model incorrectly predicts negative class), FP indicates the number of false positives (model incorrectly predicts positive class), and TP indicates the number of true positives (model correctly predicts positive class). The definitions of sensitivity (recall), precision (positive predictive value, PPV), and specificity (true negative rate, TNV) are as follows:</p>
-<span class="math display">\[\begin{align*}
-\text{sensitivity} &amp;= \text{recall} = TPR = \frac{TP}{TP + FN} \\
-\text{precision} &amp;= PPV = \frac{TP}{TP + FP} \\
-\text{specificity} &amp;= TNR = 1 - FPR = 1 - \frac{FP}{FP + TN} \\
-\end{align*}\]</span>
+
 <p>Sensitivity and precision are related in that they are both using TP in the enumerator. However, while sensitivity identifies the rate at which observations from the positive class are correctly predicted, precision indicates the rate at which positive predictions are correct. Specificity, on the other hand, is based on the rate of false positives and indicates the rate at which observations from the negative class are correctly predicted.</p>
 </div>
 <div id="the-advantage-of-sensitivity-and-specificity" class="section level2">
 <h2>The advantage of sensitivity and specificity</h2>
-<p>Evaluating a model based on both, sensitivity and specificity, is a generally valid approach because these measures consider all entries in the confusion matrix. While sensitivity deals with true positives and false negatives, specificity deals with false positives and true negatives. This means that the combination of sensitivity and specificity is a holistic measure of model performance that is generally useful</p>
+<p>Evaluating a model based on both, sensitivity and specificity, is a generally valid approach because these measures consider all entries in the confusion matrix. While sensitivity deals with true positives and false negatives, specificity deals with false positives and true negatives. This means that the combination of sensitivity and specificity is a holistic measure when both true positives and true negatives should be considered.</p>
 </div>
 <div id="the-disadvantage-of-recall-and-precision" class="section level2">
 <h2>The disadvantage of recall and precision</h2>
 <p>Evaluating a model using recall and precision does not use all cells of the confusion matrix. Recall deals with true positives and false negatives and precision deals with true positives and false positives. Thus, using this pair of performance measures, true negatives are never taken into account. Thus, precision and recall should only be used in situations, where the correct identification of the negative class does not play a role. This is why these measures originate from information retrieval where precision can be defined as</p>
-<p><span class="math display">\[\text{precision} = {\frac {|\{{\text{relevant documents}}\}\cap \{{\text{retrieved documents}}\}|}{|\{{\text{retrieved documents}}\}|}}\,.\]</span></p>
+<p><span class="math">\[\text{precision} = {\frac {|\{{\text{relevant documents}}\}\cap \{{\text{retrieved documents}}\}|}{|\{{\text{retrieved documents}}\}|}}\,.\]</span></p>
 <p>Here, it does not matter at which rate irrelevant documents are correctly discarded (true negative rate) because it is of no consequence.</p>
+</div>
+<div id="examples" class="section level2">
+<h2>Examples</h2>
+<p>Here, I provide two examples. The first examples investigates what can go wrong when precision is used as a performance metric. The second example shows a setting in which the use of precision is adequate.</p>
+<div id="what-can-go-wrong-when-using-precision" class="section level3">
+<h3>What can go wrong when using precision?</h3>
+<p>Precision is a particularly bad measure when there are few observations that belong to the positive class. Let us assume a clinical data set in which <span class="math">\(90\%\)</span> of persons are diseased (positive class) and only <span class="math">\(10\%\)</span> are healthy (negative class). Let us assume we have developed two tests for classifying whether a patient is diseased or healthy. Both tests have an accuracy of 80% but make different types of errors.</p>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<p><img src="/post/machine-learning/specificity-vs-precision_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<div id="confusion-matrix-for-the-first-test" class="section level4">
+<h4>Confusion matrix for the first test</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Prediction/Reference</th>
+<th align="left">Healthy</th>
+<th align="left">Diseased</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Healthy</td>
+<td align="left">TN = 0</td>
+<td align="left">FN = 10</td>
+</tr>
+<tr class="even">
+<td align="left">Diseased</td>
+<td align="left">FP = 10</td>
+<td align="left">TP = 80</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="confusion-matrix-for-the-second-test" class="section level4">
+<h4>Confusion matrix for the second test</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Prediction/Reference</th>
+<th align="left">Healthy</th>
+<th align="left">Diseased</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Healthy</td>
+<td align="left">TN = 10</td>
+<td align="left">FN = 20</td>
+</tr>
+<tr class="even">
+<td align="left">Diseased</td>
+<td align="left">FP = 0</td>
+<td align="left">TP = 70</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="comparison-of-the-two-tests" class="section level4">
+<h4>Comparison of the two tests</h4>
+<p>Let us compare the performance of the two tests:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Measure</th>
+<th align="left">Test 1</th>
+<th align="left">Test 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Sensitivity (Recall)</td>
+<td align="left">88.9%</td>
+<td align="left">77.7%</td>
+</tr>
+<tr class="even">
+<td align="left">Specificity</td>
+<td align="left">0%</td>
+<td align="left">100%</td>
+</tr>
+<tr class="odd">
+<td align="left">Precision</td>
+<td align="left">88.9%</td>
+<td align="left">100%</td>
+</tr>
+</tbody>
+</table>
+<p>Considering sensitivity and specificity, we would not select the first test because its balanced accuracy is merely <span class="math">\(\frac{0 + 0.889}{2} = 44.5\%\)</span>, while that of the second test is <span class="math">\(\frac{0.777 + 1}{2} = 88.85\%\)</span>.</p>
+<p>Using precision and recall, however, the first test would have an F1 score of <span class="math">\(2 \cdot \frac{0.889 \cdot 0.889}{0.889 + 0.889} = 0.889\)</span>, while the second test has a lower score of <span class="math">\(2 \cdot \frac{0.777 \cdot 1}{0.777 + 1} \approx 0.87\)</span>. Thus, we would find the first test to be superior over the second test although its specificity is a 0%. Thus, when using this test, <strong>all of the healthy patients would be classified as diseased</strong>. This would be a big problem because all of these patients would undergo severe psychological stress and expensive treatment due to the misdiagnosis. If we had used specificity instead, we would have selected the second model, which does not produce any false postives at a competitive sensitivity.</p>
+</div>
+</div>
+<div id="use-of-precision-when-true-negatives-do-not-matter" class="section level3">
+<h3>Use of precision when true negatives do not matter</h3>
+<p>Let us consider an example from information retrieval to illustrate when precision is a useful criterion. Assume that we want to compare two algorithms for document retrieval that both have have an accuracy of 80%.</p>
+<pre class="r"><code>library(waffle)
+colors &lt;- c(&quot;#c14141&quot;, &quot;#1853b2&quot;)
+iron(
+    waffle(c(&quot;Relevant&quot; = 30, &quot;Irrelevant&quot; = 70), rows = 5, use_glyph = &quot;file&quot;, 
+        glyph_size = 5, title = &quot;Reference&quot;, colors = ref.colors),
+    waffle(c(&quot;Relevant (TP)&quot; = 25, &quot;Irrelevant (FN)&quot; = 5, &quot;Relevant (FP)&quot; = 15, &quot;Irrelevant (TN)&quot; = 55), 
+        rows = 5, use_glyph = &quot;file&quot;, 
+        glyph_size = 5, title = &quot;Retrieval Algorithm 1&quot;, colors = c(true.colors[1], false.colors[2], false.colors[1], true.colors[2])),
+    waffle(c(&quot;Relevant (TP)&quot; = 20, &quot;Irrelevant (FN)&quot; = 15, &quot;Relevant (FP)&quot; = 5, &quot;Irrelevant (TN)&quot; = 60), 
+        rows = 5, use_glyph = &quot;file&quot;, 
+        glyph_size = 5, title = &quot;Retrieval Algorithm 2&quot;, colors = c(true.colors[1], false.colors[2], false.colors[1], true.colors[2]))
+)</code></pre>
+<p><img src="/post/machine-learning/specificity-vs-precision_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<div id="confusion-matrix-for-the-first-algorithm" class="section level4">
+<h4>Confusion matrix for the first algorithm</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Prediction/Reference</th>
+<th align="left">Irrelevant</th>
+<th align="left">Relevant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Irrelevant</td>
+<td align="left">TN = 55</td>
+<td align="left">FN = 5</td>
+</tr>
+<tr class="even">
+<td align="left">Relevant</td>
+<td align="left">FP = 15</td>
+<td align="left">TP = 25</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="confusion-matrix-for-the-second-algorithm" class="section level4">
+<h4>Confusion matrix for the second algorithm</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Prediction/Reference</th>
+<th align="left">Irrelevant</th>
+<th align="left">Relevant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Irrelevant</td>
+<td align="left">TN = 60</td>
+<td align="left">FN = 15</td>
+</tr>
+<tr class="even">
+<td align="left">Relevant</td>
+<td align="left">FP = 5</td>
+<td align="left">TP = 20</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="comparison-of-the-two-algorithms" class="section level4">
+<h4>Comparison of the two algorithms</h4>
+<p>Let us calculate the four quantities again:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Measure</th>
+<th align="left">Algorithm 1</th>
+<th align="left">Algorithm 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Sensitivity (Recall)</td>
+<td align="left">83.3%</td>
+<td align="left">66.6%</td>
+</tr>
+<tr class="even">
+<td align="left">Specificity</td>
+<td align="left">78.6%</td>
+<td align="left">85.7%</td>
+</tr>
+<tr class="odd">
+<td align="left">Precision</td>
+<td align="left">50%</td>
+<td align="left">80%</td>
+</tr>
+</tbody>
+</table>
+<p>The balanced accuracy of algorithms 1 and 2 would be 80.95% and 76.15%, respectively. The F1 statistic for algorithms 1 and 2 would be 62.5% and 72.7%, respectively. Thus, in this example, both approaches would lead to the selection of algorithm 2, which is the better choice for information retrieval because it is the more precise algorithm. This means that the rate of relevant documents among the retrieved documents is higher for algorithm 2 than algorithm 1. Note that the difference between the two algorithms is more pronounced using the F statistic, which is defined using precision and recall.</p>
+</div>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>In this post, we have seen that performance measures should be carefully selected. While sensitivity and specificity generally perform well, precision and recall should only be used in circumstances where the true negative rate does not play a role.</p>
 </div>

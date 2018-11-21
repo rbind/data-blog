@@ -1,19 +1,20 @@
 ---
 title: "The Case Against Precision as a Model Selection Criterion"
 author: Matthias Döring
-date: '2018-11-20'
-draft: true
-description: "TODO"
+date: '2018-11-21'
+description: "Precision and recall are frequently used for model selection. However, compared to sensitivity and recall, these performance metrics are not generally valid and should only be used in certain settings."
+thumbnail: "/post/machine-learning/sensitivity-vs-precision_cover.png"
+slug: "specificity-vs-precision"
 categories:
   - machine-learning
 tags:
     - performance-measure
 ---
-Recently, I have introduced [sensitivity and specificity as performance measures for model selection](/post/machine-learning/performance-measures-model-selection/). Besides these measures, there is also the notion of recall and precision. These measures originate from information retrieval. This is why recall and precision are suitable measures for information retrieval tasks but can be problematic for other applications. In this post, I define all of these performance measures and contrast their properties in order to showcase the shortcomings of recall and precision compared to sensitivity and specificity.
+Recently, I have introduced [sensitivity and specificity as performance measures for model selection](/post/machine-learning/performance-measures-model-selection/). Besides these measures, there is also the notion of recall and precision. Precision and recall originate from information retrieval but are also used in machine learning settings. However, the use of precision and recall can be problematic in some situations. In this post, I discuss the shortcomings of recall and precision and show why sensitivity and specificity are generally more useful.
 
 ## Definitions
 
-For a binary classification problems with classes 0 and 1, the resulting contingency tables has the following structure:
+For a binary classification problems with classes 0 and 1, the resulting confusion matrix has the following structure:
 
 | Prediction/Reference | 0  | 1  |
 |----------------------|----|----|
@@ -42,10 +43,104 @@ Evaluating a model using recall and precision does not use all cells of the conf
 
 Here, it does not matter at which rate irrelevant documents are correctly discarded (true negative rate) because it is of no consequence.
 
-## Example
+## Examples
+
+Here, I provide two examples. The first examples investigates what can go wrong when precision is used as a performance metric. The second example shows a setting in which the use of precision is adequate.
+
+### What can go wrong when using precision?
+
+Precision is a particularly bad measure when there are few observations that belong to the positive class. Let us assume a clinical data set in which $90\%$ of persons are diseased (positive class) and only $10\%$ are healthy (negative class). Let us assume we have developed two tests for classifying whether a patient is diseased or healthy. Both tests have an accuracy of 80% but make different types of errors.
+
+```{r, message = FALSE}
+library(waffle)
+ref.colors <- c("#c14141", "#1853b2")
+false.colors <- c("#9b3636", "#0e3168")
+true.colors <- c("#f75959", "#2474f2")
+iron(
+    waffle(c("Diseased" = 90, "Healthy" = 10), rows = 5, use_glyph = "child", 
+        glyph_size = 5, title = "Reference", colors = ref.colors),
+    waffle(c("Diseased (TP)" = 80, "Healthy (FN)" = 10, "Diseased (FP)" = 10), 
+        rows = 5, use_glyph = "child", 
+        glyph_size = 5, title = "Clinical Test 1", colors = c(true.colors[1], false.colors[2], false.colors[1])),
+    waffle(c("Diseased (TP)" = 70, "Healthy (FN)" = 20, "Healthy (TN)" = 10), 
+        rows = 5, use_glyph = "child", 
+        glyph_size = 5, title = "Clinical Test 2", colors = c(true.colors[1], false.colors[2], true.colors[2]))
+)
+```
+
+#### Confusion matrix for the first test
+
+| Prediction/Reference | Healthy  | Diseased  |
+|----------------------|----|----|
+| Healthy                    | TN = 0| FN = 10|
+| Diseased                    | FP = 10 | TP  = 80|
+
+#### Confusion matrix for the second test
+
+| Prediction/Reference | Healthy  | Diseased  |
+|----------------------|----|----|
+| Healthy                    | TN = 10| FN = 20 |
+| Diseased                    | FP = 0 | TP  = 70|
+
+#### Comparison of the two tests
+
+Let us compare the performance of the two tests:
+
+| Measure | Test 1  | Test 2  |
+|----------------------|----|----|
+| Sensitivity (Recall)  | 88.9% | 77.7% |
+| Specificity  | 0% | 100%  |
+| Precision     | 88.9% |  100% | 
+
+Considering sensitivity and specificity, we would not select the first test because its balanced accuracy is merely $\frac{0 + 0.889}{2} = 44.5\%$, while that of the second test is $\frac{0.777 + 1}{2} = 88.85\%$. 
+
+Using precision and recall, however, the first test would have an F1 score of $2 \cdot \frac{0.889 \cdot 0.889}{0.889 + 0.889} = 0.889$, while the second test has a lower score of $2 \cdot \frac{0.777 \cdot 1}{0.777 + 1} \approx 0.87$. Thus, we would find the first test to be superior over the second test although its specificity is a 0%. Thus, when using this test, **all of the healthy patients would be classified as diseased**. This would be a big problem because all of these patients would undergo severe psychological stress and expensive treatment due to the misdiagnosis. If we had used specificity instead, we would have selected the second model, which does not produce any false postives at a competitive sensitivity.
+
+### Use of precision when true negatives do not matter
+
+Let us consider an example from information retrieval to illustrate when precision is a useful criterion. Assume that we want to compare two algorithms for document retrieval that both have have an accuracy of 80%.
 
 ```{r}
 library(waffle)
-waffle(c(9, 1), rows = 1, use_glyph = "child", glyph_size = 6, 
-        title = "Patients")
+colors <- c("#c14141", "#1853b2")
+iron(
+    waffle(c("Relevant" = 30, "Irrelevant" = 70), rows = 5, use_glyph = "file", 
+        glyph_size = 5, title = "Reference", colors = ref.colors),
+    waffle(c("Relevant (TP)" = 25, "Irrelevant (FN)" = 5, "Relevant (FP)" = 15, "Irrelevant (TN)" = 55), 
+        rows = 5, use_glyph = "file", 
+        glyph_size = 5, title = "Retrieval Algorithm 1", colors = c(true.colors[1], false.colors[2], false.colors[1], true.colors[2])),
+    waffle(c("Relevant (TP)" = 20, "Irrelevant (FN)" = 15, "Relevant (FP)" = 5, "Irrelevant (TN)" = 60), 
+        rows = 5, use_glyph = "file", 
+        glyph_size = 5, title = "Retrieval Algorithm 2", colors = c(true.colors[1], false.colors[2], false.colors[1], true.colors[2]))
+)
 ```
+
+#### Confusion matrix for the first algorithm
+
+| Prediction/Reference | Irrelevant  | Relevant  |
+|----------------------|----|----|
+| Irrelevant                    | TN = 55 | FN = 5 |
+| Relevant                    | FP = 15 | TP  = 25|
+
+#### Confusion matrix for the second algorithm
+
+| Prediction/Reference | Irrelevant  | Relevant  |
+|----------------------|----|----|
+| Irrelevant                    | TN = 60| FN = 15 |
+| Relevant                    | FP = 5 | TP  = 20|
+
+#### Comparison of the two algorithms
+
+Let us calculate the four quantities again:
+
+| Measure | Algorithm 1  | Algorithm 2  |
+|----------------------|----|----|
+| Sensitivity (Recall)  | 83.3% | 66.6% |
+| Specificity  | 78.6% | 85.7%  |
+| Precision     | 50% |  80% |
+
+The balanced accuracy of algorithms 1 and 2 would be 80.95% and 76.15%, respectively. The F1 statistic for algorithms 1 and 2 would be 62.5% and 72.7%, respectively. Thus, in this example, both approaches would lead to the selection of algorithm 2, which is the better choice for information retrieval because it is the more precise algorithm. This means that the rate of relevant documents among the retrieved documents is higher for algorithm 2 than algorithm 1. Note that the difference between the two algorithms is more pronounced using the F statistic, which is defined using precision and recall.
+
+## Summary
+
+In this post, we have seen that performance measures should be carefully selected. While sensitivity and specificity generally perform well, precision and recall should only be used in circumstances where the true negative rate does not play a role.
