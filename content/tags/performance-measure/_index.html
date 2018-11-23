@@ -1,0 +1,24 @@
+---
+title: "Performance measures for model validation"
+description: "When validating a model, it is crucial to select a suitable performance measure. This article discusses performance measures for regression (e.g. MSE, R squared) and classification (e.g. F1 statistic, AUC)."
+thumbnail: "/tags/performance-measure/performance-measure_avatar.jpg"
+---
+
+
+
+<p><img src="performance-measure_avatar.jpg"></p>
+<p>Besides interpretability, predictive performance is the most important property of machine learning models. Here, I provide an overview of available performance measures and discuss under which circumstances they are appropriate.</p>
+<div id="performance-measures-for-regression" class="section level2">
+<h2>Performance measures for regression</h2>
+<p>For regression, the most popular performance measures are <a href="/post/machine-learning/performance-measures-model-selection/">R squared and the root mean squared error (RMSE)</a>. <span class="math inline">\(R^2\)</span> has the advantage that it is typically in the interval <span class="math inline">\([0,1]\)</span>, which makes it more interpretable than the RMSE, whose value is on the scale of the outcome. When comparing models with differentn number of features, model complexity should be taken into account through measures such as the adjusted <span class="math inline">\(R^2\)</span> or the Cp statistic.</p>
+</div>
+<div id="performance-measures-for-classification" class="section level2">
+<h2>Performance measures for classification</h2>
+<p>The performance of models for binary classification is evaluated on the basis of confusion matrices, which indicate true positives, false positives, true negatives, and false negatives. Based on these quantities, the performance measures of <a href="/post/machine-learning/performance-measures-model-selection">sensitivity and specificity (balanced accuracy)</a> are derived.
+For scoring classifier, the area under the receiver operating characterstic curve (AUC) can be used to measure the sensitivity-specificity tradeoff for different classification thresholds. In specific circumstances, it is worthwhile to consider <a href="/post/machine-learning/specificity-vs-precision/">recall and precision (the F1 score)</a> rather than sensitivity and specificity.</p>
+<p>For feature selection, model complexity should be taken into account, for example, by choosing a performance measure such as the Akaike information criterion (AIC).</p>
+</div>
+<div id="posts-about-performance-measures" class="section level2">
+<h2>Posts about performance measures</h2>
+<p>The following posts discuss performance leasures for supervised learning and how they can be computed using R.</p>
+</div>

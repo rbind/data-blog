@@ -1,0 +1,23 @@
+---
+title: "Performance measures for model validation"
+description: "When validating a model, it is crucial to select a suitable performance measure. This article discusses performance measures for regression (e.g. MSE, R squared) and classification (e.g. F1 statistic, AUC)."
+thumbnail: "/tags/performance-measure/performance-measure_avatar.jpg"
+---
+<img src="performance-measure_avatar.jpg">
+
+Besides interpretability, predictive performance is the most important property of machine learning models. Here, I provide an overview of available performance measures and discuss under which circumstances they are appropriate.
+
+## Performance measures for regression
+
+For regression, the most popular performance measures are [R squared and the root mean squared error (RMSE)](/post/machine-learning/performance-measures-model-selection/). $R^2$ has the advantage that it is typically in the interval $[0,1]$, which makes it more interpretable than the RMSE, whose value is on the scale of the outcome. When comparing models with differentn number of features, model complexity should be taken into account through measures such as the adjusted $R^2$ or the Cp statistic.
+
+## Performance measures for classification
+
+The performance of models for binary classification is evaluated on the basis of confusion matrices, which indicate true positives, false positives, true negatives, and false negatives. Based on these quantities, the performance measures of [sensitivity and specificity (balanced accuracy)](/post/machine-learning/performance-measures-model-selection) are derived. 
+For scoring classifier, the area under the receiver operating characterstic curve (AUC) can be used to measure the sensitivity-specificity tradeoff for different classification thresholds. In specific circumstances, it is worthwhile to consider [recall and precision (the F1 score)](/post/machine-learning/specificity-vs-precision/) rather than sensitivity and specificity.
+
+For feature selection, model complexity should be taken into account, for example, by choosing a performance measure such as the Akaike information criterion (AIC).
+
+## Posts about performance measures
+
+The following posts discuss performance leasures for supervised learning and how they can be computed using R.
