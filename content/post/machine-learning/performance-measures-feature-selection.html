@@ -1,0 +1,44 @@
+---
+title: "Performance Measures for Feature Selection"
+author: Matthias Döring
+date: '2018-11-20'
+draft: true
+description: "TODO"
+categories:
+  - machine-learning
+tags:
+    - performance-measure
+---
+
+
+
+<p>In a recent post, I have discussed <a href="/post/machine-learning/performance-measures-model-selection/">performance measures for model selection</a>. This time, I write about a related topic: performance measures that are suitable for selecting models when performing feature selection. Since feature selection is concerned with reducing the number of dependent variables, suitable performance measures evaluate the trade-off between the number of features, <span class="math inline">\(p\)</span>, and the fit of the model.</p>
+<div id="performance-measures-for-regression" class="section level2">
+<h2>Performance measures for regression</h2>
+<p>The mean squared error (MSE) and <span class="math inline">\(R^2\)</span> are unsuited for comparing models during feature selection. This is because, according to these measures, models with more features will always outperform models with fewer features. Instead, the adjusted <span class="math inline">\(R^2\)</span> or Mallow’s Cp statistic should be used.</p>
+<div id="adjusted-r-squared" class="section level3">
+<h3>Adjusted R squared</h3>
+<p>Given estimates of the outcome <span class="math inline">\(\hat{Y}\)</span> and observed outcomes <span class="math inline">\(Y\)</span>, the coefficient of determination can be defined as the square of Pearson’s correlation coefficient <span class="math inline">\(\rho\)</span>:</p>
+<p><span class="math display">\[R^2  = \rho_{\hat{Y}, Y} = \frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y}\]</span></p>
+<p>For models with an intercept, <span class="math inline">\(R^2\)</span> is in the range <span class="math inline">\([0,1]\)</span>. The idea of the adjusted R squared is to adjust <span class="math inline">\(R^2\)</span> according to the number of features <span class="math inline">\(p\)</span>.</p>
+<p>!A model with n -p - 1 is the degrees of freedom!</p>
+<p><span class="math display">\[R^2_{\rm{adj}} = 1 - \frac{(1 - R^2) (n-1)}{n - p -1} \]</span></p>
+<p>The intuition behind <span class="math inline">\(R^2\)</span> is the following:</p>
+<ul>
+<li><span class="math inline">\(R^2_{\rm{adj}}\)</span> increases if the enumerator decreases, that is, if <span class="math inline">\(R^2\)</span> is large</li>
+<li><span class="math inline">\(R^2_{\rm{adj}}\)</span> increases if the denominator increases, that is, if <span class="math inline">\(p\)</span> is small</li>
+</ul>
+<p>This means that <span class="math inline">\(R^2_{\rm{adj}\)</span> only increases when predictors that meaningfully increase <span class="math inline">\(R^2\)</span> are included in the model.</p>
+<div id="mallows-cp" class="section level4">
+<h4>Mallow’s Cp</h4>
+<p>Mallow’s Cp statistic can be used to assess the fit of least-squares models during feature selection. For Gaussian models, it is identical to the Akaike Information Criterion. Small values of Cp are assigned to models with a good fit.</p>
+<p>The Cp statistic assigns a value of <span class="math inline">\(p+1\)</span> for an ideal model, where <span class="math inline">\(p\)</span> is the number of independent variables. If <span class="math inline">\(C_p &gt; p+1\)</span>, this means that the model is overspecified (i.e. contains too many variables). Assume that there are <span class="math inline">\(k\)</span> available features and you are evaluating a model with <span class="math inline">\(p\)</span> features, then the Cp statistic is defined as:</p>
+<p><span class="math display">\[C_p = \frac{SS_{\rm {res}}}{MSE_k} - N + 2 p \]</span></p>
+<p>where <span class="math inline">\(SS_{\rm {res}}\)</span> is the residual sum of squares from the model with <span class="math inline">\(p\)</span> features and <span class="math inline">\(MSE_k\)</span> is the mean-squared error of the model using all of the <span class="math inline">\(k\)</span> features.</p>
+</div>
+</div>
+</div>
+<div id="performance-measures-for-classification" class="section level2">
+<h2>Performance measures for classification</h2>
+<p>AIC TODO</p>
+</div>
