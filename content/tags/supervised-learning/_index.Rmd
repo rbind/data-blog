@@ -3,7 +3,7 @@ title: "Supervised Learning"
 description: "Supervised learning is the aspect of machine learning that is concernd with models for prediction. These models are trained using data sets in which each observation is labeled with an outcome."
 thumbnail: "/tags/supervised-learning/supervised-learning_avatar.png"
 ---
-<img src="supervised-learning_avatar.png">
+<img src="supervised-learning_avatar.png" alt = "Supervised learning" width = "389" height = "282">
 
 Supervised learning is concerned with models for predicting the outcome for new data points.
 

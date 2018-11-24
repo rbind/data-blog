@@ -9,7 +9,7 @@ sidebar: true
 disable_comments: true
 ---
 
-<img src="/img/aboutus.jpg" alt = "About Us"/>
+<img src="/img/aboutus.jpg" alt = "About Us" width = "1000" height = "333"/>
 
 This blog is intended for everyone that is interested in working with data, particularly those that use [R](https://www.r-project.org/) to do so. The idea of this project is to give an overview of the most relevant methods for practicing data science, spanning areas such as statistical testing, machine learning, and data visualization. Since the site focuses on applications, every method is applied to an appropriate data set and the results are critically discussed.
 Besides dealing with basic methods that are explained using small data sets, I also plan to do more comprehensive analyses of larger data sets involving the subsequent application of several methods.

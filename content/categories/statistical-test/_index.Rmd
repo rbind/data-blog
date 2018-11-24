@@ -2,7 +2,7 @@
 title: "Statistical Significance Tests"
 thumbnail: "/categories/statistical-test/roulette-roulette-wheel-ball-turn_avatar.jpg"
 ---
-<img src="roulette-roulette-wheel-ball-turn_avatar.jpg"/>
+<img src="roulette-roulette-wheel-ball-turn_avatar.jpg"/ alt = "Statistical tests" width = "1125" height = "750">
 
 Using statistical tests, it is possible to make a statement about the significance of a set of measurements by calculating a test statistic. If it is unlikely to obtain a test statistic at least as extreme as the observed value, then the result is significant. For example, at a significance level of 5%, the probability of a false positive test result would be bounded by roughly 5%.
 

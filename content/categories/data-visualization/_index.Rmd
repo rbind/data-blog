@@ -2,7 +2,7 @@
 title: "Data Visualization"
 thumbnail: "/categories/data-visualization/data-visualization_avatar.jpg"
 ---
-<img src="data-visualization_avatar.jpg" alt="Data visualization">
+<img src="data-visualization_avatar.jpg" alt="Data visualization" width = "1500" height = "585">
 
 Humans are visual creatures. Thus, visualization is one of the most important tools for conveying information and data scientists should be adapt at selecting appropriate visualizations. 
 

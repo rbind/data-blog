@@ -3,7 +3,7 @@ title: "Hugo: A Framework for Static Websites"
 description: "Hugo is a generator for static sites on the web. For example, this blog has been created with Hugo. Here, I discuss how Hugo can be used to create a blog, implement a commenting system, and much more."
 thumbnail: "/post/other/blogdown_hugo_avatar.png"
 ---
-<img src="/post/other/blogdown_hugo_avatar.png">
+<img src="/post/other/blogdown_hugo_avatar.png" alt = "Hugo" width = "500" height = "566">
 
 [Hugo](https://gohugo.io/) is a tool for creating *static websites*. *How is this different from a dynamic website?* you may be wondering. While a static website is delivered to clients in the same way that is stored, dynamic websites build pages using an application server. As a consequence, static and dynamic web pages have contrasting properties:
 

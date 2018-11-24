@@ -2,7 +2,7 @@
 title: "Basic Statistical Concepts for Data Science"
 thumbnail: "/categories/basic-statistics/basic-statistics_avatar.jpg"
 ---
-<img src="basic-statistics_avatar.jpg" alt="Basic statistics">
+<img src="basic-statistics_avatar.jpg" alt="Basic statistics" width = "1000" height = "667">
 
 As a data scientist, it is important to have a deep understanding of statistics. Here, I introduce basic statistical concepts and quantities.
 

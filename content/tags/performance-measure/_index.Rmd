@@ -3,7 +3,7 @@ title: "Performance measures for model validation"
 description: "When validating a model, it is crucial to select a suitable performance measure. This article discusses performance measures for regression (e.g. MSE, R squared) and classification (e.g. F1 statistic, AUC)."
 thumbnail: "/tags/performance-measure/performance-measure_avatar.jpg"
 ---
-<img src="performance-measure_avatar.jpg">
+<img src="performance-measure_avatar.jpg" alt = "Performance measures for supervised learning" width = "1500" height = "844">
 
 Besides interpretability, predictive performance is the most important property of machine learning models. Here, I provide an overview of available performance measures and discuss under which circumstances they are appropriate.
 

@@ -3,7 +3,7 @@ title: "Non-Parametric Significance Tests"
 description: "Parametric tests assume that the data follow a certain distribution. This page introduces how tests such as t-test, Chi-squared test, and ANOVA work in R."
 thumbnail: "/tags/non-parametric-test/non_parametric_avatar.jpg"
 ---
-<img src="non_parametric_avatar.jpg">
+<img src="non_parametric_avatar.jpg" alt = "Non-parametric tests" width = "1000" height = "958">
 
 The benefit of non-parametric tests over [parametric tests](/tags/parametric-test/) is that they not make any assumptions about the data. Thus, they are well-suited in situations where the assumptions of parametric tests are not met, which is typically the case for small sample sizes.
 
