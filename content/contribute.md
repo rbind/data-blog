@@ -7,7 +7,7 @@ authorbox: false
 sidebar: true
 disable_comments: true
 ---
-<img src="/img/agreement-business-businessman-872957.jpg"/>
+<img src="/img/agreement-business-businessman-872957.jpg" alt = "Contribute"/>
 
 I'm always looking for original and high-quality contributions to this blog. If you're interested in collaborating, please feel free to contact me. I'm particularly interested in the following types of content:
 

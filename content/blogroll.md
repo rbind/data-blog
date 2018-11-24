@@ -8,7 +8,7 @@ authorbox: false
 sidebar: true
 disable_comments: false
 --- 
-<img src="/img/resources.jpg">
+<img src="/img/resources.jpg" alt = "Resources">
 
 ## Data science
 

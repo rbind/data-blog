@@ -64,10 +64,16 @@ rssLimit = 20 # max nbr of entries shown in rss feed
 
 [menu]
     [[menu.main]]
+    name = "Home"
+    identifier = "home"
+    url = ""
+    weight = 1
+
+    [[menu.main]]
     name = "Posts"
     identifier = "posts"
     url = "/post/"
-    weight = 1
+    weight = 2
 
     [[menu.main]]
     name = "About"
