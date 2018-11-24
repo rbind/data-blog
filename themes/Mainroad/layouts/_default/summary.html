@@ -21,11 +21,11 @@
 	</header>
 	<div class="content list__excerpt post__content clearfix">
          <p class = "summary">
-            {{ if .Params.description }}
+            {{- if .Params.description }}
                 {{ .Params.description | plainify | safeHTML}}
-            {{ else }}
+            {{- else }}
             {{ .Summary | plainify | safeHTML }}
-            {{ end }}
+            {{- end }}
             </p>
 	</div>
 	{{- if .Site.Params.readmore }}

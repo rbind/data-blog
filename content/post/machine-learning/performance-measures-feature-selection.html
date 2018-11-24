@@ -19,7 +19,7 @@ tags:
 <div id="adjusted-r-squared" class="section level3">
 <h3>Adjusted R squared</h3>
 <p>Given estimates of the outcome <span class="math inline">\(\hat{Y}\)</span> and observed outcomes <span class="math inline">\(Y\)</span>, the coefficient of determination can be defined as the square of Pearson’s correlation coefficient <span class="math inline">\(\rho\)</span>:</p>
-<p><span class="math display">\[R^2  = \rho_{\hat{Y}, Y} = \frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y}\]</span></p>
+<p><span class="math display">\[R^2  = \rho_{\hat{Y}, Y}^2 = (\frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y})^2\]</span></p>
 <p>For models with an intercept, <span class="math inline">\(R^2\)</span> is in the range <span class="math inline">\([0,1]\)</span>. The idea of the adjusted R squared is to adjust <span class="math inline">\(R^2\)</span> according to the number of features <span class="math inline">\(p\)</span>.</p>
 <p>!A model with n -p - 1 is the degrees of freedom!</p>
 <p><span class="math display">\[R^2_{\rm{adj}} = 1 - \frac{(1 - R^2) (n-1)}{n - p -1} \]</span></p>

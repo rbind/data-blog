@@ -1,43 +1,44 @@
-{{ $pollData := .Site.Data.polls }}
-{{ $pollID := .Params.pollID }}
-{{ $pollInfo := "" }} <!-- data from poll defined in data folder -->
+{{- $pollData := .Site.Data.polls }}
+{{- $pollID := .Params.pollID }}
+{{- $pollInfo := "" }} <!-- data from poll defined in data folder -->
 <!-- define pollInfo automatically -->
-{{ range $.Site.Data.pollSetup }}
-    {{ if and $pollID (eq $pollID .poll_id) }}
+{{- range $.Site.Data.pollSetup }}
+    {{- if and $pollID (eq $pollID .poll_id) }}
         <!-- for single pages: use provided pollID param-->
-            {{ $pollInfo = . }}
-    {{ end }}
-    {{ if and .show_poll (not $pollID) }}
+            {{- $pollInfo = . }}
+    {{- end }}
+    {{- if and .show_poll (not $pollID) }}
         <!-- for sidebar: select one of the polls where show_poll is true -->
-            {{ $pollInfo = . }}
-    {{ end }}
-{{ end }}
-{{ if ne $pollInfo ""}}
-    {{ $pollOptions := sort $pollInfo.poll_options }}
-    {{ $activePollID := $pollInfo.poll_id }} 
-    {{ $pollQuestion := $pollInfo.poll_text }}
+            {{- $pollInfo = . }}
+    {{- end }}
+{{- end }}
+{{- if ne $pollInfo ""}}
+    {{- $pollOptions := sort $pollInfo.poll_options }}
+    {{- $activePollID := $pollInfo.poll_id }} 
+    {{- $pollQuestion := $pollInfo.poll_text }}
     <!-- initialize optionMap -->
-    {{ range $pollOptions }}
-        {{ $.Scratch.SetInMap "optionMap" . 0 }}
-    {{ end }}
-    {{ $.Scratch.Add "totalCounter" 0 }} 
-    {{ range $index, $element := $pollData }}
+    {{- range $pollOptions }}
+        {{- $.Scratch.SetInMap "optionMap" . 0 }}
+    {{- end }}
+    {{- $.Scratch.Add "totalCounter" 0 }} 
+    {{- range $index, $element := $pollData }}
         <!--{{ printf "%#v" $.File.Path }}-->
-        {{ if eq $element.pollID $activePollID }}
-            {{ $.Scratch.Add "IPs" (print $element.ipAddress ",")}}
-            {{ $curCount := default 0 (index ($.Scratch.Get "optionMap") ($element.option)) }}
-            {{ if in $pollOptions $element.option }}
+        {{- if eq $element.pollID $activePollID }}
+            {{- $.Scratch.Add "IPs" (print $element.ipAddress ",")}}
+            {{- $curCount := default 0 (index ($.Scratch.Get "optionMap") ($element.option)) }}
+            {{- if in $pollOptions $element.option }}
                 <!-- only consider options that are allowed -->
-                {{ $.Scratch.SetInMap "optionMap" ($element.option) (add ($curCount) 1) }}
-            {{ end }}
-        {{ end }}
-    {{ end }}
+                {{- $.Scratch.SetInMap "optionMap" ($element.option) (add ($curCount) 1) }}
+            {{- end }}
+        {{- end }}
+    {{- end }}
     <div class="widget-recent widget">
     <h4 class="widget__title">{{ T "poll_title" }}</h4>
     <div class="widget__content">
     <div id="poll-container">
         <form id='poll' action="{{ .Site.Params.staticman_polls_api }}" method="post" accept-charset="utf-8">
         <fieldset id = "poll_fieldset"> <!-- TODO: deactivate based on config: jquery! -->
+            <legend>{{ $pollQuestion | markdownify}}</legend>
             <input type="hidden" name="knownIPs" value="{{ $.Scratch.Get "IPs" }}">
             <input type="hidden" name="pollActive" value={{ $pollInfo.poll_active }}>
             <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#poll-submitted">
@@ -47,10 +48,9 @@
             <input name="fields[pollID]" type="hidden" value="{{ $activePollID }}">
             <input name="fields[option]" type="hidden" value="">
             <input name="fields[ipAddress]" type="hidden" value="">
-            <p>{{ $pollQuestion | markdownify}}</p>
-            {{ range $pollOptions }}
+            {{- range $pollOptions }}
                 <label><input type="radio" name="poll" value="{{ . }}"> {{ . | markdownify}}</label><br>
-            {{ end }}
+            {{- end }}
             <br>
             <input id = "poll_submit_button" type="submit" value="Vote"/>
             </fieldset>
@@ -59,16 +59,16 @@
     <div id='poll-results'>
     <!--<h3>Poll Results</h3>-->
     <p>{{ $pollQuestion | markdownify}}</p>
-    {{ $optionMap := $.Scratch.Get "optionMap" }}
-    {{ range $key, $val := $optionMap }}
-        {{ $.Scratch.Set "totalCounter" (add ($.Scratch.Get "totalCounter") $val) }}
+    {{- $optionMap := $.Scratch.Get "optionMap" }}
+    {{- range $key, $val := $optionMap }}
+        {{- $.Scratch.Set "totalCounter" (add ($.Scratch.Get "totalCounter") $val) }}
     {{- end }}
-    {{ $totalValue := $.Scratch.Get "totalCounter" }}
-    {{ range $key, $val := $optionMap }}
-        {{ $outVal := 0 }}
-        {{ if ne ($totalValue) 0 }}
-            {{ $outVal = div (math.Round (mul (div (float $val) ($totalValue)) 1000)) 10 }}
-         {{ end }}
+    {{- $totalValue := $.Scratch.Get "totalCounter" }}
+    {{- range $key, $val := $optionMap }}
+        {{- $outVal := 0 }}
+        {{- if ne ($totalValue) 0 }}
+            {{- $outVal = div (math.Round (mul (div (float $val) ($totalValue)) 1000)) 10 }}
+         {{- end }}
          <div class = "bar-title">
          {{ $key | markdownify }}
          </div>
@@ -94,4 +94,4 @@
     </div>
     </div>
     </div>
-{{ end }}
+{{- end }}

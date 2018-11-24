@@ -7,7 +7,6 @@
 	{{ $s.Set "sb" (default .Site.Params.sidebar.list .Params.sidebar) }}
 {{ end }}
 {{- $sidebar := $s.Get "sb" }}
-
 {{- if $sidebar -}}
 <aside class="sidebar{{ if eq $sidebar "left" }} sidebar--left{{ end }}">
 {{- $root := . }}

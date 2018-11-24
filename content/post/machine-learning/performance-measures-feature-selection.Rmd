@@ -19,7 +19,7 @@ The mean squared error (MSE) and $R^2$ are unsuited for comparing models during 
 
 Given estimates of the outcome $\hat{Y}$ and observed outcomes $Y$, the coefficient of determination can be defined as the square of Pearson's correlation coefficient $\rho$:
 
-\[R^2  = \rho_{\hat{Y}, Y} = \frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y}\]
+\[R^2  = \rho_{\hat{Y}, Y}^2 = (\frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y})^2\]
 
 For models with an intercept, $R^2$ is in the range $[0,1]$. The idea of the adjusted R squared is to adjust $R^2$ according to the number of features $p$. 
 
