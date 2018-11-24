@@ -1,6 +1,5 @@
 {{- $recent := where .Site.RegularPages "Section" "in" (.Site.Params.postSections | default (slice "post")) }}
 {{- $recent_num := (.Site.Params.widgets.recent_num | default 10) }}
-
 {{- if $recent }}
 <div class="widget-recent widget">
 	<h4 class="widget__title">{{ T "recent_title" }}</h4>

@@ -1,14 +1,12 @@
+<div class="widget-poll widget">
 {{- $pollData := .Site.Data.polls }}
 {{- $pollID := .Params.pollID }}
 {{- $pollInfo := "" }} <!-- data from poll defined in data folder -->
-<!-- define pollInfo automatically -->
 {{- range $.Site.Data.pollSetup }}
     {{- if and $pollID (eq $pollID .poll_id) }}
-        <!-- for single pages: use provided pollID param-->
             {{- $pollInfo = . }}
     {{- end }}
     {{- if and .show_poll (not $pollID) }}
-        <!-- for sidebar: select one of the polls where show_poll is true -->
             {{- $pollInfo = . }}
     {{- end }}
 {{- end }}
@@ -16,28 +14,24 @@
     {{- $pollOptions := sort $pollInfo.poll_options }}
     {{- $activePollID := $pollInfo.poll_id }} 
     {{- $pollQuestion := $pollInfo.poll_text }}
-    <!-- initialize optionMap -->
     {{- range $pollOptions }}
         {{- $.Scratch.SetInMap "optionMap" . 0 }}
     {{- end }}
     {{- $.Scratch.Add "totalCounter" 0 }} 
     {{- range $index, $element := $pollData }}
-        <!--{{ printf "%#v" $.File.Path }}-->
         {{- if eq $element.pollID $activePollID }}
             {{- $.Scratch.Add "IPs" (print $element.ipAddress ",")}}
             {{- $curCount := default 0 (index ($.Scratch.Get "optionMap") ($element.option)) }}
             {{- if in $pollOptions $element.option }}
-                <!-- only consider options that are allowed -->
                 {{- $.Scratch.SetInMap "optionMap" ($element.option) (add ($curCount) 1) }}
             {{- end }}
         {{- end }}
     {{- end }}
-    <div class="widget-recent widget">
     <h4 class="widget__title">{{ T "poll_title" }}</h4>
     <div class="widget__content">
     <div id="poll-container">
         <form id='poll' action="{{ .Site.Params.staticman_polls_api }}" method="post" accept-charset="utf-8">
-        <fieldset id = "poll_fieldset"> <!-- TODO: deactivate based on config: jquery! -->
+        <fieldset id = "poll_fieldset">
             <legend>{{ $pollQuestion | markdownify}}</legend>
             <input type="hidden" name="knownIPs" value="{{ $.Scratch.Get "IPs" }}">
             <input type="hidden" name="pollActive" value={{ $pollInfo.poll_active }}>
@@ -57,7 +51,6 @@
         </form>
     </div>
     <div id='poll-results'>
-    <!--<h3>Poll Results</h3>-->
     <p>{{ $pollQuestion | markdownify}}</p>
     {{- $optionMap := $.Scratch.Get "optionMap" }}
     {{- range $key, $val := $optionMap }}
@@ -86,7 +79,6 @@
       <p>Thank you for participating in the poll!</p>
       <p><button class="btn" onclick="goBackToOrigin()">OK</button></p>
     </div>
-
     <div id="poll-error" class="dialog">
         <h3>Sorry</h3>
         <p>Unfortunately, there was an error and your poll participation could not be included.</p>
