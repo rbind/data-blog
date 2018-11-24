@@ -133,3 +133,7 @@ $(document).ready(function () {
         collapseComment($(comment));
     });
 });
+
+function goBackToOrigin() {
+    window.location.href(location.pathname);
+}
