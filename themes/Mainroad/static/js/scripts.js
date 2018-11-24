@@ -36,7 +36,7 @@ function copyToClipboard() {
         $("#copyButton span").html(oldHtml)},
         5000, oldHtml
     ) 
-};
+}
 
 $(document).ready(function () {
 	const charLimit = 512;
@@ -135,5 +135,6 @@ $(document).ready(function () {
 });
 
 function goBackToOrigin() {
+    console.log(location.pathname);
     window.location.href(location.pathname);
 }
