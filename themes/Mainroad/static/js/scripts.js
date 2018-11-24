@@ -135,6 +135,5 @@ $(document).ready(function () {
 });
 
 function goBackToOrigin() {
-    console.log(location.pathname);
-    window.location.href(location.pathname);
+    window.location.href = location.pathname;
 }
