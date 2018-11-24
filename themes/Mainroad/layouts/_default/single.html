@@ -1,5 +1,5 @@
 {{- define "main" }}
-<main class="main">
+<!--<main class="main">-->
 	<article class="post">
 		<header class="post__header">
 			<h1 class="post__title">{{ .Title }}</h1>
@@ -32,7 +32,7 @@
 		</div>
 		{{- partial "post_tags.html" . }}
 	</article>
-</main>
+    <!--</main>-->
 {{- partial "authorbox.html" . }}
 <div style = "text-align:right">
 {{- if isset .Params "author" }}

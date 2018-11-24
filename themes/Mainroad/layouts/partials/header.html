@@ -2,16 +2,16 @@
 	<div class="container">
 		<div class="logo" role="banner">
 			<a class="logo__link" href="{{ "" | relLangURL }}" title="{{ .Site.Title }}" rel="home">
-                    {{ if .Site.Params.logoPath }}
+                    {{- if .Site.Params.logoPath }}
                         <div style = "display: flex;align-items:center;">
                         <img src = "{{ .Site.Params.logoPath }}" alt="logo" width ="685" height="71">
                         </div>
-                    {{ else }}
+                    {{- else }}
 				        <div class="logo__title">
                         {{ .Site.Title }}
                         </div>
-                    {{ end }}
-				{{ with .Site.Params.subtitle }}<div class="logo__tagline">{{ . }}</div>{{ end }}
+                    {{- end }}
+				{{- with .Site.Params.subtitle }}<div class="logo__tagline">{{ . }}</div>{{- end }}
 			</a>
 		</div>
 	</div>
