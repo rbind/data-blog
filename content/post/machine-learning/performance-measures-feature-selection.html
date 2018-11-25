@@ -1,9 +1,8 @@
 ---
 title: "Performance Measures for Feature Selection"
 author: Matthias Döring
-date: '2018-11-20'
-draft: true
-description: "TODO"
+date: '2018-11-25'
+description: "Performance measures for feature selection should consider the complexity of the model in addition to the fit of the model. Popular feature selection criteria are the adjusted R squared, the Cp statistic, and the AIC."
 categories:
   - machine-learning
 tags:
@@ -15,30 +14,91 @@ tags:
 <p>In a recent post, I have discussed <a href="/post/machine-learning/performance-measures-model-selection/">performance measures for model selection</a>. This time, I write about a related topic: performance measures that are suitable for selecting models when performing feature selection. Since feature selection is concerned with reducing the number of dependent variables, suitable performance measures evaluate the trade-off between the number of features, <span class="math inline">\(p\)</span>, and the fit of the model.</p>
 <div id="performance-measures-for-regression" class="section level2">
 <h2>Performance measures for regression</h2>
-<p>The mean squared error (MSE) and <span class="math inline">\(R^2\)</span> are unsuited for comparing models during feature selection. This is because, according to these measures, models with more features will always outperform models with fewer features. Instead, the adjusted <span class="math inline">\(R^2\)</span> or Mallow’s Cp statistic should be used.</p>
+<p>Mean squared error (MSE) and <span class="math inline">\(R^2\)</span> are unsuited for comparing models during feature selection. According to these measures, a model whose set of features is a superset of the set of features from another model, always has a better performance. By using the adjusted <span class="math inline">\(R^2\)</span> or Mallow’s Cp statistic, it is possible to consider both performance and number of features.</p>
 <div id="adjusted-r-squared" class="section level3">
 <h3>Adjusted R squared</h3>
 <p>Given estimates of the outcome <span class="math inline">\(\hat{Y}\)</span> and observed outcomes <span class="math inline">\(Y\)</span>, the coefficient of determination can be defined as the square of Pearson’s correlation coefficient <span class="math inline">\(\rho\)</span>:</p>
-<p><span class="math display">\[R^2  = \rho_{\hat{Y}, Y}^2 = (\frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y})^2\]</span></p>
-<p>For models with an intercept, <span class="math inline">\(R^2\)</span> is in the range <span class="math inline">\([0,1]\)</span>. The idea of the adjusted R squared is to adjust <span class="math inline">\(R^2\)</span> according to the number of features <span class="math inline">\(p\)</span>.</p>
-<p>!A model with n -p - 1 is the degrees of freedom!</p>
+<p><span class="math display">\[R^2  = \rho_{\hat{Y}, Y}^2 = \left(\frac{\text{Cov}(\hat{Y}, Y)}{\sigma_{\hat{Y}} \sigma_Y} \right)^2\,.\]</span></p>
+<p>For models with an intercept, <span class="math inline">\(R^2\)</span> is in the range <span class="math inline">\([0,1]\)</span>. The adjusted R squared adjusts <span class="math inline">\(R^2\)</span> according to degrees of freedom of the model, <span class="math inline">\(n - p -1\)</span>:</p>
 <p><span class="math display">\[R^2_{\rm{adj}} = 1 - \frac{(1 - R^2) (n-1)}{n - p -1} \]</span></p>
 <p>The intuition behind <span class="math inline">\(R^2\)</span> is the following:</p>
 <ul>
 <li><span class="math inline">\(R^2_{\rm{adj}}\)</span> increases if the enumerator decreases, that is, if <span class="math inline">\(R^2\)</span> is large</li>
 <li><span class="math inline">\(R^2_{\rm{adj}}\)</span> increases if the denominator increases, that is, if <span class="math inline">\(p\)</span> is small</li>
 </ul>
-<p>This means that <span class="math inline">\(R^2_{\rm{adj}\)</span> only increases when predictors that meaningfully increase <span class="math inline">\(R^2\)</span> are included in the model.</p>
+<p>When adding additional features to a model, <span class="math inline">\(R^2_{\rm{adj}}\)</span> only increases when added predictors sufficiently increase <span class="math inline">\(R^2\)</span>.</p>
+</div>
+<div id="adjusted-r-squared-in-r" class="section level3">
+<h3>Adjusted R squared in R</h3>
+<p>The adjusted R squared can be directly obtained from the summary method of an <code>lm</code> object:</p>
+<pre class="r"><code>set.seed(1501)
+N &lt;- 50
+y &lt;- rnorm(N)
+set.seed(1001)
+y.hat &lt;- y + runif(N, -1, 1)
+df.low &lt;- data.frame(Y = y, Y_Hat = y.hat)
+model &lt;- lm(Y ~ Y_Hat, data = df.low)
+adj.r.squared &lt;- summary(model)$adj.r.squared</code></pre>
 <div id="mallows-cp" class="section level4">
 <h4>Mallow’s Cp</h4>
-<p>Mallow’s Cp statistic can be used to assess the fit of least-squares models during feature selection. For Gaussian models, it is identical to the Akaike Information Criterion. Small values of Cp are assigned to models with a good fit.</p>
-<p>The Cp statistic assigns a value of <span class="math inline">\(p+1\)</span> for an ideal model, where <span class="math inline">\(p\)</span> is the number of independent variables. If <span class="math inline">\(C_p &gt; p+1\)</span>, this means that the model is overspecified (i.e. contains too many variables). Assume that there are <span class="math inline">\(k\)</span> available features and you are evaluating a model with <span class="math inline">\(p\)</span> features, then the Cp statistic is defined as:</p>
+<p>Mallow’s Cp statistic can be used to assess the fit of least-squares models during feature selection. For Gaussian models, it is identical to the Akaike Information Criterion. Small values of Cp that are close to the number of features are assigned to models with a good fit.</p>
+<p>The Cp statistic assigns a value of <span class="math inline">\(p+1\)</span> for an ideal model, where <span class="math inline">\(p\)</span> is the number of independent variables. If <span class="math inline">\(C_p &gt; p+1\)</span>, this means that the model is overspecified (i.e. contains too many variables). If <span class="math inline">\(C_p &lt; p +1\)</span>, then the model lacks fit (i.e. has a large bias). Assume that there are <span class="math inline">\(k\)</span> available features and you are evaluating a model with <span class="math inline">\(p\)</span> features, then the Cp statistic is defined as:</p>
 <p><span class="math display">\[C_p = \frac{SS_{\rm {res}}}{MSE_k} - N + 2 p \]</span></p>
 <p>where <span class="math inline">\(SS_{\rm {res}}\)</span> is the residual sum of squares from the model with <span class="math inline">\(p\)</span> features and <span class="math inline">\(MSE_k\)</span> is the mean-squared error of the model using all of the <span class="math inline">\(k\)</span> features.</p>
 </div>
 </div>
+<div id="computing-the-cp-statistic-in-r" class="section level3">
+<h3>Computing the Cp statistic in R</h3>
+<p>In R, you can simply define a custom function for calculating the Cp statistic:</p>
+<pre class="r"><code>cp &lt;- function(model.subset, model.full) {
+    N &lt;- nrow(model.subset$model)
+    p &lt;- length(model.subset$coefficients)
+    rss.subset &lt;- sum(residuals(model.subset)^2)
+    mse.full &lt;- mean(sum(residuals(model.full)^2))
+    c &lt;- (rss.subset / mse.full) - N + (2 * p)
+    return(c)
+}</code></pre>
+<p>To demonstrate the use of this function, we will use the airquality data set, for which we create three models using subsets of features:</p>
+<pre class="r"><code>data(airquality)
+ozone &lt;- subset(na.omit(airquality), 
+        select = c(&quot;Ozone&quot;, &quot;Solar.R&quot;, &quot;Wind&quot;, &quot;Temp&quot;))
+m1 &lt;- lm(Temp ~ Ozone, data = ozone)
+m2 &lt;- lm(Temp + Wind ~ Ozone, data = ozone)
+m.full &lt;- lm(Temp + Wind + Solar.R ~ Ozone, data = ozone)</code></pre>
+<p>We can now determine the Cp statistic for the three models:</p>
+<pre class="r"><code>c1 &lt;- cp(m1, m.full)
+c2 &lt;- cp(m2, m.full)
+c3 &lt;- cp(m.full, m.full)
+print(paste0(&quot;Cps for three models: &quot;, paste(round(c(c1, c2, c3), 3), collapse = &quot;, &quot;)))</code></pre>
+<pre><code>## [1] &quot;Cps for three models: -106.994, -106.993, -106&quot;</code></pre>
+<p>Since Cp is closer to <span class="math inline">\(p\)</span> with increasing number of features, it is worthwhile to use all three features. The negative values of Cp, however, indicate that the model is subject to a high bias.</p>
+</div>
 </div>
 <div id="performance-measures-for-classification" class="section level2">
 <h2>Performance measures for classification</h2>
-<p>AIC TODO</p>
+<p>The Akaike information criterion (AIC) can be used for both, regression and classification. It is defined as</p>
+<p><span class="math display">\[AIC = 2p - 2 \cdot \rm{ln}(\hat{L})\]</span></p>
+<p>where <span class="math inline">\(\hat{L}\)</span> is the maximum of the likelihood function. A desirable model minimizes the AIC because this is the model that has the best fit (high <span class="math inline">\(\hat{L}\)</span>) with the fewest possible number of features (low <span class="math inline">\(p\)</span>).</p>
+<div id="calculating-the-aic-for-generalized-linear-models" class="section level3">
+<h3>Calculating the AIC for generalized linear models</h3>
+<p>For regression models, the AIC is directly available from the summary function for <code>glm</code> objects:</p>
+<pre class="r"><code>m1 &lt;- glm(Temp ~ Ozone, data = ozone)
+m2 &lt;- glm(Temp + Wind ~ Ozone, data = ozone)
+m.full &lt;- glm(Temp + Wind + Solar.R ~ Ozone, data = ozone)
+aics &lt;- c(summary(m1)$aic, summary(m2)$aic, summary(m.full)$aic)
+print(paste0(&quot;AICs are: &quot;, paste(aics, collapse = &quot;, &quot;)))</code></pre>
+<pre><code>## [1] &quot;AICs are: 746.187677405374, 753.590711437736, 1310.33092056826&quot;</code></pre>
+<p>In this case, the AIC indicates that the inclusion of the third feature does not provide a fit-complexity tradeoff.</p>
+</div>
+<div id="calculating-the-aic-more-generally" class="section level3">
+<h3>Calculating the AIC more generally</h3>
+<p>Generally, the AIC can be calculated using the <code>AIC</code> function for all models, for which a log likelihood is defined:</p>
+<pre class="r"><code>aics &lt;- c(AIC(m1), AIC(m2), AIC(m.full))
+print(paste0(&quot;AICs are: &quot;, paste(aics, collapse = &quot;, &quot;)))</code></pre>
+<pre><code>## [1] &quot;AICs are: 746.187677405374, 753.590711437736, 1310.33092056826&quot;</code></pre>
+</div>
+</div>
+<div id="alternatives-to-these-performance-measures" class="section level2">
+<h2>Alternatives to these performance measures</h2>
+<p>Rather than computing performance measures that take model complexity into account, you could also evaluate model performance on a test set (e.g. using cross validation) to prevent overfitting.</p>
 </div>
