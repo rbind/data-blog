@@ -1,0 +1,85 @@
+---
+title: "KDNuggets Guest Post: Machine Learning Through the Years"
+author: Matthias Döring
+date: '2018-11-26'
+description: "TODO"
+draft: true
+categories:
+  - machine-learning
+---
+The field of machine learning has gone through enormous changes in the last decades. For example, support vector machines and random forests were developed in the mid 1990s. However, some methods that are still used nowadays have been around for quite a long time. For example, the concept of least squares was already proposed in the early 19th century by Legendre and Gauss. Other approaches such as neural networks, which have been described already in the 1950s, have been steadily advanced through the years.
+
+A question that is often asked is: what is the best model? Answering this question is not really possible as the choice of the model is inherently linked to the data that is being modeled. A question that is easier to answer is: what is the most popular model? Here, I investigate this question in a data-driven manner. More precisely, I will define popularity in a frequentist manner. The assumption of this analysis is that a method that is associated with a greater number of
+publications is more popular. Obviously, this is not necessarily true because publications can also indicate that an algorithm is criticized or that there is a lot of room for improvement. However, overall, there should be a high correlation between the two concepts.
+
+Another question I was interested in was whether there was a difference in the frequencies with which different machine learning models are mentioned in publications from different communities. For this purpose, I counted the number of search results from Google Scholar to determine the overall frequency. For community-specfic frequencies, I performed the same queries on dplb (computer science) and on PubMed (biomedical sciences).
+
+```{r}
+df <- read.csv("ml_model_publications.csv")
+library(reshape2)
+df.m <- melt(df, "Source")
+# get percentages: values are not comparable otherwise
+library(dplyr)
+df.m <- group_by(df.m, Source) %>% mutate(percent = value/sum(value, na.rm = TRUE))
+colnames(df.m) <- c("Source", "Model", "Count", "Percentage")
+# sort columns by overall usage
+overall.idx <- which(df.m$Source == "Overall (Google Scholar)")
+o <- order(df.m$Count[overall.idx], decreasing = TRUE)
+df.m$Model <- factor(df.m$Model, levels = levels(df.m$Model)[o])
+library(ggplot2)
+ggplot(df.m, aes(x = Model, y = Percentage, fill = Source)) + geom_bar(stat = "identity") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
+    scale_y_continuous(labels = scales::percent_format())
+# top 6 models by source
+n <- 6
+for (source in unique(df.m$Source)) {
+    idx <- which(df.m$Source == source)
+    o <- order(df.m$Percentage[idx], decreasing = TRUE)
+    top.df <- df.m[idx[o[1:n]], ]
+    print(top.df)
+}
+```
+
+Overall (according to Google Scholar), these are the 6 most frequently referenced supervised models (from a total of 11,788,100 papers mentioning the considered models):
+
+1. Linear regression with 3,580,000 (30.4%) papers
+2. Logistic regression with 2,330,000 (19.8%) papers
+3. Neural networks with 1,750,000 (14.8%) papers
+4. Nearest neighbors with 1,738,000 (14.7%) papers
+5. Decision trees with 875,000 (7.4%) papers
+6. Support vector machines with 684,000 (5.8%) papers
+
+The overrepresentation of methods such as linear regression and logistic regression is not surprising because they have been around for a much longer time than other methods. Although support vector machines (SVMs) are one of the more recent methods, they are more popular than other methods that have been developed at the same time (e.g. random forests). 
+
+Looking at the numbers in the biomedical and computer sciences, there are critical differences.
+
+Biomedical:
+
+1. Logistic regression: 229,956 (54.2%) papers
+2. Linear regression: 84,850 (20%) papers
+3. Cox regression: 38,801 (9.1%) papers
+4. Neural networks: 23,883 (5.6%) papers
+5. Poisson regression: 12,978 (3.1%) papers
+6. Support vector machines: 11,061 (2.6%) papers
+
+Computer science:
+
+1. Neural networks: 63,695 (75%) papers
+2. Support vector machines: 7,750 (8.9%) papers
+3. Decision trees: 4,074 (4.8%) papers
+4. Nearest neighbors: 3,839 (4.5%) papers
+5. Random forests: 1,863 (2.2%) papers
+6. Linear regression: 1,643 (1.9%) papers
+
+Where do these considerable differences come from? The popularity of logistic regression in the PubMed data probably originates from the large number of clinical studies that are contained in the data. There, the categorical outcomes (e.g. treatment success) is often analyzed using logistic regression because it can be used for interpreting the impact of the features on the outcome. In the biomedical data, we see an overrepresentation of non-linear models. This is probably due to two
+reasons. First, in medical settings, the number of samples is often small such that it is infeasible to obtain good fits with complex models. Second, interpreting the results is critical for medical applications, which is why linear models are advantageous over non-linear methods, which are typically harder to interpret. It is also remarkable that Cox regression, a model for Kaplan-Meier survival data, is so frequently used (9.1% of papers).
+
+The computer science publications show an opposing trend: the majority of publications concerns recent, non-linear methods. Particularly the number of publications about neural networks, which make up three quarters of all retrieved publications, is astounding. Although SVMs are the second most frequently mentioned method, they are far behind (8.9% of papers). In some way, this is not surprising considering that there have been much more advances in neural networks than in SVMs,
+which is likely a byproduct of a greater focus on researching neural networks.
+
+These data also demonstrate why there is such a disconnect between machine learning researchers and persons that apply machine learning. Research is heavily focused on individual, state-of-the-art methods such as convolutional neural networks. Appliers of machine learning, however, still heavily rely on more traditional approaches such as linear or logistic regression.
+
+--
+References:
+ A.M. Legendre. Nouvelles méthodes pour la détermination des orbites des comètes, Firmin Didot, Paris, 1805. “Sur la Méthode des moindres quarrés” appears as an appendix.
+C.F. Gauss. Theoria Motus Corporum Coelestium in Sectionibus Conicis Solem Ambientum. (1809)

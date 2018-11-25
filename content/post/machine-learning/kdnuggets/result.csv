@@ -1,0 +1,760 @@
+Year,Model,Count
+1950,Neural Network,0
+1951,Neural Network,0
+1952,Neural Network,0
+1953,Neural Network,0
+1954,Neural Network,0
+1955,Neural Network,0
+1956,Neural Network,0
+1957,Neural Network,0
+1958,Neural Network,0
+1959,Neural Network,0
+1960,Neural Network,0
+1961,Neural Network,0
+1962,Neural Network,0
+1963,Neural Network,0
+1964,Neural Network,0
+1965,Neural Network,0
+1966,Neural Network,0
+1967,Neural Network,0
+1968,Neural Network,0
+1969,Neural Network,0
+1970,Neural Network,0
+1971,Neural Network,0
+1972,Neural Network,0
+1973,Neural Network,0
+1974,Neural Network,0
+1975,Neural Network,0
+1976,Neural Network,0
+1977,Neural Network,0
+1978,Neural Network,0
+1979,Neural Network,0
+1980,Neural Network,0
+1981,Neural Network,0
+1982,Neural Network,0
+1983,Neural Network,0
+1984,Neural Network,0
+1985,Neural Network,0
+1986,Neural Network,0
+1987,Neural Network,0
+1988,Neural Network,0
+1989,Neural Network,0
+1990,Neural Network,0
+1991,Neural Network,0
+1992,Neural Network,0
+1993,Neural Network,0
+1994,Neural Network,0
+1995,Neural Network,0
+1996,Neural Network,0
+1997,Neural Network,0
+1998,Neural Network,0
+1999,Neural Network,0
+2000,Neural Network,0
+2001,Neural Network,0
+2002,Neural Network,0
+2003,Neural Network,0
+2004,Neural Network,0
+2005,Neural Network,0
+2006,Neural Network,0
+2007,Neural Network,0
+2008,Neural Network,0
+2009,Neural Network,0
+2010,Neural Network,0
+2011,Neural Network,0
+2012,Neural Network,0
+2013,Neural Network,0
+2014,Neural Network,0
+2015,Neural Network,0
+2016,Neural Network,0
+2017,Neural Network,0
+2018,Neural Network,0
+1950,Support Vector Machine,0
+1951,Support Vector Machine,0
+1952,Support Vector Machine,0
+1953,Support Vector Machine,0
+1954,Support Vector Machine,0
+1955,Support Vector Machine,0
+1956,Support Vector Machine,0
+1957,Support Vector Machine,0
+1958,Support Vector Machine,0
+1959,Support Vector Machine,0
+1960,Support Vector Machine,0
+1961,Support Vector Machine,0
+1962,Support Vector Machine,0
+1963,Support Vector Machine,0
+1964,Support Vector Machine,0
+1965,Support Vector Machine,0
+1966,Support Vector Machine,0
+1967,Support Vector Machine,0
+1968,Support Vector Machine,0
+1969,Support Vector Machine,0
+1970,Support Vector Machine,0
+1971,Support Vector Machine,0
+1972,Support Vector Machine,0
+1973,Support Vector Machine,0
+1974,Support Vector Machine,0
+1975,Support Vector Machine,0
+1976,Support Vector Machine,0
+1977,Support Vector Machine,0
+1978,Support Vector Machine,0
+1979,Support Vector Machine,0
+1980,Support Vector Machine,0
+1981,Support Vector Machine,0
+1982,Support Vector Machine,0
+1983,Support Vector Machine,0
+1984,Support Vector Machine,0
+1985,Support Vector Machine,0
+1986,Support Vector Machine,0
+1987,Support Vector Machine,0
+1988,Support Vector Machine,0
+1989,Support Vector Machine,0
+1990,Support Vector Machine,0
+1991,Support Vector Machine,0
+1992,Support Vector Machine,0
+1993,Support Vector Machine,0
+1994,Support Vector Machine,0
+1995,Support Vector Machine,0
+1996,Support Vector Machine,0
+1997,Support Vector Machine,0
+1998,Support Vector Machine,0
+1999,Support Vector Machine,0
+2000,Support Vector Machine,0
+2001,Support Vector Machine,0
+2002,Support Vector Machine,0
+2003,Support Vector Machine,0
+2004,Support Vector Machine,0
+2005,Support Vector Machine,0
+2006,Support Vector Machine,0
+2007,Support Vector Machine,0
+2008,Support Vector Machine,0
+2009,Support Vector Machine,0
+2010,Support Vector Machine,0
+2011,Support Vector Machine,0
+2012,Support Vector Machine,0
+2013,Support Vector Machine,0
+2014,Support Vector Machine,0
+2015,Support Vector Machine,0
+2016,Support Vector Machine,0
+2017,Support Vector Machine,0
+2018,Support Vector Machine,0
+1950,Linear Regression,0
+1951,Linear Regression,0
+1952,Linear Regression,0
+1953,Linear Regression,0
+1954,Linear Regression,0
+1955,Linear Regression,0
+1956,Linear Regression,0
+1957,Linear Regression,0
+1958,Linear Regression,0
+1959,Linear Regression,0
+1960,Linear Regression,0
+1961,Linear Regression,0
+1962,Linear Regression,0
+1963,Linear Regression,0
+1964,Linear Regression,0
+1965,Linear Regression,0
+1966,Linear Regression,0
+1967,Linear Regression,0
+1968,Linear Regression,0
+1969,Linear Regression,0
+1970,Linear Regression,0
+1971,Linear Regression,0
+1972,Linear Regression,0
+1973,Linear Regression,0
+1974,Linear Regression,0
+1975,Linear Regression,0
+1976,Linear Regression,0
+1977,Linear Regression,0
+1978,Linear Regression,0
+1979,Linear Regression,0
+1980,Linear Regression,0
+1981,Linear Regression,0
+1982,Linear Regression,0
+1983,Linear Regression,0
+1984,Linear Regression,0
+1985,Linear Regression,0
+1986,Linear Regression,0
+1987,Linear Regression,0
+1988,Linear Regression,0
+1989,Linear Regression,0
+1990,Linear Regression,0
+1991,Linear Regression,0
+1992,Linear Regression,0
+1993,Linear Regression,0
+1994,Linear Regression,0
+1995,Linear Regression,0
+1996,Linear Regression,0
+1997,Linear Regression,0
+1998,Linear Regression,0
+1999,Linear Regression,0
+2000,Linear Regression,0
+2001,Linear Regression,0
+2002,Linear Regression,0
+2003,Linear Regression,0
+2004,Linear Regression,0
+2005,Linear Regression,0
+2006,Linear Regression,0
+2007,Linear Regression,0
+2008,Linear Regression,0
+2009,Linear Regression,0
+2010,Linear Regression,0
+2011,Linear Regression,0
+2012,Linear Regression,0
+2013,Linear Regression,0
+2014,Linear Regression,0
+2015,Linear Regression,0
+2016,Linear Regression,0
+2017,Linear Regression,0
+2018,Linear Regression,0
+1950,Logistic Regression,0
+1951,Logistic Regression,0
+1952,Logistic Regression,0
+1953,Logistic Regression,0
+1954,Logistic Regression,0
+1955,Logistic Regression,0
+1956,Logistic Regression,0
+1957,Logistic Regression,0
+1958,Logistic Regression,0
+1959,Logistic Regression,0
+1960,Logistic Regression,0
+1961,Logistic Regression,0
+1962,Logistic Regression,0
+1963,Logistic Regression,0
+1964,Logistic Regression,0
+1965,Logistic Regression,0
+1966,Logistic Regression,0
+1967,Logistic Regression,0
+1968,Logistic Regression,0
+1969,Logistic Regression,0
+1970,Logistic Regression,0
+1971,Logistic Regression,0
+1972,Logistic Regression,0
+1973,Logistic Regression,0
+1974,Logistic Regression,0
+1975,Logistic Regression,0
+1976,Logistic Regression,0
+1977,Logistic Regression,0
+1978,Logistic Regression,0
+1979,Logistic Regression,0
+1980,Logistic Regression,0
+1981,Logistic Regression,0
+1982,Logistic Regression,0
+1983,Logistic Regression,0
+1984,Logistic Regression,0
+1985,Logistic Regression,0
+1986,Logistic Regression,0
+1987,Logistic Regression,0
+1988,Logistic Regression,0
+1989,Logistic Regression,0
+1990,Logistic Regression,0
+1991,Logistic Regression,0
+1992,Logistic Regression,0
+1993,Logistic Regression,0
+1994,Logistic Regression,0
+1995,Logistic Regression,0
+1996,Logistic Regression,0
+1997,Logistic Regression,0
+1998,Logistic Regression,0
+1999,Logistic Regression,0
+2000,Logistic Regression,0
+2001,Logistic Regression,0
+2002,Logistic Regression,0
+2003,Logistic Regression,0
+2004,Logistic Regression,0
+2005,Logistic Regression,0
+2006,Logistic Regression,0
+2007,Logistic Regression,0
+2008,Logistic Regression,0
+2009,Logistic Regression,0
+2010,Logistic Regression,0
+2011,Logistic Regression,0
+2012,Logistic Regression,0
+2013,Logistic Regression,0
+2014,Logistic Regression,0
+2015,Logistic Regression,0
+2016,Logistic Regression,0
+2017,Logistic Regression,0
+2018,Logistic Regression,0
+1950,Poisson Regression,0
+1951,Poisson Regression,0
+1952,Poisson Regression,0
+1953,Poisson Regression,0
+1954,Poisson Regression,0
+1955,Poisson Regression,0
+1956,Poisson Regression,0
+1957,Poisson Regression,0
+1958,Poisson Regression,0
+1959,Poisson Regression,0
+1960,Poisson Regression,0
+1961,Poisson Regression,0
+1962,Poisson Regression,0
+1963,Poisson Regression,0
+1964,Poisson Regression,0
+1965,Poisson Regression,0
+1966,Poisson Regression,0
+1967,Poisson Regression,0
+1968,Poisson Regression,0
+1969,Poisson Regression,0
+1970,Poisson Regression,0
+1971,Poisson Regression,0
+1972,Poisson Regression,0
+1973,Poisson Regression,0
+1974,Poisson Regression,0
+1975,Poisson Regression,0
+1976,Poisson Regression,0
+1977,Poisson Regression,0
+1978,Poisson Regression,0
+1979,Poisson Regression,0
+1980,Poisson Regression,0
+1981,Poisson Regression,0
+1982,Poisson Regression,0
+1983,Poisson Regression,0
+1984,Poisson Regression,0
+1985,Poisson Regression,0
+1986,Poisson Regression,0
+1987,Poisson Regression,0
+1988,Poisson Regression,0
+1989,Poisson Regression,0
+1990,Poisson Regression,0
+1991,Poisson Regression,0
+1992,Poisson Regression,0
+1993,Poisson Regression,0
+1994,Poisson Regression,0
+1995,Poisson Regression,0
+1996,Poisson Regression,0
+1997,Poisson Regression,0
+1998,Poisson Regression,0
+1999,Poisson Regression,0
+2000,Poisson Regression,0
+2001,Poisson Regression,0
+2002,Poisson Regression,0
+2003,Poisson Regression,0
+2004,Poisson Regression,0
+2005,Poisson Regression,0
+2006,Poisson Regression,0
+2007,Poisson Regression,0
+2008,Poisson Regression,0
+2009,Poisson Regression,0
+2010,Poisson Regression,0
+2011,Poisson Regression,0
+2012,Poisson Regression,0
+2013,Poisson Regression,0
+2014,Poisson Regression,0
+2015,Poisson Regression,0
+2016,Poisson Regression,0
+2017,Poisson Regression,0
+2018,Poisson Regression,0
+1950,Cox Regression,0
+1951,Cox Regression,0
+1952,Cox Regression,0
+1953,Cox Regression,0
+1954,Cox Regression,0
+1955,Cox Regression,0
+1956,Cox Regression,0
+1957,Cox Regression,0
+1958,Cox Regression,0
+1959,Cox Regression,0
+1960,Cox Regression,0
+1961,Cox Regression,0
+1962,Cox Regression,0
+1963,Cox Regression,0
+1964,Cox Regression,0
+1965,Cox Regression,0
+1966,Cox Regression,0
+1967,Cox Regression,0
+1968,Cox Regression,0
+1969,Cox Regression,0
+1970,Cox Regression,0
+1971,Cox Regression,0
+1972,Cox Regression,0
+1973,Cox Regression,0
+1974,Cox Regression,0
+1975,Cox Regression,0
+1976,Cox Regression,0
+1977,Cox Regression,0
+1978,Cox Regression,0
+1979,Cox Regression,0
+1980,Cox Regression,0
+1981,Cox Regression,0
+1982,Cox Regression,0
+1983,Cox Regression,0
+1984,Cox Regression,0
+1985,Cox Regression,0
+1986,Cox Regression,0
+1987,Cox Regression,0
+1988,Cox Regression,0
+1989,Cox Regression,0
+1990,Cox Regression,0
+1991,Cox Regression,0
+1992,Cox Regression,0
+1993,Cox Regression,0
+1994,Cox Regression,0
+1995,Cox Regression,0
+1996,Cox Regression,0
+1997,Cox Regression,0
+1998,Cox Regression,0
+1999,Cox Regression,0
+2000,Cox Regression,0
+2001,Cox Regression,0
+2002,Cox Regression,0
+2003,Cox Regression,0
+2004,Cox Regression,0
+2005,Cox Regression,0
+2006,Cox Regression,0
+2007,Cox Regression,0
+2008,Cox Regression,0
+2009,Cox Regression,0
+2010,Cox Regression,0
+2011,Cox Regression,0
+2012,Cox Regression,0
+2013,Cox Regression,0
+2014,Cox Regression,0
+2015,Cox Regression,0
+2016,Cox Regression,0
+2017,Cox Regression,0
+2018,Cox Regression,0
+1950,Ridge Regression,0
+1951,Ridge Regression,0
+1952,Ridge Regression,0
+1953,Ridge Regression,0
+1954,Ridge Regression,0
+1955,Ridge Regression,0
+1956,Ridge Regression,0
+1957,Ridge Regression,0
+1958,Ridge Regression,0
+1959,Ridge Regression,0
+1960,Ridge Regression,0
+1961,Ridge Regression,0
+1962,Ridge Regression,0
+1963,Ridge Regression,0
+1964,Ridge Regression,0
+1965,Ridge Regression,0
+1966,Ridge Regression,0
+1967,Ridge Regression,0
+1968,Ridge Regression,0
+1969,Ridge Regression,0
+1970,Ridge Regression,0
+1971,Ridge Regression,0
+1972,Ridge Regression,0
+1973,Ridge Regression,0
+1974,Ridge Regression,0
+1975,Ridge Regression,0
+1976,Ridge Regression,0
+1977,Ridge Regression,0
+1978,Ridge Regression,0
+1979,Ridge Regression,0
+1980,Ridge Regression,0
+1981,Ridge Regression,0
+1982,Ridge Regression,0
+1983,Ridge Regression,0
+1984,Ridge Regression,0
+1985,Ridge Regression,0
+1986,Ridge Regression,0
+1987,Ridge Regression,0
+1988,Ridge Regression,0
+1989,Ridge Regression,0
+1990,Ridge Regression,0
+1991,Ridge Regression,0
+1992,Ridge Regression,0
+1993,Ridge Regression,0
+1994,Ridge Regression,0
+1995,Ridge Regression,0
+1996,Ridge Regression,0
+1997,Ridge Regression,0
+1998,Ridge Regression,0
+1999,Ridge Regression,0
+2000,Ridge Regression,0
+2001,Ridge Regression,0
+2002,Ridge Regression,0
+2003,Ridge Regression,0
+2004,Ridge Regression,0
+2005,Ridge Regression,0
+2006,Ridge Regression,0
+2007,Ridge Regression,0
+2008,Ridge Regression,0
+2009,Ridge Regression,0
+2010,Ridge Regression,0
+2011,Ridge Regression,0
+2012,Ridge Regression,0
+2013,Ridge Regression,0
+2014,Ridge Regression,0
+2015,Ridge Regression,0
+2016,Ridge Regression,0
+2017,Ridge Regression,0
+2018,Ridge Regression,0
+1950,Lasso Regression,0
+1951,Lasso Regression,0
+1952,Lasso Regression,0
+1953,Lasso Regression,0
+1954,Lasso Regression,0
+1955,Lasso Regression,0
+1956,Lasso Regression,0
+1957,Lasso Regression,0
+1958,Lasso Regression,0
+1959,Lasso Regression,0
+1960,Lasso Regression,0
+1961,Lasso Regression,0
+1962,Lasso Regression,0
+1963,Lasso Regression,0
+1964,Lasso Regression,0
+1965,Lasso Regression,0
+1966,Lasso Regression,0
+1967,Lasso Regression,0
+1968,Lasso Regression,0
+1969,Lasso Regression,0
+1970,Lasso Regression,0
+1971,Lasso Regression,0
+1972,Lasso Regression,0
+1973,Lasso Regression,0
+1974,Lasso Regression,0
+1975,Lasso Regression,0
+1976,Lasso Regression,0
+1977,Lasso Regression,0
+1978,Lasso Regression,0
+1979,Lasso Regression,0
+1980,Lasso Regression,0
+1981,Lasso Regression,0
+1982,Lasso Regression,0
+1983,Lasso Regression,0
+1984,Lasso Regression,0
+1985,Lasso Regression,0
+1986,Lasso Regression,0
+1987,Lasso Regression,0
+1988,Lasso Regression,0
+1989,Lasso Regression,0
+1990,Lasso Regression,0
+1991,Lasso Regression,0
+1992,Lasso Regression,0
+1993,Lasso Regression,0
+1994,Lasso Regression,0
+1995,Lasso Regression,0
+1996,Lasso Regression,0
+1997,Lasso Regression,0
+1998,Lasso Regression,0
+1999,Lasso Regression,0
+2000,Lasso Regression,0
+2001,Lasso Regression,0
+2002,Lasso Regression,0
+2003,Lasso Regression,0
+2004,Lasso Regression,0
+2005,Lasso Regression,0
+2006,Lasso Regression,0
+2007,Lasso Regression,0
+2008,Lasso Regression,0
+2009,Lasso Regression,0
+2010,Lasso Regression,0
+2011,Lasso Regression,0
+2012,Lasso Regression,0
+2013,Lasso Regression,0
+2014,Lasso Regression,0
+2015,Lasso Regression,0
+2016,Lasso Regression,0
+2017,Lasso Regression,0
+2018,Lasso Regression,0
+1950,Nearest Neighbor,0
+1951,Nearest Neighbor,0
+1952,Nearest Neighbor,0
+1953,Nearest Neighbor,0
+1954,Nearest Neighbor,0
+1955,Nearest Neighbor,0
+1956,Nearest Neighbor,0
+1957,Nearest Neighbor,0
+1958,Nearest Neighbor,0
+1959,Nearest Neighbor,0
+1960,Nearest Neighbor,0
+1961,Nearest Neighbor,0
+1962,Nearest Neighbor,0
+1963,Nearest Neighbor,0
+1964,Nearest Neighbor,0
+1965,Nearest Neighbor,0
+1966,Nearest Neighbor,0
+1967,Nearest Neighbor,0
+1968,Nearest Neighbor,0
+1969,Nearest Neighbor,0
+1970,Nearest Neighbor,0
+1971,Nearest Neighbor,0
+1972,Nearest Neighbor,0
+1973,Nearest Neighbor,0
+1974,Nearest Neighbor,0
+1975,Nearest Neighbor,0
+1976,Nearest Neighbor,0
+1977,Nearest Neighbor,0
+1978,Nearest Neighbor,0
+1979,Nearest Neighbor,0
+1980,Nearest Neighbor,0
+1981,Nearest Neighbor,0
+1982,Nearest Neighbor,0
+1983,Nearest Neighbor,0
+1984,Nearest Neighbor,0
+1985,Nearest Neighbor,0
+1986,Nearest Neighbor,0
+1987,Nearest Neighbor,0
+1988,Nearest Neighbor,0
+1989,Nearest Neighbor,0
+1990,Nearest Neighbor,0
+1991,Nearest Neighbor,0
+1992,Nearest Neighbor,0
+1993,Nearest Neighbor,0
+1994,Nearest Neighbor,0
+1995,Nearest Neighbor,0
+1996,Nearest Neighbor,0
+1997,Nearest Neighbor,0
+1998,Nearest Neighbor,0
+1999,Nearest Neighbor,0
+2000,Nearest Neighbor,0
+2001,Nearest Neighbor,0
+2002,Nearest Neighbor,0
+2003,Nearest Neighbor,0
+2004,Nearest Neighbor,0
+2005,Nearest Neighbor,0
+2006,Nearest Neighbor,0
+2007,Nearest Neighbor,0
+2008,Nearest Neighbor,0
+2009,Nearest Neighbor,0
+2010,Nearest Neighbor,0
+2011,Nearest Neighbor,0
+2012,Nearest Neighbor,0
+2013,Nearest Neighbor,0
+2014,Nearest Neighbor,0
+2015,Nearest Neighbor,0
+2016,Nearest Neighbor,0
+2017,Nearest Neighbor,0
+2018,Nearest Neighbor,0
+1950,Linear Discriminant Analysis,0
+1951,Linear Discriminant Analysis,0
+1952,Linear Discriminant Analysis,0
+1953,Linear Discriminant Analysis,0
+1954,Linear Discriminant Analysis,0
+1955,Linear Discriminant Analysis,0
+1956,Linear Discriminant Analysis,0
+1957,Linear Discriminant Analysis,0
+1958,Linear Discriminant Analysis,0
+1959,Linear Discriminant Analysis,0
+1960,Linear Discriminant Analysis,0
+1961,Linear Discriminant Analysis,0
+1962,Linear Discriminant Analysis,0
+1963,Linear Discriminant Analysis,0
+1964,Linear Discriminant Analysis,0
+1965,Linear Discriminant Analysis,0
+1966,Linear Discriminant Analysis,0
+1967,Linear Discriminant Analysis,0
+1968,Linear Discriminant Analysis,0
+1969,Linear Discriminant Analysis,0
+1970,Linear Discriminant Analysis,0
+1971,Linear Discriminant Analysis,0
+1972,Linear Discriminant Analysis,0
+1973,Linear Discriminant Analysis,0
+1974,Linear Discriminant Analysis,0
+1975,Linear Discriminant Analysis,0
+1976,Linear Discriminant Analysis,0
+1977,Linear Discriminant Analysis,0
+1978,Linear Discriminant Analysis,0
+1979,Linear Discriminant Analysis,0
+1980,Linear Discriminant Analysis,0
+1981,Linear Discriminant Analysis,0
+1982,Linear Discriminant Analysis,0
+1983,Linear Discriminant Analysis,0
+1984,Linear Discriminant Analysis,0
+1985,Linear Discriminant Analysis,0
+1986,Linear Discriminant Analysis,0
+1987,Linear Discriminant Analysis,0
+1988,Linear Discriminant Analysis,0
+1989,Linear Discriminant Analysis,0
+1990,Linear Discriminant Analysis,0
+1991,Linear Discriminant Analysis,0
+1992,Linear Discriminant Analysis,0
+1993,Linear Discriminant Analysis,0
+1994,Linear Discriminant Analysis,0
+1995,Linear Discriminant Analysis,0
+1996,Linear Discriminant Analysis,0
+1997,Linear Discriminant Analysis,0
+1998,Linear Discriminant Analysis,0
+1999,Linear Discriminant Analysis,0
+2000,Linear Discriminant Analysis,0
+2001,Linear Discriminant Analysis,0
+2002,Linear Discriminant Analysis,0
+2003,Linear Discriminant Analysis,0
+2004,Linear Discriminant Analysis,0
+2005,Linear Discriminant Analysis,0
+2006,Linear Discriminant Analysis,0
+2007,Linear Discriminant Analysis,0
+2008,Linear Discriminant Analysis,0
+2009,Linear Discriminant Analysis,0
+2010,Linear Discriminant Analysis,0
+2011,Linear Discriminant Analysis,0
+2012,Linear Discriminant Analysis,0
+2013,Linear Discriminant Analysis,0
+2014,Linear Discriminant Analysis,0
+2015,Linear Discriminant Analysis,0
+2016,Linear Discriminant Analysis,0
+2017,Linear Discriminant Analysis,0
+2018,Linear Discriminant Analysis,0
+1950,Log-Linear Model,0
+1951,Log-Linear Model,0
+1952,Log-Linear Model,0
+1953,Log-Linear Model,0
+1954,Log-Linear Model,0
+1955,Log-Linear Model,0
+1956,Log-Linear Model,0
+1957,Log-Linear Model,0
+1958,Log-Linear Model,0
+1959,Log-Linear Model,0
+1960,Log-Linear Model,0
+1961,Log-Linear Model,0
+1962,Log-Linear Model,0
+1963,Log-Linear Model,0
+1964,Log-Linear Model,0
+1965,Log-Linear Model,0
+1966,Log-Linear Model,0
+1967,Log-Linear Model,0
+1968,Log-Linear Model,0
+1969,Log-Linear Model,0
+1970,Log-Linear Model,0
+1971,Log-Linear Model,0
+1972,Log-Linear Model,0
+1973,Log-Linear Model,0
+1974,Log-Linear Model,0
+1975,Log-Linear Model,0
+1976,Log-Linear Model,0
+1977,Log-Linear Model,0
+1978,Log-Linear Model,0
+1979,Log-Linear Model,0
+1980,Log-Linear Model,0
+1981,Log-Linear Model,0
+1982,Log-Linear Model,0
+1983,Log-Linear Model,0
+1984,Log-Linear Model,0
+1985,Log-Linear Model,0
+1986,Log-Linear Model,0
+1987,Log-Linear Model,0
+1988,Log-Linear Model,0
+1989,Log-Linear Model,0
+1990,Log-Linear Model,0
+1991,Log-Linear Model,0
+1992,Log-Linear Model,0
+1993,Log-Linear Model,0
+1994,Log-Linear Model,0
+1995,Log-Linear Model,0
+1996,Log-Linear Model,0
+1997,Log-Linear Model,0
+1998,Log-Linear Model,0
+1999,Log-Linear Model,0
+2000,Log-Linear Model,0
+2001,Log-Linear Model,0
+2002,Log-Linear Model,0
+2003,Log-Linear Model,0
+2004,Log-Linear Model,0
+2005,Log-Linear Model,0
+2006,Log-Linear Model,0
+2007,Log-Linear Model,0
+2008,Log-Linear Model,0
+2009,Log-Linear Model,0
+2010,Log-Linear Model,0
+2011,Log-Linear Model,0
+2012,Log-Linear Model,0
+2013,Log-Linear Model,0
+2014,Log-Linear Model,0
+2015,Log-Linear Model,0
+2016,Log-Linear Model,0
+2017,Log-Linear Model,0
+2018,Log-Linear Model,0
