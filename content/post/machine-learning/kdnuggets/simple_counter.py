@@ -101,10 +101,6 @@ if not os.path.exists(os.path.dirname(out_file)):
     os.makedirs(os.path.dirname(out_file))
 # table structure: Model | Year | Count
 models = {
-        "Nearest Neighbor": ["k-nearest neighbor", "k-nearest neighbour"],
-        }
-'''
-models = {
         "Neural Network": ["neural network"],
         "Support Vector Machine": ["support vector machine"],
         "Random Forest": ["random forest"],
@@ -118,7 +114,6 @@ models = {
         "Nearest Neighbor": ["k-nearest neighbor", "k-nearest neighbour"],
         "Linear Discriminant Analysis": ["linear discriminant analysis"],
         "Log-Linear Model": ["log-linear model"]}
-'''
 rows = []
 proxies = get_proxies()
 proxy_pool = cycle(proxies)
