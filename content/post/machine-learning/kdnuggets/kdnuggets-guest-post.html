@@ -1,8 +1,8 @@
 ---
-title: "KDNuggets Guest Post: Machine Learning Through the Years"
+title: "Supervised Learning: Model Popularity from Past to Present"
 author: Matthias Döring
 date: '2018-11-26'
-description: "TODO"
+description: "The field of machine learning has changed enormously in the last decades. Here, I investigate the popularity of supervised learning techniques through time and across different scientific fields."
 draft: true
 categories:
   - machine-learning
@@ -10,8 +10,8 @@ categories:
 
 
 
-<p>The field of machine learning has gone through enormous changes in the last decades. Admittedly, there are some methods that have been around for quite a long time. For example, the concept of least squares was already proposed in the early 19th century by <a href="https://archive.org/details/nouvellesmthode00legegoog/">Legendre</a> and <a href="https://www.e-rara.ch/zut/content/titleinfo/142787">Gauss</a>. Other approaches such as neural networks, <a href="http://psycnet.apa.org/record/1959-09865-001">whose most basic form was introduced in 1958</a>, have been substantially advanced in the last decades. Finally, there are also novel methods that have been developed more recently such as <a href="https://link.springer.com/article/10.1007/BF00994018">support vector machines (SVMs)</a>.</p>
-<p>Due to the large number of available approaches for supervised learning, the following question is often posed: <strong>What is the best model?</strong> As we all know, this question is hard to answer because “[a]ll models are wrong but some are useful” (George Box). Moreover, the usefulness of the model critically depends on the data at hand. Thus, there is no general answer to this question. A question that is, easier to answer is the following: <strong>What is the most popular model?</strong></p>
+<p>The field of machine learning has gone through enormous changes in the last decades. Admittedly, there are some methods that have been around for a long time and have not changed much. For example, the concept of least squares was already proposed in the early 19th century by <a href="https://archive.org/details/nouvellesmthode00legegoog/">Legendre</a> and <a href="https://www.e-rara.ch/zut/content/titleinfo/142787">Gauss</a>. Other approaches such as neural networks, <a href="http://psycnet.apa.org/record/1959-09865-001">whose most basic form was introduced in 1958</a>, were substantially advanced in the last decades and there are also more recently developed methods such as <a href="https://link.springer.com/article/10.1007/BF00994018">support vector machines (SVMs)</a>.</p>
+<p>Due to the large number of available approaches for supervised learning, the following question is often posed: <strong>What is the best model?</strong> As we all know, this question is hard to answer because <em>[a]ll models are wrong but some are useful</em> (George Box). Moreover, the usefulness of the model critically depends on the data at hand. Thus, there is no general answer to this question. A question that is, easier to answer is the following: <strong>What is the most popular model?</strong></p>
 <div id="measuring-the-popularity-of-machine-learning-models" class="section level2">
 <h2>Measuring the popularity of machine learning models</h2>
 <p>For the purposes of this article, I will define popularity using a frequentist approach. More precisely, I will use the number of scientific publications associated with individual supervised learning models as a surrogate for popularity. Of course, there are some limitations to this approach:</p>
@@ -22,7 +22,7 @@ categories:
 </ul>
 <p>For this piece, I performed two analyses. The first analysis is a longitudinal analysis of the publication frequencies, while the second analysis compares the overall number of publication associated with machine learning models in different fields.</p>
 <p>For the first analysis, I determined the number of publications by scraping data from searches with Google Scholar, which searches the titles and abstracts of scientific publications. To identify the number of publications associated with individual supervised learning approaches, I determined the number of Google Scholar hits between 1950 and 2018. Since Google does not allow automated requests, I found <a href="https://www.scrapehero.com/how-to-fake-and-rotate-user-agents-using-python-3/">helpful advice from ScrapeHero</a> to circumvent this problem.</p>
-<p>I included the following 12 supervised models in the analysis: neural networks, SVMs, random forests, decision trees, linear regression, logistic regression, Poisson regression, ridge regression, lasso regression, k-nearest neighbors, linear discriminant analysis, and log-linear models. Note that for lasso regression, the terms <em>lasso regression</em> and <em>lasso model</em> were considered. For nearest neighbors, the terms <em>k-nearest neighbor</em> and <em>k-nearest neighbour</em> were considered. The resulting data set indicates the <a href="ml_models_timeline.csv">number of publications associated with each of the twelve supervised models from 1950 until now</a>.</p>
+<p>I included the following 12 supervised models in the analysis: neural networks, SVMs, random forests, decision trees, linear regression, logistic regression, Poisson regression, ridge regression, lasso regression, k-nearest neighbors, linear discriminant analysis, and log-linear models. Note that for lasso regression, the terms <em>lasso regression</em> and <em>lasso model</em> were considered. For nearest neighbors, the terms <em>k-nearest neighbor</em> and <em>k-nearest neighbour</em> were considered. The resulting data set indicates the <a href="https://www.datascienceblog.net/data-sets/ml_models_timeline.csv">number of publications associated with each of the twelve supervised models from 1950 until now</a>.</p>
 </div>
 <div id="use-of-supervised-models-from-1950-until-now" class="section level2">
 <h2>Use of supervised models from 1950 until now</h2>
@@ -44,7 +44,7 @@ categories:
 </div>
 <div id="popularity-of-supervised-learning-models-across-different-fields" class="section level2">
 <h2>Popularity of supervised learning models across different fields</h2>
-<p>In the second analysis, I wanted to investigate whether different communities rely on different machine learning techniques. For this purpose, I relied on three repositories for scientific publications: <a href="https://scholar.google.com">Google Scholar</a> for general publications, <a href="https://dblp.uni-trier.de/">dblp</a> for computer science publications, and <a href="https://www.ncbi.nlm.nih.gov/pubmed/">PubMed</a> for publications in the biomedical sciences. In each of the three repositories, I determined <a href="ml_models_overall.csv">the frequency with which 12 machine learning models were found</a>.</p>
+<p>In the second analysis, I wanted to investigate whether different communities rely on different machine learning techniques. For this purpose, I relied on three repositories for scientific publications: <a href="https://scholar.google.com">Google Scholar</a> for general publications, <a href="https://dblp.uni-trier.de/">dblp</a> for computer science publications, and <a href="https://www.ncbi.nlm.nih.gov/pubmed/">PubMed</a> for publications in the biomedical sciences. In each of the three repositories, I determined <a href="https://www.datascienceblog.net/data-sets/ml_models_overall.csv">the frequency with which 12 machine learning models were found</a>.</p>
 <p><img src="/post/machine-learning/kdnuggets/kdnuggets-guest-post_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <div id="overall-method-use" class="section level3">
 <h3>Overall method use</h3>
@@ -82,6 +82,9 @@ categories:
 <li>Random forests: 1,863 (2.2%) papers</li>
 </ol>
 <p>The distribution of machine learning models mentioned in computer science publications is quite distinct: the majority of publications seems to deal with recent, non-linear methods such as neural networks and support vector machines. It is particularly noteworthy that more than three quarters of all retrieved publications deal with neural networks.</p>
+</div>
+<div id="a-cleavage-between-communities" class="section level3">
+<h3>A cleavage between communities</h3>
 <p>Taken together, these data demonstrate that there is a big difference between the models investigated in machine learning research (as evidenced by computer science publications) and the types of models that are applied (as evidenced by biomedical publications). While research is heavily focused on state-of-the-art methods such as convolutional neural networks, users of machine learning often rely on traditional, linear approaches.</p>
 </div>
 </div>
