@@ -7,57 +7,96 @@ draft: true
 categories:
   - machine-learning
 ---
-The field of machine learning has gone through enormous changes in the last decades. For example, support vector machines and random forests were developed in the mid 1990s. However, some methods that are still used nowadays have been around for quite a long time. For example, the concept of least squares was already proposed in the early 19th century by Legendre and Gauss. Other approaches such as neural networks, which have been described already in the 1950s, have been steadily advanced through the years.
+The field of machine learning has gone through enormous changes in the last decades. Admittedly, there are some methods that have been around for quite a long time. For example, the concept of least squares was already proposed in the early 19th century by [Legendre](https://archive.org/details/nouvellesmthode00legegoog/) and [Gauss](https://www.e-rara.ch/zut/content/titleinfo/142787). Other approaches such as neural networks, [whose most basic form was introduced in 1958](http://psycnet.apa.org/record/1959-09865-001), have been substantially advanced in the last decades. Finally, there are also novel methods that have been developed more recently such as [support vector machines (SVMs)](https://link.springer.com/article/10.1007/BF00994018).
 
-## Machine learning models through the years
+Due to the large number of available approaches for supervised learning, the following question is often posed: **What is the best model?** As we all know, this question is hard to answer because "[a]ll models are wrong but some are useful" (George Box). Moreover, the usefulness of the model critically depends on the data at hand. Thus, there is no general answer to this question. A question that is, easier to answer is the following: **What is the most popular model?**
 
-A question that is often asked is: what is the best model? Answering this question is not really possible as the choice of the model is inherently linked to the data that is being modeled. A question that is easier to answer is: what is the most popular model? Here, I investigate this question in a data-driven manner. More precisely, I will define popularity in a frequentist manner. The assumption of this analysis is that a method that is associated with a greater number of
-publications is more popular. Obviously, this is not necessarily true because publications can also indicate that an algorithm is criticized or that there is a lot of room for improvement. However, overall, there should be a high correlation between the two concepts.
+## Measuring the popularity of machine learning models
 
-For this piece, I heavily relied on data scraping from Google Scholar. Google Scholar searches in the titles and abstracts of scientific publications. To identify the number of publications associated with individual supervised learning approaches, I determined the number of Google Scholar hits for each method between 1950 and 2018. Since Google blocks automated requests, I found [helpful advice from ScrapeHero](https://www.scrapehero.com/how-to-fake-and-rotate-user-agents-using-python-3/) to circumvent this problem. The following 12 models were considered: neural networks, support vector machines, random forests, decision trees, linear regression, logistic regression, poisson regression, ridge regression, lasso regression, nearest neighbors, linear discriminant analysis, log-linear models.
+For the purposes of this article, I will define popularity using a frequentist approach. More precisely, I will use the number of scientific publications associated with individual supervised learning models as a surrogate for popularity. Of course, there are some limitations to this approach:
 
-For lasso regression, the terms *lasso regression* and *lasso model* were considered. For nearest neighbors, the terms *nearest neighbor* and *nearest neighbour* were considered. The resulting data set indicates the [number of publications associated with each of the twelve supervised models from 1950 until now](result.csv).
+* There are probably more accurate notions of popularity than the number of publications. For example, publications criticizing a certain model do not necessarily imply that the model is popular.
+* The analysis is influenced by the search terms that are used. To ensure high specificities, I do not consider model abbreviations. Moreover, sensitivity may be low for models that are also referenced by search terms that were not included in the analysis.
+* Literature databases are not perfect: sometimes, publications are stored with incorrect metadata (e.g. incorrect years) or there may be duplicate publications. Thus, some noise in the publication frequencies is to be expected.
 
-To analyze the data, I will differentiate between two periods: the early days of machine learning (1950 to 1980), in which few models were available, and the formative years (1980 until now), in which general interest in machine learning surged and many new models were developed.
+For this piece, I performed two analyses. The first analysis is a longitudinal analysis of the publication frequencies, while the second analysis compares the overall number of publication associated with machine learning models in different fields. 
 
-```{r}
-df <- read.csv("result.csv")
+For the first analysis, I determined the number of publications by scraping data from searches with Google Scholar, which searches the titles and abstracts of scientific publications. To identify the number of publications associated with individual supervised learning approaches, I determined the number of Google Scholar hits between 1950 and 2018. Since Google does not allow automated requests, I found [helpful advice from ScrapeHero](https://www.scrapehero.com/how-to-fake-and-rotate-user-agents-using-python-3/) to circumvent this problem.
+
+I included the following 12 supervised models in the analysis: neural networks, SVMs, random forests, decision trees, linear regression, logistic regression, Poisson regression, ridge regression, lasso regression, k-nearest neighbors, linear discriminant analysis, and log-linear models. Note that for lasso regression, the terms *lasso regression* and *lasso model* were considered. For nearest neighbors, the terms *k-nearest neighbor* and *k-nearest neighbour* were considered. The resulting data set indicates the [number of publications associated with each of the twelve supervised models from 1950 until now](ml_models_timeline.csv).
+
+## Use of supervised models from 1950 until now
+
+To analyze the longitudinal data, I will differentiate two periods: the early days of machine learning (1950 to 1980), in which few models were available, and the formative years (1980 until now), in which interest in machine learning surged and many new models were developed.
+
+```{r, echo = FALSE, fig.height = 8}
+get.top.models <- function(df, k) {
+    total.df <- ddply(df, "Model", summarize, Total = sum(Count))
+    o <- order(total.df$Total, decreasing = TRUE)
+    top.models <- total.df[o, "Model"][1:k]
+    return(top.models)
+}
+
+df <- read.csv("ml_models_timeline.csv")
 # plot all and for all time
 library(ggplot2)
-ggplot(df, aes(x = Year, y = Count, color = Model)) + 
-        geom_point() + geom_line() + ggtitle("Overall")
+#ggplot(df, aes(x = Year, y = Count, color = Model)) + 
+#        geom_point() + geom_line() + ggtitle("Overall")
 # select only the top-k models overall (from 1950 to now)
 k <- 6
 library(plyr)
-total.df <- ddply(df, "Model", summarize, Total = sum(Count))
-o <- order(total.df$Total, decreasing = TRUE)
-top.models <- total.df[o, "Model"][1:k]
+top.models <- get.top.models(df, k) # overall top models
 plot.df <- df[df$Model %in% top.models, ]
 library(ggplot2)
-p.df.early <- plot.df[plot.df$Year >= 1950 & plot.df$Year < 1980, ]
-ggplot(p.df.early, aes(x = Year, y = Count, color = Model)) + 
-        geom_point() + geom_line() + ggtitle("Early days of machine learning")
+early.idx <- which(df$Year >= 1950 & df$Year < 1980)
+top.models.early <- get.top.models(df[early.idx, ], k) # early top models
+p.df.early <- df[early.idx, ]
+early.summary <- ddply(p.df.early, "Model", summarize, Total = sum(Count))
+o <- order(early.summary$Total, decreasing = TRUE)
+p.df.early$Model <- factor(p.df.early$Model, levels = early.summary$Model[o])
+p.df.early <- p.df.early[p.df.early$Model %in% top.models.early, ]
+#p.df.early <- p.df.early[p.df.early$Model %in% top.models, ]
+p1 <- ggplot(p.df.early, aes(x = Year, y = Count, color = Model)) + 
+        geom_point() + geom_line() + 
+        ggtitle("Early days of machine learning: 1950 to 1980")
 # zoom into the plot, starting from the 80s
-p.df.late <- plot.df[plot.df$Year >= 1980,]
-ggplot(p.df.late, aes(x = Year, y = Count, color = Model)) + 
-        geom_point() + geom_line() + ggtitle("Formative years of machine learning")
+late.idx <- which(df$Year >= 1980)
+top.models.late <- get.top.models(df[late.idx, ], k) # late top models
+p.df.late <- df[late.idx, ]
+late.summary <- ddply(p.df.late, "Model", summarize, Total = sum(Count))
+o <- order(late.summary$Total, decreasing = TRUE)
+p.df.late$Model <- factor(p.df.late$Model, levels = late.summary$Model[o])
+
+p.df.late <- p.df.late[p.df.late$Model %in% top.models.late, ]
+#p.df.late <- p.df.late[p.df.late$Model %in% top.models, ]
+p2 <- ggplot(p.df.late, aes(x = Year, y = Count, color = Model)) + 
+        geom_point() + geom_line() + 
+        ggtitle("Formative years of machine learning: 1980 until now")
+library(gridExtra)
+grid.arrange(p1, p2)
 ```
 
-We see that throughout the years, linear regression was the most mentioned technique. The popularity of logistic regression and neural networks took off in the early 2000s, with the use of logistic regression peaking in the early 2010s and neural networks peaking around 2014. All three methods, linear regression, logistic regression, and neural networks are characterized by similarly steep increases in their usage. Of course, linear regression became popular much earlier than the other two methods. Interestingly, however, the interest in logistic regression and neural networks show highly similar temporal growth trends from 2000 to 2010. 
+### Dominance of linear regression, logistic regression, and neural networks
 
-Overall, neural networks are the method with the greatest increase in popularity. In the 1980s, neural networks overtook logistic regression, in the 1990s neural networks overtook nearest neighbors, and in 2016, neural networks even overtook linear regression. However, the usage of these three methods is also characterized by similarly sharp drops in the last three years. 
+Linear regression was particularly dominant from 1950 to 1980. During this time, other methods were rarely used, while the use of linear regression became more and more common (Figure 1). The publication frequencies became considerably more diverse starting from the late 1980s (Figure 2) when neural networks and logistic regression grew in popularity. 
+Starting from the early 2000s, the popularity of logistic regression and neural networks took off, approaching the popularity of linear regression. Neural networks even surpassed the popularity of linear regression in 2016. All three methods, linear regression, logistic regression, and neural networks are characterized by similarly steep increases in popularity. However, the usage of these three methods is also characterized by similarly sharp drops in the last three years. 
 
-Other approaches such as nearest neighbor, decision trees, and SVMs showed more steady growth patterns. While the popularity of these methods has not noticeably declined in recent years, the number of papers based on these methods stopped increasing in the last three years. Among the three methods, nearest neighbor algorithm is the most popular, which is probably also due to the fact that it was already established in 1967, while decision trees were established in the 1980s and SVMs in 1995. Looking at the data, it is interesting to see that SVMs managed to become more popular than decision trees in 2010.
+### The competitors: decision trees, SVMs, and Cox regression
 
-Overall, the data demonstrate the breakthrough of supervised learning starting rougly from 2000s. We also see that neural networks have become the dominant machine learning method in the 2010s. The data, however, suggest that the popularity of neural networks is currently actually decreasing. This could be interpreted as the bursting of a bubble. The use of neural networks has led to breakthroughs in machine learning applications such as image recognition (ImageNet, 2009), face recognition (DeepFace, 2014), and gaming (AlphaGo, 2016). Therefore, neural networks have become immensely popular. Now, however, it could be that people realize that deep neural networks are not the solution to all problems because it is not possible to generate hundreds of thousands of data points for every prediction problem. 
+The other three, slightly less popular approaches include decision trees, SVMs, and Cox regression. The popularity of these methods is associated with a decidedly slower growth pattern. On the other hand, there also seems to be less fluctuation in the frequency at which these methods are mentioned in the literature. Notably, the popularity of these methods has not declined as much as that of the other methods in the last three years. Among decision trees, SVMs, and Cox regression, SVMs seem to be the most promising method, as their popularity started to exceed that of decision trees only 15 years after their invention.
 
+### Has the neural network bubble burst?
 
-## Popularity of supervised learning models: overall and  across different fields
+The overall number of machine learning publications peaked in the early 2010s and has slightly decreased since then. The frequency at which neural networks have been mentioned in recent years has particularly decreased. This could be interpreted as the bursting of a bubble. Neural networks have become immensely popular because they have led to breakthroughs in machine learning applications such as image recognition ([ImageNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks), 2012), face recognition ([DeepFace](https://www.cv-foundation.org/openaccess/content_cvpr_2014/html/Taigman_DeepFace_Closing_the_2014_CVPR_paper.html), 2014), and gaming ([AlphaGo](https://ai.googleblog.com/2016/01/alphago-mastering-ancient-game-of-go.html), 2016). 
 
-Another question I was interested in was whether there was a difference in the frequencies with which different machine learning models are mentioned in publications from different communities. For this purpose, I counted the number of search results from Google Scholar to determine the overall frequency. For community-specfic frequencies, I performed the same queries on dplb (computer science) and on PubMed (biomedical sciences).
+The drop in the use of neural networks could be explained by two theories. First, users of machine learning may have realized that deep neural networks are not suitable for learning tasks for which it is not feasible to generate hundreds of thousands of data points. Second, researchers may now be branching out to other topics, having spent so much effort on advancing neural networks in the last years.
 
-```{r}
-df <- read.csv("ml_model_publications.csv")
+## Popularity of supervised learning models across different fields
+
+In the second analysis, I wanted to investigate whether different communities rely on different machine learning techniques. For this purpose, I relied on three repositories for scientific publications: [Google Scholar](https://scholar.google.com) for general publications, [dblp](https://dblp.uni-trier.de/) for computer science publications, and [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/) for publications in the biomedical sciences. In each of the three repositories, I determined [the frequency with which 12 machine learning models were found](ml_models_overall.csv).
+
+```{r, message = FALSE, echo = FALSE, warning = FALSE}
+df <- read.csv("ml_models_overall.csv")
 library(reshape2)
 df.m <- melt(df, "Source")
 # get percentages: values are not comparable otherwise
@@ -67,60 +106,59 @@ colnames(df.m) <- c("Source", "Model", "Count", "Percentage")
 # sort columns by overall usage
 overall.idx <- which(df.m$Source == "Overall (Google Scholar)")
 o <- order(df.m$Count[overall.idx], decreasing = TRUE)
-df.m$Model <- factor(df.m$Model, levels = levels(df.m$Model)[o])
+df.m$Model <- factor(gsub("_", " ", df.m$Model), levels = gsub("_", " ", levels(df.m$Model))[o])
 ggplot(df.m, aes(x = Model, y = Percentage, fill = Source)) + geom_bar(stat = "identity") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
-    scale_y_continuous(labels = scales::percent_format())
+    scale_y_continuous(labels = scales::percent_format()) +
+    ggtitle("Use of machine learning models in different fields")
 # top 6 models by source
-n <- 6
-for (source in unique(df.m$Source)) {
-    idx <- which(df.m$Source == source)
-    o <- order(df.m$Percentage[idx], decreasing = TRUE)
-    top.df <- df.m[idx[o[1:n]], ]
-    print(top.df)
-}
+#n <- 6
+#for (source in unique(df.m$Source)) {
+    #idx <- which(df.m$Source == source)
+    #o <- order(df.m$Percentage[idx], decreasing = TRUE)
+    #top.df <- df.m[idx[o[1:n]], ]
+    #print(top.df)
+#}
 ```
 
-Overall (according to Google Scholar), these are the 6 most frequently referenced supervised models (from a total of 11,788,100 papers mentioning the considered models):
+### Overall method use
 
-1. Linear regression with 3,580,000 (30.4%) papers
-2. Logistic regression with 2,330,000 (19.8%) papers
-3. Neural networks with 1,750,000 (14.8%) papers
-4. Nearest neighbors with 1,738,000 (14.7%) papers
-5. Decision trees with 875,000 (7.4%) papers
-6. Support vector machines with 684,000 (5.8%) papers
+According to Google Scholar, these are the five most frequently used supervised models:
 
-The overrepresentation of methods such as linear regression and logistic regression is not surprising because they have been around for a much longer time than other methods. Although support vector machines (SVMs) are one of the more recent methods, they are more popular than other methods that have been developed at the same time (e.g. random forests). 
+1. Linear regression with 3,580,000 (35.1%) papers
+2. Logistic regression with 2,330,000 (22.8%) papers
+3. Neural networks with 1,750,000 (17.1%) papers
+4. Decision trees with 875,000 (8.6%) papers
+5. Support vector machines with 684,000 (6.7%) papers
 
-Looking at the numbers in the biomedical and computer sciences, there are critical differences.
+Overall, linear models are clearly dominating, making up more than 50% of all used methods. Non-linear methods are not far behind though: neural networks make second place with 17.1% of all papers, followed by decision trees (8.6% of papers) and SVMs (6.7% of papers).
 
-Biomedical:
+### Use of methods in the biomedical sciences
 
-1. Logistic regression: 229,956 (54.2%) papers
-2. Linear regression: 84,850 (20%) papers
-3. Cox regression: 38,801 (9.1%) papers
-4. Neural networks: 23,883 (5.6%) papers
+According to PubMed, the five most popular machine learning models in the biomedical sciences are:
+
+1. Logistic regression: 229,956 (54.9%) papers
+2. Linear regression: 84,850 (20.%) papers
+3. Cox regression: 38,801 (9.3%) papers
+4. Neural networks: 23,883 (5.7%) papers
 5. Poisson regression: 12,978 (3.1%) papers
-6. Support vector machines: 11,061 (2.6%) papers
 
-Computer science:
+Overall, we see an overrepresentation of linear models in biomedical publications: four of of the five most popular methods are linear. This is probably due to two
+reasons. First, in medical settings, the number of samples is often too small to allow for fitting complex non-linear models. Second, the ability to interpret the results is critical for medical applications. Since non-linear methods are typically harder to interpret, they are less suited for medical applications because high performance alone is typically not sufficient.
 
-1. Neural networks: 63,695 (75%) papers
-2. Support vector machines: 7,750 (8.9%) papers
-3. Decision trees: 4,074 (4.8%) papers
-4. Nearest neighbors: 3,839 (4.5%) papers
+The popularity of logistic regression in the PubMed data is likely due to the large number of publications presenting clinical studies. In these studies, the categorical outcomes (i.e. treatment success) is often analyzed using logistic regression because it is well-suited for interpreting the impact of the features on the outcome. 
+Note that that Cox regression is so popular in the PubMed data because it is frequently used for analyzing Kaplan-Meier survival data.
+
+### Use of methods in computer science
+
+The five most popular models in computer science bibliography retrieved from dblp are:
+
+1. Neural networks: 63,695 (76.7%) papers
+2. Support vector machines: 7,750 (9.1%) papers
+3. Decision trees: 4,074 (4.9%) papers
+4. Nearest neighbors: 3,839 (2.4%) papers
 5. Random forests: 1,863 (2.2%) papers
-6. Linear regression: 1,643 (1.9%) papers
 
-Where do these considerable differences come from? The popularity of logistic regression in the PubMed data probably originates from the large number of clinical studies that are contained in the data. There, the categorical outcomes (e.g. treatment success) is often analyzed using logistic regression because it can be used for interpreting the impact of the features on the outcome. In the biomedical data, we see an overrepresentation of non-linear models. This is probably due to two
-reasons. First, in medical settings, the number of samples is often small such that it is infeasible to obtain good fits with complex models. Second, interpreting the results is critical for medical applications, which is why linear models are advantageous over non-linear methods, which are typically harder to interpret. It is also remarkable that Cox regression, a model for Kaplan-Meier survival data, is so frequently used (9.1% of papers).
+The distribution of machine learning models mentioned in computer science publications is quite distinct: the majority of publications seems to deal with recent, non-linear methods such as neural networks and support vector machines. It is particularly noteworthy that more than three quarters of all retrieved publications deal with neural networks.
 
-The computer science publications show an opposing trend: the majority of publications concerns recent, non-linear methods. Particularly the number of publications about neural networks, which make up three quarters of all retrieved publications, is astounding. Although SVMs are the second most frequently mentioned method, they are far behind (8.9% of papers). In some way, this is not surprising considering that there have been much more advances in neural networks than in SVMs,
-which is likely a byproduct of a greater focus on researching neural networks.
-
-These data also demonstrate why there is such a disconnect between machine learning researchers and persons that apply machine learning. Research is heavily focused on individual, state-of-the-art methods such as convolutional neural networks. Appliers of machine learning, however, still heavily rely on more traditional approaches such as linear or logistic regression.
-
---
-References:
- A.M. Legendre. Nouvelles méthodes pour la détermination des orbites des comètes, Firmin Didot, Paris, 1805. “Sur la Méthode des moindres quarrés” appears as an appendix.
-C.F. Gauss. Theoria Motus Corporum Coelestium in Sectionibus Conicis Solem Ambientum. (1809)
+Taken together, these data demonstrate that there is a big difference between the models investigated in machine learning research (as evidenced by computer science publications) and the types of models that are applied (as evidenced by biomedical publications). While research is heavily focused on state-of-the-art methods such as convolutional neural networks, users of machine learning often rely on traditional, linear approaches.
