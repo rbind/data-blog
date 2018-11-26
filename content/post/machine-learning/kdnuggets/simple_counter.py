@@ -60,7 +60,7 @@ def get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list, re
                   proxies={"http": proxy, "https": proxy},
                   timeout = timeout)
     except KeyboardInterrupt:
-        print("W: interrupt received, stopping…")
+        print("W: interrupt received, stopping ...")
         sys.exit()
     except Exception as e:
         print(e)
@@ -101,6 +101,10 @@ if not os.path.exists(os.path.dirname(out_file)):
     os.makedirs(os.path.dirname(out_file))
 # table structure: Model | Year | Count
 models = {
+        "Nearest Neighbor": ["k-nearest neighbor", "k-nearest neighbour"],
+        }
+'''
+models = {
         "Neural Network": ["neural network"],
         "Support Vector Machine": ["support vector machine"],
         "Random Forest": ["random forest"],
@@ -111,9 +115,10 @@ models = {
         "Cox Regression": ["cox regression"],
         "Ridge Regression": ["ridge regression"],
         "Lasso Regression": ["lasso model", "lasso regression"],
-        "Nearest Neighbor": ["nearest neighbor", "nearest neighbour"],
+        "Nearest Neighbor": ["k-nearest neighbor", "k-nearest neighbour"],
         "Linear Discriminant Analysis": ["linear discriminant analysis"],
         "Log-Linear Model": ["log-linear model"]}
+'''
 rows = []
 proxies = get_proxies()
 proxy_pool = cycle(proxies)

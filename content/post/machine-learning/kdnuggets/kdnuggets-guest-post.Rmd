@@ -14,20 +14,44 @@ The field of machine learning has gone through enormous changes in the last deca
 A question that is often asked is: what is the best model? Answering this question is not really possible as the choice of the model is inherently linked to the data that is being modeled. A question that is easier to answer is: what is the most popular model? Here, I investigate this question in a data-driven manner. More precisely, I will define popularity in a frequentist manner. The assumption of this analysis is that a method that is associated with a greater number of
 publications is more popular. Obviously, this is not necessarily true because publications can also indicate that an algorithm is criticized or that there is a lot of room for improvement. However, overall, there should be a high correlation between the two concepts.
 
-For this piece, I heavily relied on data scraping from Google Scholar. Since Google blocks automated requests, I found [helpful advice from ScrapeHero](https://www.scrapehero.com/how-to-fake-and-rotate-user-agents-using-python-3/) to circumvent this problem.
+For this piece, I heavily relied on data scraping from Google Scholar. Google Scholar searches in the titles and abstracts of scientific publications. To identify the number of publications associated with individual supervised learning approaches, I determined the number of Google Scholar hits for each method between 1950 and 2018. Since Google blocks automated requests, I found [helpful advice from ScrapeHero](https://www.scrapehero.com/how-to-fake-and-rotate-user-agents-using-python-3/) to circumvent this problem. The following 12 models were considered: neural networks, support vector machines, random forests, decision trees, linear regression, logistic regression, poisson regression, ridge regression, lasso regression, nearest neighbors, linear discriminant analysis, log-linear models.
+
+For lasso regression, the terms *lasso regression* and *lasso model* were considered. For nearest neighbors, the terms *nearest neighbor* and *nearest neighbour* were considered. The resulting data set indicates the [number of publications associated with each of the twelve supervised models from 1950 until now](result.csv).
+
+To analyze the data, I will differentiate between two periods: the early days of machine learning (1950 to 1980), in which few models were available, and the formative years (1980 until now), in which general interest in machine learning surged and many new models were developed.
 
 ```{r}
 df <- read.csv("result.csv")
+# plot all and for all time
+library(ggplot2)
+ggplot(df, aes(x = Year, y = Count, color = Model)) + 
+        geom_point() + geom_line() + ggtitle("Overall")
 # select only the top-k models overall (from 1950 to now)
-k <- 5
+k <- 6
 library(plyr)
 total.df <- ddply(df, "Model", summarize, Total = sum(Count))
 o <- order(total.df$Total, decreasing = TRUE)
 top.models <- total.df[o, "Model"][1:k]
 plot.df <- df[df$Model %in% top.models, ]
 library(ggplot2)
-ggplot(plot.df, aes(x = Year, y = Count, color = Model)) + geom_point() + geom_line()
+p.df.early <- plot.df[plot.df$Year >= 1950 & plot.df$Year < 1980, ]
+ggplot(p.df.early, aes(x = Year, y = Count, color = Model)) + 
+        geom_point() + geom_line() + ggtitle("Early days of machine learning")
+# zoom into the plot, starting from the 80s
+p.df.late <- plot.df[plot.df$Year >= 1980,]
+ggplot(p.df.late, aes(x = Year, y = Count, color = Model)) + 
+        geom_point() + geom_line() + ggtitle("Formative years of machine learning")
 ```
+
+We see that throughout the years, linear regression was the most mentioned technique. The popularity of logistic regression and neural networks took off in the early 2000s, with the use of logistic regression peaking in the early 2010s and neural networks peaking around 2014. All three methods, linear regression, logistic regression, and neural networks are characterized by similarly steep increases in their usage. Of course, linear regression became popular much earlier than the other two methods. Interestingly, however, the interest in logistic regression and neural networks show highly similar temporal growth trends from 2000 to 2010. 
+
+Overall, neural networks are the method with the greatest increase in popularity. In the 1980s, neural networks overtook logistic regression, in the 1990s neural networks overtook nearest neighbors, and in 2016, neural networks even overtook linear regression. However, the usage of these three methods is also characterized by similarly sharp drops in the last three years. 
+
+Other approaches such as nearest neighbor, decision trees, and SVMs showed more steady growth patterns. While the popularity of these methods has not noticeably declined in recent years, the number of papers based on these methods stopped increasing in the last three years. Among the three methods, nearest neighbor algorithm is the most popular, which is probably also due to the fact that it was already established in 1967, while decision trees were established in the 1980s and SVMs in 1995. Looking at the data, it is interesting to see that SVMs managed to become more popular than decision trees in 2010.
+
+Overall, the data demonstrate the breakthrough of supervised learning starting rougly from 2000s. We also see that neural networks have become the dominant machine learning method in the 2010s. The data, however, suggest that the popularity of neural networks is currently actually decreasing. This could be interpreted as the bursting of a bubble. The use of neural networks has led to breakthroughs in machine learning applications such as image recognition (ImageNet, 2009), face recognition (DeepFace, 2014), and gaming (AlphaGo, 2016). Therefore, neural networks have become immensely popular. Now, however, it could be that people realize that deep neural networks are not the solution to all problems because it is not possible to generate hundreds of thousands of data points for every prediction problem. 
+
+
 ## Popularity of supervised learning models: overall and  across different fields
 
 Another question I was interested in was whether there was a difference in the frequencies with which different machine learning models are mentioned in publications from different communities. For this purpose, I counted the number of search results from Google Scholar to determine the overall frequency. For community-specfic frequencies, I performed the same queries on dplb (computer science) and on PubMed (biomedical sciences).
