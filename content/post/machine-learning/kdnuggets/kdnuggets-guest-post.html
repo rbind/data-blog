@@ -11,8 +11,23 @@ categories:
 
 
 <p>The field of machine learning has gone through enormous changes in the last decades. For example, support vector machines and random forests were developed in the mid 1990s. However, some methods that are still used nowadays have been around for quite a long time. For example, the concept of least squares was already proposed in the early 19th century by Legendre and Gauss. Other approaches such as neural networks, which have been described already in the 1950s, have been steadily advanced through the years.</p>
+<div id="machine-learning-models-through-the-years" class="section level2">
+<h2>Machine learning models through the years</h2>
 <p>A question that is often asked is: what is the best model? Answering this question is not really possible as the choice of the model is inherently linked to the data that is being modeled. A question that is easier to answer is: what is the most popular model? Here, I investigate this question in a data-driven manner. More precisely, I will define popularity in a frequentist manner. The assumption of this analysis is that a method that is associated with a greater number of
 publications is more popular. Obviously, this is not necessarily true because publications can also indicate that an algorithm is criticized or that there is a lot of room for improvement. However, overall, there should be a high correlation between the two concepts.</p>
+<p>For this piece, I heavily relied on data scraping from Google Scholar. Since Google blocks automated requests, I found <a href="https://www.scrapehero.com/how-to-fake-and-rotate-user-agents-using-python-3/">helpful advice from ScrapeHero</a> to circumvent this problem.</p>
+<pre class="r"><code>df &lt;- read.csv(&quot;result.csv&quot;)
+# select only the top-k models overall (from 1950 to now)
+k &lt;- 5
+library(plyr)
+total.df &lt;- ddply(df, &quot;Model&quot;, summarize, Total = sum(Count))
+o &lt;- order(total.df$Total, decreasing = TRUE)
+top.models &lt;- total.df[o, &quot;Model&quot;][1:k]
+plot.df &lt;- df[df$Model %in% top.models, ]
+library(ggplot2)
+ggplot(plot.df, aes(x = Year, y = Count, color = Model)) + geom_point() + geom_line()</code></pre>
+<p><img src="/post/machine-learning/kdnuggets/kdnuggets-guest-post_files/figure-html/unnamed-chunk-1-1.png" width="672" />
+## Popularity of supervised learning models: overall and across different fields</p>
 <p>Another question I was interested in was whether there was a difference in the frequencies with which different machine learning models are mentioned in publications from different communities. For this purpose, I counted the number of search results from Google Scholar to determine the overall frequency. For community-specfic frequencies, I performed the same queries on dplb (computer science) and on PubMed (biomedical sciences).</p>
 <pre class="r"><code>df &lt;- read.csv(&quot;ml_model_publications.csv&quot;)
 library(reshape2)
@@ -21,6 +36,10 @@ df.m &lt;- melt(df, &quot;Source&quot;)
 library(dplyr)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:plyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize</code></pre>
 <pre><code>## The following objects are masked from &#39;package:stats&#39;:
 ## 
 ##     filter, lag</code></pre>
@@ -33,12 +52,11 @@ colnames(df.m) &lt;- c(&quot;Source&quot;, &quot;Model&quot;, &quot;Count&quot;,
 overall.idx &lt;- which(df.m$Source == &quot;Overall (Google Scholar)&quot;)
 o &lt;- order(df.m$Count[overall.idx], decreasing = TRUE)
 df.m$Model &lt;- factor(df.m$Model, levels = levels(df.m$Model)[o])
-library(ggplot2)
 ggplot(df.m, aes(x = Model, y = Percentage, fill = Source)) + geom_bar(stat = &quot;identity&quot;) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
     scale_y_continuous(labels = scales::percent_format())</code></pre>
 <pre><code>## Warning: Removed 1 rows containing missing values (position_stack).</code></pre>
-<p><img src="/post/machine-learning/kdnuggets/kdnuggets-guest-post_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/kdnuggets/kdnuggets-guest-post_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <pre class="r"><code># top 6 models by source
 n &lt;- 6
 for (source in unique(df.m$Source)) {
@@ -115,3 +133,4 @@ which is likely a byproduct of a greater focus on researching neural networks.</
 References:
 A.M. Legendre. Nouvelles méthodes pour la détermination des orbites des comètes, Firmin Didot, Paris, 1805. “Sur la Méthode des moindres quarrés” appears as an appendix.
 C.F. Gauss. Theoria Motus Corporum Coelestium in Sectionibus Conicis Solem Ambientum. (1809)</p>
+</div>

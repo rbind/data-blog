@@ -9,8 +9,26 @@ categories:
 ---
 The field of machine learning has gone through enormous changes in the last decades. For example, support vector machines and random forests were developed in the mid 1990s. However, some methods that are still used nowadays have been around for quite a long time. For example, the concept of least squares was already proposed in the early 19th century by Legendre and Gauss. Other approaches such as neural networks, which have been described already in the 1950s, have been steadily advanced through the years.
 
+## Machine learning models through the years
+
 A question that is often asked is: what is the best model? Answering this question is not really possible as the choice of the model is inherently linked to the data that is being modeled. A question that is easier to answer is: what is the most popular model? Here, I investigate this question in a data-driven manner. More precisely, I will define popularity in a frequentist manner. The assumption of this analysis is that a method that is associated with a greater number of
 publications is more popular. Obviously, this is not necessarily true because publications can also indicate that an algorithm is criticized or that there is a lot of room for improvement. However, overall, there should be a high correlation between the two concepts.
+
+For this piece, I heavily relied on data scraping from Google Scholar. Since Google blocks automated requests, I found [helpful advice from ScrapeHero](https://www.scrapehero.com/how-to-fake-and-rotate-user-agents-using-python-3/) to circumvent this problem.
+
+```{r}
+df <- read.csv("result.csv")
+# select only the top-k models overall (from 1950 to now)
+k <- 5
+library(plyr)
+total.df <- ddply(df, "Model", summarize, Total = sum(Count))
+o <- order(total.df$Total, decreasing = TRUE)
+top.models <- total.df[o, "Model"][1:k]
+plot.df <- df[df$Model %in% top.models, ]
+library(ggplot2)
+ggplot(plot.df, aes(x = Year, y = Count, color = Model)) + geom_point() + geom_line()
+```
+## Popularity of supervised learning models: overall and  across different fields
 
 Another question I was interested in was whether there was a difference in the frequencies with which different machine learning models are mentioned in publications from different communities. For this purpose, I counted the number of search results from Google Scholar to determine the overall frequency. For community-specfic frequencies, I performed the same queries on dplb (computer science) and on PubMed (biomedical sciences).
 
@@ -26,7 +44,6 @@ colnames(df.m) <- c("Source", "Model", "Count", "Percentage")
 overall.idx <- which(df.m$Source == "Overall (Google Scholar)")
 o <- order(df.m$Count[overall.idx], decreasing = TRUE)
 df.m$Model <- factor(df.m$Model, levels = levels(df.m$Model)[o])
-library(ggplot2)
 ggplot(df.m, aes(x = Model, y = Percentage, fill = Source)) + geom_bar(stat = "identity") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
     scale_y_continuous(labels = scales::percent_format())

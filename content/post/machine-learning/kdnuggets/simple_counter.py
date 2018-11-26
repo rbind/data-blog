@@ -9,6 +9,8 @@ import csv
 import urllib.request
 import urllib.parse
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 import re
 import random
 from lxml.html import fromstring
@@ -28,32 +30,45 @@ def get_proxies(n = 20):
     print(str(len(proxies)) + " proxies selected!")
     return proxies
 
-def get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list):
+def get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list, retry_counter):
+    print("Proxies remaining: " + str(len(proxies)))
     if (len(proxies) == 0):
         print("WARNING: No more proxies to select from!")
         return None
+    if (retry_counter > 2):
+        # heuristic: if I send requests that dont make sense (no results found), google refuses
+        # return 0 in this case
+        return (0, proxies, proxy_pool)
     base_url = "https://scholar.google.com/scholar?"
     proxy = next(proxy_pool)
+    #proxy = "195.9.149.6:61619"
     print("Proxy:")
     print(proxy)
     input_options = {"as_q" : search_term, "as_ylo": year, "as_yhi": year}
     user_agent = random.choice(user_agent_list)
     headers = {'User-Agent': user_agent}
+    session = requests.Session()
+    retry = Retry(total=3, backoff_factor=0.5) # try at most 3 times, delay attempts by backoff_factor
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    timeout = 5 # allow proxy 5 seconds to retrieve results
     try:
-        results = requests.get(base_url,
+        results = session.get(base_url,
                   params=input_options,
                   headers = headers,
-                  proxies={"http": proxy, "https": proxy})
+                  proxies={"http": proxy, "https": proxy},
+                  timeout = timeout)
     except KeyboardInterrupt:
         print("W: interrupt received, stopping…")
         sys.exit()
-    except:
+    except Exception as e:
+        print(e)
         print("Connection error. Removing proxy from list!")
-        print(len(proxies))
         proxies = [l_proxy for l_proxy in proxies if l_proxy != proxy]
-        print(len(proxies))
         proxy_pool = cycle(proxies)
-        return (get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list))
+        return (get_hits_in_year(search_term, year, proxies, proxy_pool,
+                user_agent_list, retry_counter + 1))
     text = results.text
     #print(text)
     r = re.search("([0-9,]+) results", text)
@@ -64,13 +79,14 @@ def get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list):
         return((number, proxies, proxy_pool))
     else:
         # differentiate between blocked (captcha) and no results found
-        r = re.search("(Sorry)", text) # captcha should be somewhere in output when blocked
-        if (r != None):
+        r = re.search("did not match any articles", text)
+        if (r == None):
             # we are blocked
             print("Proxy is being blocked. Removing proxy and trying again ...")
             proxies = [l_proxy for l_proxy in proxies if l_proxy != proxy]
             proxy_pool = cycle(proxies)
-            return (get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list))
+            return (get_hits_in_year(search_term, year, proxies,
+                    proxy_pool, user_agent_list, retry_counter + 1))
         else:
             # no results were found
             return (0, proxies, proxy_pool)
@@ -84,7 +100,8 @@ out_file = sys.argv[1] # read from 2nd arg
 if not os.path.exists(os.path.dirname(out_file)):
     os.makedirs(os.path.dirname(out_file))
 # table structure: Model | Year | Count
-models = {"Neural Network": ["neural network"],
+models = {
+        "Neural Network": ["neural network"],
         "Support Vector Machine": ["support vector machine"],
         "Random Forest": ["random forest"],
         "Decision Tree": ["decision tree"],
@@ -134,14 +151,14 @@ for (model, search_terms) in models.items():
         total_hits = 0
         for term in search_terms:
             search_term = '"' + term + '"'
-            hit_data = get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list)
+            hit_data = get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list, 0)
             while (hit_data == None):
-                # restore initial proxy selections: hope that some of them work again
+                # no proxies remain -> load new proxies
                 print("Hit was None: reloading proxies!")
                 proxies = get_proxies() # update proxy list with current proxies
                 print(len(proxies))
                 proxy_pool = cycle(proxies)
-                hit_data = get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list)
+                hit_data = get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list, 0)
             (hits, proxies, proxy_pool) = hit_data
             print(hits)
             if hits != None:
