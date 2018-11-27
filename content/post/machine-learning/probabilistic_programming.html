@@ -1,0 +1,223 @@
+---
+title: "Probabilistic Programming in R"
+author: Matthias Döring
+date: '2018-11-26'
+description: "TODO"
+categories:
+  - machine-learning
+draft: true
+---
+
+
+
+<p>Probabilistic programming makes it easy to implement statistical models. It is particularly useful for Bayesian models. In this article, I investigate how <a href="http://mc-stan.org/">Stan</a> can be used through its implementation in R, <a href="http://mc-stan.org/rstan/">RStan</a>.</p>
+<div id="introduction-to-stan" class="section level2">
+<h2>Introduction to Stan</h2>
+<p>Stan is a C++ library for Bayesian inference. It is based on the No-U-Turn sampler (NUTS), which is used for estimating the posterior distribution according to a user-specified model and data. Performing an analysis using Stan involves the following steps</p>
+<ol style="list-style-type: decimal">
+<li>Specify the statistical model using the the Stan modeling language. This is typically done using a <em>.stan</em> file.</li>
+</ol>
+<p>We will showcase the use of Stan for a hierarchical Bayesian analysis for the eight schools example (Rubin, 1981 and Gelman, 2003). This data set measures the effect of coaching programs on college admission tests, the scholastic aptitude test (SAT), which is used in the US. The SAT was designed in such a way that it should be resistant to short-term efforts directly targeted at improving the score in the test. Rather, the test should reflect the knowledge that was acquired over a
+longer period of time. However, for most of the eight schools, the short-term coaching indeed increased the SAT scores as evidenced by positive values of <span class="math inline">\(y_j\)</span>, where <span class="math inline">\(y_j\)</span> indicates the change in SAT scores. The data set looks as follows:</p>
+<table>
+<colgroup>
+<col width="20%" />
+<col width="32%" />
+<col width="47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>School</th>
+<th>Estimated effect of coaching (<span class="math inline">\(y_j\)</span>)</th>
+<th>Standard error of effect(<span class="math inline">\(\sigma_j\)</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>28</td>
+<td>15</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td>8</td>
+<td>10</td>
+</tr>
+<tr class="odd">
+<td>C</td>
+<td>-3</td>
+<td>16</td>
+</tr>
+<tr class="even">
+<td>D</td>
+<td>7</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>E</td>
+<td>-1</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td>F</td>
+<td>1</td>
+<td>11</td>
+</tr>
+<tr class="odd">
+<td>G</td>
+<td>18</td>
+<td>10</td>
+</tr>
+<tr class="even">
+<td>H</td>
+<td>12</td>
+<td>18</td>
+</tr>
+</tbody>
+</table>
+<p>We are interested in estimating the true effect size for each of the school. There are two alternative approaches that could be used. First, we could assume that all schools are independent of each other. However, this would lead to estimates that are hard to interpret because the 95% posterior intervals for the schools would largely overlap due to the high standard error. Second, one could pool the data from all schools, assuming that the true effect is the same in all schools. This,
+however, is also not reasonable because there are different teachers and students at each of the schools.</p>
+<p>Thus, another model is required. The hierarchical model has the advantage of combining information from all eight experiments without assuming that all the <span class="math inline">\(\theta_j\)</span> are equal.
+This example is interesting because this is a nontrivial Markov chain simulation problem because there is dependence between the effects of coaching and the variation of the effect in the population.</p>
+<p>–REMOVE THIS: I THINK TAU IS ACTUALLY SD–
+Note that, in Bayesian settings, the normal distribution is often parameterized using the precision, <span class="math inline">\(\tau\)</span> instead of the standard deviation <span class="math inline">\(\sigma\)</span>, where the precision is defined as the inverse of the variance, i.e., <span class="math inline">\(\tau = \frac{1}{\sigma^2}\)</span>. We will use the following model:</p>
+<p><span class="math display">\[\begin{align*}
+y_i &amp;\sim \text{Normal}(\theta_j, \sigma_j), j = 1, \ldots, 8 \\
+\theta_j &amp;\sim \text{Normal}(\mu, \tau), j = 1, \ldots, 8 \\
+p(\mu, \tau) &amp;\propto 1
+\end{align*}\]</span></p>
+<p>According to the model, the effects of coaching follow a normal distribution parameterized by the true effect, <span class="math inline">\(\theta_j\)</span>, and <span class="math inline">\(\sigma_j\)</span> (known from the table), while the parameters <span class="math inline">\(\theta_j\)</span> follow a normal distribution with parameters <span class="math inline">\(\mu\)</span> and $.</p>
+</div>
+<div id="defining-the-stan-model-file" class="section level2">
+<h2>Defining the Stan model file</h2>
+<p>Before defining the Stan program for the model specified above, let us take a look at some statements in Stan. In Stan, the upper and lower bound of each variable can be denoted in the following way:</p>
+<pre><code>int&lt;lower=0&gt; n; # lower bound is 0
+int&lt;upper=5&gt; n; # upper bound is 5
+int&lt;lower=0,upper=5&gt; n; # n is in [0,5]</code></pre>
+<p>Multi-dimensional data can be specified via square brackets:</p>
+<pre><code>vector[n] numbers; // a vector of length n
+real[n] numbers;  // an array of floats with length n
+matrix[n,n] matrix; // an n times n matrix</code></pre>
+<p>The following special constructs are used in Stan:</p>
+<ul>
+<li>data: for specifying the data that is conditioned upon using Bayes rule</li>
+<li>parameters: for specifying the parameters of the model</li>
+<li>transformed parameters: for parameter processing before computing the posterior</li>
+<li>model: for specifying the model itself</li>
+</ul>
+<p>To specify the model, distributions can be specified in two equivalent ways. The first one, uses the statistical notation:</p>
+<pre><code>y ~ normal(mu, sigma); # y follows a normal distribution </code></pre>
+<p>The second way uses a programmatic notation based on the log probability density function (lpdf):</p>
+<pre><code>target += normal_lpdf(y | mu, sigma); # increment the normal log density sum</code></pre>
+<p>With that knowledge, we can define our model, which we will store in a file called <code>schools.stan</code>:</p>
+<pre><code>data {
+  int&lt;lower=0&gt; n; # number of schools
+  real y[n]; # effect of coaching
+  real&lt;lower=0&gt; sigma[n]; # standard errors of effects
+}
+parameters {
+  real mu;  # the overall mean effect
+  real&lt;lower=0&gt; tau; # the standard deviation of the effect
+  vector[n] eta; # standardized school-level effects (see below)
+}
+transformed parameters {
+  vector[n] theta; 
+  theta = mu + tau * eta; # find theta from mu, tau, and eta
+}
+model {
+  target += normal_lpdf(eta | 0, 1); # prior for eta: standard normal
+  target += normal_lpdf(y | theta, sigma);  # likelihood for y follows normal with mean theta and sd sigma
+}</code></pre>
+<p>In the model, note that <span class="math inline">\(\theta\)</span> never appears in the parameters. This is because we do not explicitly model <span class="math inline">\(\theta\)</span> but instead model <span class="math inline">\(\eta\)</span>, the standardized effect for individual schools. We then construct <span class="math inline">\(\theta\)</span> in the <em>transformed parameters</em> section according to <span class="math inline">\(\mu\)</span>, <span class="math inline">\(\tau\)</span>, and <span class="math inline">\(\eta\)</span>. This parametrization makes the sampler more efficient.</p>
+<p>Note that the model is specified using vector notation since both <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\sigma\)</span> indicate vectors. This allows for improved runtimes because it is not necessary to loop over every individual element of the vectors. When specifying models via Stan, the <code>lookup</code> function comes in handy: It provides a mapping from R functions to Stan functions. Consider the following example:</p>
+<pre class="r"><code>library(rstan) # load stan package
+lookup(rnorm)</code></pre>
+<pre><code>##     StanFunction               Arguments ReturnType Page
+## 369   normal_rng (reals mu, reals sigma)          R  112</code></pre>
+</div>
+<div id="preparing-the-data-for-modeling" class="section level2">
+<h2>Preparing the data for modeling</h2>
+<p>Before we can fit our model, we need to encode the input data as a list whose parameters should correspond to the entries in the data section of the Stan model. For the schools data, the data are the following:</p>
+<pre class="r"><code>schools.data &lt;- list(
+  n = 8,
+  y = c(28,  8, -3,  7, -1,  1, 18, 12),
+  sigma = c(15, 10, 16, 11,  9, 11, 10, 18)
+)</code></pre>
+</div>
+<div id="sampling-from-the-posterior-distribution" class="section level2">
+<h2>Sampling from the posterior distribution</h2>
+<p>To sample from the posterior distribution, we use the <code>stan</code> function. The only two required parameters are the location of the model file and the data to be fed to the model. Before calling the <code>stan</code> function, we specify the number of cores we would like to use and allow Stan to store compiled models:</p>
+<pre class="r"><code>options(mc.cores = parallel::detectCores()) # parallelize
+rstan_options(auto_write = TRUE)  # store compiled stan model
+fit1 &lt;- stan(
+  file = &quot;schools.stan&quot;,  # Stan program
+  data = schools.data,    # named list of data
+  chains = 4,             # number of Markov chains
+  warmup = 1000,          # number of warmup iterations per chain
+  iter = 2000,            # total number of iterations per chain
+  refresh = 1000          # show progress every &#39;refresh&#39; iterations
+  )</code></pre>
+<p>The <code>stan</code> function performs three tasks:</p>
+<ol style="list-style-type: decimal">
+<li>It translate the model specificiation to C++ code</li>
+<li>It compiles the C++ code to a shared object</li>
+<li>It samples from the posterior distribution according to the specified model, data, and settings</li>
+</ol>
+<p>Since Stan stores the compiled model, subsequent calls of the same model will be faster than the first call.</p>
+</div>
+<div id="model-interpretation" class="section level2">
+<h2>Model interpretation</h2>
+<pre class="r"><code>print(fit1, pars=c(&quot;theta&quot;, &quot;mu&quot;, &quot;tau&quot;, &quot;lp__&quot;), probs=c(.1,.5,.9))</code></pre>
+<pre><code>## Inference for Stan model: schools.
+## 4 chains, each with iter=2000; warmup=1000; thin=1; 
+## post-warmup draws per chain=1000, total post-warmup draws=4000.
+## 
+##            mean se_mean   sd    10%    50%    90% n_eff Rhat
+## theta[1]  11.42    0.16 8.45   2.25  10.18  22.14  2774    1
+## theta[2]   7.89    0.10 6.32   0.08   7.86  15.54  4238    1
+## theta[3]   6.34    0.12 7.66  -2.92   6.65  15.22  3875    1
+## theta[4]   7.65    0.10 6.52  -0.10   7.58  15.53  4512    1
+## theta[5]   5.11    0.09 6.24  -3.08   5.46  12.63  4442    1
+## theta[6]   5.95    0.11 6.74  -2.63   6.12  14.20  3469    1
+## theta[7]  10.66    0.11 6.92   2.64   9.97  19.79  3816    1
+## theta[8]   8.55    0.13 7.94  -0.35   8.23  18.19  3952    1
+## mu         7.95    0.10 5.00   1.77   7.85  14.28  2400    1
+## tau        6.55    0.14 5.38   1.15   5.25  13.59  1562    1
+## lp__     -39.52    0.08 2.64 -42.96 -39.28 -36.38  1198    1
+## 
+## Samples were drawn using NUTS(diag_e) at Tue Nov 27 22:25:57 2018.
+## For each parameter, n_eff is a crude measure of effective sample size,
+## and Rhat is the potential scale reduction factor on split chains (at 
+## convergence, Rhat=1).</code></pre>
+<pre class="r"><code>plot(fit1)</code></pre>
+<pre><code>## &#39;pars&#39; not specified. Showing first 10 parameters by default.</code></pre>
+<pre><code>## ci_level: 0.8 (80% intervals)</code></pre>
+<pre><code>## outer_level: 0.95 (95% intervals)</code></pre>
+<p><img src="/post/machine-learning/probabilistic_programming_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code># diagnostics:
+traceplot(fit1, pars = c(&quot;mu&quot;, &quot;tau&quot;), inc_warmup = TRUE, nrow = 2)</code></pre>
+<p><img src="/post/machine-learning/probabilistic_programming_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<pre class="r"><code>print(fit1, pars = c(&quot;mu&quot;, &quot;tau&quot;))</code></pre>
+<pre><code>## Inference for Stan model: schools.
+## 4 chains, each with iter=2000; warmup=1000; thin=1; 
+## post-warmup draws per chain=1000, total post-warmup draws=4000.
+## 
+##     mean se_mean   sd  2.5%  25%  50%   75% 97.5% n_eff Rhat
+## mu  7.95    0.10 5.00 -1.43 4.53 7.85 11.27 18.08  2400    1
+## tau 6.55    0.14 5.38  0.32 2.53 5.25  9.05 20.02  1562    1
+## 
+## Samples were drawn using NUTS(diag_e) at Tue Nov 27 22:25:57 2018.
+## For each parameter, n_eff is a crude measure of effective sample size,
+## and Rhat is the potential scale reduction factor on split chains (at 
+## convergence, Rhat=1).</code></pre>
+<pre class="r"><code># better: shinystan package</code></pre>
+<pre class="r"><code># retrieve the samples
+la &lt;- extract(fit1, permuted = TRUE)
+mu &lt;- la$mu 
+# retrieve iterations, chains, and parameters
+a &lt;- extract(fit1, permuted = FALSE) </code></pre>
+<p>SOURCES
+<a href="https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/" class="uri">https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/</a>
+<a href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started" class="uri">https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started</a>
+<a href="http://mc-stan.org/rstan/articles/rstan.html" class="uri">http://mc-stan.org/rstan/articles/rstan.html</a></p>
+</div>
