@@ -1,0 +1,10 @@
+---
+title: "Probabilistic Programming in R"
+author: Matthias Döring
+date: '2018-11-26'
+description: "TODO"
+categories:
+  - machine-learning
+draft: true
+---
+Probabilistic programming using the Stan package.
