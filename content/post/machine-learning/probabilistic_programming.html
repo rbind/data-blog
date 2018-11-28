@@ -20,69 +20,77 @@ draft: true
 <li>Sample from the posterior distribution. The <code>stan</code> function automatically compiles the specified model and samples from the specified distributions.</li>
 <li>Analyze the results.</li>
 </ol>
-<p>We will showcase the use of Stan for a hierarchical Bayesian analysis for the eight schools example (Rubin, 1981 and Gelman, 2003). This data set measures the effect of coaching programs on college admission tests, the scholastic aptitude test (SAT), which is used in the US. The SAT was designed in such a way that it should be resistant to short-term efforts directly targeted at improving the score in the test. Rather, the test should reflect the knowledge that was acquired over a longer period of time. However, for most of the eight schools, the short-term coaching indeed increased the SAT scores as evidenced by positive values of <span class="math">\(y_j\)</span>, where <span class="math">\(y_j\)</span> indicates the change in SAT scores. The data set looks as follows:</p>
+<p>We will showcase the use of Stan for a hierarchical Bayesian analysis for the eight schools example (Rubin, 1981 and Gelman, 2003). This data set measures the effect of coaching programs on college admission tests, the scholastic aptitude test (SAT), which is used in the US. The SAT was designed in such a way that it should be resistant to short-term efforts directly targeted at improving the score in the test. Rather, the test should reflect the knowledge that was acquired over a
+longer period of time. However, for most of the eight schools, the short-term coaching indeed increased the SAT scores as evidenced by positive values of <span class="math inline">\(y_j\)</span>, where <span class="math inline">\(y_j\)</span> indicates the change in SAT scores. The data set looks as follows:</p>
 <table>
+<colgroup>
+<col width="20%" />
+<col width="32%" />
+<col width="47%" />
+</colgroup>
 <thead>
 <tr class="header">
-<th align="left">School</th>
-<th align="left">Estimated effect of coaching (<span class="math">\(y_j\)</span>)</th>
-<th align="left">Standard error of effect (<span class="math">\(\sigma_j\)</span>)</th>
+<th>School</th>
+<th>Estimated effect of coaching (<span class="math inline">\(y_j\)</span>)</th>
+<th>Standard error of effect (<span class="math inline">\(\sigma_j\)</span>)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">A</td>
-<td align="left">28</td>
-<td align="left">15</td>
+<td>A</td>
+<td>28</td>
+<td>15</td>
 </tr>
 <tr class="even">
-<td align="left">B</td>
-<td align="left">8</td>
-<td align="left">10</td>
+<td>B</td>
+<td>8</td>
+<td>10</td>
 </tr>
 <tr class="odd">
-<td align="left">C</td>
-<td align="left">-3</td>
-<td align="left">16</td>
+<td>C</td>
+<td>-3</td>
+<td>16</td>
 </tr>
 <tr class="even">
-<td align="left">D</td>
-<td align="left">7</td>
-<td align="left">11</td>
+<td>D</td>
+<td>7</td>
+<td>11</td>
 </tr>
 <tr class="odd">
-<td align="left">E</td>
-<td align="left">-1</td>
-<td align="left">9</td>
+<td>E</td>
+<td>-1</td>
+<td>9</td>
 </tr>
 <tr class="even">
-<td align="left">F</td>
-<td align="left">1</td>
-<td align="left">11</td>
+<td>F</td>
+<td>1</td>
+<td>11</td>
 </tr>
 <tr class="odd">
-<td align="left">G</td>
-<td align="left">18</td>
-<td align="left">10</td>
+<td>G</td>
+<td>18</td>
+<td>10</td>
 </tr>
 <tr class="even">
-<td align="left">H</td>
-<td align="left">12</td>
-<td align="left">18</td>
+<td>H</td>
+<td>12</td>
+<td>18</td>
 </tr>
 </tbody>
 </table>
-<p>We are interested in estimating the true effect size for each of the school. There are two alternative approaches that could be used. First, we could assume that all schools are independent of each other. However, this would lead to estimates that are hard to interpret because the 95% posterior intervals for the schools would largely overlap due to the high standard error. Second, one could pool the data from all schools, assuming that the true effect is the same in all schools. This, however, is also not reasonable because there are different teachers and students at each of the schools.</p>
-<p>Thus, another model is required. The hierarchical model has the advantage of combining information from all eight experiments without assuming that all the <span class="math">\(\theta_j\)</span> are equal. This example is interesting because this is a nontrivial Markov chain simulation problem because there is dependence between the effects of coaching and the variation of the effect in the population.</p>
+<p>We are interested in estimating the true effect size for each of the school. There are two alternative approaches that could be used. First, we could assume that all schools are independent of each other. However, this would lead to estimates that are hard to interpret because the 95% posterior intervals for the schools would largely overlap due to the high standard error. Second, one could pool the data from all schools, assuming that the true effect is the same in all schools. This,
+however, is also not reasonable because there are different teachers and students at each of the schools.</p>
+<p>Thus, another model is required. The hierarchical model has the advantage of combining information from all eight experiments without assuming that all the <span class="math inline">\(\theta_j\)</span> are equal.
+This example is interesting because this is a nontrivial Markov chain simulation problem because there is dependence between the effects of coaching and the variation of the effect in the population.</p>
 <p>We will use the following model:</p>
-<p><span class="math">\[
+<p><span class="math display">\[
 \begin{align}
 y_i &amp;\sim \text{Normal}(\theta_j, \sigma_j)\,, j = 1, \ldots, 8 &amp; \text{Prior for the data}\\
 \theta_j &amp;\sim \text{Normal}(\mu, \tau)\,, j = 1, \ldots, 8 &amp; \text{The true effect of the intervention} \\
 p(\mu, \tau) &amp;\propto 1 &amp; \text{Parameter distribution is uniform} 
 \end{align}
 \]</span></p>
-<p>According to the model, the effects of coaching follow a normal distribution whose mean is the true effect, <span class="math">\(\theta_j\)</span>, and whose standard deviation is the observed deviation of <span class="math">\(y_j\)</span>, <span class="math">\(\sigma_j\)</span>, which is known from the data. The true effect, <span class="math">\(\theta_j\)</span>, follows a normal distribution with parameters <span class="math">\(\mu\)</span> and <span class="math">\(\tau\)</span>.</p>
+<p>According to the model, the effects of coaching follow a normal distribution whose mean is the true effect, <span class="math inline">\(\theta_j\)</span>, and whose standard deviation is the observed deviation of <span class="math inline">\(y_j\)</span>, <span class="math inline">\(\sigma_j\)</span>, which is known from the data. The true effect, <span class="math inline">\(\theta_j\)</span>, follows a normal distribution with parameters <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\tau\)</span>.</p>
 </div>
 <div id="defining-the-stan-model-file" class="section level2">
 <h2>Defining the Stan model file</h2>
@@ -126,25 +134,25 @@ lookup(rnorm)</code></pre>
 <h3>The eight schools model</h3>
 <p>With that knowledge, we can define our model, which we will store in a file called <code>schools.stan</code>:</p>
 <pre><code>data {
-  int&lt;lower=0&gt; n; # number of schools
-  real y[n]; # effect of coaching
-  real&lt;lower=0&gt; sigma[n]; # standard errors of effects
+  int&lt;lower=0&gt; n; //number of schools
+  real y[n]; // effect of coaching
+  real&lt;lower=0&gt; sigma[n]; // standard errors of effects
 }
 parameters {
-  real mu;  # the overall mean effect
-  real&lt;lower=0&gt; tau; # the standard deviation of the effect
-  vector[n] eta; # standardized school-level effects (see below)
+  real mu;  // the overall mean effect
+  real&lt;lower=0&gt; tau; // the inverse variance of the effect
+  vector[n] eta; // standardized school-level effects (see below)
 }
 transformed parameters {
   vector[n] theta; 
-  theta = mu + tau * eta; # find theta from mu, tau, and eta
+  theta = mu + tau * eta; // find theta from mu, tau, and eta
 }
 model {
-  target += normal_lpdf(eta | 0, 1); # prior for eta: standard normal
-  target += normal_lpdf(y | theta, sigma);  # likelihood for y follows normal with mean theta and sd sigma
+  target += normal_lpdf(eta | 0, 1); // eta follows standard normal
+  target += normal_lpdf(y | theta, sigma);  // y follows normal with mean theta and sd sigma
 }</code></pre>
-<p>Note that <span class="math">\(\theta\)</span> never appears in the parameters. This is because we do not explicitly model <span class="math">\(\theta\)</span> but instead model <span class="math">\(\eta\)</span>, the standardized effect for individual schools. For example, we would expect <span class="math">\(\eta_1\)</span> to be large because <span class="math">\(y_1\)</span> is the maximum among all schools. We then construct <span class="math">\(\theta\)</span> in the <em>transformed parameters</em> section according to <span class="math">\(\mu\)</span>, <span class="math">\(\tau\)</span>, and <span class="math">\(\eta\)</span>. This parameterization makes the sampler more efficient.</p>
-<p>Note that the model is specified using vector notation since both <span class="math">\(\theta\)</span> and <span class="math">\(\sigma\)</span> indicate vectors. This allows for improved runtimes because it is not necessary to loop over every individual element of the vectors.</p>
+<p>Note that <span class="math inline">\(\theta\)</span> never appears in the parameters. This is because we do not explicitly model <span class="math inline">\(\theta\)</span> but instead model <span class="math inline">\(\eta\)</span>, the standardized effect for individual schools. For example, we would expect <span class="math inline">\(\eta_1\)</span> to be large because <span class="math inline">\(y_1\)</span> is the maximum among all schools. We then construct <span class="math inline">\(\theta\)</span> in the <em>transformed parameters</em> section according to <span class="math inline">\(\mu\)</span>, <span class="math inline">\(\tau\)</span>, and <span class="math inline">\(\eta\)</span>. This parameterization makes the sampler more efficient.</p>
+<p>Note that the model is specified using vector notation since both <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\sigma\)</span> indicate vectors. This allows for improved runtimes because it is not necessary to loop over every individual element of the vectors.</p>
 </div>
 </div>
 <div id="preparing-the-data-for-modeling" class="section level2">
@@ -191,31 +199,31 @@ rstan_options(auto_write = TRUE)  # store compiled stan model</code></pre>
 ## post-warmup draws per chain=1000, total post-warmup draws=4000.
 ## 
 ##            mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
-## mu         8.05    0.12 5.13  -2.04   4.76   8.05  11.21  18.37  1717    1
-## tau        6.51    0.13 5.34   0.22   2.42   5.27   9.22  20.65  1729    1
-## eta[1]     0.39    0.02 0.96  -1.56  -0.25   0.41   1.05   2.20  3707    1
-## eta[2]     0.00    0.01 0.87  -1.74  -0.56   0.00   0.54   1.80  3809    1
-## eta[3]    -0.22    0.01 0.89  -1.90  -0.81  -0.25   0.38   1.54  3940    1
-## eta[4]    -0.03    0.02 0.90  -1.81  -0.63  -0.03   0.58   1.73  3092    1
-## eta[5]    -0.34    0.01 0.88  -1.97  -0.92  -0.36   0.22   1.45  3895    1
-## eta[6]    -0.22    0.01 0.89  -1.99  -0.81  -0.23   0.35   1.58  4089    1
-## eta[7]     0.34    0.01 0.87  -1.41  -0.21   0.34   0.91   2.05  3646    1
-## eta[8]     0.05    0.01 0.94  -1.82  -0.58   0.06   0.69   1.88  4001    1
-## theta[1]  11.47    0.16 8.45  -2.19   6.04  10.13  15.59  31.59  2815    1
-## theta[2]   7.87    0.10 6.19  -4.59   4.13   7.86  11.64  20.73  4083    1
-## theta[3]   6.20    0.13 7.63 -11.70   2.23   6.70  10.75  20.56  3397    1
-## theta[4]   7.77    0.10 6.60  -5.60   3.54   7.77  11.77  21.52  4488    1
-## theta[5]   5.28    0.10 6.43  -8.68   1.45   5.69   9.55  16.87  3758    1
-## theta[6]   6.19    0.10 6.71  -8.95   2.41   6.59  10.48  18.65  4112    1
-## theta[7]  10.69    0.12 6.74  -1.23   6.23  10.02  14.64  25.83  3208    1
-## theta[8]   8.54    0.13 7.92  -6.62   3.94   8.13  12.68  26.62  3567    1
-## lp__     -39.56    0.07 2.64 -45.43 -41.19 -39.30 -37.69 -35.16  1383    1
+## mu         8.00    0.12 5.00  -1.60   4.79   7.93  11.12  18.31  1758    1
+## tau        6.63    0.14 5.54   0.31   2.57   5.27   9.20  21.18  1562    1
+## eta[1]     0.38    0.01 0.93  -1.42  -0.23   0.38   1.01   2.18  3880    1
+## eta[2]     0.00    0.01 0.87  -1.69  -0.57   0.01   0.55   1.76  3718    1
+## eta[3]    -0.22    0.02 0.91  -2.04  -0.80  -0.24   0.37   1.61  3371    1
+## eta[4]    -0.05    0.01 0.89  -1.81  -0.64  -0.05   0.55   1.68  3858    1
+## eta[5]    -0.34    0.01 0.88  -2.02  -0.94  -0.36   0.20   1.49  3676    1
+## eta[6]    -0.20    0.02 0.89  -1.95  -0.77  -0.21   0.36   1.65  3386    1
+## eta[7]     0.35    0.02 0.88  -1.46  -0.21   0.36   0.93   2.01  2985    1
+## eta[8]     0.07    0.01 0.94  -1.82  -0.55   0.08   0.68   1.93  3916    1
+## theta[1]  11.39    0.16 8.43  -2.27   5.95  10.36  15.56  32.40  2743    1
+## theta[2]   7.96    0.10 6.21  -4.66   4.09   7.95  11.85  20.67  4219    1
+## theta[3]   5.96    0.13 7.52 -11.61   2.04   6.39  10.72  19.97  3214    1
+## theta[4]   7.58    0.10 6.49  -5.49   3.71   7.63  11.36  21.13  4310    1
+## theta[5]   5.12    0.10 6.37  -9.06   1.23   5.59   9.55  16.33  3961    1
+## theta[6]   6.26    0.11 6.71  -8.21   2.30   6.57  10.56  19.26  3711    1
+## theta[7]  10.65    0.11 6.71  -1.05   6.20  10.02  14.31  26.02  3665    1
+## theta[8]   8.55    0.13 7.80  -6.70   4.02   8.29  12.65  25.99  3541    1
+## lp__     -39.46    0.07 2.64 -45.61 -41.07 -39.19 -37.55 -35.13  1317    1
 ## 
-## Samples were drawn using NUTS(diag_e) at Wed Nov 28 15:10:55 2018.
+## Samples were drawn using NUTS(diag_e) at Wed Nov 28 18:17:42 2018.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
-<p>Here, the row names indicate the estimated parameters: mu is the mean of the posterior distribution and tau is its standard deviation. The entries for eta and theta indicate the estimates for the vectors <span class="math">\(\eta\)</span> and <span class="math">\(\theta\)</span>, repectively. The *lp$ entry shows the log density. The columns indicate the computed values. The percentages indicate the credible intervals. For example, the 95% credible interval for <span class="math">\(\mu\)</span> is <span class="math">\([-1.27, 18.26]\)</span>. Since we are not very certain of the mean, the 95% credible intervals for <span class="math">\(\theta_j\)</span> are also quite wide. For example, for the first school, the 95% credible interval is <span class="math">\([-2.19, 32.33]\)</span>.</p>
+<p>Here, the row names indicate the estimated parameters: mu is the mean of the posterior distribution and tau is its standard deviation. The entries for eta and theta indicate the estimates for the vectors <span class="math inline">\(\eta\)</span> and <span class="math inline">\(\theta\)</span>, repectively. The *lp$ entry shows the log density. The columns indicate the computed values. The percentages indicate the credible intervals. For example, the 95% credible interval for <span class="math inline">\(\mu\)</span> is <span class="math inline">\([-1.27, 18.26]\)</span>. Since we are not very certain of the mean, the 95% credible intervals for <span class="math inline">\(\theta_j\)</span> are also quite wide. For example, for the first school, the 95% credible interval is <span class="math inline">\([-2.19, 32.33]\)</span>.</p>
 <p>We can visualize the uncertainty in the estimates using the <code>plot</code> function:</p>
 <pre class="r"><code># specify the params to plot via pars
 plot(fit1, pars = &quot;theta&quot;)</code></pre>
@@ -224,31 +232,12 @@ plot(fit1, pars = &quot;theta&quot;)</code></pre>
 <p><img src="/post/machine-learning/probabilistic_programming_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>The black lines indicate the 95% intervals, while the red lines indicate the 80% intervals. The circles indicate the estimate of the mean.</p>
 </div>
-<div id="prediction" class="section level3">
-<h3>Prediction</h3>
-<p>Since we are not only interested in learning about the data but about making predictions for new data points, we need to sample from the posterior predictive distribution. For this purpose, the <code>posterior_predict</code> function can be used. We simply need to specify a fitted Stan model and a data frame containing the new measurements. To perform <em>applied regression modeling</em>, we need to load the <code>rstanarm</code> package:</p>
-<pre class="r"><code>library(rstanarm)</code></pre>
-<pre><code>## Loading required package: Rcpp</code></pre>
-<pre><code>## rstanarm (Version 2.18.2, packaged: 2018-11-08 22:19:38 UTC)</code></pre>
-<pre><code>## - Do not expect the default priors to remain the same in future rstanarm versions.</code></pre>
-<pre><code>## Thus, R scripts should specify priors explicitly, even if they are just the defaults.</code></pre>
-<pre><code>## - For execution on a local, multicore CPU with excess RAM we recommend calling</code></pre>
-<pre><code>## options(mc.cores = parallel::detectCores())</code></pre>
-<pre><code>## - Plotting theme set to bayesplot::theme_default().</code></pre>
-<pre><code>## 
-## Attaching package: &#39;rstanarm&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:rstan&#39;:
-## 
-##     loo</code></pre>
-<pre class="r"><code>newdata &lt;- data.frame(&quot;y&quot; = 50, &quot;sigma&quot; = 10)
-#pred &lt;- posterior_predict(fit1, newdata)</code></pre>
-</div>
 <div id="mcmc-diagnostics" class="section level3">
 <h3>MCMC diagnostics</h3>
 <p>There are also functions for diagnosing the MCMC procedure. By plotting the trace of the sampling procedure, we can identify whether anything has gone wrong during sampling. This could for example be the case if the chain stays in one place for too long or makes too many steps in one direction. We can plot the traces of the four chains used in our model with the <code>traceplot</code> function:</p>
 <pre class="r"><code># diagnostics:
 traceplot(fit1, pars = c(&quot;mu&quot;, &quot;tau&quot;), inc_warmup = TRUE, nrow = 2)</code></pre>
-<p><img src="/post/machine-learning/probabilistic_programming_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/probabilistic_programming_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>Both traces look fine to me.</p>
 <p>We can also obtain the generated samples using the <code>extract</code> function:</p>
 <pre class="r"><code># retrieve the samples
@@ -258,32 +247,55 @@ mu &lt;- samples$mu  # samples of mu only
 chain.data &lt;- extract(fit1, permuted = FALSE) 
 print(chain.data[1,,]) # parameters of all chains for the 1st of 1000 iterations</code></pre>
 <pre><code>##          parameters
-## chains           mu       tau    eta[1]     eta[2]     eta[3]      eta[4]
-##   chain:1  9.049027  9.289464 0.2874623  1.4589250 -0.3119025 -0.21017327
-##   chain:2  5.004315  5.000802 0.7556127  0.1950647  0.5499478  0.49929027
-##   chain:3  4.637674 11.190531 1.7640995  0.4475074 -1.1811156 -0.55538622
-##   chain:4 11.486161  1.042507 0.3028020 -0.1277070 -0.2959118 -0.08705909
+## chains           mu        tau      eta[1]     eta[2]     eta[3]
+##   chain:1 10.325084 21.4834379  0.96124418  0.2409967 -1.4417570
+##   chain:2  1.997901  9.4257983 -0.03113638  0.7226716 -1.6403665
+##   chain:3 11.439935  5.1438354  0.93219147 -0.4904590 -0.4541057
+##   chain:4  6.071879  0.1195319  0.27632831 -0.3147785 -0.5270769
 ##          parameters
-## chains        eta[5]     eta[6]     eta[7]     eta[8]  theta[1]  theta[2]
-##   chain:1 -0.5057930 -0.1214980 0.04997955 -1.9478619 11.719397 22.601658
-##   chain:2 -0.5193835 -0.8385716 1.96418387 -1.7017181  8.782985  5.979795
-##   chain:3 -0.3231747  0.3225989 0.45978439 -0.7923999 24.378884  9.645519
-##   chain:4 -1.7095203  0.7407190 0.75794351  1.6753406 11.801834 11.353026
+## chains          eta[4]     eta[5]      eta[6]     eta[7]      eta[8]
+##   chain:1  0.481518912 -0.2915351 -0.48916922  0.9755797  0.75674395
+##   chain:2 -0.009287974  0.2258830 -0.00885383  1.3691056  0.04158465
+##   chain:3 -0.744449490 -0.3009601  0.10093719  2.1679021 -0.82410724
+##   chain:4  0.623873396 -1.1318487 -0.29450369 -1.0255216  0.45158730
 ##          parameters
-## chains     theta[3]  theta[4] theta[5]   theta[6]  theta[7]  theta[8]
-##   chain:1  6.151620  7.096630 4.350481  7.9203759  9.513310 -9.045566
-##   chain:2  7.754495  7.501167 2.406981  0.8107841 14.826810 -3.505641
-##   chain:3 -8.579637 -1.577393 1.021178  8.2477268  9.782905 -4.229702
-##   chain:4 11.177671 11.395401 9.703975 12.2583658 12.276322 13.232715
+## chains     theta[1]  theta[2]   theta[3]  theta[4] theta[5]  theta[6]
+##   chain:1 30.975914 15.502522 -20.648812 20.669766 4.061909 -0.183952
+##   chain:2  1.704416  8.809658 -13.463863  1.910354 4.127029  1.914447
+##   chain:3 16.234974  8.917095   9.104090  7.610609 9.891846 11.959139
+##   chain:4  6.104909  6.034253   6.008877  6.146452 5.936587  6.036677
 ##          parameters
-## chains         lp__
-##   chain:1 -38.89016
-##   chain:2 -39.06756
-##   chain:3 -36.68282
-##   chain:4 -40.66721</code></pre>
+## chains     theta[7]  theta[8]      lp__
+##   chain:1 31.283890 26.582546 -37.23165
+##   chain:2 14.902814  2.389869 -37.21641
+##   chain:3 22.591267  7.200863 -38.67827
+##   chain:4  5.949297  6.125858 -40.95670</code></pre>
 <p>To do more advanced analytics of the sampling process, we can use the <code>shinystan</code> package, which provides a Shiny frontend. A fitted model can be analyzed in the following way:</p>
 <pre class="r"><code>library(shinystan)
 launch_shinystan(fit1)</code></pre>
-<p>SOURCES <a href="https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/">https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/</a> <a href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started">https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started</a> <a href="http://mc-stan.org/rstan/articles/rstan.html">http://mc-stan.org/rstan/articles/rstan.html</a> <a href="https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/">https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/</a></p>
 </div>
+</div>
+<div id="hierarchical-regression" class="section level2">
+<h2>Hierarchical regression</h2>
+<p>Now that we have a basic understanding of Stan, let’s try our hands at hierarchical regression. In conventional regression, we model a relationship of the form</p>
+<p><span class="math display">\[Y = \beta_0 + X \beta\]</span></p>
+<p>This representation assumes that all samples have the same distribution. This approach is ill-suited if there is a grouping of the samples because latent differences within and between groups are ignored. An alternative to a single regression model would be to have one regression model for each group. In this case, however, the small sample size would be problematic when estimating individual models. Hierarchical regression is a compromise between both extremes because it assumes that
+the groups are similar but still takes differences into account.</p>
+<p>Assume that there are <span class="math inline">\(K\)</span> groups. Then, a hierarchical regression is specified as follows:</p>
+<p><span class="math display">\[Y_k = \beta_{0k} + X_k \beta^{(k)}\,, \forall k \in {1, \ldots, K\} \]</span></p>
+<p>where <span class="math inline">\(Y_k\)</span> is the outcome for the <span class="math inline">\(k\)</span>-th group, <span class="math inline">\(\beta_{0k}\)</span> is the intercept, <span class="math inline">\(X_k\)</span> are the features, and <span class="math inline">\(\beta^{(k)}\)</span> indicates the weights. The hierarchical model is different from a model where <span class="math inline">\(Y_k\)</span> is fit for each group individually because the parameters, <span class="math inline">\(\beta_{0k}\)</span> and <span class="math inline">\(\beta^{(k)}\)</span> are assumed to originate from a common distribution.</p>
+<p>A classic example for hiearchical regression is the rats data set. This longitudinal data set contains the weights of rats as mesaured for 5 weeks. Let us load the data:</p>
+<pre class="r"><code>library(RCurl)</code></pre>
+<pre><code>## Loading required package: bitops</code></pre>
+<pre class="r"><code># load data as character
+f &lt;- getURL(&#39;https://www.datascienceblog.net/data-sets/rats.txt&#39;)
+# read table from text connection
+df &lt;- read.csv(textConnection(f), header=T)</code></pre>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p><a href="https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/" class="uri">https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/</a>
+<a href="https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started" class="uri">https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started</a>
+<a href="http://mc-stan.org/rstan/articles/rstan.html" class="uri">http://mc-stan.org/rstan/articles/rstan.html</a>
+<a href="https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/" class="uri">https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/</a></p>
 </div>

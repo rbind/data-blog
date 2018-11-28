@@ -199,48 +199,6 @@ plot(fit1, pars = "theta")
 
 The black lines indicate the 95% intervals, while the red lines indicate the 80% intervals. The circles indicate the estimate of the mean. 
 
-### Prediction
-
-Since we are not only interested in learning about the data but about making predictions for new data points, we need to sample from the posterior predictive distribution. 
-
-Fit and predict scheme:
-
-parameters {
-  real mu;  // the overall mean effect
-  real<lower=0> tau; // the inverse variance of the effect
-  vector[n] eta; // standardized school-level effects (see below)
-}
-transformed parameters {
-  vector[n] theta; 
-  theta = mu + tau * eta; // find theta from mu, tau, and eta
-}
-model {
-  target += normal_lpdf(eta | 0, 1); // eta follows standard normal
-  target += normal_lpdf(y | theta, sigma);  // y follows normal with mean theta and sd sigma
-}
-generated quantities {
-
-}
-```
-
-
-```{r}
-# generate posterior samples of the stan model coefficients
-param.sample <- as.data.frame(fit1)  
-# generate some artificial new data for prediction:
-# assume we have four more samples for the first school!
-newdata <- data.frame(y = c(50, 30, 10, 80),
-                    sigma = c(20, 10, 3, 25)) 
-# posterior predicted values for coaching effect on newdata
-predict.custom <- apply(param.sample, 1, function(x) x["mu"] + x["tau"] * x["eta[1]"])
-rnorm(1, param.sample[1, "theta[1]"], newdata$sigma[1])
-result.sample <- t(apply(param.sample, 1, function(x) 
-
-# summary
-result.summary <- apply(result.sample, 2, mean) 
-result.summary.std <- apply(result.sample, 2, sd) 
-```
-
 ### MCMC diagnostics
 
 There are also functions for diagnosing the MCMC procedure. By plotting the trace of the sampling procedure, we can identify whether anything has gone wrong during sampling. This could for example be the case if the chain stays in one place for too long or makes too many steps in one direction. We can plot the traces of the four chains used in our model with the  ```traceplot``` function:
@@ -270,7 +228,34 @@ library(shinystan)
 launch_shinystan(fit1)
 ```
 
-SOURCES
+## Hierarchical regression
+
+Now that we have a basic understanding of Stan, let's try our hands at hierarchical regression. In conventional regression, we model a relationship of the form
+
+\[Y = \beta_0 + X \beta\]
+
+This representation assumes that all samples have the same distribution. This approach is ill-suited if there is a grouping of the samples because latent differences within and between groups are ignored. An alternative to a single regression model would be to have one regression model for each group. In this case, however, the small sample size would be problematic when estimating individual models. Hierarchical regression is a compromise between both extremes because it assumes that
+the groups are similar but still takes differences into account.
+
+Assume that there are $K$ groups. Then, a hierarchical regression is specified as follows:
+
+\[Y_k = \beta_{0k} + X_k \beta^{(k)}\,, \forall k \in {1, \ldots, K\} \]
+
+where $Y_k$ is the outcome for the $k$-th group, $\beta_{0k}$ is the intercept, $X_k$ are the features, and $\beta^{(k)}$ indicates the weights. The hierarchical model is different from a model where $Y_k$ is fit for each group individually because the parameters, $\beta_{0k}$ and $\beta^{(k)}$ are assumed to originate from a common distribution. 
+
+A classic example for hiearchical regression is the rats data set. This longitudinal data set contains the weights of rats as mesaured for 5 weeks. Let us load the data:
+
+```{r}
+library(RCurl)
+# load data as character
+f <- getURL('https://www.datascienceblog.net/data-sets/rats.txt')
+# read table from text connection
+df <- read.csv(textConnection(f), header=T)
+```
+
+
+## References
+
 https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/
 https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 http://mc-stan.org/rstan/articles/rstan.html
