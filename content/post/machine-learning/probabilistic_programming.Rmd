@@ -13,12 +13,15 @@ Probabilistic programming makes it easy to implement statistical models. It is p
 
 Stan is a C++ library for Bayesian inference. It is based on the No-U-Turn sampler (NUTS), which is used for estimating the posterior distribution according to a user-specified model and data. Performing an analysis using Stan involves the following steps
 
-1. Specify the statistical model using the the Stan modeling language. This is typically done using a *.stan* file.
+1. Specify the statistical model using the the Stan modeling language. This is typically done through an independent *.stan* file.
+2. Prepare the data that is fed to the model.
+3. Sample from the posterior distribution. The ```stan``` function automatically compiles the specified model and samples from the specified distributions.
+4. Analyze the results.
 
 We will showcase the use of Stan for a hierarchical Bayesian analysis for the eight schools example (Rubin, 1981 and Gelman, 2003). This data set measures the effect of coaching programs on college admission tests, the scholastic aptitude test (SAT), which is used in the US. The SAT was designed in such a way that it should be resistant to short-term efforts directly targeted at improving the score in the test. Rather, the test should reflect the knowledge that was acquired over a
 longer period of time. However, for most of the eight schools, the short-term coaching indeed increased the SAT scores as evidenced by positive values of $y_j$, where $y_j$ indicates the change in SAT scores. The data set looks as follows:
 
-|School 	| Estimated effect of coaching ($y_j$) | Standard error of effect($\sigma_j$) |
+|School 	| Estimated effect of coaching ($y_j$) | Standard error of effect ($\sigma_j$) |
 |-----------|-----------------|-------------------------|
 A| 	28| 	15|
 B| 	8 |	10|
@@ -35,20 +38,26 @@ however, is also not reasonable because there are different teachers and student
 Thus, another model is required. The hierarchical model has the advantage of combining information from all eight experiments without assuming that all the $\theta_j$ are equal.
 This example is interesting because this is a nontrivial Markov chain simulation problem because there is dependence between the effects of coaching and the variation of the effect in the population. 
 
---REMOVE THIS: I THINK TAU IS ACTUALLY SD--
-Note that, in Bayesian settings, the normal distribution is often parameterized using the precision, $\tau$ instead of the standard deviation $\sigma$, where the precision is defined as the inverse of the variance, i.e., $\tau = \frac{1}{\sigma^2}$. We will use the following model:
+We will use the following model:
 
-\begin{align*}
-y_i &\sim \text{Normal}(\theta_j, \sigma_j), j = 1, \ldots, 8 \\
-\theta_j &\sim \text{Normal}(\mu, \tau), j = 1, \ldots, 8 \\
-p(\mu, \tau) &\propto 1
-\end{align*}
 
-According to the model, the effects of coaching follow a normal distribution parameterized by the true effect, $\theta_j$, and $\sigma_j$ (known from the table), while the parameters $\theta_j$ follow a normal distribution with parameters $\mu$ and $\tau.
+\[
+\begin{align}
+y_i &\sim \text{Normal}(\theta_j, \sigma_j)\,, j = 1, \ldots, 8 & \text{Prior for the data}\\
+\theta_j &\sim \text{Normal}(\mu, \tau)\,, j = 1, \ldots, 8 & \text{The true effect of the intervention} \\
+p(\mu, \tau) &\propto 1 & \text{Parameter distribution is uniform} 
+\end{align}
+\]
+
+According to the model, the effects of coaching follow a normal distribution whose mean is the true effect, $\theta_j$, and whose standard deviation is the observed deviation of $y_j$, $\sigma_j$, which is known from the data. The true effect, $\theta_j$, follows a normal distribution with parameters $\mu$ and $\tau$.
 
 ## Defining the Stan model file
 
-Before defining the Stan program for the model specified above, let us take a look at some statements in Stan. In Stan, the upper and lower bound of each variable can be denoted in the following way:
+Before defining the Stan program for the model specified above, let us take a look at some statements in Stan. 
+
+### Variables
+
+In Stan, the upper and lower bound of each variable can be denoted in the following way:
 
 ```
 int<lower=0> n; # lower bound is 0
@@ -64,14 +73,22 @@ real[n] numbers;  // an array of floats with length n
 matrix[n,n] matrix; // an n times n matrix
 ```
 
-The following special constructs are used in Stan:
+### Program blocks
 
-* data: for specifying the data that is conditioned upon using Bayes rule
-* parameters: for specifying the parameters of the model
-* transformed parameters: for parameter processing before computing the posterior
-* model: for specifying the model itself
 
-To specify the model, distributions can be specified in two equivalent ways. The first one, uses the statistical notation:
+The following program blocks are used in Stan:
+
+* *data*: for specifying the data that is conditioned upon using Bayes rule
+* *transformed data*: for preprocessing the data
+* *parameters* (required): for specifying the parameters of the model
+* *transformed parameters*: for parameter processing before computing the posterior
+* *model* (required): for specifying the model itself
+* *generated quantities*: for postprocessing the results
+
+
+#### The model program block
+
+For the model program block, distributions can be specified in two equivalent ways. The first one, uses the statistical notation:
 
 ```
 y ~ normal(mu, sigma); # y follows a normal distribution 
@@ -80,8 +97,17 @@ y ~ normal(mu, sigma); # y follows a normal distribution
 The second way uses a programmatic notation based on the log probability density function (lpdf):
 
 ```
-target += normal_lpdf(y | mu, sigma); # increment the normal log density sum
+target += normal_lpdf(y | mu, sigma); # increment the normal log density
 ```
+
+When specifying models via Stan, the ```lookup``` function comes in handy: It provides a mapping from R functions to Stan functions. Consider the following example:
+
+```{r, message = FALSE}
+library(rstan) # load stan package
+lookup(rnorm)
+```
+
+### The eight schools model
 
 With that knowledge, we can define our model, which we will store in a file called ```schools.stan```:
 
@@ -105,18 +131,14 @@ model {
   target += normal_lpdf(y | theta, sigma);  # likelihood for y follows normal with mean theta and sd sigma
 }
 ```
-In the model, note that $\theta$ never appears in the parameters. This is because we do not explicitly model $\theta$ but instead model $\eta$, the standardized effect for individual schools. We then construct $\theta$ in the *transformed parameters* section according to $\mu$, $\tau$, and $\eta$. This parametrization makes the sampler more efficient.
 
-Note that the model is specified using vector notation since both $\theta$ and $\sigma$ indicate vectors. This allows for improved runtimes because it is not necessary to loop over every individual element of the vectors. When specifying models via Stan, the ```lookup``` function comes in handy: It provides a mapping from R functions to Stan functions. Consider the following example:
+Note that $\theta$ never appears in the parameters. This is because we do not explicitly model $\theta$ but instead model $\eta$, the standardized effect for individual schools. For example, we would expect $\eta_1$ to be large because $y_1$ is the maximum among all schools. We then construct $\theta$ in the *transformed parameters* section according to $\mu$, $\tau$, and $\eta$. This parameterization makes the sampler more efficient.
 
-```{r, message = FALSE}
-library(rstan) # load stan package
-lookup(rnorm)
-```
+Note that the model is specified using vector notation since both $\theta$ and $\sigma$ indicate vectors. This allows for improved runtimes because it is not necessary to loop over every individual element of the vectors.
 
 ## Preparing the data for modeling
 
-Before we can fit our model, we need to encode the input data as a list whose parameters should correspond to the entries in the data section of the Stan model. For the schools data, the data are the following:
+Before we can fit the model, we need to encode the input data as a list whose parameters should correspond to the entries in the data section of the Stan model. For the schools data, the data are the following:
 
 ```{r}
 schools.data <- list(
@@ -128,11 +150,22 @@ schools.data <- list(
 
 ## Sampling from the posterior distribution
 
-To sample from the posterior distribution, we use the ```stan``` function. The only two required parameters are the location of the model file and the data to be fed to the model. Before calling the ```stan``` function, we specify the number of cores we would like to use and allow Stan to store compiled models:
+We can sample from the posterior distribution using the ```stan``` function, which performs the following three steps:
+
+1. It translate the model specificiation to C++ code
+2. It compiles the C++ code to a shared object
+3. It samples from the posterior distribution according to the specified model, data, and settings
+
+If ```rstan_options(auto_write = TRUE)``` has been executed before compiling the model, subsequent calls of the same model will be much faster than the first call because the ```stan``` function then skips the first two steps (translating and compliling the model). Before calling the ```stan``` function, we specify the number of cores we would like to use and allow Stan to store compiled models:
 
 ```{r}
 options(mc.cores = parallel::detectCores()) # parallelize
 rstan_options(auto_write = TRUE)  # store compiled stan model
+```
+
+Now, we can compile the model and sample from the posterior. The only two required parameters of ```stan``` are the location of the model file and the data to be fed to the model:
+
+```{r}
 fit1 <- stan(
   file = "schools.stan",  # Stan program
   data = schools.data,    # named list of data
@@ -143,33 +176,70 @@ fit1 <- stan(
   )
 ```
 
-The ```stan``` function performs three tasks:
 
-1. It translate the model specificiation to C++ code
-2. It compiles the C++ code to a shared object
-3. It samples from the posterior distribution according to the specified model, data, and settings
-
-Since Stan stores the compiled model, subsequent calls of the same model will be faster than the first call.
 
 ## Model interpretation
 
+### Basic model interpretation
+
+To retrieve the estimated parameters, we can simply use the ```print``` function.
 ```{r}
-print(fit1, pars=c("theta", "mu", "tau", "lp__"), probs=c(.1,.5,.9))
-plot(fit1)
+print(fit1) # optional parameters: pars, probs
+```
+
+Here, the row names indicate the estimated parameters: mu is the mean of the posterior distribution and tau is its standard deviation. The entries for eta and theta indicate the estimates for the vectors $\eta$ and $\theta$, repectively. The *lp$ entry shows the log density. The columns indicate the computed values. The percentages indicate the credible intervals. For example, the 95% credible interval for $\mu$ is $[-1.27, 18.26]$. Since we are not very certain of the mean, the 95% credible intervals for $\theta_j$ are also quite wide. For example, for the first school, the 95% credible interval is $[-2.19, 32.33]$. 
+
+We can visualize the uncertainty in the estimates using the ```plot``` function:
+
+
+```{r}
+# specify the params to plot via pars
+plot(fit1, pars = "theta")
+```
+
+The black lines indicate the 95% intervals, while the red lines indicate the 80% intervals. The circles indicate the estimate of the mean. 
+
+### Prediction
+
+Since we are not only interested in learning about the data but about making predictions for new data points, we need to sample from the posterior predictive distribution. For this purpose, the ```posterior_predict``` function can be used. We simply need to specify a fitted Stan model and a data frame containing the new measurements. To perform *applied regression modeling*, we need to load the ```rstanarm``` package:
+
+```{r}
+library(rstanarm)
+newdata <- data.frame("y" = 50, "sigma" = 10)
+#pred <- posterior_predict(fit1, newdata)
+```
+
+### MCMC diagnostics
+
+There are also functions for diagnosing the MCMC procedure. By plotting the trace of the sampling procedure, we can identify whether anything has gone wrong during sampling. This could for example be the case if the chain stays in one place for too long or makes too many steps in one direction. We can plot the traces of the four chains used in our model with the  ```traceplot``` function:
+
+```{r}
 # diagnostics:
 traceplot(fit1, pars = c("mu", "tau"), inc_warmup = TRUE, nrow = 2)
-print(fit1, pars = c("mu", "tau"))
-# better: shinystan package
 ```
+
+Both traces look fine to me.
+
+We can also obtain the generated samples using the ```extract``` function:
 
 ```{r}
 # retrieve the samples
-la <- extract(fit1, permuted = TRUE)
-mu <- la$mu 
-# retrieve iterations, chains, and parameters
-a <- extract(fit1, permuted = FALSE) 
+samples <- extract(fit1, permuted = TRUE)
+mu <- samples$mu  # samples of mu only
+# retrieve matrix of iterations, chains, and parameters
+chain.data <- extract(fit1, permuted = FALSE) 
+print(chain.data[1,,]) # parameters of all chains for the 1st of 1000 iterations
 ```
+
+To do more advanced analytics of the sampling process, we can use the ```shinystan``` package, which provides a Shiny frontend. A fitted model can be analyzed in the following way:
+
+```{r, eval = FALSE, message = FALSE}
+library(shinystan)
+launch_shinystan(fit1)
+```
+
 SOURCES
 https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/
 https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 http://mc-stan.org/rstan/articles/rstan.html
+https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/
