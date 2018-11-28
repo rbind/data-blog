@@ -113,22 +113,22 @@ With that knowledge, we can define our model, which we will store in a file call
 
 ```
 data {
-  int<lower=0> n; # number of schools
-  real y[n]; # effect of coaching
-  real<lower=0> sigma[n]; # standard errors of effects
+  int<lower=0> n; //number of schools
+  real y[n]; // effect of coaching
+  real<lower=0> sigma[n]; // standard errors of effects
 }
 parameters {
-  real mu;  # the overall mean effect
-  real<lower=0> tau; # the standard deviation of the effect
-  vector[n] eta; # standardized school-level effects (see below)
+  real mu;  // the overall mean effect
+  real<lower=0> tau; // the inverse variance of the effect
+  vector[n] eta; // standardized school-level effects (see below)
 }
 transformed parameters {
   vector[n] theta; 
-  theta = mu + tau * eta; # find theta from mu, tau, and eta
+  theta = mu + tau * eta; // find theta from mu, tau, and eta
 }
 model {
-  target += normal_lpdf(eta | 0, 1); # prior for eta: standard normal
-  target += normal_lpdf(y | theta, sigma);  # likelihood for y follows normal with mean theta and sd sigma
+  target += normal_lpdf(eta | 0, 1); // eta follows standard normal
+  target += normal_lpdf(y | theta, sigma);  // y follows normal with mean theta and sd sigma
 }
 ```
 
@@ -201,12 +201,44 @@ The black lines indicate the 95% intervals, while the red lines indicate the 80%
 
 ### Prediction
 
-Since we are not only interested in learning about the data but about making predictions for new data points, we need to sample from the posterior predictive distribution. For this purpose, the ```posterior_predict``` function can be used. We simply need to specify a fitted Stan model and a data frame containing the new measurements. To perform *applied regression modeling*, we need to load the ```rstanarm``` package:
+Since we are not only interested in learning about the data but about making predictions for new data points, we need to sample from the posterior predictive distribution. 
+
+Fit and predict scheme:
+
+parameters {
+  real mu;  // the overall mean effect
+  real<lower=0> tau; // the inverse variance of the effect
+  vector[n] eta; // standardized school-level effects (see below)
+}
+transformed parameters {
+  vector[n] theta; 
+  theta = mu + tau * eta; // find theta from mu, tau, and eta
+}
+model {
+  target += normal_lpdf(eta | 0, 1); // eta follows standard normal
+  target += normal_lpdf(y | theta, sigma);  // y follows normal with mean theta and sd sigma
+}
+generated quantities {
+
+}
+```
+
 
 ```{r}
-library(rstanarm)
-newdata <- data.frame("y" = 50, "sigma" = 10)
-#pred <- posterior_predict(fit1, newdata)
+# generate posterior samples of the stan model coefficients
+param.sample <- as.data.frame(fit1)  
+# generate some artificial new data for prediction:
+# assume we have four more samples for the first school!
+newdata <- data.frame(y = c(50, 30, 10, 80),
+                    sigma = c(20, 10, 3, 25)) 
+# posterior predicted values for coaching effect on newdata
+predict.custom <- apply(param.sample, 1, function(x) x["mu"] + x["tau"] * x["eta[1]"])
+rnorm(1, param.sample[1, "theta[1]"], newdata$sigma[1])
+result.sample <- t(apply(param.sample, 1, function(x) 
+
+# summary
+result.summary <- apply(result.sample, 2, mean) 
+result.summary.std <- apply(result.sample, 2, sd) 
 ```
 
 ### MCMC diagnostics
