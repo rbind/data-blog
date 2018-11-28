@@ -2,24 +2,30 @@
 title: "Probabilistic Programming in R"
 author: Matthias Döring
 date: '2018-11-26'
-description: "TODO"
+description: "Bayesian modeling does not have to be tedious. Using probabilistic programming it is relatively easy to implement statistical models that make use of MCMC sampling. In this post, I explore probabilistic programming using Stan."
+thumbnail: "/post/machine-learning/probabilistic_programming_cover.png"
 categories:
   - machine-learning
-draft: true
+tags:
+    - Bayesian
 ---
-Probabilistic programming makes it easy to implement statistical models. It is particularly useful for Bayesian models. In this article, I investigate how [Stan](http://mc-stan.org/) can be used through its implementation in R, [RStan](http://mc-stan.org/rstan/).
+Probabilistic programming makes enables us to implement statistical models without having to worry about the technical details. It is particularly useful for Bayesian models that are based on MCMC sampling. In this article, I investigate how [Stan](http://mc-stan.org/) can be used through its implementation in R, [RStan](http://mc-stan.org/rstan/). This post is largely based on the [GitHub documentation of Rstan](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started) and [its vignette](http://mc-stan.org/rstan/articles/rstan.html). 
 
 ## Introduction to Stan
 
-Stan is a C++ library for Bayesian inference. It is based on the No-U-Turn sampler (NUTS), which is used for estimating the posterior distribution according to a user-specified model and data. Performing an analysis using Stan involves the following steps
+Stan is a C++ library for Bayesian inference. It is based on the No-U-Turn sampler (NUTS), which is used for estimating the posterior distribution according to a user-specified model and data. Performing an analysis using Stan involves the following steps:
 
-1. Specify the statistical model using the the Stan modeling language. This is typically done through an independent *.stan* file.
-2. Prepare the data that is fed to the model.
-3. Sample from the posterior distribution. The ```stan``` function automatically compiles the specified model and samples from the specified distributions.
+1. Specify the statistical model using the the Stan modeling language. This is typically done through a dedicated *.stan* file.
+2. Prepare the data that is to be fed to the model.
+3. Sample from the posterior distribution using the ```stan``` function.
 4. Analyze the results.
 
-We will showcase the use of Stan for a hierarchical Bayesian analysis for the eight schools example (Rubin, 1981 and Gelman, 2003). This data set measures the effect of coaching programs on college admission tests, the scholastic aptitude test (SAT), which is used in the US. The SAT was designed in such a way that it should be resistant to short-term efforts directly targeted at improving the score in the test. Rather, the test should reflect the knowledge that was acquired over a
-longer period of time. However, for most of the eight schools, the short-term coaching indeed increased the SAT scores as evidenced by positive values of $y_j$, where $y_j$ indicates the change in SAT scores. The data set looks as follows:
+In this article, I will showcase the use of Stan using two hierarchical models. I will use the first model to talk about the basic features of Stan and the second example to demonstrate a more advanced application. 
+
+### The eight schools data set
+
+The first data set we are going to use is the [eight schools data set](https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/) (Rubin, 1981 and Gelman, 2003). This data set measures the effect of coaching programs on college admission tests, the scholastic aptitude test (SAT), which is used in the US. The SAT was designed in such a way that it should be resistant to short-term efforts directly targeted at improving the score in the test. Rather, the test should reflect the knowledge that was acquired over a
+longer period of time. The data set looks as follows:
 
 |School 	| Estimated effect of coaching ($y_j$) | Standard error of effect ($\sigma_j$) |
 |-----------|-----------------|-------------------------|
@@ -32,38 +38,36 @@ F| 	1 |	11|
 G| 	18| 	10|
 H| 	12| 	18|
 
-We are interested in estimating the true effect size for each of the school. There are two alternative approaches that could be used. First, we could assume that all schools are independent of each other. However, this would lead to estimates that are hard to interpret because the 95% posterior intervals for the schools would largely overlap due to the high standard error. Second, one could pool the data from all schools, assuming that the true effect is the same in all schools. This,
-however, is also not reasonable because there are different teachers and students at each of the schools. 
+As we can see, the SAT did not fulfill its promise: for most of the eight schools, the short-term coaching indeed increased the SAT scores as evidenced by positive values of $y_j$, where $y_j$ indicates the change in SAT scores. 
+For this data set, we are interested in estimating the true effect size associated with each school. There are two alternative approaches that could be used. First, we could assume that all schools are independent of each other. However, this would lead to estimates that are hard to interpret because the 95% posterior intervals for the schools would largely overlap due to the high standard error. Second, one could pool the data from all schools, assuming that the true effect is the same in all schools. This, however, is also not reasonable because there should be school-specific effects (e.g. different teachers and students).
 
-Thus, another model is required. The hierarchical model has the advantage of combining information from all eight experiments without assuming that all the $\theta_j$ are equal.
-This example is interesting because this is a nontrivial Markov chain simulation problem because there is dependence between the effects of coaching and the variation of the effect in the population. 
-
-We will use the following model:
-
+Thus, another model is required. The hierarchical model has the advantage of combining information from all eight schools (*experiments*) without assuming that they have common true effects. We can specify a hierarchial Bayesian model in the following way:
 
 \[
 \begin{align}
-y_i &\sim \text{Normal}(\theta_j, \sigma_j)\,, j = 1, \ldots, 8 & \text{Prior for the data}\\
-\theta_j &\sim \text{Normal}(\mu, \tau)\,, j = 1, \ldots, 8 & \text{The true effect of the intervention} \\
+y_i &\sim \text{Normal}(\theta_j, \sigma_j)\,, j = 1, \ldots, 8 & \text{Prior distribution}\\
+\theta_j &\sim \text{Normal}(\mu, \tau)\,, j = 1, \ldots, 8 & \text{Posterior distribution} \\
 p(\mu, \tau) &\propto 1 & \text{Parameter distribution is uniform} 
 \end{align}
 \]
 
-According to the model, the effects of coaching follow a normal distribution whose mean is the true effect, $\theta_j$, and whose standard deviation is the observed deviation of $y_j$, $\sigma_j$, which is known from the data. The true effect, $\theta_j$, follows a normal distribution with parameters $\mu$ and $\tau$.
+According to the model, the effects of coaching follow a normal distribution whose mean is the true effect, $\theta_j$, and whose standard deviation is $\sigma_j$, which is known from the data. The true effect, $\theta_j$, follows a normal distribution with parameters $\mu$ and $\tau$.
 
-## Defining the Stan model file
+### Defining the Stan model file
 
-Before defining the Stan program for the model specified above, let us take a look at some statements in Stan. 
+Having specified the model we are going to use, we can now deliberate about how to specify this model in Stan. Before defining the Stan program for the model specified above, let us take a look at the structure of the Stan modeling language.
 
-### Variables
+#### Variables
 
-In Stan, the upper and lower bound of each variable can be denoted in the following way:
+In Stan, variables can be defined in the following way: 
 
 ```
 int<lower=0> n; # lower bound is 0
 int<upper=5> n; # upper bound is 5
 int<lower=0,upper=5> n; # n is in [0,5]
 ```
+
+Note that the upper and lower boundaries of the variables should be specified, if they are known a priori. 
 
 Multi-dimensional data can be specified via square brackets:
 
@@ -73,7 +77,7 @@ real[n] numbers;  // an array of floats with length n
 matrix[n,n] matrix; // an n times n matrix
 ```
 
-### Program blocks
+#### Program blocks
 
 
 The following program blocks are used in Stan:
@@ -85,13 +89,10 @@ The following program blocks are used in Stan:
 * *model* (required): for specifying the model itself
 * *generated quantities*: for postprocessing the results
 
-
-#### The model program block
-
-For the model program block, distributions can be specified in two equivalent ways. The first one, uses the statistical notation:
+For the *model* program block, distributions can be specified in two equivalent ways. The first one, uses the following statistical notation:
 
 ```
-y ~ normal(mu, sigma); # y follows a normal distribution 
+y ~ normal(mu, sigma); # y follows a normal distribution
 ```
 
 The second way uses a programmatic notation based on the log probability density function (lpdf):
@@ -100,16 +101,18 @@ The second way uses a programmatic notation based on the log probability density
 target += normal_lpdf(y | mu, sigma); # increment the normal log density
 ```
 
-When specifying models via Stan, the ```lookup``` function comes in handy: It provides a mapping from R functions to Stan functions. Consider the following example:
+Stan supports a large number of probability distributions. When specifying models via Stan, the ```lookup``` function comes in handy: It provides a mapping from R functions to Stan functions. Consider the following example:
 
 ```{r, message = FALSE}
 library(rstan) # load stan package
 lookup(rnorm)
 ```
 
-### The eight schools model
+Here, we see that the equivalent of ```rnorm``` in R is ```normal_rng``` in Stan.
 
-With that knowledge, we can define our model, which we will store in a file called ```schools.stan```:
+#### The eight schools model
+
+Now that we know the basics of the Stan modeling langeu, we can define our model, which we will store in a file called ```schools.stan```:
 
 ```
 data {
@@ -132,11 +135,11 @@ model {
 }
 ```
 
-Note that $\theta$ never appears in the parameters. This is because we do not explicitly model $\theta$ but instead model $\eta$, the standardized effect for individual schools. For example, we would expect $\eta_1$ to be large because $y_1$ is the maximum among all schools. We then construct $\theta$ in the *transformed parameters* section according to $\mu$, $\tau$, and $\eta$. This parameterization makes the sampler more efficient.
+Note that $\theta$ never appears in the parameters. This is because we do not explicitly model $\theta$ but instead model $\eta$, the standardized effect for individual schools. We then construct $\theta$ in the *transformed parameters* section according to $\mu$, $\tau$, and $\eta$. This parameterization makes the sampler more efficient.
 
-Note that the model is specified using vector notation since both $\theta$ and $\sigma$ indicate vectors. This allows for improved runtimes because it is not necessary to loop over every individual element of the vectors.
+Note that the model is specified using vector notation since both $\theta$ and $\sigma$ indicate vectors. This allows for improved runtimes because it is not necessary to loop over every individual element.
 
-## Preparing the data for modeling
+### Preparing the data for modeling
 
 Before we can fit the model, we need to encode the input data as a list whose parameters should correspond to the entries in the data section of the Stan model. For the schools data, the data are the following:
 
@@ -148,24 +151,24 @@ schools.data <- list(
 )
 ```
 
-## Sampling from the posterior distribution
+### Sampling from the posterior distribution
 
 We can sample from the posterior distribution using the ```stan``` function, which performs the following three steps:
 
-1. It translate the model specificiation to C++ code
-2. It compiles the C++ code to a shared object
-3. It samples from the posterior distribution according to the specified model, data, and settings
+1. It translate the model specification to C++ code.
+2. It compiles the C++ code to a shared object.
+3. It samples from the posterior distribution according to the specified model, data, and settings.
 
-If ```rstan_options(auto_write = TRUE)``` has been executed before compiling the model, subsequent calls of the same model will be much faster than the first call because the ```stan``` function then skips the first two steps (translating and compliling the model). Before calling the ```stan``` function, we specify the number of cores we would like to use and allow Stan to store compiled models:
+If ```rstan_options(auto_write = TRUE)``` has been executed in the active R session, subsequent calls of the same model will be much faster than the first call because the ```stan``` function then skips the first two steps (translating and compiling the model). Additionally, we will set the number of cores to be used:
 
 ```{r}
 options(mc.cores = parallel::detectCores()) # parallelize
 rstan_options(auto_write = TRUE)  # store compiled stan model
 ```
 
-Now, we can compile the model and sample from the posterior. The only two required parameters of ```stan``` are the location of the model file and the data to be fed to the model:
+Now, we can compile the model and sample from the posterior. The only two required parameters of ```stan``` are the location of the model file and the data to be fed to the model. The other parameters indicated here are just shown to provide an overview of the possible options:
 
-```{r}
+```{r, warning = FALSE}
 fit1 <- stan(
   file = "schools.stan",  # Stan program
   data = schools.data,    # named list of data
@@ -178,30 +181,41 @@ fit1 <- stan(
 
 
 
-## Model interpretation
+### Model interpretation
 
-### Basic model interpretation
+We will first do a basic interpretation of the model and then investigate the MCMC procedure.
 
-To retrieve the estimated parameters, we can simply use the ```print``` function.
+#### Basic model interpretation
+
+To perform inference using the fitted model, we can use the ```print``` function.
+
 ```{r}
 print(fit1) # optional parameters: pars, probs
 ```
 
-Here, the row names indicate the estimated parameters: mu is the mean of the posterior distribution and tau is its standard deviation. The entries for eta and theta indicate the estimates for the vectors $\eta$ and $\theta$, repectively. The *lp$ entry shows the log density. The columns indicate the computed values. The percentages indicate the credible intervals. For example, the 95% credible interval for $\mu$ is $[-1.27, 18.26]$. Since we are not very certain of the mean, the 95% credible intervals for $\theta_j$ are also quite wide. For example, for the first school, the 95% credible interval is $[-2.19, 32.33]$. 
+Here, the row names indicate the estimated parameters: mu is the mean of the posterior distribution and tau is its standard deviation. The entries for eta and theta indicate the estimates for the vectors $\eta$ and $\theta$, respectively. The *lp* entry shows the log density, which is typically not relevant. The columns indicate the computed values. The percentages indicate the credible intervals. For example, the 95% credible interval for the overall effect of coaching, $\mu$, is $[-1.27, 18.26]$. Since we are not very certain of the mean, the 95% credible intervals for $\theta_j$ are also quite wide. For example, for the first school, the 95% credible interval is $[-2.19, 32.33]$. 
 
 We can visualize the uncertainty in the estimates using the ```plot``` function:
 
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 # specify the params to plot via pars
 plot(fit1, pars = "theta")
 ```
 
 The black lines indicate the 95% intervals, while the red lines indicate the 80% intervals. The circles indicate the estimate of the mean. 
 
-### MCMC diagnostics
+We can obtain the generated samples using the ```extract``` function:
 
-There are also functions for diagnosing the MCMC procedure. By plotting the trace of the sampling procedure, we can identify whether anything has gone wrong during sampling. This could for example be the case if the chain stays in one place for too long or makes too many steps in one direction. We can plot the traces of the four chains used in our model with the  ```traceplot``` function:
+```{r}
+# retrieve the samples
+samples <- extract(fit1, permuted = TRUE) # 1000 samples per parameter
+mu <- samples$mu  # samples of mu only
+```
+
+#### MCMC diagnostics
+
+There are also functions for diagnosing the [MCMC procedure](https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/). By plotting the trace of the sampling procedure, we can identify whether anything has gone wrong during sampling. This could for example be the case if the chain stays in one place for too long or makes too many steps in one direction. We can plot the traces of the four chains used in our model with the  ```traceplot``` function:
 
 ```{r}
 # diagnostics:
@@ -210,18 +224,15 @@ traceplot(fit1, pars = c("mu", "tau"), inc_warmup = TRUE, nrow = 2)
 
 Both traces look fine to me.
 
-We can also obtain the generated samples using the ```extract``` function:
+To obtain the samples from individual Markov chains, we can use the ```extract``` function once again:
 
 ```{r}
-# retrieve the samples
-samples <- extract(fit1, permuted = TRUE)
-mu <- samples$mu  # samples of mu only
 # retrieve matrix of iterations, chains, and parameters
 chain.data <- extract(fit1, permuted = FALSE) 
 print(chain.data[1,,]) # parameters of all chains for the 1st of 1000 iterations
 ```
 
-To do more advanced analytics of the sampling process, we can use the ```shinystan``` package, which provides a Shiny frontend. A fitted model can be analyzed in the following way:
+To perform more advanced analytics of the sampling process, we can use the ```shinystan``` package, which provides a Shiny frontend. Using the package, a fitted model can be analyzed by starting the Shiny application in the following way:
 
 ```{r, eval = FALSE, message = FALSE}
 library(shinystan)
@@ -230,33 +241,174 @@ launch_shinystan(fit1)
 
 ## Hierarchical regression
 
-Now that we have a basic understanding of Stan, let's try our hands at hierarchical regression. In conventional regression, we model a relationship of the form
+Now that we have a basic understanding of Stan, we can dive into a more advanced application: Let's try our hands at hierarchical regression. In conventional regression, we model a relationship of the form
 
-\[Y = \beta_0 + X \beta\]
+\[Y = \beta_0 + X \beta\,.\]
 
-This representation assumes that all samples have the same distribution. This approach is ill-suited if there is a grouping of the samples because latent differences within and between groups are ignored. An alternative to a single regression model would be to have one regression model for each group. In this case, however, the small sample size would be problematic when estimating individual models. Hierarchical regression is a compromise between both extremes because it assumes that
-the groups are similar but still takes differences into account.
+This representation assumes that all samples have the same distribution. If there is a grouping of samples, then we have a problem because latent differences within and between groups will be ignored. 
 
-Assume that there are $K$ groups. Then, a hierarchical regression is specified as follows:
+An alternative would be to have one regression model for each group. In this case, however, the small sample size would be problematic when estimating the individual models. 
 
-\[Y_k = \beta_{0k} + X_k \beta^{(k)}\,, \forall k \in {1, \ldots, K\} \]
+Hierarchical regression is a compromise between both extremes. This model assumes that
+the groups are similar but yet exhibit differences.
 
-where $Y_k$ is the outcome for the $k$-th group, $\beta_{0k}$ is the intercept, $X_k$ are the features, and $\beta^{(k)}$ indicates the weights. The hierarchical model is different from a model where $Y_k$ is fit for each group individually because the parameters, $\beta_{0k}$ and $\beta^{(k)}$ are assumed to originate from a common distribution. 
+Assume that each sample belongs to one of $K$ groups. Then, hierarchical regression is specified as follows:
 
-A classic example for hiearchical regression is the rats data set. This longitudinal data set contains the weights of rats as mesaured for 5 weeks. Let us load the data:
+\[Y_k = \alpha_{k} + X_k \beta^{(k)}\,, \forall k \in \{1, \ldots, K\} \]
 
-```{r}
+where $Y_k$ is the outcome for the $k$-th group, $\alpha_{k}$ is the intercept, $X_k$ are the features, and $\beta^{(k)}$ indicates the weights. The hierarchical model is different from a model where $Y_k$ is fit for each group individually because the parameters, $\alpha_{k}$ and $\beta^{(k)}$ are assumed to originate from a common distribution. 
+
+### The rats data set
+
+A classic example for hierarchical regression is the rats data set. This longitudinal data set contains the weights of rats as measured for 5 weeks. Let us load the data:
+
+```{r, message = FALSE}
 library(RCurl)
 # load data as character
 f <- getURL('https://www.datascienceblog.net/data-sets/rats.txt')
 # read table from text connection
-df <- read.csv(textConnection(f), header=T)
+df <- read.delim(textConnection(f), header=T, sep = " ")
+print(head(df)) # each row corresponds to an individual rat
 ```
 
+Let us investigate the data:
 
-## References
+```{r, message = FALSE}
+library(reshape2)
+ddf <- cbind(melt(df), Group = rep(paste0("Rat", seq(1, nrow(df))), 5))
+library(ggplot2)
+ggplot(ddf, aes(x = variable, y = value, group = Group)) + geom_line() + geom_point()
+```
 
-https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/
-https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
-http://mc-stan.org/rstan/articles/rstan.html
-https://jeremykun.com/2015/04/06/markov-chain-monte-carlo-without-all-the-bullshit/
+The data show a linear growth trend that is quite similar for different rats. However, we also see that the rats have different initial weights, which require different intercepts, as well as different growth rates, which require different slopes. Thus, a hierarchical model seems appropriate. 
+
+### Specification of the hierarchical regression model
+
+The model can be specified as follows:
+
+\[
+\begin{align*}
+Y_{ij} &\sim \text{Normal} (\alpha_i + \beta_i (x_j - \bar{x}), \sigma_Y) \\ 
+\alpha_i &\sim \text{Normal}(\mu_{\alpha}, \sigma_{\alpha}) \\
+\beta_i &\sim \text{Normal}(\mu_{\beta}, \sigma_{\beta}) \\
+\end{align*}
+\]
+
+where the intercept for the $i$-th rat is indicated by $\alpha_i$ and the slope by $\beta_i$. Note that the measurement times are centered around $\bar{x} = 22$ is the median measurement (day 22) of the time-series data. 
+
+We can now specify the model and store it in a file called ```rats.stan```:
+
+```
+data {
+    int<lower=0> N; // the number of rats
+    int<lower=0> T; // the number of time points
+    real x[T]; // day at which measurement was taken
+    real y[N,T]; // matrix of weight times time
+    real xbar; // the median number of days in the time series
+}
+parameters {
+  real alpha[N]; // the intercepts of rat weights
+  real beta[N]; // the slopes of rat weights
+
+  real mu_alpha; // the mean intercept
+  real mu_beta; // the mean slope
+
+  real<lower=0> sigmasq_y;
+  real<lower=0> sigmasq_alpha;
+  real<lower=0> sigmasq_beta;
+}
+transformed parameters {
+  real<lower=0> sigma_y; // sd of rat weight
+  real<lower=0> sigma_alpha; // sd of intercept distribution
+  real<lower=0> sigma_beta; // sd of slope distribution
+
+  sigma_y <- sqrt(sigmasq_y);
+  sigma_alpha <- sqrt(sigmasq_alpha);
+  sigma_beta <- sqrt(sigmasq_beta);
+}
+model {
+  mu_alpha ~ normal(0, 100); // non-informative prior
+  mu_beta ~ normal(0, 100); // non-informative prior
+  sigmasq_y ~ inv_gamma(0.001, 0.001); // conjugate prior of normal
+  sigmasq_alpha ~ inv_gamma(0.001, 0.001); // conjugate prior of normal
+  sigmasq_beta ~ inv_gamma(0.001, 0.001); // conjugate prior of normal
+  alpha ~ normal(mu_alpha, sigma_alpha); // all intercepts are normal 
+  beta ~ normal(mu_beta, sigma_beta);  // all slopes are normal
+  for (n in 1:N) // for each sample
+    for (t in 1:T)  // for each time point
+      y[n,t] ~ normal(alpha[n] + beta[n] * (x[t] - xbar), sigma_y);
+
+}
+generated quantities {
+  // determine the intercept at time 0 (birth weight)
+  real alpha0;
+  alpha0 <- mu_alpha - xbar * mu_beta;
+}
+
+```
+
+Note that the model code estimates the variance (the *sigmasq* variables) rather than the standard deviations. Additionally, the *generated quantities* block explicitly calculates $\alpha_0$, the intercept at time 0, that is, the weight of the rats at birth. We could have also calculated any other quantity in the *generated quantities* block, for example, the estimated weight of the rats at different points in time. We will do this in R later. 
+
+### Data preparation
+
+To prepare the data for the model, we first extract the measurement points as numeric values and then encode everything in a list structure:
+
+```{r}
+days <- as.numeric(regmatches(colnames(df), regexpr("[0-9]*$", colnames(df))))
+rat.data <- list(N = nrow(df), T = ncol(df), x = days,
+                 y = df, xbar = median(days)) 
+```
+
+### Fitting the regression model
+
+We can now fit the Bayesian hierarchical regression model for the rat weight data set:
+
+```{r}
+rat.model <- stan(
+  file = "rats.stan",
+  data = rat.data)
+# model contains estimates for intercepts (alpha) and slopes (beta)
+```
+
+### Prediction with the hiearchical regression model
+
+Having determined $\alpha$ and $\beta$ for each rat, we can now estimate the weight of individual rats at arbitrary points in time. Here, we are interested in finding the weight of the rats from day 0 to day 100. 
+
+```{r}
+predict.rat.weight <- function(rat.model, newdays) {
+    # newdays: vector of time points to consider
+    rat.fit <- extract(rat.model)
+    alpha <- rat.fit$alpha
+    beta <- rat.fit$beta
+    xbar <- 22 # hardcoded since not stored in rat.model
+    y <- lapply(newdays, function(t) alpha + beta * (t - 22))
+    return(y)
+}
+newdays <- seq(0, 100)
+pred.weights <- predict.rat.weight(rat.model, newdays)
+# extract means and standard deviations from posterior samples
+pred.means <- lapply(pred.weights, function(x) apply(x, 2, mean))
+pred.sd <- lapply(pred.weights, function(x) apply(x, 2, sd)) 
+# create plotting data frame with 95% CI interval from sd
+pred.df <- data.frame(Weight = unlist(pred.means), 
+              Upr_Weight = unlist(pred.means) + 1.96 * unlist(pred.sd), 
+              Lwr_Weight = unlist(pred.means) - 1.96 * unlist(pred.sd), 
+              Day = unlist(lapply(newdays, function(x) rep(x, 30))),
+              Rat = rep(seq(1,30), length(newdays)))
+# predicted mean weight of all rats
+ggplot(pred.df, aes(x = Day, y = Weight, group = Rat)) +
+    geom_line()
+# predictions for selected rats
+sel.rats <- c(9, 8, 29)
+ggplot(pred.df[pred.df$Rat %in% sel.rats, ], 
+       aes(x = Day, y = Weight, group = Rat, 
+           ymin = Lwr_Weight, ymax = Upr_Weight)) +   
+    geom_line()  +
+    geom_errorbar(width=0.2, size=0.5, color="blue")
+```
+
+In contrast to the original data, the estimates from the model are smooth because each curve follows a linear model. Investigating the confidence intervals shown in the last plot, we can see that the variance estimates are reasonable. We are confident about the rat weights at the time of sampling (days 8 to 36) but the uncertainty increases the further we move away from the sampled region.
+
+## Where to go from here?
+
+I am really impressed that Bayesian approaches have become so accessible through probabilistic programming. There are [dozens of Stan usage examples available at GitHub](https://github.com/stan-dev/example-models). If you would like to learn more about Bayesian models, I would [recommend the book *Bayesian Data Analysis* from Andrew Galeman](http://www.stat.columbia.edu/~gelman/book/).
