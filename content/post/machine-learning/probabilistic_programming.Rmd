@@ -411,4 +411,4 @@ In contrast to the original data, the estimates from the model are smooth becaus
 
 ## Where to go from here?
 
-I am really impressed that Bayesian approaches have become so accessible through probabilistic programming. There are [dozens of Stan usage examples available at GitHub](https://github.com/stan-dev/example-models). If you would like to learn more about Bayesian models, I would [recommend the book *Bayesian Data Analysis* from Andrew Galeman](http://www.stat.columbia.edu/~gelman/book/).
+I am really impressed that Bayesian approaches have become so accessible through probabilistic programming. There are [dozens of Stan usage examples available at GitHub](https://github.com/stan-dev/example-models). If you would like to learn more about Bayesian models, I would [recommend the book *Bayesian Data Analysis* from Andrew Gelman](http://www.stat.columbia.edu/~gelman/book/).
