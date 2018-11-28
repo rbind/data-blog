@@ -4,7 +4,6 @@ author: Matthias Döring
 date: '2018-11-26'
 description: "Bayesian modeling does not have to be tedious. Using probabilistic programming it is relatively easy to implement statistical models that make use of MCMC sampling. In this post, I explore probabilistic programming using Stan."
 thumbnail: "/post/machine-learning/probabilistic_programming_cover.png"
-slug: "probabilistic-programming-with-stan-and-r"
 categories:
   - machine-learning
 tags:
