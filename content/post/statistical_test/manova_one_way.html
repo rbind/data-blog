@@ -8,15 +8,15 @@ categories:
   - statistical test
 tags:
   - parametric test
+  - R
 ---
 
 
 
-<p>Analysis of variance (ANOVA) can be used to compare a single dependent variable across several groups. If there is more than one dependent variable, multivariate ANOVA (MANOVA) should be used. MANOVA determines whether there is a significant difference in the multivariate sample means.
-<!--more--></p>
+<p>Analysis of variance (ANOVA) can be used to compare a single dependent variable across several groups. If there is more than one dependent variable, multivariate ANOVA (MANOVA) should be used. MANOVA determines whether there is a significant difference in the multivariate sample means. <!--more--></p>
 <div id="why-use-manova" class="section level2">
 <h2>Why use MANOVA?</h2>
-<p>Since MANOVA is an extension of ANOVA you may argue that you could also use multiple ANOVA tests instead. However, in the same way that it is better to use ANOVA rather than multiple t-tests, it is better to use MANOVA over multiple ANOVA tests for the following reason. If you are conducting a series of <span class="math inline">\(k\)</span> tests at a significance level <span class="math inline">\(\alpha = 0.05\)</span>, then the type 1 error rate can be as high as <span class="math inline">\(1 - (1 - .05)^k\)</span> due to multiple testing.</p>
+<p>Since MANOVA is an extension of ANOVA you may argue that you could also use multiple ANOVA tests instead. However, in the same way that it is better to use ANOVA rather than multiple t-tests, it is better to use MANOVA over multiple ANOVA tests for the following reason. If you are conducting a series of <span class="math">\(k\)</span> tests at a significance level <span class="math">\(\alpha = 0.05\)</span>, then the type 1 error rate can be as high as <span class="math">\(1 - (1 - .05)^k\)</span> due to multiple testing.</p>
 <p>Only once the MANOVA test has returned a significant result should ANOVA be used to identify for which dependent variables there is an effect.</p>
 </div>
 <div id="the-iris-data-set" class="section level2">
@@ -24,16 +24,16 @@ tags:
 <p>The <em>iris</em> data set has the following structure:</p>
 <pre class="r"><code>print(iris[sample(seq_len(nrow(iris)), 10), ])</code></pre>
 <pre><code>##     Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
-## 26           5.0         3.0          1.6         0.2     setosa
-## 86           6.0         3.4          4.5         1.6 versicolor
-## 63           6.0         2.2          4.0         1.0 versicolor
-## 41           5.0         3.5          1.3         0.3     setosa
-## 135          6.1         2.6          5.6         1.4  virginica
-## 7            4.6         3.4          1.4         0.3     setosa
-## 104          6.3         2.9          5.6         1.8  virginica
+## 92           6.1         3.0          4.6         1.4 versicolor
+## 37           5.5         3.5          1.3         0.2     setosa
+## 124          6.3         2.7          4.9         1.8  virginica
+## 27           5.0         3.4          1.6         0.4     setosa
+## 66           6.7         3.1          4.4         1.4 versicolor
 ## 126          7.2         3.2          6.0         1.8  virginica
-## 143          5.8         2.7          5.1         1.9  virginica
-## 48           4.6         3.2          1.4         0.2     setosa</code></pre>
+## 125          6.7         3.3          5.7         2.1  virginica
+## 148          6.5         3.0          5.2         2.0  virginica
+## 76           6.6         3.0          4.4         1.4 versicolor
+## 70           5.6         2.5          3.9         1.1 versicolor</code></pre>
 <p><em>Species</em> is the independent nominal variabe indicating three <a href="https://en.wikipedia.org/wiki/Iris_(plant)">iris</a> species. There are four dependent, quantitative variables measuring properties of <a href="https://en.wikipedia.org/wiki/Sepal">sepals</a> and petals:</p>
 <ul>
 <li><em>Sepal.length</em>: the sepal length</li>
@@ -59,4 +59,6 @@ print(summary(m))</code></pre>
 
 To investigate the significance for individual dependent variables, we can use the `summary.aov` function. 
 manova is a type of glm-->
+
+
 </div>

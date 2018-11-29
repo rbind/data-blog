@@ -9,6 +9,7 @@ tags:
     - unsupervised learning
     - supervised learning
     - analysis
+    - R
 thumbnail: "/post/machine-learning/whiskey-twilight-zone.png"
 
 ---
@@ -41,8 +42,7 @@ feat.df &lt;- df[, c(&quot;Distillery&quot;, features)]</code></pre>
 <div id="assumptions-about-the-results" class="section level2">
 <h2>Assumptions about the results</h2>
 <p>Before we begin reducing the dimensionality of the data, we should think about the data. We would expect that whiskeys with similar taste profiles are close to each other in the reduced space.</p>
-<p>Since whiskeys from distilleries that are in proximity to another use similar distilling techniques and resources, their whiskeys also share similarities.<br />
-To validate this assumption, we are going to test whether the mean expression of whiskey characteristics differ between distilleries from different regions. For this, we will run a MANOVA test:</p>
+<p>Since whiskeys from distilleries that are in proximity to another use similar distilling techniques and resources, their whiskeys also share similarities.<br />To validate this assumption, we are going to test whether the mean expression of whiskey characteristics differ between distilleries from different regions. For this, we will run a MANOVA test:</p>
 <pre class="r"><code>m &lt;- manova(as.matrix(df[, features]) ~ Region, df)
 summary(m)</code></pre>
 <pre><code>##           Df Pillai approx F num Df den Df    Pr(&gt;F)    
@@ -56,8 +56,7 @@ summary(m)</code></pre>
 <h2>Geographical locations of the distilleries</h2>
 <p>Since regionality plays an important role for whiskeys, we will explore where the distilleries in the data set are located by plotting their latitude and longitude. The following Scotch whiskey regions exist:</p>
 <div class="figure">
-<img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Scotch_regions.svg" alt="Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from https://commons.wikimedia.org/wiki/File:Scotch_regions.svg)" />
-<p class="caption">Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from <a href="https://commons.wikimedia.org/wiki/File:Scotch_regions.svg" class="uri">https://commons.wikimedia.org/wiki/File:Scotch_regions.svg</a>)</p>
+<img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Scotch_regions.svg" alt="Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from https://commons.wikimedia.org/wiki/File:Scotch_regions.svg)" /><p class="caption">Scotch regions (Licensed under CC BY-SA 3.0 and retrieved from <a href="https://commons.wikimedia.org/wiki/File:Scotch_regions.svg">https://commons.wikimedia.org/wiki/File:Scotch_regions.svg</a>)</p>
 </div>
 <p>Fortunately, we have already mapped <code>Latitude</code> and <code>Longitude</code> <a href="/post/other/whiskey-data-annotation/">from UTM coordinates to degrees before</a>. Therefore, we can now directly plot the locations of the distilleries using the <code>lat</code> and <code>long</code> variables:</p>
 <pre class="r"><code>library(ggplot2) # for map_data and ggplot functions
@@ -81,15 +80,15 @@ p</code></pre>
 </div>
 <div id="pca" class="section level2">
 <h2>PCA</h2>
-<p>PCA computes a rotation matrix <span class="math inline">\(W \in \mathbb{R}^{p \times p}\)</span> from the matrix of features <span class="math inline">\(X \in \mathbb{R}^{N \times p}\)</span>. <span class="math inline">\(W\)</span> can be understood as a mapping function that transforms the observations in <span class="math inline">\(X\)</span> to a rotated space. The coordinates of observations in <span class="math inline">\(X\)</span> are transformed to their new form, <span class="math inline">\(Z\)</span>, via</p>
-<p><span class="math display">\[Z = XW\,.\]</span></p>
-<p>The rotation matrix <span class="math inline">\(W\)</span> is constructed through orthogonal linear transformations. Each of these transformations is performed in order to maximize the variance in the data that has not been explained yet. This procedure leads to a new coordinate system in terms of <em>principal components</em>.</p>
+<p>PCA computes a rotation matrix <span class="math">\(W \in \mathbb{R}^{p \times p}\)</span> from the matrix of features <span class="math">\(X \in \mathbb{R}^{N \times p}\)</span>. <span class="math">\(W\)</span> can be understood as a mapping function that transforms the observations in <span class="math">\(X\)</span> to a rotated space. The coordinates of observations in <span class="math">\(X\)</span> are transformed to their new form, <span class="math">\(Z\)</span>, via</p>
+<p><span class="math">\[Z = XW\,.\]</span></p>
+<p>The rotation matrix <span class="math">\(W\)</span> is constructed through orthogonal linear transformations. Each of these transformations is performed in order to maximize the variance in the data that has not been explained yet. This procedure leads to a new coordinate system in terms of <em>principal components</em>.</p>
 <p>One of the reasons why PCA is so popular is that it is a very interpretable method. Each principal component (PC) is well-defined as we know that it is orthogonal to the other dimensions. Moreover, we can obtain the variance that is explained by each PC in order to select an appropriate number of dimensions.</p>
 <div id="visualizing-the-whiskey-data-set-using-pca" class="section level3">
 <h3>Visualizing the whiskey data set using PCA</h3>
-<p>PCA is normally performed using the <code>prcomp</code> function. Here, we use <code>autoplot</code> instead because we are primarily interested in the visualization. In addition to PCA, we call the <code>pam</code> function, which performs partitioning around medoids, which is a more robust version of <span class="math inline">\(k\)</span>-means. In the first plot we create, we will draw the loadings of PCA, which are defined as</p>
-<p><span class="math display">\[ L = v \sqrt{\lambda}\]</span></p>
-<p>where <span class="math inline">\(L\)</span> are the loadings, <span class="math inline">\(v\)</span> are the eigenvectors, and <span class="math inline">\(\lambda\)</span> are the eigenvalues. The loadings indicate the directions of variance from the original features:</p>
+<p>PCA is normally performed using the <code>prcomp</code> function. Here, we use <code>autoplot</code> instead because we are primarily interested in the visualization. In addition to PCA, we call the <code>pam</code> function, which performs partitioning around medoids, which is a more robust version of <span class="math">\(k\)</span>-means. In the first plot we create, we will draw the loadings of PCA, which are defined as</p>
+<p><span class="math">\[ L = v \sqrt{\lambda}\]</span></p>
+<p>where <span class="math">\(L\)</span> are the loadings, <span class="math">\(v\)</span> are the eigenvectors, and <span class="math">\(\lambda\)</span> are the eigenvalues. The loadings indicate the directions of variance from the original features:</p>
 <pre class="r"><code>library(ggfortify) # for autplot support for the clustering
 library(cluster) # for pam
 data &lt;- df[,features]
@@ -139,13 +138,13 @@ print(cluster.df)</code></pre>
 <h2>Kernel PCA</h2>
 <p>Kernel PCA (KPCA) is an extension of PCA that makes use of kernel functions, which are well known from support vector machines. By mapping the data into a reproducing kernel Hilbert space, it is possible to separate data even if they are not linearly separable.</p>
 <p>In KPCA, observations are transformed to a kernel matrix via</p>
-<p><span class="math display">\[K = k(x,y) = \phi(x)^T \phi(y)\]</span></p>
-<p>where <span class="math inline">\(k(x,y)\)</span> is the kernel function for observations <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>. The function <span class="math inline">\(\phi\)</span> maps the observations into reproducing kernel Hilbert space. This function does not need to be explicitly computed due to the <em>kernel trick</em>, according to which only the kernel function needs to be computed.</p>
+<p><span class="math">\[K = k(x,y) = \phi(x)^T \phi(y)\]</span></p>
+<p>where <span class="math">\(k(x,y)\)</span> is the kernel function for observations <span class="math">\(x\)</span> and <span class="math">\(y\)</span>. The function <span class="math">\(\phi\)</span> maps the observations into reproducing kernel Hilbert space. This function does not need to be explicitly computed due to the <em>kernel trick</em>, according to which only the kernel function needs to be computed.</p>
 <div id="using-kpca-in-r" class="section level3">
 <h3>Using KPCA in R</h3>
 <p>To perform KPCA, we use the <code>kpca</code> function from the <code>kernlab</code> package. By default, <code>kpca</code> uses a radial basis function (RBF) as a kernel when a matrix is provided although other kernel functions are available as well. The RBF kernel that is used by kernlab is defined as</p>
-<p><span class="math display">\[K (x, y) = \exp \left(-\sigma -||x − y||^2 \right)\]</span></p>
-<p>where <span class="math inline">\(\sigma\)</span> is the inverse kernel width. Using this kernel, the dimensionality reduction can be done as follows:</p>
+<p><span class="math">\[K (x, y) = \exp \left(-\sigma -||x − y||^2 \right)\]</span></p>
+<p>where <span class="math">\(\sigma\)</span> is the inverse kernel width. Using this kernel, the dimensionality reduction can be done as follows:</p>
 <pre class="r"><code>library(kernlab) # for kpca function
 # use the default of sigma = 0.1 because it works well
 pca.k &lt;- kpca(as.matrix(data), kpar = list(sigma = 0.1))
@@ -168,20 +167,18 @@ ggplot(kpca.df, aes(label = Label, x = PC1, y = PC2, color = Region)) +
 </div>
 <div id="t-sne" class="section level2">
 <h2>t-SNE</h2>
-<p>t-SNE was introduced in 2008. Since then it has established itself as a very popular method for visualizing data.
-t-SNE performs two algorithmic steps. First, a probability distribution <span class="math inline">\(P\)</span> over pairs of samples is constructed. This distribution assigns high probabilities of selection to similar pairs and low probabilities to dissimilar pairs.</p>
-<p>The <span class="math inline">\(P\)</span> distribution is constructed in the following way. Given two feature vectors <span class="math inline">\(x_i\)</span> and <span class="math inline">\(x_j\)</span>, the probability of <span class="math inline">\(x_j\)</span> given <span class="math inline">\(x_i\)</span> is defined by</p>
-<p><span class="math display">\[p_{j\mid i}={\frac {\exp(-\lVert \mathbf {x} _{i}-\mathbf {x} _{j}\rVert ^{2}/2\sigma _{i}^{2})}{\sum _{k\neq i}\exp(-\lVert \mathbf {x} _{i}-\mathbf {x} _{k}\rVert ^{2}/2\sigma _{i}^{2})}}\]</span></p>
-<p>such that the probability of selecting the pair <span class="math inline">\(x_i\)</span>, <span class="math inline">\(x_j\)</span> is</p>
-<p><span class="math display">\[p_{ij}={\frac{p_{j\mid i} + p_{i\mid j}}{2N}}\,.\]</span></p>
-<p>The probabilities for <span class="math inline">\(i = j\)</span> are set to <span class="math inline">\(p_{ij} = 0\)</span>.</p>
-<p>The bandwidth of the Gaussian kernel <span class="math inline">\(\sigma\)</span> is set such that the perplexity of the conditional distribution assumes a predefined value.
-Here, <em>perplexity</em> indicates how well a probability distribution predicts a sample. You can think of perplexity as a measure of surprise. If a model is not appropriate for a test sample, it will be perplexed (it does not fit the sample), while a model that fits well will have low perplexity. To reach the target perplexity, the bandwidth <span class="math inline">\(\sigma_i\)</span> is adjusted to the density of the data.</p>
-<p>To construct a <span class="math inline">\(d\)</span>-dimensional map <span class="math inline">\(y_i, \ldots, y_N\)</span> where <span class="math inline">\(y_i \in \mathbb{R}^d\)</span>, the second phase of the algorithm defines the second distribution <span class="math inline">\(Q\)</span> through similarities <span class="math inline">\(q_{ij}\)</span> between two points <span class="math inline">\(y_i\)</span>, <span class="math inline">\(y_j\)</span> in the map:</p>
-<p><span class="math display">\[q_{ij}={\frac {(1+\lVert \mathbf {y} _{i}-\mathbf {y} _{j}\rVert ^{2})^{-1}}{\sum _{k\neq l}(1+\lVert \mathbf {y} _{k}-\mathbf {y} _{l}\rVert ^{2})^{-1}}}\,.\]</span></p>
-<p>The <span class="math inline">\(q_{ij}\)</span> follow Student’s t-distribution. Again, <span class="math inline">\(q_{ij} = 0\)</span> for <span class="math inline">\(i = j\)</span>.</p>
-<p>To determine the <span class="math inline">\(y_i\)</span>, the Kullback Leibler divergence between the distributions <span class="math inline">\(Q\)</span> (<span class="math inline">\(y\)</span> similarities) and <span class="math inline">\(P\)</span> (<span class="math inline">\(x\)</span> similarities) is minimized:</p>
-<p><span class="math display">\[KL(P||Q)=\sum _{i\neq j}p_{ij}\log {\frac {p_{ij}}{q_{ij}}}\]</span></p>
+<p>t-SNE was introduced in 2008. Since then it has established itself as a very popular method for visualizing data. t-SNE performs two algorithmic steps. First, a probability distribution <span class="math">\(P\)</span> over pairs of samples is constructed. This distribution assigns high probabilities of selection to similar pairs and low probabilities to dissimilar pairs.</p>
+<p>The <span class="math">\(P\)</span> distribution is constructed in the following way. Given two feature vectors <span class="math">\(x_i\)</span> and <span class="math">\(x_j\)</span>, the probability of <span class="math">\(x_j\)</span> given <span class="math">\(x_i\)</span> is defined by</p>
+<p><span class="math">\[p_{j\mid i}={\frac {\exp(-\lVert \mathbf {x} _{i}-\mathbf {x} _{j}\rVert ^{2}/2\sigma _{i}^{2})}{\sum _{k\neq i}\exp(-\lVert \mathbf {x} _{i}-\mathbf {x} _{k}\rVert ^{2}/2\sigma _{i}^{2})}}\]</span></p>
+<p>such that the probability of selecting the pair <span class="math">\(x_i\)</span>, <span class="math">\(x_j\)</span> is</p>
+<p><span class="math">\[p_{ij}={\frac{p_{j\mid i} + p_{i\mid j}}{2N}}\,.\]</span></p>
+<p>The probabilities for <span class="math">\(i = j\)</span> are set to <span class="math">\(p_{ij} = 0\)</span>.</p>
+<p>The bandwidth of the Gaussian kernel <span class="math">\(\sigma\)</span> is set such that the perplexity of the conditional distribution assumes a predefined value. Here, <em>perplexity</em> indicates how well a probability distribution predicts a sample. You can think of perplexity as a measure of surprise. If a model is not appropriate for a test sample, it will be perplexed (it does not fit the sample), while a model that fits well will have low perplexity. To reach the target perplexity, the bandwidth <span class="math">\(\sigma_i\)</span> is adjusted to the density of the data.</p>
+<p>To construct a <span class="math">\(d\)</span>-dimensional map <span class="math">\(y_i, \ldots, y_N\)</span> where <span class="math">\(y_i \in \mathbb{R}^d\)</span>, the second phase of the algorithm defines the second distribution <span class="math">\(Q\)</span> through similarities <span class="math">\(q_{ij}\)</span> between two points <span class="math">\(y_i\)</span>, <span class="math">\(y_j\)</span> in the map:</p>
+<p><span class="math">\[q_{ij}={\frac {(1+\lVert \mathbf {y} _{i}-\mathbf {y} _{j}\rVert ^{2})^{-1}}{\sum _{k\neq l}(1+\lVert \mathbf {y} _{k}-\mathbf {y} _{l}\rVert ^{2})^{-1}}}\,.\]</span></p>
+<p>The <span class="math">\(q_{ij}\)</span> follow Student’s t-distribution. Again, <span class="math">\(q_{ij} = 0\)</span> for <span class="math">\(i = j\)</span>.</p>
+<p>To determine the <span class="math">\(y_i\)</span>, the Kullback Leibler divergence between the distributions <span class="math">\(Q\)</span> (<span class="math">\(y\)</span> similarities) and <span class="math">\(P\)</span> (<span class="math">\(x\)</span> similarities) is minimized:</p>
+<p><span class="math">\[KL(P||Q)=\sum _{i\neq j}p_{ij}\log {\frac {p_{ij}}{q_{ij}}}\]</span></p>
 <div id="selecting-a-perplexity" class="section level3">
 <h3>Selecting a perplexity</h3>
 <p>In t-SNE, perplexity balances local and global aspects of the data. It can be interpreted as the number of close neighbors associated with each point. The suggested range for perplexity is 5 to 50. Since t-SNE is probabilistic and also has the perplexity parameter, it is a very flexible method. However, <a href="https://distill.pub/2016/misread-tsne/">this may make one a bit suspicious about the results</a>. Note that t-SNE is not suitable for settings such as supervised learning because the resulting dimensions lack interpretability.</p>
@@ -214,10 +211,10 @@ ggplot(t.df, aes(x = V1, y = V2, color = Cluster, label = Distillery)) +
 <li>Perform PCA on the test data set and train the model on the transformed data.</li>
 <li>Apply the learned PCA transformation from the training data on the test data set and evaluate the performance of the model on the transformed data.</li>
 </ol>
-<p>To exemplify the workflow, let us <strong>predict the region that a whiskey originates from given its taste profile</strong>. For this purpose, we will use the <span class="math inline">\(k\)</span>-nearest neighbor model because the few features we have (p = 12) will be further reduced by PCA. Moreover, the feature space is small because all variables are in <span class="math inline">\([0,4]\)</span>. Since we have to optimize <span class="math inline">\(k\)</span>, we also set aside a validation set for determining this parameter.</p>
+<p>To exemplify the workflow, let us <strong>predict the region that a whiskey originates from given its taste profile</strong>. For this purpose, we will use the <span class="math">\(k\)</span>-nearest neighbor model because the few features we have (p = 12) will be further reduced by PCA. Moreover, the feature space is small because all variables are in <span class="math">\([0,4]\)</span>. Since we have to optimize <span class="math">\(k\)</span>, we also set aside a validation set for determining this parameter.</p>
 <div id="obtaining-the-pca-transformation" class="section level3">
 <h3>Obtaining the PCA transformation</h3>
-<p>First, we write some functions for validating the performance of the prediction. We will simply use the accuracy here, although another performance measure may be more appropriate because it is likely that the regions for which few samples are available are confused more often. Moreover, we assign 50% of the observations to the training set, 25% to the validation set (for tuning <span class="math inline">\(k\)</span>), and 25% to the testing set (for reporting the performance).</p>
+<p>First, we write some functions for validating the performance of the prediction. We will simply use the accuracy here, although another performance measure may be more appropriate because it is likely that the regions for which few samples are available are confused more often. Moreover, we assign 50% of the observations to the training set, 25% to the validation set (for tuning <span class="math">\(k\)</span>), and 25% to the testing set (for reporting the performance).</p>
 <pre class="r"><code># split data into 3 parts: training, validation, and testing
 get.accuracy &lt;- function(preds, labels) {
     correct.idx &lt;- which(preds == labels)
@@ -269,7 +266,7 @@ print(t(var.df))</code></pre>
 df.train.p &lt;- predict(pca, newdata = df.train)[, 1:n.dims]
 df.val.p &lt;- predict(pca, newdata = df.val)[, 1:n.dims]
 df.test.p &lt;- predict(pca, newdata = df.test)[, 1:n.dims]</code></pre>
-<p>Now that we have transformed the training, validation, and test sets into PCA space, we can use <span class="math inline">\(k\)</span>-nearest neighbors. Note that this prediction scenario is challenging because some regions such as Islands and Lowlands are underrepresented. If we would select <span class="math inline">\(k\)</span> with a very large value (e.g. k = 30), then most samples would be assigned to the overrepresented regions. Since we are using accuracy as a performance measure, such a classifier may actually perform well. Thus, we conservatively limit the range of <span class="math inline">\(k\)</span> in order to avoid choosing such a model.</p>
+<p>Now that we have transformed the training, validation, and test sets into PCA space, we can use <span class="math">\(k\)</span>-nearest neighbors. Note that this prediction scenario is challenging because some regions such as Islands and Lowlands are underrepresented. If we would select <span class="math">\(k\)</span> with a very large value (e.g. k = 30), then most samples would be assigned to the overrepresented regions. Since we are using accuracy as a performance measure, such a classifier may actually perform well. Thus, we conservatively limit the range of <span class="math">\(k\)</span> in order to avoid choosing such a model.</p>
 <pre class="r"><code># train k-nearest neighbor models to find ideal value of k
 library(class) # for knn classifier
 K &lt;- 3:10 # conservative number of nearest neighbors to consider 
@@ -292,7 +289,7 @@ accuracy.knn &lt;- get.accuracy(test.preds, df[samp.test, &quot;Region&quot;])
 print(paste0(&quot;KNN accuracy for k = &quot;, k.sel, &quot; is: &quot;,
              round(accuracy.knn, 3)))</code></pre>
 <pre><code>## [1] &quot;KNN accuracy for k = 7 is: 0.524&quot;</code></pre>
-<p>So, using <span class="math inline">\(k\)</span>-nearest neighbors, PCA does indeed seem to boost the prediction accuracy for this data set although there are few features to begin with. However, there are some low-variance features in the data set (e.g. <code>Tobacco</code> or <code>Malty</code>):</p>
+<p>So, using <span class="math">\(k\)</span>-nearest neighbors, PCA does indeed seem to boost the prediction accuracy for this data set although there are few features to begin with. However, there are some low-variance features in the data set (e.g. <code>Tobacco</code> or <code>Malty</code>):</p>
 <pre class="r"><code># variances of whiskeys characteristics
 print(diag(var(data)))</code></pre>
 <pre><code>##      Body Sweetness     Smoky Medicinal   Tobacco     Honey     Spicy 
@@ -326,7 +323,7 @@ print(paste0(&quot;PCA+KNN accuracy for k = &quot;, k.sel.pca, &quot; is: &quot;
 </div>
 <div id="kpca-for-supervised-learning" class="section level3">
 <h3>KPCA for supervised learning</h3>
-<p>Applying KPCA for prediction is not as straight-forward as applying PCA. In PCA, the eigenvectors are computed in the input space but in KPCA, the eigenvectors come from kernel Hilbert space. Thus, it is not simply possible to transform new data points when we do not know the explicit mapping function <span class="math inline">\(\phi\)</span> that is used.</p>
+<p>Applying KPCA for prediction is not as straight-forward as applying PCA. In PCA, the eigenvectors are computed in the input space but in KPCA, the eigenvectors come from kernel Hilbert space. Thus, it is not simply possible to transform new data points when we do not know the explicit mapping function <span class="math">\(\phi\)</span> that is used.</p>
 <p>What is easily possible is to create a model from the transformed data. However, this approach is not helpful for validation because this would mean that we include the test set in the PCA. So, the approach in the following approach <strong>should not be used for validating a model</strong>:</p>
 <pre class="r"><code>library(class) # for knn
 Z &lt;- pca.k@rotated[,1:(n.dim.model)] # the transformed input matrix
@@ -352,7 +349,6 @@ accuracy &lt;- get.accuracy(preds.kpca, df$Region[samp.test])</code></pre>
 <p>A whiskey that comes to lie on the lower right of the 2-dimensional PCA space would have both properties: it would be complex and smoky at the same time. I guess that a whiskey exhibiting both characteristics would be just too much for the palate to handle (i.e. smokiness masks complexity).</p>
 <p>This unexplored region of taste can be considered to be <em>the whiskey twilight zone</em>. Regarding the twilight zone there are two questions. First, would it be possible to produce whiskeys to fill that void and, second, and probably more important, how would these whiskeys taste?</p>
 <div class="figure">
-<img src="https://www.datascienceblog.net/post/machine-learning/whiskey-twilight-zone.png" alt="Whiskey twilight zone" />
-<p class="caption">Whiskey twilight zone</p>
+<img src="https://www.datascienceblog.net/post/machine-learning/whiskey-twilight-zone.png" alt="Whiskey twilight zone" /><p class="caption">Whiskey twilight zone</p>
 </div>
 </div>

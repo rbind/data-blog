@@ -9,6 +9,7 @@ categories:
   - machine-learning
 tags:
     - performance-measure
+    - R
 ---
 
 
@@ -58,7 +59,20 @@ tags:
 <div id="what-can-go-wrong-when-using-precision" class="section level3">
 <h3>What can go wrong when using precision?</h3>
 <p>Precision is a particularly bad measure when there are few observations that belong to the positive class. Let us assume a clinical data set in which <span class="math">\(90\%\)</span> of persons are diseased (positive class) and only <span class="math">\(10\%\)</span> are healthy (negative class). Let us assume we have developed two tests for classifying whether a patient is diseased or healthy. Both tests have an accuracy of 80% but make different types of errors.</p>
-<pre><code>## Loading required package: ggplot2</code></pre>
+<pre class="r"><code>library(waffle)
+ref.colors &lt;- c(&quot;#c14141&quot;, &quot;#1853b2&quot;)
+false.colors &lt;- c(&quot;#9b3636&quot;, &quot;#0e3168&quot;)
+true.colors &lt;- c(&quot;#f75959&quot;, &quot;#2474f2&quot;)
+iron(
+    waffle(c(&quot;Diseased&quot; = 90, &quot;Healthy&quot; = 10), rows = 5, use_glyph = &quot;child&quot;, 
+        glyph_size = 5, title = &quot;Reference&quot;, colors = ref.colors),
+    waffle(c(&quot;Diseased (TP)&quot; = 80, &quot;Healthy (FN)&quot; = 10, &quot;Diseased (FP)&quot; = 10), 
+        rows = 5, use_glyph = &quot;child&quot;, 
+        glyph_size = 5, title = &quot;Clinical Test 1&quot;, colors = c(true.colors[1], false.colors[2], false.colors[1])),
+    waffle(c(&quot;Diseased (TP)&quot; = 70, &quot;Healthy (FN)&quot; = 20, &quot;Healthy (TN)&quot; = 10), 
+        rows = 5, use_glyph = &quot;child&quot;, 
+        glyph_size = 5, title = &quot;Clinical Test 2&quot;, colors = c(true.colors[1], false.colors[2], true.colors[2]))
+)</code></pre>
 <p><img src="/post/machine-learning/specificity-vs-precision_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 <div id="confusion-matrix-for-the-first-test" class="section level4">
 <h4>Confusion matrix for the first test</h4>

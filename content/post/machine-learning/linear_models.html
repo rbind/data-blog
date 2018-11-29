@@ -8,6 +8,7 @@ categories:
 tags:
     - linear model
     - supervised learning
+    - R
 thumbnail: "/post/machine-learning/linear_models_cover.png"
 
 ---
@@ -96,11 +97,8 @@ print(model.summary)</code></pre>
 <div id="the-residuals" class="section level3">
 <h3>The residuals</h3>
 <p>The first piece of information we obtain is on the residuals. The term <em>residual</em> comes from the residual sum of squares (RSS), which is defined as</p>
-<p><span class="math display">\[\begin{align*}
-r_i &amp;= y_i - f(x_i) \\
-\text{RSS} &amp;= \sum_{i=1}^n r_i^2
-\end{align*}\]</span></p>
-<p>where the residual <span class="math inline">\(r_i\)</span> is defined as the difference between observed and predicted values, <span class="math inline">\(f(x_i)\)</span>, from the observed value, <span class="math inline">\(y_i\)</span>.</p>
+
+<p>where the residual <span class="math">\(r_i\)</span> is defined as the difference between observed and predicted values, <span class="math">\(f(x_i)\)</span>, from the observed value, <span class="math">\(y_i\)</span>.</p>
 <p>The residual median value suggest that the model generally predicts slightly higher values of ozone than observed. The large maximum value, however, indicates that some outlier predictions are also much too low. Looking at a numbers can be a bit abstract, so let us plot the predictions of the model against the observed values:</p>
 <pre class="r"><code>res &lt;- residuals(model)
 # ensure that x- and y-axis have the same range
@@ -142,8 +140,8 @@ segments(obs, pred, obs, pred + res)</code></pre>
 <div id="the-standard-error" class="section level3">
 <h3>The standard error</h3>
 <p>The standard error of the coefficients is defined as the standard deviation of the feature variance:</p>
-<p><span class="math display">\[\hat{\sigma} = \sqrt{\text{diag}\left(\sigma_{\text{err}}^2 (X^T X)^{-1}\right)}\]</span></p>
-<p>where <span class="math inline">\({X^T X}^{-1}\)</span> is the inverse of the design matrix <span class="math inline">\(X\)</span>, which includes the intercept, and where <span class="math inline">\(\sigma_{\text{err}}^2\)</span> is the variance of the error.</p>
+<p><span class="math">\[\hat{\sigma} = \sqrt{\text{diag}\left(\sigma_{\text{err}}^2 (X^T X)^{-1}\right)}\]</span></p>
+<p>where <span class="math">\({X^T X}^{-1}\)</span> is the inverse of the design matrix <span class="math">\(X\)</span>, which includes the intercept, and where <span class="math">\(\sigma_{\text{err}}^2\)</span> is the variance of the error.</p>
 <p>In R, the standard errors of the model estimates can be computed via:</p>
 <pre class="r"><code># compute variance-covariance matrix of model estimates
 var.matrix &lt;- vcov(model)
@@ -167,8 +165,8 @@ print(scaled.var.matrix)</code></pre>
 ## Temp         -5.34595752 -1.667748e-03  0.065180401  6.715467e-02
 ## Wind         -9.94096142  7.495211e-05  0.067154670  4.750058e-01</code></pre>
 <p>The variance that is used to scale to unscaled variance-covariance matrix is the estimated variance of the error, which is defined by</p>
-<p><span class="math display">\[ \sigma_{\text{err}}^2 = \frac{1}{n-p} \text{RSS}\]</span></p>
-<p>The <code>cov.unscaled</code> parameter is simply the variance-covariance matrix of all features <span class="math inline">\(\beta_i\)</span> (including the intercept) of the design matrix:</p>
+<p><span class="math">\[ \sigma_{\text{err}}^2 = \frac{1}{n-p} \text{RSS}\]</span></p>
+<p>The <code>cov.unscaled</code> parameter is simply the variance-covariance matrix of all features <span class="math">\(\beta_i\)</span> (including the intercept) of the design matrix:</p>
 <pre class="r"><code># include intercept as a feature via &#39;model.matrix&#39;
 X &lt;- model.matrix(model) # design matrix
 # solve X^T %*% X = I to find the inverse of X^T * X
@@ -178,7 +176,7 @@ print(paste(&quot;Is this the same?&quot;, isTRUE(all.equal(unscaled.var.matrix,
 <div id="the-t-value" class="section level4">
 <h4>The t-value</h4>
 <p>The t-value is defined as</p>
-<p><span class="math display">\[t_i = \frac{\hat{\beta}_i}{\hat{\sigma}_i}\]</span></p>
+<p><span class="math">\[t_i = \frac{\hat{\beta}_i}{\hat{\sigma}_i}\]</span></p>
 <p>In R, they are computed via</p>
 <pre class="r"><code># divide model coefficients by standard errors
 t.vals &lt;- coef(model) / std.err
@@ -188,11 +186,9 @@ print(t.vals)</code></pre>
 </div>
 <div id="the-p-value" class="section level4">
 <h4>The p-value</h4>
-<p>The p-value is computed under the assumption that <span class="math inline">\(\beta_i = 0\)</span> for all coefficients. The t-values follow a t-distribution with</p>
+<p>The p-value is computed under the assumption that <span class="math">\(\beta_i = 0\)</span> for all coefficients. The t-values follow a t-distribution with</p>
 <pre class="r"><code>model.df &lt;- df.residual(model)</code></pre>
-<p>degrees of freedom. The degrees of freedom of a linear model is defined as
-<span class="math display">\[\text{df} = n - p\]</span>
-where <span class="math inline">\(n\)</span> is the number of samples and <span class="math inline">\(p\)</span> is the number of features (including the inctercept). The p-value indicates the likelihood that the obtained coefficient estimates are different from zero purely by chance. Thus, a low p-value suggests that there is a significant association between a variable and the outcome.</p>
+<p>degrees of freedom. The degrees of freedom of a linear model is defined as <span class="math">\[\text{df} = n - p\]</span> where <span class="math">\(n\)</span> is the number of samples and <span class="math">\(p\)</span> is the number of features (including the inctercept). The p-value indicates the likelihood that the obtained coefficient estimates are different from zero purely by chance. Thus, a low p-value suggests that there is a significant association between a variable and the outcome.</p>
 </div>
 </div>
 <div id="further-statistics" class="section level3">
@@ -214,13 +210,13 @@ print(res.std.error)</code></pre>
 <pre class="r"><code>r.squared &lt;- cor(pred, obs)^2
 print(r.squared)</code></pre>
 <pre><code>## [1] 0.5924073</code></pre>
-<p>In contrast to the correlation, which is in <span class="math inline">\([-1,1]\)</span>, R-squared is in <span class="math inline">\([0,1]\)</span>.</p>
+<p>In contrast to the correlation, which is in <span class="math">\([-1,1]\)</span>, R-squared is in <span class="math">\([0,1]\)</span>.</p>
 </div>
 <div id="the-adjusted-r-squared" class="section level4">
 <h4>The adjusted R-squared</h4>
 <p>The adjusted R-squared value adjusts the R-squared according to the complexity of the model:</p>
-<p><span class="math display">\[R^2_{a} = 1 - (1 - R^2) \frac{n - 1}{n - p - 1}\]</span></p>
-<p>where <span class="math inline">\(n\)</span> is the number of observations and <span class="math inline">\(p\)</span> the number of features. Thus, the adjusted R-squared can be computed like this:</p>
+<p><span class="math">\[R^2_{a} = 1 - (1 - R^2) \frac{n - 1}{n - p - 1}\]</span></p>
+<p>where <span class="math">\(n\)</span> is the number of observations and <span class="math">\(p\)</span> the number of features. Thus, the adjusted R-squared can be computed like this:</p>
 <pre class="r"><code>n &lt;- length(trainset) # number of samples
 p &lt;- length(coefficients(model)) - 1 # number of features w/o intercept
 r.squared.adj &lt;- 1 - (1 - r.squared) * ((n - 1) / (n - p - 1))
@@ -230,8 +226,8 @@ print(r.squared.adj)</code></pre>
 </div>
 <div id="the-f-statistic" class="section level4">
 <h4>The F-statistic</h4>
-<p>The F-statistic is defined as the ratio of explained vs unexplained variance. For regression, the F-statistic always indicates the difference between two models where model 1 (<span class="math inline">\(p_1\)</span>) is defined by a subset of features from model 2 (<span class="math inline">\(p_2\)</span>):</p>
-<p><span class="math display">\[F={\frac  {\left({\frac  {{\text{RSS}}_{1}-{\text{RSS}}_{2}}{p_{2}-p_{1}}}\right)}{\left({\frac  {{\text{RSS}}_{2}}{n-p_{2}}}\right)}}\]</span></p>
+<p>The F-statistic is defined as the ratio of explained vs unexplained variance. For regression, the F-statistic always indicates the difference between two models where model 1 (<span class="math">\(p_1\)</span>) is defined by a subset of features from model 2 (<span class="math">\(p_2\)</span>):</p>
+<p><span class="math">\[F={\frac  {\left({\frac  {{\text{RSS}}_{1}-{\text{RSS}}_{2}}{p_{2}-p_{1}}}\right)}{\left({\frac  {{\text{RSS}}_{2}}{n-p_{2}}}\right)}}\]</span></p>
 <p>The F-statistic describes the extent to which the predictive performance (in terms of the RSS) of model 2 is superior over model 1. The default F-statistic that is reported refers to the difference between the trained model and the intercept-only model:</p>
 <pre class="r"><code># create intercept-only model
 null.model &lt;- lm(formula = Ozone ~ 1, ozone, trainset)
@@ -245,8 +241,7 @@ print(null.model)</code></pre>
 ##       36.76</code></pre>
 <pre class="r"><code># plot the incercept-only prediction function
 plot(ozone$Ozone[trainset], null.model$fitted.values)</code></pre>
-<p><img src="/post/machine-learning/linear_models_files/figure-html/unnamed-chunk-17-1.png" width="672" />
-Hence, the null hypothesis of the test is that the fit of the intercept-only model and the specified model is equal. If the null hypothesis can be rejected, this implies that the specified model has a better fit than the null model.</p>
+<p><img src="/post/machine-learning/linear_models_files/figure-html/unnamed-chunk-17-1.png" width="672" /> Hence, the null hypothesis of the test is that the fit of the intercept-only model and the specified model is equal. If the null hypothesis can be rejected, this implies that the specified model has a better fit than the null model.</p>
 <p>Let’s calculate this by hand to show the idea:</p>
 <pre class="r"><code>rss &lt;- function(model) {
     return(sum(model$residuals^2))
@@ -273,7 +268,7 @@ f.statistic(null.model, model)</code></pre>
 </div>
 <div id="confidence-intervals" class="section level2">
 <h2>Confidence intervals</h2>
-<p>Confidence intervals are a useful tool for interpreting linear models. By default, <code>confint</code> computes the 95% confidence interval (<span class="math inline">\(\pm 1.96 \hat{\sigma}\)</span>):</p>
+<p>Confidence intervals are a useful tool for interpreting linear models. By default, <code>confint</code> computes the 95% confidence interval (<span class="math">\(\pm 1.96 \hat{\sigma}\)</span>):</p>
 <pre class="r"><code>ci &lt;- confint(model)
 apply(ci, 1, function(x) paste0(&quot;95% CI: [&quot;, 
         round(x[1], 2), &quot;,&quot;, round(x[2], 2), &quot;]&quot;))</code></pre>
@@ -296,9 +291,8 @@ cbind(rbind(preds.ci[1,], preds.pred[2,]), &quot;Method&quot; = c(&quot;CI&quot;
 ## [1,] &quot;-4.42397219873667&quot; &quot;-13.4448767773931&quot; &quot;4.59693237991976&quot; &quot;CI&quot;  
 ## [2,] &quot;-22.0446990408131&quot; &quot;-61.0004555440645&quot; &quot;16.9110574624383&quot; &quot;PI&quot;</code></pre>
 <p>The confidence intervals are narrow intervals, while the prediction (tolerance) intervals are wide intervals. Their values are based on the provided tolerance/significance level, as specified by the <code>level</code> parameter (default: 0.95).</p>
-<p>Their definitions are slightly different. Given a new observation <span class="math inline">\(x\)</span>, CIs and PIs are defined as follows</p>
-<p><span class="math display">\[\hat{y}_{\text{CI}} \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(\frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span>
-<span class="math display">\[\hat{y}_{\text{PI}}  \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(1 + \frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span></p>
-<p>where <span class="math inline">\(t_{\alpha/2, \text{df}}\)</span> is the t-value with <span class="math inline">\(\text{df} = 2\)</span> degrees of freedom and a significance level of <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\sigma_{\text{err}}\)</span> is the standard error of the residual, <span class="math inline">\({\sigma}_x^2\)</span> is the variance of the independent features, and <span class="math inline">\(\overline{x}\)</span> indicates the mean value of the features. More detailed <a href="https://rpubs.com/aaronsc32/regression-confidence-prediction-intervals">explanations for calculating CIs and PIs are available at RPubs</a> and <a href="https://www.youtube.com/watch?feature=player_embedded&amp;v=qVCQi0KPR0s">through this video</a>.</p>
+<p>Their definitions are slightly different. Given a new observation <span class="math">\(x\)</span>, CIs and PIs are defined as follows</p>
+<p><span class="math">\[\hat{y}_{\text{CI}} \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(\frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span> <span class="math">\[\hat{y}_{\text{PI}}  \pm t_{\alpha/2, \text{df}} \sqrt{\text{MSE} \cdot \left(1 + \frac{1}{n} \frac{(x - \overline{x})^2}{\sum_i (x_i - \overline{x})^2}\right)}\]</span></p>
+<p>where <span class="math">\(t_{\alpha/2, \text{df}}\)</span> is the t-value with <span class="math">\(\text{df} = 2\)</span> degrees of freedom and a significance level of <span class="math">\(\alpha\)</span>, <span class="math">\(\sigma_{\text{err}}\)</span> is the standard error of the residual, <span class="math">\({\sigma}_x^2\)</span> is the variance of the independent features, and <span class="math">\(\overline{x}\)</span> indicates the mean value of the features. More detailed <a href="https://rpubs.com/aaronsc32/regression-confidence-prediction-intervals">explanations for calculating CIs and PIs are available at RPubs</a> and <a href="https://www.youtube.com/watch?feature=player_embedded&amp;v=qVCQi0KPR0s">through this video</a>.</p>
 <p>With regard to their interpretation, <a href="https://www.graphpad.com/support/faq/the-distinction-between-confidence-intervals-prediction-intervals-and-tolerance-intervals/">the difference between the two intervals is further discussed at GraphPad</a>.</p>
 </div>

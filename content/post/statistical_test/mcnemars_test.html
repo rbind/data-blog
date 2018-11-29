@@ -7,12 +7,12 @@ categories:
   - statistical test
 tags:
   - matched data
+  - R
 ---
 
 
 
-<p>McNemar’s test is a non-parametric test for contingency tables that arise from paired measurements. In contrast to the chi-squared test, which is a test for independence, McNemar’s test is a test for symmetry (also called marginal homogeneity). Still, McNemar’s test is related to the chi-squared test because its test static also follows a chi-squared distribution.
-<!--more--></p>
+<p>McNemar’s test is a non-parametric test for contingency tables that arise from paired measurements. In contrast to the chi-squared test, which is a test for independence, McNemar’s test is a test for symmetry (also called marginal homogeneity). Still, McNemar’s test is related to the chi-squared test because its test static also follows a chi-squared distribution. <!--more--></p>
 <div id="paired-categorical-data-from-two-classifiers" class="section level2">
 <h2>Paired categorical data from two classifiers</h2>
 <p>A typical example for paired categorical measurements arises when one wants to identify whether two classifiers yield similar predictions for identical sets of observations. In this case, the predictions relate to the same measurements and are therefore paired. Assume there are two class labels, 0 and 1.</p>
@@ -66,37 +66,37 @@ print(tab)</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th></th>
-<th>Second Classifier: 0</th>
-<th>Second classifier: 1</th>
-<th>Marginal</th>
+<th align="left"></th>
+<th align="left">Second Classifier: 0</th>
+<th align="left">Second classifier: 1</th>
+<th align="left">Marginal</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>First Classifier: 0</td>
-<td>a</td>
-<td>b</td>
-<td>a + b</td>
+<td align="left">First Classifier: 0</td>
+<td align="left">a</td>
+<td align="left">b</td>
+<td align="left">a + b</td>
 </tr>
 <tr class="even">
-<td>First classifier: 1</td>
-<td>c</td>
-<td>d</td>
-<td>c + d</td>
+<td align="left">First classifier: 1</td>
+<td align="left">c</td>
+<td align="left">d</td>
+<td align="left">c + d</td>
 </tr>
 <tr class="odd">
-<td>Marginal</td>
-<td>a + c</td>
-<td>b + d</td>
-<td></td>
+<td align="left">Marginal</td>
+<td align="left">a + c</td>
+<td align="left">b + d</td>
+<td align="left"></td>
 </tr>
 </tbody>
 </table>
-<p>Further, let <span class="math inline">\(p_a\)</span>, <span class="math inline">\(p_b\)</span>, <span class="math inline">\(p_c\)</span>, and <span class="math inline">\(p_c\)</span> indicate the probabilities for the individual cells. The assumption of marginal homogeneity means that <span class="math inline">\(p_a + p_c = p_a + p_b\)</span> and <span class="math inline">\(p_b + p_d = p_c + p_d\)</span>. Thus, <span class="math inline">\(p_a\)</span> and <span class="math inline">\(p_d\)</span> don’t provide any information and the null hypothesis is <span class="math inline">\(p_b = p_c\)</span>, while the alternative is <span class="math inline">\(p_b \neq p_c\)</span>.</p>
+<p>Further, let <span class="math">\(p_a\)</span>, <span class="math">\(p_b\)</span>, <span class="math">\(p_c\)</span>, and <span class="math">\(p_c\)</span> indicate the probabilities for the individual cells. The assumption of marginal homogeneity means that <span class="math">\(p_a + p_c = p_a + p_b\)</span> and <span class="math">\(p_b + p_d = p_c + p_d\)</span>. Thus, <span class="math">\(p_a\)</span> and <span class="math">\(p_d\)</span> don’t provide any information and the null hypothesis is <span class="math">\(p_b = p_c\)</span>, while the alternative is <span class="math">\(p_b \neq p_c\)</span>.</p>
 <p>The test statistic is</p>
-<p><span class="math display">\[\chi^2 =\frac{(b - c)^2}{b+c}\,.\]</span></p>
-<p>Since the test statistic has a <span class="math inline">\(\chi^2\)</span> distribution with 1 degree of freedom, McNemar’s test should only be applied if <span class="math inline">\(b +c\)</span> is sufficiently large (e.g. <span class="math inline">\(b + c &gt; 25\)</span>). Otherwise, an <a href="https://cran.r-project.org/web/packages/exact2x2/index.html">exact version of McNemar’s test</a> should be considered.</p>
+<p><span class="math">\[\chi^2 =\frac{(b - c)^2}{b+c}\,.\]</span></p>
+<p>Since the test statistic has a <span class="math">\(\chi^2\)</span> distribution with 1 degree of freedom, McNemar’s test should only be applied if <span class="math">\(b +c\)</span> is sufficiently large (e.g. <span class="math">\(b + c &gt; 25\)</span>). Otherwise, an <a href="https://cran.r-project.org/web/packages/exact2x2/index.html">exact version of McNemar’s test</a> should be considered.</p>
 <div id="performing-mcnemars-test-in-r" class="section level3">
 <h3>Performing McNemar’s test in R</h3>
 <p>McNemar’s test can be performed by providing the contingency table as an argument to <code>mcnemar.test</code>:</p>

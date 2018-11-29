@@ -9,12 +9,12 @@ categories:
 tags:
   - parametric test
   - non-parametric test
+  - R
 ---
 
 
 
-<p>The means of quantitative measurements from two groups can be compared using Student’s t-test. To compare the means of measurements for more than two levels of a categorical variable, one-way ANOVA has to be used. Here, we’ll explore the parametric, one-way ANOVA test as well as the non-parametric version of the test, the Kruskal-Wallis test, which compares median values.
-<!--more--></p>
+<p>The means of quantitative measurements from two groups can be compared using Student’s t-test. To compare the means of measurements for more than two levels of a categorical variable, one-way ANOVA has to be used. Here, we’ll explore the parametric, one-way ANOVA test as well as the non-parametric version of the test, the Kruskal-Wallis test, which compares median values. <!--more--></p>
 <div id="parametric-testing-with-the-one-way-anova-test" class="section level2">
 <h2>Parametric testing with the one-way ANOVA test</h2>
 <p><em>ANOVA</em> stands for analysis of variance and indicates that test analyzes the within-group and between-group variance to determine whether there is a difference in group means.</p>
@@ -48,8 +48,7 @@ print(df)</code></pre>
 ## 10 20 21 0  5 2 26
 ## 11 14  7 1  2 6 24
 ## 12 13 13 4  4 4 13</code></pre>
-<p>The entries of <code>df</code> constitute a matrix <span class="math inline">\(X \in \mathbb{N}^{n \times p}\)</span> with <span class="math inline">\(n\)</span> rows and <span class="math inline">\(p\)</span> columns (groups). The observation in row <span class="math inline">\(i\)</span> and column <span class="math inline">\(j\)</span> is denoted by <span class="math inline">\(x_{ij}\)</span>. The measurements for group <span class="math inline">\(i\)</span> are indicated by <span class="math inline">\(X_i\)</span>, where <span class="math inline">\(\overline{X}_i\)</span> indicates the mean of the measurements for group <span class="math inline">\(i\)</span> and <span class="math inline">\(\overline{X}\)</span> indicates the overall mean. Let <span class="math inline">\(n_j\)</span> indicate the number of measurements for group <span class="math inline">\(j \in \{1, \ldots, p\}\)</span>. Note that the sample sizes do not have to be same
-across groups for one-way ANOVA. This would only be a problem for factorial ANOVA (ANOVA with at least two independent variables) due to confounding.</p>
+<p>The entries of <code>df</code> constitute a matrix <span class="math">\(X \in \mathbb{N}^{n \times p}\)</span> with <span class="math">\(n\)</span> rows and <span class="math">\(p\)</span> columns (groups). The observation in row <span class="math">\(i\)</span> and column <span class="math">\(j\)</span> is denoted by <span class="math">\(x_{ij}\)</span>. The measurements for group <span class="math">\(i\)</span> are indicated by <span class="math">\(X_i\)</span>, where <span class="math">\(\overline{X}_i\)</span> indicates the mean of the measurements for group <span class="math">\(i\)</span> and <span class="math">\(\overline{X}\)</span> indicates the overall mean. Let <span class="math">\(n_j\)</span> indicate the number of measurements for group <span class="math">\(j \in \{1, \ldots, p\}\)</span>. Note that the sample sizes do not have to be same across groups for one-way ANOVA. This would only be a problem for factorial ANOVA (ANOVA with at least two independent variables) due to confounding.</p>
 </div>
 <div id="computing-the-anova-test-statistic" class="section level2">
 <h2>Computing the ANOVA test statistic</h2>
@@ -57,22 +56,22 @@ across groups for one-way ANOVA. This would only be a problem for factorial ANOV
 <div id="between-group-mean-squared-value" class="section level4">
 <h4>Between-group mean-squared value</h4>
 <p>The sum of squared differences between the groups is:</p>
-<p><span class="math display">\[SS_B = \sum_{j = 1}^p n_j(\overline{X}_j - \overline{X})\]</span></p>
-<p>The value of <span class="math inline">\(SS_B\)</span> indicates how much the group means deviate from the overall mean. To obtain the between-group mean-squared value, we divide by the between-group degrees of freedom, <span class="math inline">\(p-1\)</span>:</p>
-<p><span class="math display">\[MS_B = \frac{SS_B}{p-1}\]</span></p>
+<p><span class="math">\[SS_B = \sum_{j = 1}^p n_j(\overline{X}_j - \overline{X})\]</span></p>
+<p>The value of <span class="math">\(SS_B\)</span> indicates how much the group means deviate from the overall mean. To obtain the between-group mean-squared value, we divide by the between-group degrees of freedom, <span class="math">\(p-1\)</span>:</p>
+<p><span class="math">\[MS_B = \frac{SS_B}{p-1}\]</span></p>
 </div>
 <div id="within-group-mean-squared-value" class="section level4">
 <h4>Within-group mean-squared value</h4>
 <p>The within-group sum of squares is defined as</p>
-<p><span class="math display">\[SS_W = \sum_{j = 1}^p \sum_{i = 1}^{n_j} (x_{ij} - \overline{X}_j)^2\,.\]</span></p>
-<p>The value of <span class="math inline">\(SS_W\)</span> can be understood as the squared sum of the column entries after centering them using <span class="math inline">\(\overline{X}_j\)</span>. Its value indicates the variance of measurements within the groups. The within-group mean-squared value is obtained by dividing <span class="math inline">\(SS_W\)</span> by the within-group degrees of freedom, <span class="math inline">\(\sum_{j=1}^p n_j - 1\)</span>:</p>
-<p><span class="math display">\[MS_W = \frac{SS_W}{\sum_{j=1}^p n_j - 1}\]</span></p>
+<p><span class="math">\[SS_W = \sum_{j = 1}^p \sum_{i = 1}^{n_j} (x_{ij} - \overline{X}_j)^2\,.\]</span></p>
+<p>The value of <span class="math">\(SS_W\)</span> can be understood as the squared sum of the column entries after centering them using <span class="math">\(\overline{X}_j\)</span>. Its value indicates the variance of measurements within the groups. The within-group mean-squared value is obtained by dividing <span class="math">\(SS_W\)</span> by the within-group degrees of freedom, <span class="math">\(\sum_{j=1}^p n_j - 1\)</span>:</p>
+<p><span class="math">\[MS_W = \frac{SS_W}{\sum_{j=1}^p n_j - 1}\]</span></p>
 </div>
 <div id="the-f-statistic" class="section level4">
 <h4>The F-statistic</h4>
 <p>The F-statistic is the test statistic of the ANOVA test. It is defined as the ratio of the between-group and the within-group mean squared value:</p>
-<p><span class="math display">\[F = \frac{MS_B}{MS_{W}}\]</span></p>
-<p>The null hypothesis (groups have equal means) can be rejected if <span class="math inline">\(F\)</span> is sufficiently large. In this case, <span class="math inline">\(MS_B\)</span> is considerably larger than <span class="math inline">\(MS_W\)</span>. In this case, there are large differences between the means of the groups at a low variance within the groups.</p>
+<p><span class="math">\[F = \frac{MS_B}{MS_{W}}\]</span></p>
+<p>The null hypothesis (groups have equal means) can be rejected if <span class="math">\(F\)</span> is sufficiently large. In this case, <span class="math">\(MS_B\)</span> is considerably larger than <span class="math">\(MS_W\)</span>. In this case, there are large differences between the means of the groups at a low variance within the groups.</p>
 </div>
 </div>
 <div id="performing-the-anova-test-in-r" class="section level2">
@@ -115,11 +114,10 @@ plot(spray.model, which = 2)</code></pre>
 </div>
 <div id="non-parametric-testing-with-the-kruskal-wallis-test" class="section level2">
 <h2>Non-parametric testing with the Kruskal-Wallis test</h2>
-<p>If the assumptions of the ANOVA test do not hold, one can use a non-parametric ANOVA test, the Kruskal-Wallis test. In contrast to the parametric version of the test, Kruskal-Wallis test compares the medians of the groups rather than the means. Since the test is an extension of the Wilcoxon rank-sum test, their test statistics are computed in a similar manner. After ranking all
-observations, the test statistic can be obtained as:</p>
-<p><span class="math display">\[H = (n − 1) \frac{\sum_{j = 1}^{p} n_j (\overline{r}_j - \overline{r})^2}
+<p>If the assumptions of the ANOVA test do not hold, one can use a non-parametric ANOVA test, the Kruskal-Wallis test. In contrast to the parametric version of the test, Kruskal-Wallis test compares the medians of the groups rather than the means. Since the test is an extension of the Wilcoxon rank-sum test, their test statistics are computed in a similar manner. After ranking all observations, the test statistic can be obtained as:</p>
+<p><span class="math">\[H = (n − 1) \frac{\sum_{j = 1}^{p} n_j (\overline{r}_j - \overline{r})^2}
                 {\sum_{j = 1}^p \sum_{i = 1}^{n_j} (r_{ij} − \overline{r})^2}\]</span></p>
-<p>Here, <span class="math inline">\(\overline{r}_j = \frac{1}{n_j} \sum_{i = 1}^{n_j} r_{ij}\)</span> is the average rank of all observations in group <span class="math inline">\(j\)</span>, <span class="math inline">\(r_ij\)</span> is the rank of the <span class="math inline">\(i\)</span>-th measurement in group <span class="math inline">\(j\)</span>, and <span class="math inline">\(\overline{r}\)</span> is the average of all <span class="math inline">\(r_{ij}\)</span>. The interpretation of the test statistic is similar as for the parametric ANOVA: the enumerator indicates the between-group variance of ranks, which corresponds to the within-group sum of squared differences.</p>
+<p>Here, <span class="math">\(\overline{r}_j = \frac{1}{n_j} \sum_{i = 1}^{n_j} r_{ij}\)</span> is the average rank of all observations in group <span class="math">\(j\)</span>, <span class="math">\(r_ij\)</span> is the rank of the <span class="math">\(i\)</span>-th measurement in group <span class="math">\(j\)</span>, and <span class="math">\(\overline{r}\)</span> is the average of all <span class="math">\(r_{ij}\)</span>. The interpretation of the test statistic is similar as for the parametric ANOVA: the enumerator indicates the between-group variance of ranks, which corresponds to the within-group sum of squared differences.</p>
 <div id="applying-the-kruskal-wallis-test-in-r" class="section level3">
 <h3>Applying the Kruskal-Wallis test in R</h3>
 <p>The Kruskal-Wallis test can be applied in the following way:</p>
