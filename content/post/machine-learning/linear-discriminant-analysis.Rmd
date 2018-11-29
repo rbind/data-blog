@@ -1,5 +1,5 @@
 ---
-title: "Linear Discriminant Analysis"
+title: "Linear and Quadratic Discriminant Analysis"
 author: Matthias Döring
 date: '2018-11-29'
 description: ""
@@ -9,3 +9,164 @@ categories:
 tags:
     - R
 ---
+The main reason for the popularity of linear discriminant analysis (LDA) is that it allows for transforming data into a (possibly) lower-dimensional space. Given $K$ classes, LDA maps the data to a subspace of $K - 1$ dimensions that is spanned by $K$ centroids. 
+
+## Optimization
+
+LDA is based on Fisher's optimization criterion according to which the centroids are spread out as far as possible. This amounts to finding a linear combination $Z = a^T X$ such that $a^T$ maximizes the between-class variance relative to the within-class variance.
+
+Each class $k \in \{1, \ldots, K\}$ is assigned a prior $\hat{\pi}_k = \frac{N_k}{N}$ such that $\sum_{i=1}^k \hat{\pi}_k = 1$. The within-class variance is $W = \hat{\Sigma}$. This matrix determines the deviation of all observations from their class centroids, which are defined by $\hat{\mu}_k = \frac{1}{N_k} \sum_{g_i = k} x_i$. It is defined by:
+
+\[W = \sum_{k=1}^K \hat{\pi}_k \sum_{g_i = k} (x_i - \hat{\mu}_k) (x_i - \hat{\mu}_k)^T\,.\]
+
+The between-class variance is defined according to the deviation of the centroids from the overall mean, $\hat{\mu} = \sum_{k=1}^K \hat{\pi}_k \hat{\mu}_k$:
+
+\[B \sum_{k=1}^K \hat{\pi}_k(\hat{\mu}_k - \hat{\mu}) (\hat{\mu}_k - \hat{\mu})^T\,.\]
+
+For $Z$, the between class variance is $a^T B a$ and the within-class variance is $A^T W a$. Thus, LDA can be optimized through the Rayleigh quotient
+
+\[\max_a \frac{a^T B a}{a^T W a}\,. \]
+
+By solving this optimization problem for $a_1, \ldots, a_{K-1}$, we obtain $K-1$ discriminant coordinates, where each successive $a_k$ is constructed to be orthogonal in $W$ to the previous discriminant coordinates.
+
+The benefit of this projection is that LDA allows us to perform classification in a reduced subspace. Moreover, we do not need to use the full $K-1$ dimensions but we can even choose a smaller subspace $l < K-1$ by limiting the number of considered dimensions.
+
+## Classification
+
+For classification, LDA performs the following two steps:
+
+1. Sphere the data using the common covariance matrix $\hat{\Sigma} = UDU^T$ (eigendecomposition) via $X^{\ast} = D^{-\frac{1}{2}} U^T X$.
+2. Classify observations $x_i$ to the closest class centroid in the transformed space, taking into account the class priors $\pi_k$.
+
+## The phoneme data set
+
+We will use the [phoneme speech recognition data set](https://web.stanford.edu/~hastie/ElemStatLearn/datasets/phoneme.info.txt):
+
+```{r, message = FALSE}
+library(RCurl)
+f <- getURL('https://www.datascienceblog.net/data-sets/phoneme.csv')
+df <- read.csv(textConnection(f), header=T)
+print(dim(df))
+```
+
+The data set contains samples of digitized speech for five phonemes: *aa* (as the vowel in *dark*), *ao* (as the first vowel in *water*), *dcl* (as in *dark*), *iy* (as the vowel in *she*), and *sh* (as in *she*). In total, 4509 speech frames of 32 msec were selected. For each speech frame, a log-periodogram of length 256 was computed, which is suitable for speech recognition. The 256 columns labeled *x.1* to *x.256* identify the speech features, while the columns *g* and *speaker* indicate the phonemes (labels) and speakers, respectively.
+
+Let us assign training and test samples:
+```{r}
+#logical vector: TRUE if entry belongs to train set, FALSE else
+train <- grepl("^train", df$speaker)
+# remove non-feature columns
+to.exclude <- c("row.names", "speaker", "g")
+feature.df <- df[, !colnames(df) %in% to.exclude]
+test.set <- subset(feature.df, !train)
+train.set <- subset(feature.df, train)
+train.responses <- subset(df, train)$g
+test.responses <- subset(df, !train)$g
+```
+
+## Fitting an LDA model in R
+
+We can fit an LDA model in the following way:
+
+```{r}
+library(MASS)
+lda.model <- lda(train.set, grouping = train.responses)
+```
+
+We can transform the training data to the canonical coordinates in the following way:
+
+```{r}
+lda.prediction.train <- predict(lda.model, train.set)
+x.projected <- lda.prediction.train$x # feature transformation 
+# visualize the features in the two LDA dimensions
+plot.df <- data.frame(x.projected[,1:2], "Outcome" = train.responses)
+library(ggplot2)
+ggplot(plot.df, aes(x = LD1, y = LD2, color = Outcome)) + geom_point()
+```
+
+Plotting the data in the two LDA dimensions reveals three clusters:
+
+* Cluster 1 (left) consists of **aa** and **ao** phonemes
+* Cluster 2 (bottom right) consists of **dcl** and **iy** phonemes
+* Cluster 3 (top right) consists of **sh** phonemes
+
+This indicates that two dimensions are not sufficient for differentiating all 5 classes. However, the clustering indicates that phonemes that are sufficiently different from one another can be differentiated very well. 
+
+We can also plot the mapping of training data onto the discriminant dimensions using the ```plot.lda``` function where the *dimen* parameter can be used to specify the number of considered dimensions:
+
+```{r}
+colors <- c("red", "blue", "green", "yellow", "black") # aa, ao, dcl, iy, sh
+my.cols <- colors[match(lda.prediction.train$class, levels(df$g))]
+plot(lda.model, dimen = 4, col = my.cols)
+```
+
+Plotting the training data for all dimension pairs demonstrates that, by construction, the first two dimensions separate the phoneme groups best. What we can learn from the plot, though, is how many dimensions we should select for a reduced-rank LDA. Remember that LD1 and LD2 confused *aa* with *ao* and *dcl* with *iy*. Thus, we would like additional dimensions that help us differentiating these groups. It seems that we need all of the four dimensions because *dcl* and *iy* are only well-separed in LD1 vs LD3, while *aa* and *ao* are only well-separated when LD4 is combined with any of the other dimensions.
+
+To visualize the centroids of the groups, we can create a custom plot:
+
+```{r, fig.height = 8, fig.width = 12}
+plot_lda_centroids <- function(lda.model, train.set, response) {
+    centroids <- lda.model$means %*% lda.model$scaling 
+    library(RColorBrewer)
+    colors <- brewer.pal(8, "Accent")
+    my.cols <- colors[match(lda.prediction.train$class, levels(df$g))]
+    my.points <- as.matrix(train.set) %*% lda.model$scaling
+    no.classes <- length(levels(response))
+    par(mfrow=c(no.classes -1, no.classes -1), mar=c(1,1,1,1), oma=c(1,1,1,10))
+    for (i in 1:(no.classes - 1)) {
+        for (j in 1:(no.classes - 1)) {
+            y <- my.points[, i]
+            x <- my.points[, j]
+            cen <- cbind(centroids[, j], centroids[, i])
+            if (i == j) {
+                plot(x, y, type="n") 
+                max.y <- max(my.points[, i])
+                max.x <- max(my.points[, j])
+                min.y <- min(my.points[, i])
+                min.x <- min(my.points[, j])
+                max.both <- max(c(max.x, max.y))
+                min.both <- max(c(min.x, min.y))
+                center <- min.both + ((max.both - min.both) / 2)
+                text(center, center, colnames(my.points)[i], cex = 3)}
+            else {
+                plot(x, y, col = my.cols, pch = as.character(response), xlab ="", ylab="")
+                points(cen[,1], cen[,2], pch = 21, col = "black", bg = colors, cex = 3)
+            }
+        }
+    }
+    par(xpd = NA)
+    legend(x=par("usr")[2] + 1, y = mean(par("usr")[3:4]) + 20, 
+            legend = rownames(centroids), col = colors, pch = rep(20, length(colors)), cex = 3)
+}
+plot_lda_centroids(lda.model, train.set, train.responses)
+```
+
+## Reduced-rank LDA
+
+Although this data set is not optimal for reduced-rank LDA since it seems that all dimensions are worthwhile, we will still showcase the use of reduced-rank LDA by evaluating the accuracy of LDA based on one to four discriminant coordinates:
+
+```{r}
+# perform LDA with 1 to 4 discriminant coordinates
+dims <- 1:4
+accuracies <- rep(NA, length(dims))
+for (i in seq_along(dims)) {
+    lda.pred <- predict(lda.model, test.set, dim = dims[i])
+    acc <- length(which(lda.pred$class == test.responses))/length(test.responses)
+    accuracies[i] <- acc
+}
+print(accuracies)
+```
+
+As expected from the visual exploration of the transformed space, the test accuracy increases with each additional dimension. Since LDA with four dimension obtains the maximal accuracy, we would decide to use all of the discriminant coordinates for classification. 
+
+We can visualize the performance of the classifier using four dimensions:
+
+```{r}
+lda.pred <- predict(lda.model, test.set)
+plot.df <- data.frame(lda.pred$x[,1:2], "Outcome" = test.responses, 
+                    "Prediction" = lda.pred$class)
+ggplot(plot.df, aes(x = LD1, y = LD2, color = Outcome, shape = Prediction)) +
+        geom_point()
+```
+
+In the plot, the labels are indicated by different colors and the predictions by different colors. Ideally, each color would have only a single symbol. Incorrect predictions are visible when one colors exhibits different symbols. Using the plot, we quickly see that most confusions occur when observations labeled as *aa* are incorrectly classified as *ao* and vice versa.
