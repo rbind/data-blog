@@ -8,6 +8,7 @@ categories:
   - statistical test
 tags:
   - parametric test
+  - R
 ---
 Analysis of variance (ANOVA) can be used to compare a single dependent variable across several groups. If there is more than one dependent variable, multivariate ANOVA (MANOVA) should be used. MANOVA determines whether there is a significant difference in the multivariate sample means.
 <!--more-->

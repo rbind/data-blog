@@ -8,6 +8,7 @@ categories:
   - data-visualization
 tags:
   - plot
+  - R
 thumbnail: "/post/data-visualization/lineplot_cover.png"
 ---
 The line plot is the go-to plot for visualizing time-series data (i.e. measurements for several points in time) as it allows for showing trends along time. Here, we'll use stock market data to show how line plots can be created using native R, the MTS package, and ggplot.

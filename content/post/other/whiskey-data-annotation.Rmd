@@ -5,7 +5,8 @@ date: '2018-11-13T18:00:00Z'
 description: "In this post, I clean up and augment a data set that provides their taste characteristics. The improved data set is augmented with the regions where the distilleries are situated, as well as their geological location in terms of longitude and latitude."
 categories:
   - Other
-
+tags:
+ - R
 ---
 
 I have previously used a data set describing the characteristics of whiskeys to [draw radar plots](/post/data-visualization/radar-plot/). Here, I present how I cleaned and augmented [the original data from the University of Strathclyde](http://outreach.mathstat.strath.ac.uk/outreach/nessie/datasets/whiskies.txt), resulting in an [improved version of the whiskey data set](https://www.datascienceblog.net/data-sets/whiskies.csv).

@@ -7,18 +7,17 @@ categories:
   - data-visualization
 tags:
   - plot
+  - R
 thumbnail: "/post/data-visualization/barplot_cover.png"
 
 ---
 
 
 
-<p>Bar plots display quantities according to the height of bars. Since standard bar plots do not indicate the level of variation in the data, they are most appropriate for showing individual values (e.g. count data) rather than aggregates of several values (e.g. arithmetic means). Although variation can be shown through error bars, this is only appropriate if the data are normally distributed.
-<!--more--></p>
+<p>Bar plots display quantities according to the height of bars. Since standard bar plots do not indicate the level of variation in the data, they are most appropriate for showing individual values (e.g. count data) rather than aggregates of several values (e.g. arithmetic means). Although variation can be shown through error bars, this is only appropriate if the data are normally distributed. <!--more--></p>
 <div id="plotting-a-histogram-in-native-r" class="section level2">
 <h2>Plotting a histogram in native R</h2>
-<p>We will use the <a href="/post/statistical_test/contingency_table_tests/">warpbreaks data set</a> to exemplify the use of bar plots.
-To obtain a bar plot in native R, we can use the <code>barplot</code> function.</p>
+<p>We will use the <a href="/post/statistical_test/contingency_table_tests/">warpbreaks data set</a> to exemplify the use of bar plots. To obtain a bar plot in native R, we can use the <code>barplot</code> function.</p>
 <pre class="r"><code>data(warpbreaks)
 # create positions for tick marks, one more than number of bars
 x &lt;- warpbreaks$breaks
@@ -32,8 +31,7 @@ cols &lt;- c(rep(group.cols[1], 9), rep(group.cols[2], 9),
         rep(group.cols[5], 9), rep(group.cols[6], 9))
 barplot(x, space = 0,  col = cols)
 legend(&quot;topright&quot;, legend = c(unique(x.labels)), col = group.cols, pch = 20)</code></pre>
-<p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-1-1.png" width="672" />
-A disadvantage of this approach is that it is tedious to specify the <a href="http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf">coloring vector</a> if there are many group combinations.</p>
+<p><img src="/post/data-visualization/barplot_files/figure-html/unnamed-chunk-1-1.png" width="672" /> A disadvantage of this approach is that it is tedious to specify the <a href="http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf">coloring vector</a> if there are many group combinations.</p>
 </div>
 <div id="plotting-a-histogram-with-ggplot" class="section level2">
 <h2>Plotting a histogram with ggplot</h2>

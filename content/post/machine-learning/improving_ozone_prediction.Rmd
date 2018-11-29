@@ -11,6 +11,7 @@ tags:
     - analysis
     - linear model
     - supervised learning
+    - R
 thumbnail: "/post/machine-learning/improving_ozone_prediction_cover.png"
 
 ---

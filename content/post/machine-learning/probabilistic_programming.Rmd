@@ -8,6 +8,7 @@ categories:
   - machine-learning
 tags:
     - Bayesian
+    - R
 ---
 Probabilistic programming enables us to implement statistical models without having to worry about the technical details. It is particularly useful for Bayesian models that are based on MCMC sampling. In this article, I investigate how [Stan](http://mc-stan.org/) can be used through its implementation in R, [RStan](http://mc-stan.org/rstan/). This post is largely based on the [GitHub documentation of Rstan](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started) and [its vignette](http://mc-stan.org/rstan/articles/rstan.html). 
 

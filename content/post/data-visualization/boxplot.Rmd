@@ -7,6 +7,7 @@ categories:
   - data-visualization
 tags:
   - plot
+  - R
 thumbnail: "/post/data-visualization/boxplot_cover.png"
 
 ---

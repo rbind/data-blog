@@ -8,6 +8,7 @@ categories:
   - statistical test
 tags:
   - matched data
+  - R
 ---
 
 In a previous post, I've contrasted [two tests for pairs of measurements](/post/statistical_test/signed_wilcox_rank_test/). Here, I'd like to show why it is important to choose a test that appropriately accounts for such dependent measurements.

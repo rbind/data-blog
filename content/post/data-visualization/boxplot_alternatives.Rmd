@@ -7,6 +7,7 @@ categories:
   - data-visualization
 tags:
   - plot
+  - R
 thumbnail: "/post/data-visualization/boxplot_alternatives_cover.png"
 ---
 [Box plots](/post/data-visualization/boxplot/) are great as they do not only indicate the median value but also show the variation of the measurements in terms of the 1st and 3rd quartiles. There are, however, also plots that provide a bit of additional information. Here, we take a closer look at potential alternatives to the box plot: the beeswarm and the violin plot. 

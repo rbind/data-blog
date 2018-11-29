@@ -7,6 +7,7 @@ categories:
   - machine-learning
 tags:
     - performance-measure
+    - R
 ---
 In a recent post, I have discussed [performance measures for model selection](/post/machine-learning/performance-measures-model-selection/). This time, I write about a related topic: performance measures that are suitable for selecting models when performing feature selection. Since feature selection is concerned with reducing the number of dependent variables, suitable performance measures evaluate the trade-off between the number of features, $p$, and the fit of the model. 
 

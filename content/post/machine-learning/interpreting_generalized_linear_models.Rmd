@@ -8,6 +8,7 @@ categories:
 tags:
     - linear model
     - supervised learning
+    - R
 thumbnail: "/post/machine-learning/interpreting_generalized_linear_models_cover.png"
 
 ---

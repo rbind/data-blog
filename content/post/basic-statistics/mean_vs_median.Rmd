@@ -6,6 +6,8 @@ date: '2018-10-26'
 description: "If your data follows a normal distribution using the mean is fine. But what should you do in other cases? Here, I explore the implications of using one or the other measure."
 categories:
   - basic-statistics
+tags:
+  - R
 ---
 Two of the most commonly used statistical measures are the mean and the median. Both measures indicate the central value of a distribution, that is, the value at which one would expect the majority of data points to lie. In many applications, however, it is useful to think about which of the two measures is more appropriate given the data at hand. In this post, we'll investigate the differences between both quantities and give recommendations when one should be
 preferred over the other.

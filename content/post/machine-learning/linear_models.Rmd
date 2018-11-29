@@ -8,6 +8,7 @@ categories:
 tags:
     - linear model
     - supervised learning
+    - R
 thumbnail: "/post/machine-learning/linear_models_cover.png"
 
 ---

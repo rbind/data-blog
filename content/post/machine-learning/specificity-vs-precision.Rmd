@@ -9,6 +9,7 @@ categories:
   - machine-learning
 tags:
     - performance-measure
+    - R
 ---
 Recently, I have introduced [sensitivity and specificity as performance measures for model selection](/post/machine-learning/performance-measures-model-selection/). Besides these measures, there is also the notion of recall and precision. Precision and recall originate from information retrieval but are also used in machine learning settings. However, the use of precision and recall can be problematic in some situations. In this post, I discuss the shortcomings of recall and precision and show why sensitivity and specificity are generally more useful.
 

@@ -7,14 +7,14 @@ categories:
   - data-visualization
 tags:
   - plot
+  - R
 thumbnail: "/post/data-visualization/boxplot_cover.png"
 
 ---
 
 
 
-<p>The box plot is useful for comparing the quartiles of quantitative variables. More specifically, lower and upper ends of a box (the hinges) are defined by the first (Q1) and third quartile (Q3). The median (Q2) is shown as a horizontal line within the box. Additionally, outliers are indicated by the whiskers of the boxes whose definition is implementation-dependent. For example, in <code>geom_boxplot</code> of ggplot2, whiskers are defined by the inter-quartile range (IQR = Q3 - Q1), extending no further than 1.5 * IQR.
-<!--more--></p>
+<p>The box plot is useful for comparing the quartiles of quantitative variables. More specifically, lower and upper ends of a box (the hinges) are defined by the first (Q1) and third quartile (Q3). The median (Q2) is shown as a horizontal line within the box. Additionally, outliers are indicated by the whiskers of the boxes whose definition is implementation-dependent. For example, in <code>geom_boxplot</code> of ggplot2, whiskers are defined by the inter-quartile range (IQR = Q3 - Q1), extending no further than 1.5 * IQR. <!--more--></p>
 <div id="creating-a-box-plot-in-native-r" class="section level2">
 <h2>Creating a box plot in native R</h2>
 <p>We will use the <a href="/post/statistical_test/contingency_table_tests/">warpbreaks data set</a> to exemplify the use of box plots. In native R, a box plot can be obtained via <code>boxplot</code>.</p>

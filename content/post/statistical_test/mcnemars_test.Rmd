@@ -7,6 +7,7 @@ categories:
   - statistical test
 tags:
   - matched data
+  - R
 ---
 
 McNemar's test is a non-parametric test for contingency tables that arise from paired measurements. In contrast to the chi-squared test, which is a test for independence, McNemar's test is a test for symmetry (also called marginal homogeneity). Still, McNemar's test is related to the chi-squared test because its test static also follows a chi-squared distribution.

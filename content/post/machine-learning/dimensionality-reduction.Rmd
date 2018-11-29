@@ -9,6 +9,7 @@ tags:
     - unsupervised learning
     - supervised learning
     - analysis
+    - R
 thumbnail: "/post/machine-learning/whiskey-twilight-zone.png"
 
 ---

@@ -8,13 +8,13 @@ categories:
   - data-visualization
 tags:
   - plot
+  - R
 thumbnail: "/post/data-visualization/lineplot_cover.png"
 ---
 
 
 
-<p>The line plot is the go-to plot for visualizing time-series data (i.e. measurements for several points in time) as it allows for showing trends along time. Here, we’ll use stock market data to show how line plots can be created using native R, the MTS package, and ggplot.
-<!--more--></p>
+<p>The line plot is the go-to plot for visualizing time-series data (i.e. measurements for several points in time) as it allows for showing trends along time. Here, we’ll use stock market data to show how line plots can be created using native R, the MTS package, and ggplot. <!--more--></p>
 <div id="the-eustockmarkets-data-set" class="section level2">
 <h2>The EuStockMarkets data set</h2>
 <p>The EuStockMarkets data set contains the daily closing prices (except for weekends/holidays) of four European stock exchanges: the DAX (Germany), the SMI (Switzerland), the CAC (France), and the FTSE (UK). An important characteristic of these data is that they represent <a href="https://finance.zacks.com/stock-market-points-vs-percent-6029.html">stock market points</a>, which have different interpretations depending on the exchange. Thus, one should not compare points between different exchanges.</p>

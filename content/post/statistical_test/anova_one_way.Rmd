@@ -9,6 +9,7 @@ categories:
 tags:
   - parametric test
   - non-parametric test
+  - R
 ---
 The means of quantitative measurements from two groups can be compared using Student's t-test. To compare the means of measurements for more than two levels of a categorical variable, one-way ANOVA has to be used. Here, we'll explore the parametric, one-way ANOVA test as well as the non-parametric version of the test, the Kruskal-Wallis test, which compares median values.
 <!--more-->

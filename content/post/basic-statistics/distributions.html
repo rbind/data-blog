@@ -6,12 +6,13 @@ description: "Since R was made for statistical computations, it is very easy to 
 date: '2018-10-29'
 categories:
   - basic-statistics
+tags:
+  - R
 ---
 
 
 
-<p>R is a great tool for working with distributions. However, one has to know which specific function is the right wrong. Here, I’ll discuss which functions are available for dealing with the normal distribution: dnorm, pnorm, qnorm, and rnorm.
-<!--more--></p>
+<p>R is a great tool for working with distributions. However, one has to know which specific function is the right wrong. Here, I’ll discuss which functions are available for dealing with the normal distribution: dnorm, pnorm, qnorm, and rnorm. <!--more--></p>
 <div id="distribution-functions-in-r" class="section level2">
 <h2>Distribution functions in R</h2>
 <p>Every distribution has four associated functions whose prefix indicates the type of function and the suffix indicates the distribution. To exemplify the use of these functions, I will limit myself to the normal (Gaussian) distribution. The four normal distribution functions are:</p>
@@ -24,9 +25,7 @@ categories:
 </div>
 <div id="the-probability-density-function-dnorm" class="section level2">
 <h2>The probability density function: dnorm</h2>
-<p>The probability density function (PDF, in short: density) indicates the probability of observing a measurement with a specific value and thus the integral over the density is always 1. For a value <span class="math inline">\(x\)</span>, the normal density is defined as
-<span class="math display">\[{\displaystyle f(x\mid \mu ,\sigma ^{2})={\frac {1}{\sqrt {2\pi \sigma ^{2}}}}\text{exp}\left(-{\frac {(x-\mu )^{2}}{2\sigma ^{2}}}\right)}\]</span>
-where <span class="math inline">\(\mu\)</span> is the mean, <span class="math inline">\(\sigma\)</span> is the standard deviation, and <span class="math inline">\(\sigma^2\)</span> is the variance.</p>
+<p>The probability density function (PDF, in short: density) indicates the probability of observing a measurement with a specific value and thus the integral over the density is always 1. For a value <span class="math inline">\(x\)</span>, the normal density is defined as <span class="math display">\[{\displaystyle f(x\mid \mu ,\sigma ^{2})={\frac {1}{\sqrt {2\pi \sigma ^{2}}}}\text{exp}\left(-{\frac {(x-\mu )^{2}}{2\sigma ^{2}}}\right)}\]</span> where <span class="math inline">\(\mu\)</span> is the mean, <span class="math inline">\(\sigma\)</span> is the standard deviation, and <span class="math inline">\(\sigma^2\)</span> is the variance.</p>
 <p>Using the density, it is possible to determine the probabilities of events. For example, you may wonder: <em>What is the likelihood that a person has an IQ of exactly 140?</em>. In this case, you would need to retrieve the density of the IQ distribution at value 140. The IQ distribution can be modeled with a mean of 100 and a standard deviation of 15. The corresponding density is:</p>
 <pre class="r"><code>sample.range &lt;- 50:150
 iq.mean &lt;- 100
@@ -52,9 +51,7 @@ pp(sum(iq.df$Density[iq.df$IQ &lt;= 90]))</code></pre>
 </div>
 <div id="the-cumulative-density-function-pnorm" class="section level2">
 <h2>The cumulative density function: pnorm</h2>
-<p>The cumulative density (CDF) function is a monotonically increasing function as it integrates over densities via
-<span class="math display">\[f(x | \mu, \sigma) = \displaystyle {\frac {1}{2}}\left[1+\operatorname {erf} \left({\frac {x-\mu }{\sigma {\sqrt {2}}}}\right)\right]\]</span>
-where <span class="math inline">\(\text{erf}(x) = \frac {1}{\sqrt {\pi }}\int _{-x}^{x}e^{-t^{2}}\,dt\)</span> is the error function.</p>
+<p>The cumulative density (CDF) function is a monotonically increasing function as it integrates over densities via <span class="math display">\[f(x | \mu, \sigma) = \displaystyle {\frac {1}{2}}\left[1+\operatorname {erf} \left({\frac {x-\mu }{\sigma {\sqrt {2}}}}\right)\right]\]</span> where <span class="math inline">\(\text{erf}(x) = \frac {1}{\sqrt {\pi }}\int _{-x}^{x}e^{-t^{2}}\,dt\)</span> is the error function.</p>
 <p>To get an intuition of the CDF, let’s create a plot for the IQ data:</p>
 <pre class="r"><code>cdf &lt;- pnorm(sample.range, iq.mean, iq.sd)
 iq.df &lt;- cbind(iq.df, &quot;CDF_LowerTail&quot; = cdf)

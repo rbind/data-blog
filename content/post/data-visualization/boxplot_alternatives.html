@@ -7,6 +7,7 @@ categories:
   - data-visualization
 tags:
   - plot
+  - R
 thumbnail: "/post/data-visualization/boxplot_alternatives_cover.png"
 ---
 
@@ -62,7 +63,6 @@ p.violin &lt;- ggplot(warpbreaks, aes(x = wool, y = breaks)) +
 p.box &lt;- ggplot(warpbreaks, aes(x = wool, y = breaks)) +
     geom_boxplot() + ggtitle (&quot;Box plot&quot;)
 grid.arrange(p.violin, p.box, ncol = 2)</code></pre>
-<p><img src="/post/data-visualization/boxplot_alternatives_files/figure-html/unnamed-chunk-3-1.png" width="672" />
-In this case, we see the limitation of the violin plot for small sample sizes (hint: the limitation is not that the plot does not seem to show violins but vases). The violin for wool A stretches up to the outliers at a value of 65 indicating. Since the width is similar at values 40 and 60, one could think that there are many such measurements. The box plot, on the other hand, reveals that there are indeed only two measurements with a value greater than 60.</p>
+<p><img src="/post/data-visualization/boxplot_alternatives_files/figure-html/unnamed-chunk-3-1.png" width="672" /> In this case, we see the limitation of the violin plot for small sample sizes (hint: the limitation is not that the plot does not seem to show violins but vases). The violin for wool A stretches up to the outliers at a value of 65 indicating. Since the width is similar at values 40 and 60, one could think that there are many such measurements. The box plot, on the other hand, reveals that there are indeed only two measurements with a value greater than 60.</p>
 </div>
 </div>
