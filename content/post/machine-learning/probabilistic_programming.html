@@ -8,6 +8,7 @@ categories:
   - machine-learning
 tags:
     - Bayesian
+    - R
 ---
 
 
@@ -25,13 +26,12 @@ tags:
 <p>In this article, I will showcase the use of Stan using two hierarchical models. I will use the first model to talk about the basic features of Stan and the second example to demonstrate a more advanced application.</p>
 <div id="the-eight-schools-data-set" class="section level3">
 <h3>The eight schools data set</h3>
-<p>The first data set we are going to use is the <a href="https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/">eight schools data set</a> (Rubin, 1981 and Gelman, 2003). This data set measures the effect of coaching programs on college admission tests, the scholastic aptitude test (SAT), which is used in the US. The SAT was designed in such a way that it should be resistant to short-term efforts directly targeted at improving the score in the test. Rather, the test should reflect the knowledge that was acquired over a
-longer period of time. The data set looks as follows:</p>
-<table>
+<p>The first data set we are going to use is the <a href="https://andrewgelman.com/2014/01/21/everything-need-know-bayesian-statistics-learned-eight-schools/">eight schools data set</a> (Rubin, 1981 and Gelman, 2003). This data set measures the effect of coaching programs on college admission tests, the scholastic aptitude test (SAT), which is used in the US. The SAT was designed in such a way that it should be resistant to short-term efforts directly targeted at improving the score in the test. Rather, the test should reflect the knowledge that was acquired over a longer period of time. The data set looks as follows:</p>
+<table style="width:78%;">
 <colgroup>
-<col width="20%" />
-<col width="32%" />
-<col width="47%" />
+<col width="16%" />
+<col width="25%" />
+<col width="36%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -83,8 +83,7 @@ longer period of time. The data set looks as follows:</p>
 </tr>
 </tbody>
 </table>
-<p>As we can see, the SAT did not fulfill its promise: for most of the eight schools, the short-term coaching indeed increased the SAT scores as evidenced by positive values of <span class="math inline">\(y_j\)</span>, where <span class="math inline">\(y_j\)</span> indicates the change in SAT scores.
-For this data set, we are interested in estimating the true effect size associated with each school. There are two alternative approaches that could be used. First, we could assume that all schools are independent of each other. However, this would lead to estimates that are hard to interpret because the 95% posterior intervals for the schools would largely overlap due to the high standard error. Second, one could pool the data from all schools, assuming that the true effect is the same in all schools. This, however, is also not reasonable because there should be school-specific effects (e.g. different teachers and students).</p>
+<p>As we can see, the SAT did not fulfill its promise: for most of the eight schools, the short-term coaching indeed increased the SAT scores as evidenced by positive values of <span class="math inline">\(y_j\)</span>, where <span class="math inline">\(y_j\)</span> indicates the change in SAT scores. For this data set, we are interested in estimating the true effect size associated with each school. There are two alternative approaches that could be used. First, we could assume that all schools are independent of each other. However, this would lead to estimates that are hard to interpret because the 95% posterior intervals for the schools would largely overlap due to the high standard error. Second, one could pool the data from all schools, assuming that the true effect is the same in all schools. This, however, is also not reasonable because there should be school-specific effects (e.g. different teachers and students).</p>
 <p>Thus, another model is required. The hierarchical model has the advantage of combining information from all eight schools (<em>experiments</em>) without assuming that they have common true effects. We can specify a hierarchial Bayesian model in the following way:</p>
 <p><span class="math display">\[
 \begin{align}
@@ -128,8 +127,8 @@ matrix[n,n] matrix; // an n times n matrix</code></pre>
 <p>Stan supports a large number of probability distributions. When specifying models via Stan, the <code>lookup</code> function comes in handy: It provides a mapping from R functions to Stan functions. Consider the following example:</p>
 <pre class="r"><code>library(rstan) # load stan package
 lookup(rnorm)</code></pre>
-<pre><code>##     StanFunction               Arguments ReturnType Page
-## 369   normal_rng (reals mu, reals sigma)          R  112</code></pre>
+<pre><code>##     StanFunction             Arguments ReturnType Page
+## 355   normal_rng (real mu, real sigma)       real  494</code></pre>
 <p>Here, we see that the equivalent of <code>rnorm</code> in R is <code>normal_rng</code> in Stan.</p>
 </div>
 <div id="the-eight-schools-model" class="section level4">
@@ -186,6 +185,19 @@ rstan_options(auto_write = TRUE)  # store compiled stan model</code></pre>
   iter = 2000,            # total number of iterations per chain
   refresh = 1000          # show progress every &#39;refresh&#39; iterations
   )</code></pre>
+<pre><code>## In file included from /TL/opt/R-3.4.0/library/BH/include/boost/config.hpp:39:0,
+##                  from /TL/opt/R-3.4.0/library/BH/include/boost/math/tools/config.hpp:13,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/var.hpp:7,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core.hpp:12,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math.hpp:4,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file409636dbb970.cpp:8:
+## /TL/opt/R-3.4.0/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
+##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
+##  ^
+## &lt;command-line&gt;:0:0: note: this is the location of the previous definition</code></pre>
 </div>
 <div id="model-interpretation" class="section level3">
 <h3>Model interpretation</h3>
@@ -199,27 +211,27 @@ rstan_options(auto_write = TRUE)  # store compiled stan model</code></pre>
 ## post-warmup draws per chain=1000, total post-warmup draws=4000.
 ## 
 ##            mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
-## mu         7.88    0.10 4.97  -2.09   4.68   7.99  11.17  17.58  2240    1
-## tau        6.49    0.14 5.37   0.26   2.49   5.21   9.05  20.11  1499    1
-## eta[1]     0.41    0.02 0.96  -1.45  -0.23   0.42   1.07   2.25  3809    1
-## eta[2]     0.00    0.01 0.89  -1.78  -0.59   0.00   0.59   1.73  3899    1
-## eta[3]    -0.19    0.02 0.94  -2.02  -0.82  -0.19   0.42   1.67  3873    1
-## eta[4]    -0.03    0.01 0.87  -1.80  -0.61  -0.03   0.55   1.67  4308    1
-## eta[5]    -0.35    0.01 0.87  -2.02  -0.94  -0.35   0.22   1.41  3457    1
-## eta[6]    -0.23    0.02 0.90  -2.02  -0.82  -0.25   0.35   1.56  3553    1
-## eta[7]     0.32    0.02 0.89  -1.53  -0.26   0.34   0.91   2.02  3470    1
-## eta[8]     0.09    0.01 0.93  -1.72  -0.55   0.08   0.69   1.90  4685    1
-## theta[1]  11.48    0.15 8.22  -2.00   6.08  10.28  15.72  31.40  3004    1
-## theta[2]   7.80    0.10 6.33  -5.19   3.94   7.89  11.66  20.45  4316    1
-## theta[3]   6.18    0.13 7.67 -11.45   2.26   6.66  10.91  20.26  3348    1
-## theta[4]   7.73    0.09 6.53  -5.43   3.65   7.71  11.85  21.11  5083    1
-## theta[5]   5.15    0.10 6.40  -8.51   1.26   5.48   9.45  16.76  3929    1
-## theta[6]   6.02    0.11 6.51  -8.46   2.34   6.34  10.20  18.01  3834    1
-## theta[7]  10.44    0.11 6.78  -1.48   5.92   9.76  14.31  25.69  3768    1
-## theta[8]   8.50    0.12 7.86  -6.33   3.82   8.26  12.81  25.37  4242    1
-## lp__     -39.57    0.07 2.67 -45.56 -41.19 -39.34 -37.69 -35.14  1300    1
+## mu         7.74    0.11 4.98  -2.25   4.60   7.64  10.90  17.46  1885    1
+## tau        6.41    0.14 5.39   0.32   2.52   5.03   8.84  19.96  1527    1
+## eta[1]     0.38    0.01 0.93  -1.53  -0.22   0.41   0.99   2.19  4000    1
+## eta[2]     0.02    0.01 0.88  -1.70  -0.57   0.02   0.58   1.78  3929    1
+## eta[3]    -0.19    0.02 0.92  -2.01  -0.81  -0.20   0.42   1.68  3377    1
+## eta[4]    -0.03    0.01 0.90  -1.81  -0.62  -0.04   0.56   1.73  4000    1
+## eta[5]    -0.34    0.01 0.89  -2.06  -0.91  -0.34   0.21   1.48  4000    1
+## eta[6]    -0.20    0.02 0.89  -1.86  -0.79  -0.21   0.38   1.64  3242    1
+## eta[7]     0.35    0.01 0.87  -1.46  -0.21   0.38   0.92   2.08  4000    1
+## eta[8]     0.08    0.01 0.93  -1.81  -0.53   0.09   0.72   1.87  4000    1
+## theta[1]  10.93    0.14 7.83  -2.14   5.82   9.96  14.77  29.29  3178    1
+## theta[2]   7.86    0.10 6.06  -3.85   4.03   7.79  11.60  20.17  4000    1
+## theta[3]   5.97    0.14 7.69 -11.47   1.80   6.58  10.81  19.59  3059    1
+## theta[4]   7.67    0.11 6.64  -5.72   3.67   7.70  11.60  21.15  4000    1
+## theta[5]   5.06    0.10 6.41  -9.31   1.28   5.47   9.41  16.57  4000    1
+## theta[6]   6.14    0.10 6.57  -8.34   2.37   6.44  10.44  18.14  4000    1
+## theta[7]  10.52    0.10 6.64  -1.20   6.02   9.95  14.36  25.17  4000    1
+## theta[8]   8.41    0.14 7.66  -6.12   3.94   8.09  12.65  25.21  3220    1
+## lp__     -39.51    0.07 2.59 -45.09 -41.17 -39.29 -37.69 -35.06  1335    1
 ## 
-## Samples were drawn using NUTS(diag_e) at Wed Nov 28 22:20:41 2018.
+## Samples were drawn using NUTS(diag_e) at Thu Nov 29 10:12:03 2018.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
@@ -246,29 +258,29 @@ traceplot(fit1, pars = c(&quot;mu&quot;, &quot;tau&quot;), inc_warmup = TRUE, nr
 chain.data &lt;- extract(fit1, permuted = FALSE) 
 print(chain.data[1,,]) # parameters of all chains for the 1st of 1000 iterations</code></pre>
 <pre><code>##          parameters
-## chains           mu       tau     eta[1]     eta[2]      eta[3]     eta[4]
-##   chain:1  5.215157 19.894214  0.5719329 -0.6031763 -0.31015543  0.7253821
-##   chain:2 19.889271  6.640606  0.3676036  0.1861418 -0.51717636 -1.6413788
-##   chain:3 12.935590  2.300785 -0.2022055 -0.3343769  0.03165075  0.5491112
-##   chain:4 10.582680  4.902657  0.4310298 -1.2304104 -0.59952095  0.1128762
+## chains           mu      tau     eta[1]     eta[2]     eta[3]    eta[4]
+##   chain:1 15.433122 3.467958 -0.7312814  0.6058079 -2.6863685 0.8496479
+##   chain:2  7.359994 2.972028  1.0115190  2.4128459 -0.3594159 0.1874117
+##   chain:3  4.625446 1.437482  0.9778894 -0.4066848 -1.6740774 1.1981366
+##   chain:4  5.552294 5.448782  0.4722921  1.2388426 -1.3279797 2.2288927
 ##          parameters
-## chains        eta[5]     eta[6]     eta[7]     eta[8] theta[1]  theta[2]
-##   chain:1 -0.6460842 -0.2720261 -0.2850890 -0.7659714 16.59331 -6.784561
-##   chain:2 -1.7198181 -0.7182227 -0.4478693  0.7531220 22.33038 21.125366
-##   chain:3 -0.5398902 -1.7251951 -0.3433588 -0.7445325 12.47036 12.166260
-##   chain:4  0.4916620  0.9210080 -0.9412523  0.5000668 12.69587  4.550400
+## chains         eta[5]     eta[6]     eta[7]     eta[8]  theta[1]  theta[2]
+##   chain:1  0.04031318 -0.1213009 -0.4069464 -1.5494432 12.897069 17.534038
+##   chain:2  1.04778075 -0.9775907  0.5325148 -0.1757284 10.366257 14.531040
+##   chain:3 -0.95627682 -1.5051008 -0.6760256  0.5595071  6.031145  4.040844
+##   chain:4  0.63978423 -1.1219998  0.7288301  2.1191802  8.125711 12.302478
 ##          parameters
-## chains      theta[3]  theta[4]  theta[5]   theta[6]   theta[7]  theta[8]
-##   chain:1 -0.9551411 19.646064 -7.638179 -0.1965885 -0.4564649 -10.02324
-##   chain:2 16.4549069  8.989522  8.468637 15.1198375 16.9151477  24.89046
-##   chain:3 13.0084112 14.198977 11.693418  8.9662863 12.1455947  11.22258
-##   chain:4  7.6434344 11.136073 12.993130 15.0980662  5.9680429  13.03434
+## chains     theta[3]  theta[4]  theta[5]   theta[6]  theta[7]  theta[8]
+##   chain:1  6.116909 18.379665 15.572926 15.0124554 14.021849 10.059718
+##   chain:2  6.291800  7.916987 10.474028  4.4545671  8.942643  6.837724
+##   chain:3  2.218990  6.347746  3.250815  2.4618904  3.653671  5.429728
+##   chain:4 -1.683578 17.697046  9.038339 -0.5612385  9.523531 17.099246
 ##          parameters
 ## chains         lp__
-##   chain:1 -37.69883
-##   chain:2 -39.79339
-##   chain:3 -38.80310
-##   chain:4 -38.85878</code></pre>
+##   chain:1 -43.39070
+##   chain:2 -40.66127
+##   chain:3 -41.38603
+##   chain:4 -43.04463</code></pre>
 <p>To perform more advanced analytics of the sampling process, we can use the <code>shinystan</code> package, which provides a Shiny frontend. Using the package, a fitted model can be analyzed by starting the Shiny application in the following way:</p>
 <pre class="r"><code>library(shinystan)
 launch_shinystan(fit1)</code></pre>
@@ -281,8 +293,7 @@ launch_shinystan(fit1)</code></pre>
 <p><span class="math display">\[Y = \beta_0 + X \beta\,.\]</span></p>
 <p>This representation assumes that all samples have the same distribution. If there is a grouping of samples, then we have a problem because latent differences within and between groups will be ignored.</p>
 <p>An alternative would be to have one regression model for each group. In this case, however, the small sample size would be problematic when estimating the individual models.</p>
-<p>Hierarchical regression is a compromise between both extremes. This model assumes that
-the groups are similar but yet exhibit differences.</p>
+<p>Hierarchical regression is a compromise between both extremes. This model assumes that the groups are similar but yet exhibit differences.</p>
 <p>Assume that each sample belongs to one of <span class="math inline">\(K\)</span> groups. Then, hierarchical regression is specified as follows:</p>
 <p><span class="math display">\[Y_k = \alpha_{k} + X_k \beta^{(k)}\,, \forall k \in \{1, \ldots, K\} \]</span></p>
 <p>where <span class="math inline">\(Y_k\)</span> is the outcome for the <span class="math inline">\(k\)</span>-th group, <span class="math inline">\(\alpha_{k}\)</span> is the intercept, <span class="math inline">\(X_k\)</span> are the features, and <span class="math inline">\(\beta^{(k)}\)</span> indicates the weights. The hierarchical model is different from a model where <span class="math inline">\(Y_k\)</span> is fit for each group individually because the parameters, <span class="math inline">\(\alpha_{k}\)</span> and <span class="math inline">\(\beta^{(k)}\)</span> are assumed to originate from a common distribution.</p>
@@ -382,8 +393,21 @@ rat.data &lt;- list(N = nrow(df), T = ncol(df), x = days,
 <p>We can now fit the Bayesian hierarchical regression model for the rat weight data set:</p>
 <pre class="r"><code>rat.model &lt;- stan(
   file = &quot;rats.stan&quot;,
-  data = rat.data)
-# model contains estimates for intercepts (alpha) and slopes (beta)</code></pre>
+  data = rat.data)</code></pre>
+<pre><code>## In file included from /TL/opt/R-3.4.0/library/BH/include/boost/config.hpp:39:0,
+##                  from /TL/opt/R-3.4.0/library/BH/include/boost/math/tools/config.hpp:13,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/var.hpp:7,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core.hpp:12,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math.hpp:4,
+##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file40962b8bdb3e.cpp:8:
+## /TL/opt/R-3.4.0/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
+##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
+##  ^
+## &lt;command-line&gt;:0:0: note: this is the location of the previous definition</code></pre>
+<pre class="r"><code># model contains estimates for intercepts (alpha) and slopes (beta)</code></pre>
 </div>
 <div id="prediction-with-the-hiearchical-regression-model" class="section level3">
 <h3>Prediction with the hiearchical regression model</h3>
