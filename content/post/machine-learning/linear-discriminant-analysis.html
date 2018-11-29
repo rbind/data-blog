@@ -13,30 +13,54 @@ tags:
 
 
 <p>The main reason for the popularity of linear discriminant analysis (LDA) is that it allows for transforming data into a (possibly) lower-dimensional space. Given <span class="math inline">\(K\)</span> classes, LDA maps the data to a subspace of <span class="math inline">\(K - 1\)</span> dimensions that is spanned by <span class="math inline">\(K\)</span> centroids.</p>
-<div id="optimization" class="section level2">
-<h2>Optimization</h2>
-<p>LDA is based on Fisher’s optimization criterion according to which the centroids are spread out as far as possible. This amounts to finding a linear combination <span class="math inline">\(Z = a^T X\)</span> such that <span class="math inline">\(a^T\)</span> maximizes the between-class variance relative to the within-class variance.</p>
-<p>Each class <span class="math inline">\(k \in \{1, \ldots, K\}\)</span> is assigned a prior <span class="math inline">\(\hat{\pi}_k = \frac{N_k}{N}\)</span> such that <span class="math inline">\(\sum_{i=1}^k \hat{\pi}_k = 1\)</span>. The within-class variance is <span class="math inline">\(W = \hat{\Sigma}\)</span>. This matrix determines the deviation of all observations from their class centroids, which are defined by <span class="math inline">\(\hat{\mu}_k = \frac{1}{N_k} \sum_{g_i = k} x_i\)</span>. It is defined by:</p>
-<p><span class="math display">\[W = \sum_{k=1}^K \hat{\pi}_k \sum_{g_i = k} (x_i - \hat{\mu}_k) (x_i - \hat{\mu}_k)^T\,.\]</span></p>
-<p>The between-class variance is defined according to the deviation of the centroids from the overall mean, <span class="math inline">\(\hat{\mu} = \sum_{k=1}^K \hat{\pi}_k \hat{\mu}_k\)</span>:</p>
-<p><span class="math display">\[B \sum_{k=1}^K \hat{\pi}_k(\hat{\mu}_k - \hat{\mu}) (\hat{\mu}_k - \hat{\mu})^T\,.\]</span></p>
-<p>For <span class="math inline">\(Z\)</span>, the between class variance is <span class="math inline">\(a^T B a\)</span> and the within-class variance is <span class="math inline">\(A^T W a\)</span>. Thus, LDA can be optimized through the Rayleigh quotient</p>
-<p><span class="math display">\[\max_a \frac{a^T B a}{a^T W a}\,. \]</span></p>
-<p>By solving this optimization problem for <span class="math inline">\(a_1, \ldots, a_{K-1}\)</span>, we obtain <span class="math inline">\(K-1\)</span> discriminant coordinates, where each successive <span class="math inline">\(a_k\)</span> is constructed to be orthogonal in <span class="math inline">\(W\)</span> to the previous discriminant coordinates.</p>
-<p>The benefit of this projection is that LDA allows us to perform classification in a reduced subspace. Moreover, we do not need to use the full <span class="math inline">\(K-1\)</span> dimensions but we can even choose a smaller subspace <span class="math inline">\(l &lt; K-1\)</span> by limiting the number of considered dimensions.</p>
+<div id="the-approach-of-lda" class="section level2">
+<h2>The approach of LDA</h2>
+<p>LDA can be explained through two perspectives. The first is the probabilistic, Gaussian interpretation and the second is the interpretation as a transformation that is due to Fisher. The first interpretation is useful to understand the underlying assumptions of LDA. The second interpretation gives a better inutition on how the inherent dimensionality reduction of LDA works.</p>
+<div id="probabilistic-interpretation" class="section level3">
+<h3>Probabilistic interpretation</h3>
+<p>Each class <span class="math inline">\(k \in \{1, \ldots, K\}\)</span> is assigned a prior $_k such that that <span class="math inline">\(\sum_{i=1}^k \hat{\pi}_k = 1\)</span>. The posterior probability is</p>
+<p><span class="math display">\[\rm{Pr}(G = k |X = x) = \frac{f_k(x) \pi_k}{\sum_{l=1}^K f_l(x) \pi_l} \]</span></p>
+<p>where <span class="math inline">\(f_k(x)\)</span> is the density of <span class="math inline">\(X\)</span> conditioned on <span class="math inline">\(k\)</span>. The maximum-a-posterior estimator is</p>
+<p><span class="math display">\[G(x) = \arg \max_k \rm{Pr}(G = k | X = x) = \arg \max_k f_k(x) \pi_k \]</span></p>
+<p>because the denominator is identical for all classes.</p>
+<p>LDA assumes that the density is Gaussian:</p>
+<p><span class="math display">\[f_k(x) = \frac{1}{(2 \pi)^{\frac{p}{2}} \sqrt{|\Sigma_k|}} \exp\left(-\frac{1}{2}(x - \mu_k)^T\Sigma_k^{-1}(x - \mu_k)\right)\]</span></p>
+<p>where <span class="math inline">\(\Sigma_k\)</span> is the covariance matrix for the samples from class <span class="math inline">\(k\)</span> and <span class="math inline">\(|\Sigma_k|\)</span> is its determinant. LDA assumes that all classes have the same covariance matrices, i.e. <span class="math inline">\(\Sigma_k = \Sigma\,, \forall k\)</span>.</p>
+<p>Plugging <span class="math inline">\(f_k\)</span> into the classification function, we find that</p>
+<p><span class="math display">\[G(x) = \arg \max_k \delta_k(x)\]</span></p>
+<p>where</p>
+<p><span class="math display">\[\delta_k(x) = x^T \Sigma^{-1} \hat{\mu}_k -\frac{1}{2} \hat{\mu}_k^T \Sigma^{-1} \mu_k + \log \pi_k \]</span></p>
+<p>is the discriminant function for class <span class="math inline">\(k\)</span>. So, now that we have a classifier, how we can compute it?</p>
+<p>To find the covariance matrix, we simply compute</p>
+<p><span class="math display">\[\Sigma = \sum_{k=1}^K \frac{1}{N - K} \sum_{g_i = k} (x_i - \hat{\mu}_k) (x_i - \hat{\mu}_k)^T\,.\]</span></p>
+<p>Note that the deviation from the means is divided by <span class="math inline">\(N-K\)</span>, the degrees of freedom, to obtain an unbiased estimator.</p>
+<p>The means of the classes, which are also called centrois, are defined by</p>
+<p><span class="math display">\[\hat{\mu}_k = \frac{1}{N_k} \sum_{g_i = k} x_i\,.\]</span></p>
+<p>The priors are set to the ratio of the class-specific observations:</p>
+<p><span class="math display">\[\hat{\pi}_k = \frac{N_k}{N}\,.\]</span></p>
+<p>With this, we have defined all parameters required for the classifier. However, we have not really understood how LDA works: we only know that it is maximizing the posterior according to the Gaussian density. Fortunately, there is an alternative formulation of LDA due to Fisher, which we will briefly deal with next.</p>
 </div>
-<div id="classification" class="section level2">
-<h2>Classification</h2>
-<p>For classification, LDA performs the following two steps:</p>
+<div id="interpretation-as-a-transformation" class="section level3">
+<h3>Interpretation as a transformation</h3>
+<p>Fisher’s LDA optimization criterion states that the centroids of the groups should be spread out as far as possible. This amounts to finding a linear combination <span class="math inline">\(Z = a^T X\)</span> such that <span class="math inline">\(a^T\)</span> maximizes the between-class variance relative to the within-class variance.</p>
+<p>The within-class variance is <span class="math inline">\(W\)</span> is simply the overall covariance matrix, <span class="math inline">\(\hat{\Sigma}\)</span>. This matrix determines the deviation of all observations from their class centroids. The between-class variance is defined according to the deviation of the centroids from the overall mean, <span class="math inline">\(\hat{\mu} = \sum_{k=1}^K \hat{\pi}_k \hat{\mu}_k\)</span>:</p>
+<p><span class="math display">\[B = \sum_{k=1}^K \hat{\pi}_k(\hat{\mu}_k - \hat{\mu}) (\hat{\mu}_k - \hat{\mu})^T\,.\]</span></p>
+<p>For <span class="math inline">\(Z\)</span>, the between class variance is <span class="math inline">\(a^T B a\)</span> and the within-class variance is <span class="math inline">\(A^T W a\)</span>. Thus, LDA can be optimized through the Rayleigh quotient</p>
+<p><span class="math display">\[\max_a \frac{a^T B a}{a^T W a}\,, \]</span></p>
+<p>which defines an optimal mapping of <span class="math inline">\(X\)</span> to the new space <span class="math inline">\(Z\)</span>. Note that $Z ^{1 p}, that is, the observations are mapped to a single dimension. To obtain additional dimensions, we need to solve the optimization problem for <span class="math inline">\(a_1, \ldots, a_{K-1}\)</span> where each successive <span class="math inline">\(a_k\)</span> is constructed to be orthogonal in <span class="math inline">\(W\)</span> to the previous discriminant coordinates. This leads to the linear transformation <span class="math inline">\(G = (Z_1^T, Z_2^T, \ldots, Z_{K-1}^T) \in \mathbb{R}^{p \times q}\)</span> with which we can map <span class="math inline">\(X\)</span> from <span class="math inline">\(p\)</span> to <span class="math inline">\(q\)</span> dimension via <span class="math inline">\(X G\)</span>. Why do we consider <span class="math inline">\(K-1\)</span> projections? This is because the affine subspace that is spanned by the <span class="math inline">\(K\)</span> centroids has a rank of at most <span class="math inline">\(K-1\)</span> due to the spherical assumptions of LDA.</p>
+<p>The benefit of this formulation of LDA is that is enables us to perform classification in a reduced subspace. We do not need to use the full <span class="math inline">\(K-1\)</span> dimensions but can choose a smaller subspace <span class="math inline">\(l &lt; K-1\)</span>. This is called reduced-rank LDA.</p>
+<p>Using this formulation of LDA, classification involves two steps:</p>
 <ol style="list-style-type: decimal">
-<li>Sphere the data using the common covariance matrix <span class="math inline">\(\hat{\Sigma} = UDU^T\)</span> (eigendecomposition) via <span class="math inline">\(X^{\ast} = D^{-\frac{1}{2}} U^T X\)</span>.</li>
-<li>Classify observations <span class="math inline">\(x_i\)</span> to the closest class centroid in the transformed space, taking into account the class priors <span class="math inline">\(\pi_k\)</span>.</li>
+<li>Sphere the data using the common covariance matrix <span class="math inline">\(\hat{\Sigma} = UDU^T\)</span> (eigendecomposition) such that <span class="math inline">\(X^{\ast} = D^{-\frac{1}{2}} U^T X\)</span>. In this way, the covariance of <span class="math inline">\(X^{\ast}\)</span> becomes the identity matrix. By eliminating the covariance between the variables through sphering the data, it becomes much easier for separation of classes in the transformed space.</li>
+<li>Classify observations <span class="math inline">\(x_i\)</span> to the closest class centroid in the transformed space, taking into account the class priors <span class="math inline">\(\pi_k\)</span>. The intuition about the <span class="math inline">\(\pi_k\)</span> is that if an observation would have equal distance to the centroids from two classes, then it would be assigned to the class with the greater prior.</li>
 </ol>
-<p>Questions to answer:</p>
-<ul>
-<li>Deefinition of discriminants?</li>
-<li>How are the decision values computed? According to the text: distance to centroid somehow?</li>
-</ul>
+<p><a href="https://machinelearningmastery.com/linear-discriminant-analysis-for-machine-learning/" class="uri">https://machinelearningmastery.com/linear-discriminant-analysis-for-machine-learning/</a></p>
+</div>
+</div>
+<div id="complexity-of-the-lda-model" class="section level2">
+<h2>Complexity of the LDA model</h2>
+<p>The number of effective parameters of LDA can be derived in the following way.
+There are <span class="math inline">\(K\)</span> means, <span class="math inline">\(\hat{\mu}_k\)</span> that are estimated. Since the covariance matrix is specified by the centroids alone, there are no additional parameters for <span class="math inline">\(\Sigma\)</span>. Since we only need to consider the differences <span class="math inline">\(\delta_k(x) - \delta_K(x)\)</span> of discriminant function, this gives rise to <span class="math inline">\(K-1\)</span> calculations involving the <span class="math inline">\(p\)</span> elements of the centroids and the prior. Thus, the total number of parameters is <span class="math inline">\(K-1 \cdot (p+1)\)</span>.</p>
 </div>
 <div id="the-phoneme-data-set" class="section level2">
 <h2>The phoneme data set</h2>
@@ -46,7 +70,7 @@ f &lt;- getURL(&#39;https://www.datascienceblog.net/data-sets/phoneme.csv&#39;)
 df &lt;- read.csv(textConnection(f), header=T)
 print(dim(df))</code></pre>
 <pre><code>## [1] 4509  259</code></pre>
-<p>The data set contains samples of digitized speech for five phonemes: <em>aa</em> (as the vowel in <em>dark</em>), <em>ao</em> (as the first vowel in <em>water</em>), <em>dcl</em> (as in <em>dark</em>), <em>iy</em> (as the vowel in <em>she</em>), and <em>sh</em> (as in <em>she</em>). In total, 4509 speech frames of 32 msec were selected. For each speech frame, a log-periodogram of length 256 was computed, which is suitable for speech recognition. The 256 columns labeled <em>x.1</em> to <em>x.256</em> identify the speech features, while the columns <em>g</em> and <em>speaker</em> indicate the phonemes (labels) and speakers, respectively.</p>
+<p>The data set contains samples of digitized speech for five phonemes: aa (as the vowel in <em>dark</em>), <em>ao</em> (as the first vowel in <em>water</em>), <em>dcl</em> (as in <em>dark</em>), <em>iy</em> (as the vowel in <em>she</em>), and <em>sh</em> (as in <em>she</em>). In total, 4509 speech frames of 32 msec were selected. For each speech frame, a log-periodogram of length 256 was computed, which is suitable for speech recognition. The 256 columns labeled <em>x.1</em> to <em>x.256</em> identify the speech features, while the columns <em>g</em> and <em>speaker</em> indicate the phonemes (labels) and speakers, respectively.</p>
 <p>Let us assign training and test samples:</p>
 <pre class="r"><code>#logical vector: TRUE if entry belongs to train set, FALSE else
 train &lt;- grepl(&quot;^train&quot;, df$speaker)
@@ -73,9 +97,9 @@ ggplot(plot.df, aes(x = LD1, y = LD2, color = Outcome)) + geom_point()</code></p
 <p><img src="/post/machine-learning/linear-discriminant-analysis_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>Plotting the data in the two LDA dimensions reveals three clusters:</p>
 <ul>
-<li>Cluster 1 (left) consists of <strong>aa</strong> and <strong>ao</strong> phonemes</li>
-<li>Cluster 2 (bottom right) consists of <strong>dcl</strong> and <strong>iy</strong> phonemes</li>
-<li>Cluster 3 (top right) consists of <strong>sh</strong> phonemes</li>
+<li>Cluster 1 (left) consists of <em>aa</em> and <em>ao</em> phonemes</li>
+<li>Cluster 2 (bottom right) consists of <em>dcl</em> and <em>iy</em> phonemes</li>
+<li>Cluster 3 (top right) consists of <em>sh</em> phonemes</li>
 </ul>
 <p>This indicates that two dimensions are not sufficient for differentiating all 5 classes. However, the clustering indicates that phonemes that are sufficiently different from one another can be differentiated very well.</p>
 <p>We can also plot the mapping of training data onto the discriminant dimensions using the <code>plot.lda</code> function where the <em>dimen</em> parameter can be used to specify the number of considered dimensions:</p>
@@ -143,4 +167,8 @@ ggplot(plot.df, aes(x = LD1, y = LD2, color = Outcome, shape = Prediction)) +
         geom_point()</code></pre>
 <p><img src="/post/machine-learning/linear-discriminant-analysis_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>In the plot, the labels are indicated by different colors and the predictions by different colors. Ideally, each color would have only a single symbol. Incorrect predictions are visible when one colors exhibits different symbols. Using the plot, we quickly see that most confusions occur when observations labeled as <em>aa</em> are incorrectly classified as <em>ao</em> and vice versa.</p>
+</div>
+<div id="qda" class="section level2">
+<h2>QDA</h2>
+<p>QDA has (K-1)[P(P+3)/2+1] parameters</p>
 </div>
