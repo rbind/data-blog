@@ -43,6 +43,8 @@ Questions to answer:
 * Deefinition of discriminants?
 * How are the decision values computed? According to the text: distance to centroid somehow?
 
+https://machinelearningmastery.com/linear-discriminant-analysis-for-machine-learning/
+
 ## The phoneme data set
 
 We will use the [phoneme speech recognition data set](https://web.stanford.edu/~hastie/ElemStatLearn/datasets/phoneme.info.txt):
