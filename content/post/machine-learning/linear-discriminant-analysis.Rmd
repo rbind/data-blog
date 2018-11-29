@@ -38,6 +38,11 @@ For classification, LDA performs the following two steps:
 1. Sphere the data using the common covariance matrix $\hat{\Sigma} = UDU^T$ (eigendecomposition) via $X^{\ast} = D^{-\frac{1}{2}} U^T X$.
 2. Classify observations $x_i$ to the closest class centroid in the transformed space, taking into account the class priors $\pi_k$.
 
+Questions to answer:
+
+* Deefinition of discriminants?
+* How are the decision values computed? According to the text: distance to centroid somehow?
+
 ## The phoneme data set
 
 We will use the [phoneme speech recognition data set](https://web.stanford.edu/~hastie/ElemStatLearn/datasets/phoneme.info.txt):
