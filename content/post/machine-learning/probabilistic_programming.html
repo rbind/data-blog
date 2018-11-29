@@ -1,7 +1,7 @@
 ---
 title: "An Introduction to Probabilistic Programming with Stan in R"
 author: Matthias Döring
-date: '2018-11-26'
+date: '2018-11-28'
 description: "Bayesian modeling does not have to be tedious. Using probabilistic programming it is relatively easy to implement statistical models that make use of MCMC sampling. In this post, I explore probabilistic programming using Stan."
 thumbnail: "/post/machine-learning/probabilistic_programming_cover.png"
 categories:
@@ -198,27 +198,27 @@ rstan_options(auto_write = TRUE)  # store compiled stan model</code></pre>
 ## post-warmup draws per chain=1000, total post-warmup draws=4000.
 ## 
 ##            mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
-## mu         7.93    0.14 5.27  -2.20   4.51   7.90  11.24  18.46  1350 1.00
-## tau        6.51    0.17 5.78   0.23   2.48   5.11   9.08  20.21  1115 1.00
-## eta[1]     0.38    0.02 0.93  -1.49  -0.21   0.41   1.01   2.17  3538 1.00
-## eta[2]     0.02    0.02 0.87  -1.69  -0.56   0.00   0.58   1.85  2917 1.00
-## eta[3]    -0.21    0.02 0.94  -2.04  -0.83  -0.19   0.44   1.61  3469 1.00
-## eta[4]    -0.03    0.02 0.90  -1.81  -0.62  -0.02   0.57   1.75  3071 1.00
-## eta[5]    -0.37    0.01 0.87  -2.00  -0.94  -0.39   0.20   1.38  3398 1.00
-## eta[6]    -0.23    0.02 0.90  -1.95  -0.83  -0.24   0.36   1.58  2787 1.00
-## eta[7]     0.34    0.02 0.91  -1.46  -0.23   0.36   0.92   2.09  3202 1.00
-## eta[8]     0.06    0.02 0.96  -1.86  -0.58   0.08   0.72   1.96  4000 1.00
-## theta[1]  11.19    0.16 8.13  -2.31   5.76  10.26  15.23  30.61  2477 1.00
-## theta[2]   7.94    0.10 6.33  -4.78   4.04   7.90  11.89  20.58  3682 1.00
-## theta[3]   6.17    0.16 7.75 -11.90   1.88   6.71  11.07  19.91  2365 1.00
-## theta[4]   7.68    0.10 6.61  -5.55   3.60   7.61  11.60  21.47  4000 1.00
-## theta[5]   5.15    0.11 6.40  -9.14   1.38   5.49   9.44  16.80  3209 1.00
-## theta[6]   6.12    0.12 6.73  -8.17   1.99   6.49  10.48  18.53  3005 1.00
-## theta[7]  10.66    0.14 6.86  -1.06   6.10   9.94  14.68  26.66  2509 1.00
-## theta[8]   8.48    0.14 7.70  -7.57   4.08   8.26  12.70  24.83  3094 1.00
-## lp__     -39.63    0.08 2.70 -45.75 -41.23 -39.40 -37.72 -35.13  1085 1.01
+## mu         7.67    0.15 5.14  -2.69   4.42   7.83  10.93  17.87  1185    1
+## tau        6.54    0.16 5.40   0.31   2.52   5.28   9.05  20.30  1157    1
+## eta[1]     0.42    0.01 0.92  -1.47  -0.18   0.44   1.03   2.18  4000    1
+## eta[2]     0.03    0.01 0.87  -1.74  -0.54   0.03   0.58   1.72  4000    1
+## eta[3]    -0.18    0.02 0.92  -1.95  -0.81  -0.20   0.45   1.65  3690    1
+## eta[4]    -0.03    0.01 0.92  -1.85  -0.64  -0.02   0.57   1.81  4000    1
+## eta[5]    -0.33    0.01 0.86  -2.05  -0.89  -0.34   0.22   1.43  3318    1
+## eta[6]    -0.20    0.01 0.87  -1.91  -0.80  -0.21   0.36   1.51  4000    1
+## eta[7]     0.37    0.02 0.87  -1.37  -0.23   0.37   0.96   2.02  3017    1
+## eta[8]     0.05    0.01 0.92  -1.77  -0.55   0.05   0.69   1.88  4000    1
+## theta[1]  11.39    0.15 8.09  -2.21   6.14  10.30  15.56  30.22  2759    1
+## theta[2]   7.92    0.10 6.25  -4.75   4.04   8.03  11.83  20.05  4000    1
+## theta[3]   6.22    0.14 7.83 -11.41   2.03   6.64  10.80  20.97  3043    1
+## theta[4]   7.58    0.10 6.54  -5.93   3.54   7.60  11.66  20.90  4000    1
+## theta[5]   5.14    0.10 6.30  -8.68   1.40   5.63   9.50  16.12  4000    1
+## theta[6]   6.08    0.10 6.62  -8.06   2.21   6.45  10.35  18.53  4000    1
+## theta[7]  10.60    0.11 6.70  -0.94   6.15  10.01  14.48  25.75  4000    1
+## theta[8]   8.19    0.14 8.18  -8.13   3.59   8.01  12.48  25.84  3361    1
+## lp__     -39.47    0.07 2.58 -45.21 -41.01 -39.28 -37.70 -34.99  1251    1
 ## 
-## Samples were drawn using NUTS(diag_e) at Thu Nov 29 10:28:10 2018.
+## Samples were drawn using NUTS(diag_e) at Thu Nov 29 11:17:50 2018.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
@@ -245,29 +245,29 @@ traceplot(fit1, pars = c(&quot;mu&quot;, &quot;tau&quot;), inc_warmup = TRUE, nr
 chain.data &lt;- extract(fit1, permuted = FALSE) 
 print(chain.data[1,,]) # parameters of all chains for the 1st of 1000 iterations</code></pre>
 <pre><code>##          parameters
-## chains           mu      tau      eta[1]     eta[2]     eta[3]      eta[4]
-##   chain:1 -2.746330 4.331718 -0.09236649  0.3273003 -0.8243994  2.00034759
-##   chain:2 10.524676 7.498804  0.61707889 -0.5950907 -0.8951201 -0.44002480
-##   chain:3  6.830166 3.441065  1.38809721 -0.4728165  1.4512123  0.09198391
-##   chain:4 -1.027019 5.399081  0.57620713 -0.2192507 -1.2519190  1.75575194
+## chains           mu       tau     eta[1]     eta[2]     eta[3]     eta[4]
+##   chain:1  1.111120  2.729124 -0.1581242 -0.8498898  0.5025965 -1.9874554
+##   chain:2  3.633421  2.588945  1.2058772 -1.1173221  1.4830778  0.4838649
+##   chain:3 13.793056  3.144159  0.6023924 -1.1188243 -1.2393491 -0.6118482
+##   chain:4  3.673380 13.889267 -0.0869434  1.1900236 -0.0378830 -0.2687284
 ##          parameters
-## chains       eta[5]     eta[6]     eta[7]     eta[8]  theta[1]  theta[2]
-##   chain:1 -0.422475 -1.2525170  1.5072839  1.3500444 -3.146436 -1.328557
-##   chain:2 -1.724786 -0.4515949  0.9911818  2.0868215 15.152030  6.062207
-##   chain:3  1.877451 -0.5970420 -1.1753330 -0.7597141 11.606699  5.203173
-##   chain:4  1.231959  0.1916635  1.3099377  0.3222195  2.083970 -2.210771
+## chains        eta[5]     eta[6]     eta[7]      eta[8]   theta[1]
+##   chain:1  0.3367602 -1.1940843  0.5834020 -0.08371249  0.6795797
+##   chain:2 -1.8057252  0.7429594  0.9517675  0.55907356  6.7553706
+##   chain:3 -1.5867789  0.6334288 -0.4613463 -1.44533007 15.6870727
+##   chain:4  0.1028605  0.3481214  0.9264762  0.45331024  2.4657999
 ##          parameters
-## chains     theta[3] theta[4]  theta[5]     theta[6]  theta[7]   theta[8]
-##   chain:1 -6.317396 5.918612 -4.576373 -8.171880650  3.782799  3.1016817
-##   chain:2  3.812345 7.225016 -2.409155  7.138253954 17.957354 26.1733422
-##   chain:3 11.823882 7.146688 13.290598  4.775705034  2.785768  4.2159400
-##   chain:4 -7.786231 8.452428  5.624427  0.007787911  6.045441  0.7126701
+## chains     theta[2] theta[3]    theta[4]  theta[5]  theta[6]  theta[7]
+##   chain:1 -1.208335 2.482769 -4.31289292  2.030181 -2.147684  2.703297
+##   chain:2  0.740736 7.473028  4.88612054 -1.041502  5.556902  6.097494
+##   chain:3 10.275294 9.896345 11.86930758  8.803971 15.784656 12.342510
+##   chain:4 20.201935 3.147213 -0.05906019  5.102037  8.508530 16.541455
 ##          parameters
-## chains         lp__
-##   chain:1 -42.70212
-##   chain:2 -38.73482
-##   chain:3 -42.12478
-##   chain:4 -40.44153</code></pre>
+## chains     theta[8]      lp__
+##   chain:1 0.8826584 -41.21499
+##   chain:2 5.0808317 -41.17178
+##   chain:3 9.2487083 -40.35351
+##   chain:4 9.9695268 -36.34043</code></pre>
 <p>To perform more advanced analytics of the sampling process, we can use the <code>shinystan</code> package, which provides a Shiny frontend. Using the package, a fitted model can be analyzed by starting the Shiny application in the following way:</p>
 <pre class="r"><code>library(shinystan)
 launch_shinystan(fit1)</code></pre>
