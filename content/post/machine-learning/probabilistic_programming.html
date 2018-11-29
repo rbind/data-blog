@@ -185,19 +185,6 @@ rstan_options(auto_write = TRUE)  # store compiled stan model</code></pre>
   iter = 2000,            # total number of iterations per chain
   refresh = 1000          # show progress every &#39;refresh&#39; iterations
   )</code></pre>
-<pre><code>## In file included from /TL/opt/R-3.4.0/library/BH/include/boost/config.hpp:39:0,
-##                  from /TL/opt/R-3.4.0/library/BH/include/boost/math/tools/config.hpp:13,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/var.hpp:7,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core.hpp:12,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math.hpp:4,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file409636dbb970.cpp:8:
-## /TL/opt/R-3.4.0/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
-##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
-##  ^
-## &lt;command-line&gt;:0:0: note: this is the location of the previous definition</code></pre>
 </div>
 <div id="model-interpretation" class="section level3">
 <h3>Model interpretation</h3>
@@ -211,27 +198,27 @@ rstan_options(auto_write = TRUE)  # store compiled stan model</code></pre>
 ## post-warmup draws per chain=1000, total post-warmup draws=4000.
 ## 
 ##            mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
-## mu         7.74    0.11 4.98  -2.25   4.60   7.64  10.90  17.46  1885    1
-## tau        6.41    0.14 5.39   0.32   2.52   5.03   8.84  19.96  1527    1
-## eta[1]     0.38    0.01 0.93  -1.53  -0.22   0.41   0.99   2.19  4000    1
-## eta[2]     0.02    0.01 0.88  -1.70  -0.57   0.02   0.58   1.78  3929    1
-## eta[3]    -0.19    0.02 0.92  -2.01  -0.81  -0.20   0.42   1.68  3377    1
-## eta[4]    -0.03    0.01 0.90  -1.81  -0.62  -0.04   0.56   1.73  4000    1
-## eta[5]    -0.34    0.01 0.89  -2.06  -0.91  -0.34   0.21   1.48  4000    1
-## eta[6]    -0.20    0.02 0.89  -1.86  -0.79  -0.21   0.38   1.64  3242    1
-## eta[7]     0.35    0.01 0.87  -1.46  -0.21   0.38   0.92   2.08  4000    1
-## eta[8]     0.08    0.01 0.93  -1.81  -0.53   0.09   0.72   1.87  4000    1
-## theta[1]  10.93    0.14 7.83  -2.14   5.82   9.96  14.77  29.29  3178    1
-## theta[2]   7.86    0.10 6.06  -3.85   4.03   7.79  11.60  20.17  4000    1
-## theta[3]   5.97    0.14 7.69 -11.47   1.80   6.58  10.81  19.59  3059    1
-## theta[4]   7.67    0.11 6.64  -5.72   3.67   7.70  11.60  21.15  4000    1
-## theta[5]   5.06    0.10 6.41  -9.31   1.28   5.47   9.41  16.57  4000    1
-## theta[6]   6.14    0.10 6.57  -8.34   2.37   6.44  10.44  18.14  4000    1
-## theta[7]  10.52    0.10 6.64  -1.20   6.02   9.95  14.36  25.17  4000    1
-## theta[8]   8.41    0.14 7.66  -6.12   3.94   8.09  12.65  25.21  3220    1
-## lp__     -39.51    0.07 2.59 -45.09 -41.17 -39.29 -37.69 -35.06  1335    1
+## mu         7.93    0.14 5.27  -2.20   4.51   7.90  11.24  18.46  1350 1.00
+## tau        6.51    0.17 5.78   0.23   2.48   5.11   9.08  20.21  1115 1.00
+## eta[1]     0.38    0.02 0.93  -1.49  -0.21   0.41   1.01   2.17  3538 1.00
+## eta[2]     0.02    0.02 0.87  -1.69  -0.56   0.00   0.58   1.85  2917 1.00
+## eta[3]    -0.21    0.02 0.94  -2.04  -0.83  -0.19   0.44   1.61  3469 1.00
+## eta[4]    -0.03    0.02 0.90  -1.81  -0.62  -0.02   0.57   1.75  3071 1.00
+## eta[5]    -0.37    0.01 0.87  -2.00  -0.94  -0.39   0.20   1.38  3398 1.00
+## eta[6]    -0.23    0.02 0.90  -1.95  -0.83  -0.24   0.36   1.58  2787 1.00
+## eta[7]     0.34    0.02 0.91  -1.46  -0.23   0.36   0.92   2.09  3202 1.00
+## eta[8]     0.06    0.02 0.96  -1.86  -0.58   0.08   0.72   1.96  4000 1.00
+## theta[1]  11.19    0.16 8.13  -2.31   5.76  10.26  15.23  30.61  2477 1.00
+## theta[2]   7.94    0.10 6.33  -4.78   4.04   7.90  11.89  20.58  3682 1.00
+## theta[3]   6.17    0.16 7.75 -11.90   1.88   6.71  11.07  19.91  2365 1.00
+## theta[4]   7.68    0.10 6.61  -5.55   3.60   7.61  11.60  21.47  4000 1.00
+## theta[5]   5.15    0.11 6.40  -9.14   1.38   5.49   9.44  16.80  3209 1.00
+## theta[6]   6.12    0.12 6.73  -8.17   1.99   6.49  10.48  18.53  3005 1.00
+## theta[7]  10.66    0.14 6.86  -1.06   6.10   9.94  14.68  26.66  2509 1.00
+## theta[8]   8.48    0.14 7.70  -7.57   4.08   8.26  12.70  24.83  3094 1.00
+## lp__     -39.63    0.08 2.70 -45.75 -41.23 -39.40 -37.72 -35.13  1085 1.01
 ## 
-## Samples were drawn using NUTS(diag_e) at Thu Nov 29 10:12:03 2018.
+## Samples were drawn using NUTS(diag_e) at Thu Nov 29 10:28:10 2018.
 ## For each parameter, n_eff is a crude measure of effective sample size,
 ## and Rhat is the potential scale reduction factor on split chains (at 
 ## convergence, Rhat=1).</code></pre>
@@ -258,29 +245,29 @@ traceplot(fit1, pars = c(&quot;mu&quot;, &quot;tau&quot;), inc_warmup = TRUE, nr
 chain.data &lt;- extract(fit1, permuted = FALSE) 
 print(chain.data[1,,]) # parameters of all chains for the 1st of 1000 iterations</code></pre>
 <pre><code>##          parameters
-## chains           mu      tau     eta[1]     eta[2]     eta[3]    eta[4]
-##   chain:1 15.433122 3.467958 -0.7312814  0.6058079 -2.6863685 0.8496479
-##   chain:2  7.359994 2.972028  1.0115190  2.4128459 -0.3594159 0.1874117
-##   chain:3  4.625446 1.437482  0.9778894 -0.4066848 -1.6740774 1.1981366
-##   chain:4  5.552294 5.448782  0.4722921  1.2388426 -1.3279797 2.2288927
+## chains           mu      tau      eta[1]     eta[2]     eta[3]      eta[4]
+##   chain:1 -2.746330 4.331718 -0.09236649  0.3273003 -0.8243994  2.00034759
+##   chain:2 10.524676 7.498804  0.61707889 -0.5950907 -0.8951201 -0.44002480
+##   chain:3  6.830166 3.441065  1.38809721 -0.4728165  1.4512123  0.09198391
+##   chain:4 -1.027019 5.399081  0.57620713 -0.2192507 -1.2519190  1.75575194
 ##          parameters
-## chains         eta[5]     eta[6]     eta[7]     eta[8]  theta[1]  theta[2]
-##   chain:1  0.04031318 -0.1213009 -0.4069464 -1.5494432 12.897069 17.534038
-##   chain:2  1.04778075 -0.9775907  0.5325148 -0.1757284 10.366257 14.531040
-##   chain:3 -0.95627682 -1.5051008 -0.6760256  0.5595071  6.031145  4.040844
-##   chain:4  0.63978423 -1.1219998  0.7288301  2.1191802  8.125711 12.302478
+## chains       eta[5]     eta[6]     eta[7]     eta[8]  theta[1]  theta[2]
+##   chain:1 -0.422475 -1.2525170  1.5072839  1.3500444 -3.146436 -1.328557
+##   chain:2 -1.724786 -0.4515949  0.9911818  2.0868215 15.152030  6.062207
+##   chain:3  1.877451 -0.5970420 -1.1753330 -0.7597141 11.606699  5.203173
+##   chain:4  1.231959  0.1916635  1.3099377  0.3222195  2.083970 -2.210771
 ##          parameters
-## chains     theta[3]  theta[4]  theta[5]   theta[6]  theta[7]  theta[8]
-##   chain:1  6.116909 18.379665 15.572926 15.0124554 14.021849 10.059718
-##   chain:2  6.291800  7.916987 10.474028  4.4545671  8.942643  6.837724
-##   chain:3  2.218990  6.347746  3.250815  2.4618904  3.653671  5.429728
-##   chain:4 -1.683578 17.697046  9.038339 -0.5612385  9.523531 17.099246
+## chains     theta[3] theta[4]  theta[5]     theta[6]  theta[7]   theta[8]
+##   chain:1 -6.317396 5.918612 -4.576373 -8.171880650  3.782799  3.1016817
+##   chain:2  3.812345 7.225016 -2.409155  7.138253954 17.957354 26.1733422
+##   chain:3 11.823882 7.146688 13.290598  4.775705034  2.785768  4.2159400
+##   chain:4 -7.786231 8.452428  5.624427  0.007787911  6.045441  0.7126701
 ##          parameters
 ## chains         lp__
-##   chain:1 -43.39070
-##   chain:2 -40.66127
-##   chain:3 -41.38603
-##   chain:4 -43.04463</code></pre>
+##   chain:1 -42.70212
+##   chain:2 -38.73482
+##   chain:3 -42.12478
+##   chain:4 -40.44153</code></pre>
 <p>To perform more advanced analytics of the sampling process, we can use the <code>shinystan</code> package, which provides a Shiny frontend. Using the package, a fitted model can be analyzed by starting the Shiny application in the following way:</p>
 <pre class="r"><code>library(shinystan)
 launch_shinystan(fit1)</code></pre>
@@ -393,21 +380,8 @@ rat.data &lt;- list(N = nrow(df), T = ncol(df), x = days,
 <p>We can now fit the Bayesian hierarchical regression model for the rat weight data set:</p>
 <pre class="r"><code>rat.model &lt;- stan(
   file = &quot;rats.stan&quot;,
-  data = rat.data)</code></pre>
-<pre><code>## In file included from /TL/opt/R-3.4.0/library/BH/include/boost/config.hpp:39:0,
-##                  from /TL/opt/R-3.4.0/library/BH/include/boost/math/tools/config.hpp:13,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/var.hpp:7,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/core.hpp:12,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/stan/math.hpp:4,
-##                  from /TL/opt/R-3.4.0/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file40962b8bdb3e.cpp:8:
-## /TL/opt/R-3.4.0/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
-##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
-##  ^
-## &lt;command-line&gt;:0:0: note: this is the location of the previous definition</code></pre>
-<pre class="r"><code># model contains estimates for intercepts (alpha) and slopes (beta)</code></pre>
+  data = rat.data)
+# model contains estimates for intercepts (alpha) and slopes (beta)</code></pre>
 </div>
 <div id="prediction-with-the-hiearchical-regression-model" class="section level3">
 <h3>Prediction with the hiearchical regression model</h3>

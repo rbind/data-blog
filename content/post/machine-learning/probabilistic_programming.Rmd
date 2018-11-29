@@ -169,7 +169,7 @@ rstan_options(auto_write = TRUE)  # store compiled stan model
 
 Now, we can compile the model and sample from the posterior. The only two required parameters of ```stan``` are the location of the model file and the data to be fed to the model. The other parameters indicated here are just shown to provide an overview of the possible options:
 
-```{r, warning = FALSE}
+```{r, warning = FALSE, message= FALSE}
 fit1 <- stan(
   file = "schools.stan",  # Stan program
   data = schools.data,    # named list of data
@@ -364,7 +364,7 @@ rat.data <- list(N = nrow(df), T = ncol(df), x = days,
 
 We can now fit the Bayesian hierarchical regression model for the rat weight data set:
 
-```{r}
+```{r, message = FALSE}
 rat.model <- stan(
   file = "rats.stan",
   data = rat.data)
