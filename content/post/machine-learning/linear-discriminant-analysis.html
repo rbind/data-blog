@@ -7,12 +7,14 @@ draft: true
 categories:
   - machine-learning
 tags:
+    - supervised-learning
+    - linear-model
     - R
 ---
 
 
 
-<p>The main reason for the popularity of linear discriminant analysis (LDA) is that it allows for transforming data into a (possibly) lower-dimensional space. Given <span class="math inline">\(K\)</span> classes, LDA maps the data to a subspace of <span class="math inline">\(K - 1\)</span> dimensions that is spanned by <span class="math inline">\(K\)</span> centroids.</p>
+<p>Discriminant analysis encompasses methods that can be used for both classification and dimensionality reduction. There are three flavors of discriminant analysis: linear discriminant analysis (LDA), quadratic discriminant analysis (QDA), and regularized discriminant analysis (RDA). The main driver for the popularity of discriminant analysis is that these methods implicitly transform the data into low-dimensional space.</p>
 <div id="the-approach-of-lda" class="section level2">
 <h2>The approach of LDA</h2>
 <p>LDA can be explained through two perspectives. The first is the probabilistic, Gaussian interpretation and the second is the interpretation as a transformation that is due to Fisher. The first interpretation is useful to understand the underlying assumptions of LDA. The second interpretation gives a better inutition on how the inherent dimensionality reduction of LDA works.</p>
@@ -38,29 +40,60 @@ tags:
 <p><span class="math display">\[\hat{\mu}_k = \frac{1}{N_k} \sum_{g_i = k} x_i\,.\]</span></p>
 <p>The priors are set to the ratio of the class-specific observations:</p>
 <p><span class="math display">\[\hat{\pi}_k = \frac{N_k}{N}\,.\]</span></p>
-<p>With this, we have defined all parameters required for the classifier. However, we have not really understood how LDA works: we only know that it is maximizing the posterior according to the Gaussian density. Fortunately, there is an alternative formulation of LDA due to Fisher, which we will briefly deal with next.</p>
+<p>With this, we have defined all parameters required for the classifier. We have, however, not yet dealt with the dimensionality reduction that LDA performs. This procedure involves the within-class variance, <span class="math inline">\(W\)</span>, and the between-class variance, <span class="math inline">\(B\)</span>. The between-class variance indicates the deviation of centroids from the overall mean, <span class="math inline">\(\hat{\mu} = \sum_{k=1}^K \hat{\pi}_k \hat{\mu}_k\)</span>, and is defined as:</p>
+<p><span class="math display">\[B = \sum_{k=1}^K \hat{\pi}_k(\hat{\mu}_k - \hat{\mu}) (\hat{\mu}_k - \hat{\mu})^T\,.\]</span></p>
+<p>Finding a sequence of optimal substeps involves three steps:</p>
+<ol style="list-style-type: decimal">
+<li>Compute the <span class="math inline">\(K \times p\)</span> matrix <span class="math inline">\(M\)</span> containing the centroids, <span class="math inline">\(\mu_k\)</span>, and determine the common covariance matrix <span class="math inline">\(W = \Sigma\)</span>.</li>
+<li>Compute <span class="math inline">\(M^{\ast} = MW^{-\frac{1}{2}}\)</span> using the eigen-decomposition of W.</li>
+<li>Compute <span class="math inline">\(B^{\ast}\)</span> (the between-class covariance), the covariance matrix of <span class="math inline">\(M^{\ast}\)</span>, and its eigen-decomposition <span class="math inline">\(B^{\ast} = V^{\ast} D_B {V^{\ast}}^T\)</span>. The columns <span class="math inline">\(v^{\ast}_l\)</span> of <span class="math inline">\(V^{\ast}\)</span> define the coordinates of the reduced subspace.</li>
+</ol>
+<p>Thus, the <span class="math inline">\(l\)</span>-th discriminant variable (one of the <span class="math inline">\(K-1\)</span> new dimensions) is determined by <span class="math inline">\(Z_l = v_l^T X\)</span> with <span class="math inline">\(v_l = W^{-\frac{1}{2}} v^{\ast}_l\)</span>.</p>
+<p>Next, we will deal with the alternative formulation of LDA due to Fisher, which provides a better intuition on the canonical variables.</p>
 </div>
 <div id="interpretation-as-a-transformation" class="section level3">
 <h3>Interpretation as a transformation</h3>
 <p>Fisher’s LDA optimization criterion states that the centroids of the groups should be spread out as far as possible. This amounts to finding a linear combination <span class="math inline">\(Z = a^T X\)</span> such that <span class="math inline">\(a^T\)</span> maximizes the between-class variance relative to the within-class variance.</p>
-<p>The within-class variance is <span class="math inline">\(W\)</span> is simply the overall covariance matrix, <span class="math inline">\(\hat{\Sigma}\)</span>. This matrix determines the deviation of all observations from their class centroids. The between-class variance is defined according to the deviation of the centroids from the overall mean, <span class="math inline">\(\hat{\mu} = \sum_{k=1}^K \hat{\pi}_k \hat{\mu}_k\)</span>:</p>
-<p><span class="math display">\[B = \sum_{k=1}^K \hat{\pi}_k(\hat{\mu}_k - \hat{\mu}) (\hat{\mu}_k - \hat{\mu})^T\,.\]</span></p>
-<p>For <span class="math inline">\(Z\)</span>, the between class variance is <span class="math inline">\(a^T B a\)</span> and the within-class variance is <span class="math inline">\(A^T W a\)</span>. Thus, LDA can be optimized through the Rayleigh quotient</p>
+<p>The within-class variance is <span class="math inline">\(W\)</span> is simply the overall covariance matrix, <span class="math inline">\(\hat{\Sigma}\)</span>. This matrix determines the deviation of all observations from their class centroids. The between-class variance is defined according to the deviation of the centroids from the overall mean, as defined earlier.
+For <span class="math inline">\(Z\)</span>, the between class variance is <span class="math inline">\(a^T B a\)</span> and the within-class variance is <span class="math inline">\(A^T W a\)</span>. Thus, LDA can be optimized through the Rayleigh quotient</p>
 <p><span class="math display">\[\max_a \frac{a^T B a}{a^T W a}\,, \]</span></p>
-<p>which defines an optimal mapping of <span class="math inline">\(X\)</span> to the new space <span class="math inline">\(Z\)</span>. Note that $Z ^{1 p}, that is, the observations are mapped to a single dimension. To obtain additional dimensions, we need to solve the optimization problem for <span class="math inline">\(a_1, \ldots, a_{K-1}\)</span> where each successive <span class="math inline">\(a_k\)</span> is constructed to be orthogonal in <span class="math inline">\(W\)</span> to the previous discriminant coordinates. This leads to the linear transformation <span class="math inline">\(G = (Z_1^T, Z_2^T, \ldots, Z_{K-1}^T) \in \mathbb{R}^{p \times q}\)</span> with which we can map <span class="math inline">\(X\)</span> from <span class="math inline">\(p\)</span> to <span class="math inline">\(q\)</span> dimension via <span class="math inline">\(X G\)</span>. Why do we consider <span class="math inline">\(K-1\)</span> projections? This is because the affine subspace that is spanned by the <span class="math inline">\(K\)</span> centroids has a rank of at most <span class="math inline">\(K-1\)</span> due to the spherical assumptions of LDA.</p>
-<p>The benefit of this formulation of LDA is that is enables us to perform classification in a reduced subspace. We do not need to use the full <span class="math inline">\(K-1\)</span> dimensions but can choose a smaller subspace <span class="math inline">\(l &lt; K-1\)</span>. This is called reduced-rank LDA.</p>
-<p>Using this formulation of LDA, classification involves two steps:</p>
+<p>which defines an optimal mapping of <span class="math inline">\(X\)</span> to the new space <span class="math inline">\(Z\)</span>. Note that <span class="math inline">\(Z \in \mathbb{R}^{1 \times p}\)</span>, that is, the observations are mapped to a single dimension. To obtain additional dimensions, we need to solve the optimization problem for <span class="math inline">\(a_1, \ldots, a_{K-1}\)</span> where each successive <span class="math inline">\(a_k\)</span> is constructed to be orthogonal in <span class="math inline">\(W\)</span> to the previous discriminant coordinates. This leads to the linear transformation <span class="math inline">\(G = (Z_1^T, Z_2^T, \ldots, Z_{K-1}^T) \in \mathbb{R}^{p \times q}\)</span> with which we can map <span class="math inline">\(X\)</span> from <span class="math inline">\(p\)</span> to <span class="math inline">\(q\)</span> dimension via <span class="math inline">\(X G\)</span>. Why do we consider <span class="math inline">\(K-1\)</span> projections? This is because the affine subspace that is spanned by the <span class="math inline">\(K\)</span> centroids has a rank of at most <span class="math inline">\(K-1\)</span> due to the spherical assumptions of LDA.</p>
+<p>The benefit of this formulation of LDA is that is enables us to perform classification in a reduced subspace. We do not need to use the full <span class="math inline">\(K-1\)</span> dimensions but can choose a smaller subspace <span class="math inline">\(l &lt; K-1\)</span>. This is called reduced-rank LDA. The motivation for reduced-rank LDA is that classification basd on a reduced number of discriminant variables can improve performance on the test set when the model is overfitted.</p>
+<p>Using Fisher’s formulation of LDA, classification involves two steps:</p>
 <ol style="list-style-type: decimal">
 <li>Sphere the data using the common covariance matrix <span class="math inline">\(\hat{\Sigma} = UDU^T\)</span> (eigendecomposition) such that <span class="math inline">\(X^{\ast} = D^{-\frac{1}{2}} U^T X\)</span>. In this way, the covariance of <span class="math inline">\(X^{\ast}\)</span> becomes the identity matrix. By eliminating the covariance between the variables through sphering the data, it becomes much easier for separation of classes in the transformed space.</li>
 <li>Classify observations <span class="math inline">\(x_i\)</span> to the closest class centroid in the transformed space, taking into account the class priors <span class="math inline">\(\pi_k\)</span>. The intuition about the <span class="math inline">\(\pi_k\)</span> is that if an observation would have equal distance to the centroids from two classes, then it would be assigned to the class with the greater prior.</li>
 </ol>
-<p><a href="https://machinelearningmastery.com/linear-discriminant-analysis-for-machine-learning/" class="uri">https://machinelearningmastery.com/linear-discriminant-analysis-for-machine-learning/</a></p>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>In summary, LDA can be understood in two complementary ways. The first view focuses on the Gaussian assumption, while the second view focuses on the transformation to canonical variables.</p>
+<div id="probabilistic-view" class="section level3">
+<h3>Probabilistic view</h3>
+<p>LDA uses Bayes’ rule to determine the posterior probability that an observation <span class="math inline">\(x\)</span> belongs to class <span class="math inline">\(k\)</span>. Due to the normal assumption of LDA, the posterior is defined through Gaussian densities where the covariance matrix is assumed to be identical for all of the classes. New points are classified by computing the discriminant function <span class="math inline">\(\delta_k\)</span> (the enumerator of the posterior probability) for each class and returning the class <span class="math inline">\(k\)</span> with maximal <span class="math inline">\(\delta_k\)</span>. The discriminant variables
+can be obtained through eigen-decompositions of the within-class and between-class variance.</p>
+</div>
+<div id="fishers-view" class="section level3">
+<h3>Fisher’s view</h3>
+<p>According to Fisher, LDA can be understood as a dimensionality reduction where each successive transformation is orthogonal and maximizes the between-class variance relative to the within-class variance. This transforms the feature space to an affine space with <span class="math inline">\(K-1\)</span> dimensions. After sphering the input data, new points can be classified by determining the closest centroid in the affine space under consideration of the class priors.</p>
 </div>
 </div>
 <div id="complexity-of-the-lda-model" class="section level2">
 <h2>Complexity of the LDA model</h2>
 <p>The number of effective parameters of LDA can be derived in the following way.
-There are <span class="math inline">\(K\)</span> means, <span class="math inline">\(\hat{\mu}_k\)</span> that are estimated. Since the covariance matrix is specified by the centroids alone, there are no additional parameters for <span class="math inline">\(\Sigma\)</span>. Since we only need to consider the differences <span class="math inline">\(\delta_k(x) - \delta_K(x)\)</span> of discriminant function, this gives rise to <span class="math inline">\(K-1\)</span> calculations involving the <span class="math inline">\(p\)</span> elements of the centroids and the prior. Thus, the total number of parameters is <span class="math inline">\(K-1 \cdot (p+1)\)</span>.</p>
+There are <span class="math inline">\(K\)</span> means, <span class="math inline">\(\hat{\mu}_k\)</span> that are estimated. The covariance matrix does not require additional parameters because it is already defined by the centroids. Since we need to estimate <span class="math inline">\(K\)</span> discriminant functions (to obtain the decision boundaries), this gives rise to <span class="math inline">\(K\)</span> calculations involving the <span class="math inline">\(p\)</span> elements. Additionally, we have <span class="math inline">\(K-1\)</span> free parameters for the <span class="math inline">\(K\)</span> priors. Thus, the number of effective LDA parameters is <span class="math inline">\(Kp + (K-1)\)</span>.</p>
+</div>
+<div id="properties-of-lda" class="section level2">
+<h2>Properties of LDA</h2>
+<p>LDA has the following properties:</p>
+<ul>
+<li>LDA assumes that the data are Gaussian. More specificially, it assumes that all classes share the same covariance matrix.</li>
+<li>LDA is a linear method that is not suited if there are higher-order interactions between the independent variables.</li>
+<li>LDA classifies samples by mapping them to <span class="math inline">\(K-1\)</span> discriminant variables. Since observations are represented in terms of few discriminant variables, LDA is well-suited for multi-class problems.</li>
+<li>LDA is unsuited when the class distribution is imbalanced since the priors are estimated from the observed counts. Thus, observations will rarely be classified to infrequent classes.</li>
+<li>Similarly to PCA, LDA can be used as a dimensionality reduction technique. Note that the transformation of LDA is inherently different to PCA because LDA is a supervised method that considers the outcomes.</li>
+</ul>
 </div>
 <div id="the-phoneme-data-set" class="section level2">
 <h2>The phoneme data set</h2>
@@ -168,7 +201,27 @@ ggplot(plot.df, aes(x = LD1, y = LD2, color = Outcome, shape = Prediction)) +
 <p><img src="/post/machine-learning/linear-discriminant-analysis_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>In the plot, the labels are indicated by different colors and the predictions by different colors. Ideally, each color would have only a single symbol. Incorrect predictions are visible when one colors exhibits different symbols. Using the plot, we quickly see that most confusions occur when observations labeled as <em>aa</em> are incorrectly classified as <em>ao</em> and vice versa.</p>
 </div>
-<div id="qda" class="section level2">
-<h2>QDA</h2>
-<p>QDA has (K-1)[P(P+3)/2+1] parameters</p>
+<div id="quadratic-discriminant-analysis" class="section level2">
+<h2>Quadratic discriminant analysis</h2>
+<p>Since we have already covered LDA in detail, it is very easy to explain QDA. QDA allows the covariance matrices to be different for each class. This means we need to estimate <span class="math inline">\(\Sigma_k\)</span> for each class <span class="math inline">\(k \in \{1, \ldots, K\}\)</span> rather than assuming <span class="math inline">\(\Sigma_k = \Sigma\)</span> as in LDA. The discriminant function of LDA is quadratic in <span class="math inline">\(x\)</span>:</p>
+<p><span class="math display">\[\delta_k(x) = - \frac{1}{2} \log |\Sigma_k| - \frac{1}{2}(x- \mu_k)^ \Sigma_k^{-1} (x - \mu_k) + \log \pi_k\]</span></p>
+<p>Since QDA estimates a covariance matrix for each class, it has a greater number of effective parameters than LDA. We can derive the number of parameters in the following way.</p>
+<ul>
+<li>We need <span class="math inline">\(K\)</span> class priors <span class="math inline">\(\pi_k\)</span>. Since <span class="math inline">\(\sum_{i=1}^K \pi_k = 1\)</span>, we do not need a parameter for one of the priors. Thus, there are <span class="math inline">\(K-1\)</span> free parameters for the priors.</li>
+<li>The <span class="math inline">\(K\)</span> centroids <span class="math inline">\(\mu_k\)</span> with <span class="math inline">\(p\)</span> entries each give <span class="math inline">\(Kp\)</span> parameters.</li>
+<li>A covariance matrix <span class="math inline">\(\Sigma_k\)</span>. From the matrix, we only need to consider the diagonal and the upper right triangle. This region of the covariance matrix has <span class="math inline">\(\frac{p (p+1)}{2}\)</span> elements. Since <span class="math inline">\(K\)</span> such matrices need to be estimated, these are <span class="math inline">\(K \frac{p (p+1)}{2}\)</span> parameters.</li>
+</ul>
+<p>So, the effective number of QDA parameters is <span class="math inline">\(K-1 + Kp + K \frac{p (p+1)}{2}\)</span>. Since the number of QDA parameters is quadratic in <span class="math inline">\(p\)</span>, QDA should be used with care when the feature space is large. QDA is particularly useful if there is prior knowledge that individual classes exhibit distinct covariances.</p>
+</div>
+<div id="regularized-discriminant-analysis" class="section level2">
+<h2>Regularized discriminant analysis</h2>
+<p>RDA is a compromise between LDA and QDA as it shrinks <span class="math inline">\(\Sigma_k\)</span> to a pooled variance <span class="math inline">\(\Sigma\)</span> by defining</p>
+<p><span class="math display">\[\hat{\Sigma}_k(\alpha) = \alpha \hat{\Sigma}_k + (1 - \alpha) \hat{\Sigma}\]</span></p>
+<p>and replacing <span class="math inline">\(\hat{\Sigma}_k\)</span> with <span class="math inline">\(\hat{\Sigma}_k(\alpha)\)</span> in the discriminant functions. Here, <span class="math inline">\(\alpha \in [0,1]\)</span> is a tuning parameter determining whether the covariances should be estimated independently (<span class="math inline">\(\alpha = 1\)</span>) or should be pooled (<span class="math inline">\(\alpha = 0\)</span>).</p>
+</div>
+<div id="refs" class="section level2">
+<h2>Refs</h2>
+<p><a href="https://onlinecourses.science.psu.edu/stat857/node/75/" class="uri">https://onlinecourses.science.psu.edu/stat857/node/75/</a>
+<a href="https://web.stanford.edu/class/stats202/content/lec9.pdf" class="uri">https://web.stanford.edu/class/stats202/content/lec9.pdf</a>
+<a href="https://machinelearningmastery.com/linear-discriminant-analysis-for-machine-learning/" class="uri">https://machinelearningmastery.com/linear-discriminant-analysis-for-machine-learning/</a></p>
 </div>
