@@ -1,9 +1,9 @@
 ---
-title: "Linear and Quadratic Discriminant Analysis"
+title: "Linear, Quadratic, and Regularized Discriminant Analysis"
 author: Matthias Döring
-date: '2018-11-29'
-description: ""
-draft: true
+date: '2018-11-30'
+thumbnail: "/post/machine-learning/linear-discriminant-analysis_cover.png" 
+description: "Linear discriminant analysis (LDA) is a classification and dimensionality reduction technique that is particularly useful for multi-class prediction problems. In this post I investigate the properties of LDA and the related methods of quadratic discriminant analysis and regularized discriminant analysis."
 categories:
   - machine-learning
 tags:
@@ -11,19 +11,21 @@ tags:
     - linear-model
     - R
 ---
-Discriminant analysis encompasses methods that can be used for both classification and dimensionality reduction. There are three flavors of discriminant analysis: linear discriminant analysis (LDA), quadratic discriminant analysis (QDA), and regularized discriminant analysis (RDA). The main driver for the popularity of discriminant analysis is that these methods implicitly transform the data into low-dimensional space.
+Discriminant analysis encompasses methods that can be used for both classification and dimensionality reduction. Linear discriminant analysis (LDA) is particularly popular because it is both a classifier and a dimensionality reduction technique. Quadratic discriminant analysis (QDA) is a variant of LDA that allows for non-linear separation of data. Finally, regularized discriminant analysis (RDA) is a compromise between LDA and QDA.
 
-## The approach of LDA
+This post focuses mostly on LDA and explores its use as a classification and visualization technique, both in theory and in practice. Since QDA and RDA are related techniques, I shortly describe their main properties and how they can be used in R.
 
-LDA can be explained through two perspectives. The first is the probabilistic, Gaussian interpretation and the second is the interpretation as a transformation that is due to Fisher. The first interpretation is useful to understand the underlying assumptions of LDA. The second interpretation gives a better inutition on how the inherent dimensionality reduction of LDA works.
+## Linear discriminant analysis
 
-### Probabilistic interpretation
+LDA is a classification and dimensionality reduction techniques, which can be interpreted from two perspectives. The first is interpretation is probabilistic and the second, more procedure interpretation, is due to Fisher. The first interpretation is useful for understanding the assumptions of LDA. The second interpretation allows for a better understanding on how LDA performs dimensionality reduction.
 
-Each class $k \in \{1, \ldots, K\}$ is assigned a prior $\hat{\pi}_k such that that $\sum_{i=1}^k \hat{\pi}_k = 1$. The posterior probability is
+### The probabilistic interpretation
+
+Each class $k \in \{1, \ldots, K\}$ is assigned a prior $\hat{\pi}_k$ such that that $\sum_{i=1}^k \hat{\pi}_k = 1$. According to Bayes' rule, the posterior probability is
 
 \[\rm{Pr}(G = k |X = x) = \frac{f_k(x) \pi_k}{\sum_{l=1}^K f_l(x) \pi_l} \]
 
-where $f_k(x)$ is the density of $X$ conditioned on $k$. The maximum-a-posterior estimator is
+where $f_k(x)$ is the density of $X$ conditioned on $k$. The maximum-a-posteriori (MAP) estimator simplifies to
 
 \[G(x) = \arg \max_k \rm{Pr}(G = k | X = x) = \arg \max_k f_k(x) \pi_k \]
 
@@ -31,99 +33,100 @@ because the denominator is identical for all classes.
 
 LDA assumes that the density is Gaussian:
 
-\[f_k(x) = \frac{1}{(2 \pi)^{\frac{p}{2}} \sqrt{|\Sigma_k|}} \exp\left(-\frac{1}{2}(x - \mu_k)^T\Sigma_k^{-1}(x - \mu_k)\right)\]
+\[f_k(x) = {|2 \pi  \Sigma_k|}^{-1/2} \exp\left(-\frac{1}{2}(x - \mu_k)^T\Sigma_k^{-1}(x - \mu_k)\right)\]
 
-where $\Sigma_k$ is the covariance matrix for the samples from class $k$ and $|\Sigma_k|$ is its determinant. LDA assumes that all classes have the same covariance matrices, i.e. $\Sigma_k = \Sigma\,, \forall k$. 
+where $\Sigma_k$ is the covariance matrix for the samples from class $k$ and $|.|$ is the determinant. LDA assumes that all classes have the same covariance matrix, i.e. $\Sigma_k = \Sigma\,, \forall k$. 
 
-Plugging $f_k$ into the classification function, we find that
+Plugging $f_k$ into the classification function, [we arrive at the classification function](https://onlinecourses.science.psu.edu/stat857/node/75/):
 
 \[G(x) = \arg \max_k \delta_k(x)\] 
 
 where 
 
-\[\delta_k(x) = x^T \Sigma^{-1} \hat{\mu}_k -\frac{1}{2} \hat{\mu}_k^T \Sigma^{-1} \mu_k + \log \pi_k \]
+\[\delta_k(x) = x^T \Sigma^{-1} \mu_k -\frac{1}{2} \mu_k^T \Sigma^{-1} \mu_k + \log \pi_k \]
 
 is the discriminant function for class $k$. So, now that we have a classifier, how we can compute it?
 
 To find the covariance matrix, we simply compute
 
-\[\Sigma = \sum_{k=1}^K \frac{1}{N - K} \sum_{g_i = k} (x_i - \hat{\mu}_k) (x_i - \hat{\mu}_k)^T\,.\]
+\[\hat{\Sigma} = \sum_{k=1}^K \frac{1}{N - K} \sum_{g_i = k} (x_i - \hat{\mu}_k) (x_i - \hat{\mu}_k)^T\,.\]
 
 Note that the deviation from the means is divided by $N-K$, the degrees of freedom, to obtain an unbiased estimator.
 
-The means of the classes, which are also called centrois, are defined by 
+The means of the classes, which are also called centroids, are defined by 
 
 \[\hat{\mu}_k = \frac{1}{N_k} \sum_{g_i = k} x_i\,.\]
 
-The priors are set to the ratio of the class-specific observations:
+The priors $\pi_k$ are set to the prevalence ratio of the class-specific observations:
 
 \[\hat{\pi}_k = \frac{N_k}{N}\,.\]
 
-With this, we have defined all parameters required for the classifier. We have, however, not yet dealt with the dimensionality reduction that LDA performs. This procedure involves the within-class variance, $W$, and the between-class variance, $B$. The between-class variance indicates the deviation of centroids from the overall mean, $\hat{\mu} = \sum_{k=1}^K \hat{\pi}_k \hat{\mu}_k$, and is defined as:
+With this, we have defined all parameters required for the classifier. 
+
+The dimensionality reduction procedure of LDA involves the within-class variance, $W = \hat{\Sigma}$, and the between-class variance, $B$. The between-class variance indicates the deviation of centroids from the overall mean, $\hat{\mu} = \sum_{k=1}^K \hat{\pi}_k \hat{\mu}_k$, and is defined as:
 
 \[B = \sum_{k=1}^K \hat{\pi}_k(\hat{\mu}_k - \hat{\mu}) (\hat{\mu}_k - \hat{\mu})^T\,.\]
 
 Finding a sequence of optimal substeps involves three steps:
 
 
-1. Compute the $K \times p$ matrix $M$ containing the centroids, $\mu_k$, and determine the common covariance matrix $W = \Sigma$.
+1. Compute the $K \times p$ matrix $M$ containing the centroids, $\mu_k$, and determine the common covariance matrix $W$.
 2. Compute $M^{\ast} = MW^{-\frac{1}{2}}$ using the eigen-decomposition of W.
-3. Compute $B^{\ast}$ (the between-class covariance), the covariance matrix of $M^{\ast}$, and its eigen-decomposition $B^{\ast} = V^{\ast} D_B {V^{\ast}}^T$. The columns $v^{\ast}_l$ of $V^{\ast}$ define the coordinates of the reduced subspace.
+3. Compute $B^{\ast}$ (the between-class covariance) and its eigen-decomposition $B^{\ast} = V^{\ast} D_B {V^{\ast}}^T$. The columns $v^{\ast}_l$ of $V^{\ast}$ define the coordinates of the reduced subspace.
 
-Thus, the $l$-th discriminant variable (one of the $K-1$ new dimensions) is determined by $Z_l = v_l^T X$ with $v_l = W^{-\frac{1}{2}} v^{\ast}_l$.
+The $l$-th discriminant variable (one of the $K-1$ new dimensions) is determined by $Z_l = v_l^T X$ with $v_l = W^{-\frac{1}{2}} v^{\ast}_l$.
 
-Next, we will deal with the alternative formulation of LDA due to Fisher, which provides a better intuition on the canonical variables.
-
-### Interpretation as a transformation
+### The interpretation of Fisher
 
 Fisher's LDA optimization criterion states that the centroids of the groups should be spread out as far as possible. This amounts to finding a linear combination $Z = a^T X$ such that $a^T$ maximizes the between-class variance relative to the within-class variance.
 
-The within-class variance is $W$ is simply the overall covariance matrix, $\hat{\Sigma}$. This matrix determines the deviation of all observations from their class centroids. The between-class variance is defined according to the deviation of the centroids from the overall mean, as defined earlier.
+As before, the within-class variance is $W$ is the pooled covariance matrix, $\hat{\Sigma}$, which indicates the deviation of all observations from their class centroids. The between-class variance is defined according to the deviation of the centroids from the overall mean, as defined earlier.
 For $Z$, the between class variance is $a^T B a$ and the within-class variance is $A^T W a$. Thus, LDA can be optimized through the Rayleigh quotient
 
 \[\max_a \frac{a^T B a}{a^T W a}\,, \]
 
-which defines an optimal mapping of $X$ to the new space $Z$. Note that $Z \in \mathbb{R}^{1 \times p}$, that is, the observations are mapped to a single dimension. To obtain additional dimensions, we need to solve the optimization problem for $a_1, \ldots, a_{K-1}$ where each successive $a_k$ is constructed to be orthogonal in $W$ to the previous discriminant coordinates. This leads to the linear transformation $G = (Z_1^T, Z_2^T, \ldots, Z_{K-1}^T) \in \mathbb{R}^{p \times q}$ with which we can map $X$ from $p$ to $q$ dimension via $X G$. Why do we consider $K-1$ projections? This is because the affine subspace that is spanned by the $K$ centroids has a rank of at most $K-1$ due to the spherical assumptions of LDA.
+which defines an optimal mapping of $X$ to the new space $Z$. Note that $Z \in \mathbb{R}^{1 \times p}$, that is, the observations are mapped to a single dimension. To obtain additional dimensions, we need to solve the optimization problem for $a_1, \ldots, a_{K-1}$ where each successive $a_k$ is constructed to be orthogonal in $W$ to the previous discriminant coordinates. This leads to the linear transformation $G = (Z_1^T, Z_2^T, \ldots, Z_{K-1}^T) \in \mathbb{R}^{p \times q}$ with which we can map from $p$ to $q$ dimension via $X G$. Why do we consider $K-1$ projections? This is because the affine subspace that is spanned by the $K$ centroids has a rank of at most $K-1$.
 
-The benefit of this formulation of LDA is that is enables us to perform classification in a reduced subspace. We do not need to use the full $K-1$ dimensions but can choose a smaller subspace $l < K-1$. This is called reduced-rank LDA. The motivation for reduced-rank LDA is that classification basd on a reduced number of discriminant variables can improve performance on the test set when the model is overfitted to the training data.
 
 Using Fisher's formulation of LDA, classification involves two steps:
 
-1. Sphere the data using the common covariance matrix $\hat{\Sigma} = UDU^T$ (eigendecomposition) such that $X^{\ast} = D^{-\frac{1}{2}} U^T X$. In this way, the covariance of $X^{\ast}$ becomes the identity matrix. By eliminating the covariance between the variables through sphering the data, it becomes much easier for separation of classes in the transformed space.
-2. Classify observations $x_i$ to the closest class centroid in the transformed space, taking into account the class priors $\pi_k$. The intuition about the $\pi_k$ is that if an observation would have equal distance to the centroids from two classes, then it would be assigned to the class with the greater prior.
+1. Sphere the data using the common covariance matrix $\hat{\Sigma} = UDU^T$ (eigendecomposition) such that $X^{\ast} = D^{-\frac{1}{2}} U^T X$. In this way, the covariance of $X^{\ast}$ becomes the identity matrix. By eliminating the covariance between the variables in this way, it becomes much easier to separate the classes in the transformed space.
+2. Classify observations $x_i$ to the closest class centroid in the transformed space, taking into account the class priors $\pi_k$. Here, the intuition is that an observation with equal distance to two centroids would be assigned to the class with the greater prior.
 
-## Summary
+### Reduced-rank LDA
 
-In summary, LDA can be understood in two complementary ways. The first view focuses on the Gaussian assumption, while the second view focuses on the transformation to canonical variables.
+LDA performs classification in a reduced subspace. When performing classification, we do not need to use all $K-1$ dimensions and instead can choose a smaller subspace $H_l$ with $l < K-1$. When $l < K-1$ is used, this is called reduced-rank LDA. The motivation for reduced-rank LDA is that classification basd on a reduced number of discriminant variables can improve performance on the test set when the model is overfitted.
+
+### Complexity of the LDA model
+
+The number of effective parameters of LDA can be derived in the following way.
+There are $K$ means, $\hat{\mu}_k$ that are estimated. The covariance matrix does not require additional parameters because it is already defined by the centroids. Since we need to estimate $K$ discriminant functions (to obtain the decision boundaries), this gives rise to $K$ calculations involving the $p$ elements. Additionally, we have $K-1$ free parameters for the $K$ priors. Thus, the number of effective LDA parameters is $Kp + (K-1)$.
+
+### Summary of LDA
+
+Here, I summarize the two perspectives on LDA and give a summary of the main properties of the model.
 
 ### Probabilistic view
 
-LDA uses Bayes' rule to determine the posterior probability that an observation $x$ belongs to class $k$. Due to the normal assumption of LDA, the posterior is defined through Gaussian densities where the covariance matrix is assumed to be identical for all of the classes. New points are classified by computing the discriminant function $\delta_k$ (the enumerator of the posterior probability) for each class and returning the class $k$ with maximal $\delta_k$. The discriminant variables
+LDA uses Bayes' rule to determine the posterior probability that an observation $x$ belongs to class $k$. Due to the normal assumption of LDA, the posterior is defined by a multivariate Gaussian whose covariance matrix is assumed to be identical for all classes. New points are classified by computing the discriminant function $\delta_k$ (the enumerator of the posterior probability) and returning the class $k$ with maximal $\delta_k$. The discriminant variables
 can be obtained through eigen-decompositions of the within-class and between-class variance.
 
-### Fisher's view
+#### Fisher's view
 
-According to Fisher, LDA can be understood as a dimensionality reduction where each successive transformation is orthogonal and maximizes the between-class variance relative to the within-class variance. This transforms the feature space to an affine space with $K-1$ dimensions. After sphering the input data, new points can be classified by determining the closest centroid in the affine space under consideration of the class priors.
+According to Fisher, LDA can be understood as a dimensionality reduction technique where each successive transformation is orthogonal and maximizes the between-class variance relative to the within-class variance. This procedure transforms the feature space to an affine space with $K-1$ dimensions. After sphering the input data, new points can be classified by determining the closest centroid in the affine space under consideration of the class priors.
 
-
-## Complexity of the LDA model
-
-The number of effective parameters of LDA can be derived in the following way.
-There are $K$ means, $\hat{\mu}_k$ that are estimated. The covariance matrix does not require additional parameters because it is already defined by the centroids. Since we need to estimate $K$ discriminant functions (to obtain the decision boundaries), this gives rise to $K$ calculations involving the $p$ elements. Additionally, we have $K-1$ free parameters for the $K$ priors. Thus, the number of effective LDA parameters is $Kp + (K-1)$. 
-
-## Properties of LDA
+#### Properties of LDA
 
 LDA has the following properties:
 
-* LDA assumes that the data are Gaussian. More specificially, it assumes that all classes share the same covariance matrix. 
-* LDA is a linear method that is not suited if there are higher-order interactions between the independent variables.
-* LDA classifies samples by mapping them to $K-1$ discriminant variables. Since observations are represented in terms of few discriminant variables, LDA is well-suited for multi-class problems. 
-* LDA is unsuited when the class distribution is imbalanced since the priors are estimated from the observed counts. Thus, observations will rarely be classified to infrequent classes.
+* LDA assumes that the data are Gaussian. More specifically, it assumes that all classes share the same covariance matrix. 
+* LDA finds linear decision boundaries in a $K-1$ dimensional subspace. As such, it is not suited if there are higher-order interactions between the independent variables.
+* LDA is well-suited for multi-class problems but should be used with care when the class distribution is imbalanced because the priors are estimated from the observed counts. Thus, observations will rarely be classified to infrequent classes.
 * Similarly to PCA, LDA can be used as a dimensionality reduction technique. Note that the transformation of LDA is inherently different to PCA because LDA is a supervised method that considers the outcomes.
 
-## The phoneme data set
+### The phoneme data set
 
-We will use the [phoneme speech recognition data set](https://web.stanford.edu/~hastie/ElemStatLearn/datasets/phoneme.info.txt):
+To exemplify linear discriminant analysis, we will use the [phoneme speech recognition data set](https://web.stanford.edu/~hastie/ElemStatLearn/datasets/phoneme.info.txt). This data set is useful for showcasing discriminant analysis because it involves five different outcomes.
 
 ```{r, message = FALSE}
 library(RCurl)
@@ -132,9 +135,10 @@ df <- read.csv(textConnection(f), header=T)
 print(dim(df))
 ```
 
-The data set contains samples of digitized speech for five phonemes: aa (as the vowel in *dark*), *ao* (as the first vowel in *water*), *dcl* (as in *dark*), *iy* (as the vowel in *she*), and *sh* (as in *she*). In total, 4509 speech frames of 32 msec were selected. For each speech frame, a log-periodogram of length 256 was computed, which is suitable for speech recognition. The 256 columns labeled *x.1* to *x.256* identify the speech features, while the columns *g* and *speaker* indicate the phonemes (labels) and speakers, respectively.
+The data set contains samples of digitized speech for five phonemes: aa (as the vowel in *dark*), *ao* (as the first vowel in *water*), *dcl* (as in *dark*), *iy* (as the vowel in *she*), and *sh* (as in *she*). In total, 4509 speech frames of 32 msec were selected. For each speech frame, a log-periodogram of length 256 was computed, on whose basis we want to perform speech recognition. The 256 columns labeled *x.1* to *x.256* identify the speech features, while the columns *g* and *speaker* indicate the phonemes (labels) and speakers, respectively.
 
-Let us assign training and test samples:
+For evaluating models later, we will assign each sample either into the training or the test set:
+
 ```{r}
 #logical vector: TRUE if entry belongs to train set, FALSE else
 train <- grepl("^train", df$speaker)
@@ -147,7 +151,7 @@ train.responses <- subset(df, train)$g
 test.responses <- subset(df, !train)$g
 ```
 
-## Fitting an LDA model in R
+### Fitting an LDA model in R
 
 We can fit an LDA model in the following way:
 
@@ -156,13 +160,33 @@ library(MASS)
 lda.model <- lda(train.set, grouping = train.responses)
 ```
 
-We can transform the training data to the canonical coordinates in the following way:
+Let us take a moment to investigate the relevant components of the model:
+
+* *prior* contains the group priors $\pi_k$ and *counts* the corresponding group counts, $N_k$.
+* *means* is the centroid matrix $M \in \mathbb{R}^{K \times p}$ whose components are the mean vectors, $\mu_k$.
+* *scaling* is the $N \times (K-1)$ matrix that transforms samples to the space defined by the $K-1$ discriminant variables.
+* *svd* are the singular values, which indicate the ratio of between- and within-group standard deviations on the linear discriminant variables.
+
+#### LDA as a visualization technique
+
+We can transform the training data to the canonical coordinates by applying the transformation matrix on the scaled data. To obtain the same results as returned by the ```predict.lda``` function, we need to center the data around the weighted means first:
 
 ```{r}
+# 1. Manual transformation
+# center data around weighted means & transform
+means <- colSums(lda.model$prior * lda.model$means)
+train.mod <- scale(train.set, center = means, scale = FALSE) %*% 
+             lda.model$scaling
+# 2. Use the predict function to transform:
 lda.prediction.train <- predict(lda.model, train.set)
-x.projected <- lda.prediction.train$x # feature transformation 
+all.equal(lda.prediction.train$x, train.mod)
+```
+
+We can use the first two discriminant variables to visualize the data:
+
+```{r}
 # visualize the features in the two LDA dimensions
-plot.df <- data.frame(x.projected[,1:2], "Outcome" = train.responses)
+plot.df <- data.frame(train.mod, "Outcome" = train.responses)
 library(ggplot2)
 ggplot(plot.df, aes(x = LD1, y = LD2, color = Outcome)) + geom_point()
 ```
@@ -175,25 +199,26 @@ Plotting the data in the two LDA dimensions reveals three clusters:
 
 This indicates that two dimensions are not sufficient for differentiating all 5 classes. However, the clustering indicates that phonemes that are sufficiently different from one another can be differentiated very well. 
 
-We can also plot the mapping of training data onto the discriminant dimensions using the ```plot.lda``` function where the *dimen* parameter can be used to specify the number of considered dimensions:
+We can also plot the mapping of training data onto all pairs of discriminant variables using the ```plot.lda``` function where the *dimen* parameter can be used to specify the number of considered dimensions:
 
 ```{r}
-colors <- c("red", "blue", "green", "yellow", "black") # aa, ao, dcl, iy, sh
+library(RColorBrewer)
+colors <- brewer.pal(8, "Accent")
 my.cols <- colors[match(lda.prediction.train$class, levels(df$g))]
 plot(lda.model, dimen = 4, col = my.cols)
 ```
 
-Plotting the training data for all dimension pairs demonstrates that, by construction, the first two dimensions separate the phoneme groups best. What we can learn from the plot, though, is how many dimensions we should select for a reduced-rank LDA. Remember that LD1 and LD2 confused *aa* with *ao* and *dcl* with *iy*. Thus, we would like additional dimensions that help us differentiating these groups. It seems that we need all of the four dimensions because *dcl* and *iy* are only well-separed in LD1 vs LD3, while *aa* and *ao* are only well-separated when LD4 is combined with any of the other dimensions.
+Plotting the training data for all dimension pairs demonstrates that, by construction, capture most of the variance. Using the plot, we can obtain an intuition about the number of dimensions we should select for reduced-rank LDA. Remember that LD1 and LD2 confused *aa* with *ao* and *dcl* with *iy*. Thus, we need additional dimensions for differentiating these groups. Looking at the plots, it seems that we indeed need all of the four dimensions because *dcl* and *iy* are only well-separated in LD1 vs LD3, while *aa* and *ao* are only well-separated when LD4 is combined with any of the other dimensions.
 
 To visualize the centroids of the groups, we can create a custom plot:
 
 ```{r, fig.height = 8, fig.width = 12}
 plot_lda_centroids <- function(lda.model, train.set, response) {
-    centroids <- lda.model$means %*% lda.model$scaling 
+    centroids <- predict(lda.model, lda.model$means)$x
     library(RColorBrewer)
     colors <- brewer.pal(8, "Accent")
     my.cols <- colors[match(lda.prediction.train$class, levels(df$g))]
-    my.points <- as.matrix(train.set) %*% lda.model$scaling
+    my.points <- predict(lda.model, train.set)$x
     no.classes <- length(levels(response))
     par(mfrow=c(no.classes -1, no.classes -1), mar=c(1,1,1,1), oma=c(1,1,1,10))
     for (i in 1:(no.classes - 1)) {
@@ -224,25 +249,43 @@ plot_lda_centroids <- function(lda.model, train.set, response) {
 plot_lda_centroids(lda.model, train.set, train.responses)
 ```
 
-## Reduced-rank LDA
+#### Interpreting the posterior probabilities
 
-Although this data set is not optimal for reduced-rank LDA since it seems that all dimensions are worthwhile, we will still showcase the use of reduced-rank LDA by evaluating the accuracy of LDA based on one to four discriminant coordinates:
+Besides the transformation of the data to the discriminant variables, which is provided by the component *x*, the predict function also gives the posterior probabilities, which can be used for further interpretation of the classifier. For example:
 
 ```{r}
-# perform LDA with 1 to 4 discriminant coordinates
-dims <- 1:4
+posteriors <- lda.prediction.train$posterior # N x K matrix
+# MAP classification for sample 1:
+pred.class <- names(which.max(posteriors[1,])) # <=> lda.prediction.train$class[1]
+print(paste0("Posterior of predicted class '", pred.class, 
+    "' is: ", round(posteriors[1,pred.class], 2)))
+# what are the mean posteriors for individual groups?
+res <- do.call(rbind, (lapply(levels(train.responses), function(x) apply(posteriors[train.responses == x, ], 2, mean))))
+rownames(res) <- levels(train.responses)
+print(round(res, 3)) 
+```
+
+The table of posteriors for individual classes demonstrates that the model is most uncertain about the phonemes *aa* and *ao*, which is in agreement with our expectations from the visualizations.
+
+#### LDA as a classifier
+
+As mentioned before, LDA has the benefit that we can select the number of canonical variables that are used for classification. Here, we will still showcase the use of reduced-rank LDA by performing classification with up to four canonical variables.
+
+```{r}
+dims <- 1:4 # number of canonical variables to use
 accuracies <- rep(NA, length(dims))
 for (i in seq_along(dims)) {
     lda.pred <- predict(lda.model, test.set, dim = dims[i])
     acc <- length(which(lda.pred$class == test.responses))/length(test.responses)
     accuracies[i] <- acc
 }
-print(accuracies)
+reduced.df <- data.frame("Rank" = dims, "Accuracy" = round(accuracies, 2))
+print(reduced.df)
 ```
 
 As expected from the visual exploration of the transformed space, the test accuracy increases with each additional dimension. Since LDA with four dimension obtains the maximal accuracy, we would decide to use all of the discriminant coordinates for classification. 
 
-We can visualize the performance of the classifier using four dimensions:
+To interpret the model, we can visualize the performance of the full-rank classifier:
 
 ```{r}
 lda.pred <- predict(lda.model, test.set)
@@ -252,21 +295,45 @@ ggplot(plot.df, aes(x = LD1, y = LD2, color = Outcome, shape = Prediction)) +
         geom_point()
 ```
 
-In the plot, the labels are indicated by different colors and the predictions by different colors. Ideally, each color would have only a single symbol. Incorrect predictions are visible when one colors exhibits different symbols. Using the plot, we quickly see that most confusions occur when observations labeled as *aa* are incorrectly classified as *ao* and vice versa.
+In the plot, the expected phonemes are shown by different colors, while the model predictions are shown through different symbols. A model with 100% accuracy would assign a single symbol to each each color. Thus, incorrect predictions are revealed when a single color exhibits different symbols. Using the plot, we quickly see that most confusions occur when observations labeled as *aa* are incorrectly classified as *ao* and vice versa.
 
 ## Quadratic discriminant analysis
 
-Since we have already covered LDA in detail, it is very easy to explain QDA. QDA allows the covariance matrices to be different for each class. This means we need to estimate $\Sigma_k$ for each class $k \in \{1, \ldots, K\}$ rather than assuming $\Sigma_k = \Sigma$ as in LDA. The discriminant function of LDA is quadratic in $x$:
+QDA is a variant of LDA in which an individual covariance matrix is estimated for every class of observations. QDA is particularly useful if there is prior knowledge that individual classes exhibit distinct covariances. A disadvantage of QDA is that it cannot be used as a dimensionality reduction technique. 
 
-\[\delta_k(x) = - \frac{1}{2} \log |\Sigma_k| - \frac{1}{2}(x- \mu_k)^ \Sigma_k^{-1} (x - \mu_k) + \log \pi_k\]
+In QDA, we need to estimate $\Sigma_k$ for each class $k \in \{1, \ldots, K\}$ rather than assuming $\Sigma_k = \Sigma$ as in LDA. The discriminant function of LDA is quadratic in $x$:
+
+\[\delta_k(x) = - \frac{1}{2} \log |\Sigma_k| - \frac{1}{2}(x- \mu_k)^T \Sigma_k^{-1} (x - \mu_k) + \log \pi_k\,.\]
 
 Since QDA estimates a covariance matrix for each class, it has a greater number of effective parameters than LDA. We can derive the number of parameters in the following way.
 
 * We need $K$ class priors $\pi_k$. Since $\sum_{i=1}^K \pi_k = 1$, we do not need a parameter for one of the priors. Thus, there are $K-1$ free parameters for the priors.
-* The $K$ centroids $\mu_k$ with $p$ entries each give $Kp$ parameters.
-* A covariance matrix $\Sigma_k$. From the matrix, we only need to consider the diagonal and the upper right triangle. This region of the covariance matrix has $\frac{p (p+1)}{2}$ elements. Since $K$ such matrices need to be estimated, these are $K \frac{p (p+1)}{2}$ parameters.
+* Since there are $K$ centroids, $\mu_k$, with $p$ entries each, there are $Kp$ parameters relating to the means.
+* From the covariance matrix, $\Sigma_k$, we only need to consider the diagonal and the upper right triangle. This region of the covariance matrix has $\frac{p (p+1)}{2}$ elements. Since $K$ such matrices need to be estimated, there are $K \frac{p (p+1)}{2}$ parameters relating to the covariance matrices.
 
-So, the effective number of QDA parameters is $K-1 + Kp + K \frac{p (p+1)}{2}$. Since the number of QDA parameters is quadratic in $p$, QDA should be used with care when the feature space is large. QDA is particularly useful if there is prior knowledge that individual classes exhibit distinct covariances. 
+Thus, the effective number of QDA parameters is $K-1 + Kp + K \frac{p (p+1)}{2}$. 
+
+Since the number of QDA parameters is quadratic in $p$, QDA should be used with care when the feature space is large.
+
+### QDA in R
+
+We can perform QDA in the following way:
+
+```{r}
+qda.model <- qda(train.set, grouping = train.responses)
+```
+
+The main difference between the QDA and the LDA object is that the QDA has a $p \times p$ transformation matrix for every class $k \in \{1, \ldots, K\}$. These matrices ensure that the within-group covariance matrix is spherical but do not induce a reduced subspace. Thus, QDA cannot be used as a visualization technique. 
+
+Let us determine whether QDA outperforms LDA on the phoneme data set:
+
+```{r}
+qda.preds <- predict(qda.model, test.set)
+acc <- length(which(qda.preds$class == test.responses))/length(test.responses)
+print(paste0("Accuracy of QDA is: " , round(acc, 2)))
+```
+
+The accuracy of QDA is slightly below that of full-rank LDA. This could indicate that the assumption of common covariance is suitable for this data set. 
 
 ## Regularized discriminant analysis
 
@@ -276,9 +343,43 @@ RDA is a compromise between LDA and QDA as it shrinks $\Sigma_k$ to a pooled var
 
 and replacing $\hat{\Sigma}_k$ with $\hat{\Sigma}_k(\alpha)$ in the discriminant functions. Here, $\alpha \in [0,1]$ is a tuning parameter determining whether the covariances should be estimated independently ($\alpha = 1$) or should be pooled ($\alpha = 0$).
 
-## Refs
-https://onlinecourses.science.psu.edu/stat857/node/75/
-https://web.stanford.edu/class/stats202/content/lec9.pdf
-https://machinelearningmastery.com/linear-discriminant-analysis-for-machine-learning/
+Additionally, $\hat{\Sigma}$ can also be shrunk toward the scalar covariance by requiring
 
+\[\hat{\Sigma}(\gamma) = \gamma \hat{\Sigma} + (1 - \gamma) \hat{\sigma}^2 I\]
 
+where $\gamma = 1$ leads to the pooled covariance and $\gamma = 0$ leads to the scalar covariance. Replacing $\hat{\Sigma}_k$ by $\hat{\Sigma}(\alpha, \gamma)$ leads to a more general notion of covariance.
+
+Since RDA is a regularization technique, it is particularly useful when there are many features that are potentially correlated. Let us now evaluate RDA on the phoneme data set.
+
+### RDA in R
+
+To perform RDA, we need to load the ```rda``` package. A regularized discriminant analysis model can be fit using the ```rda``` function, which has two main parameters: $\alpha$ as introduced before and $\delta$, [which defines the threshold for values](https://www.mathworks.com/help/stats/classificationdiscriminant.cvshrink.html).
+
+```{r, eval = FALSE}
+library(rda)
+# note: optimization is time-intensive, especially if many alpha/gammas are used
+alphas <- c(0.1, 0.25, 0.5, 0.75, 0.9)
+rda.model <- rda(t(as.matrix(train.set)), y = train.responses,
+                alpha = alphas)
+```
+
+Having obtained the fitted model, let us determine the performance of RDA on the test set. The following code is a bit more complicated than the code for LDA/QDA because we need to iterate over the results for both $\alpha$ and $\delta$:
+
+```{r, eval = FALSE}
+rda.preds <- predict(rda.model, t(train.set), train.responses, t(test.set))
+# determine performance for each alpha:
+rda.perf <- vector("list", dim(rda.preds)[1])
+for (i in seq(dim(rda.preds)[1])) {
+    # performance for each gamma
+    res <- apply(rda.preds[i,,], 1, function(x) length(which(x == as.numeric(test.responses))) / length(test.responses))
+    rda.perf[[i]] <- res
+}
+rda.perf <- do.call(rbind, rda.perf)
+rownames(rda.perf) <- alphas
+```
+
+The calculated accuracies suggest that the RDA classifier with $\delta = 0$ and $\alpha = 0.25$ (92.2% accuracy) slightly outperforms full-rank LDA (91.9% accuracy).
+
+## Conclusions
+
+Discriminant analysis is particularly useful for multi-class problems. LDA is very interpretable because it allows for dimensionality reduction. Using QDA, it is possible to model non-linear relationships. RDA is a regularized discriminant analysis technique that is particularly useful for large number of features. Besides these methods, there are also other techniques based on discriminants such as flexible discriminant analysis, penalized discriminant analysis, and mixture discriminant analysis.
