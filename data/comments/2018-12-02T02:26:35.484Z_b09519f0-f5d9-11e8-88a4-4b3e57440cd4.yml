@@ -1,0 +1,10 @@
+_id: b09519f0-f5d9-11e8-88a4-4b3e57440cd4
+path: post/machine-learning/specificity-vs-precision.html
+name: Erbo
+email: 208dd608a22ccc893cca311ba02522e6
+message: >-
+  Also in the last section, you conclude with the balanced accuracy choosing the
+  second algorithm after stating the second algorithm had the lower value for
+  that metric. You want the higher accuracy so I assume something is mixed up
+  there too. Enjoyed the post.
+date: '2018-12-02T02:26:35.484Z'
