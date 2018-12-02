@@ -10,6 +10,7 @@ categories:
   - machine-learning
 tags:
     - performance-measure
+    - R
 ---
 For classification problems, performance measures are typically defined according to the confusion matrix associated with the classifier. Based on the entries of the confusion matrix, we can compute sensitivity (recall), specificity, and precision. For a single cutoff, these quantities lead to balanced accuracy (sensitivity and specificity) or to the [F1-score (recall and precision)](/post/machine-learning/specificity-vs-precision/). For multiple cutoffs, these quantities lead to the [area under the ROC curve (AUC)](/post/machine-learning/performance-measures-model-selection/) or the area under the precision-recall curve (AUCPR). 
 
