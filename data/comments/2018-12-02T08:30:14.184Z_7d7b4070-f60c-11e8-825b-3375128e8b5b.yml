@@ -1,0 +1,12 @@
+_id: 7d7b4070-f60c-11e8-825b-3375128e8b5b
+path: post/machine-learning/linear-discriminant-analysis.html
+name: Matthias Döring
+email: e90d48aac6bcd47b2bcf84b337a118d2
+message: >-
+  Is this expression data? You can find some useful [processing steps and
+  packages at
+  Bioconductor](https://bioconductor.org/packages/release/workflows/vignettes/arrays/inst/doc/arrays.html).
+  You probably want to perform some form of clustering on the expression data in
+  order to identify whether there are groups of persons with similar patterns of
+  over/underexpression. What are you exactly planning to do?
+date: '2018-12-02T08:30:14.184Z'
