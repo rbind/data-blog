@@ -1,0 +1,6 @@
+_id: f0b0cf00-f617-11e8-afe8-e76afa4a14bf
+path: post/machine-learning/specificity-vs-precision.html
+name: Matthias Döring
+email: e90d48aac6bcd47b2bcf84b337a118d2
+message: "Thanks for your comments Erbo. You're right about the ordering in the table - the positive class should definitely come first, I just changed this. Regarding the ordering of predicted/reference I'm not sure, I think I have seen both versions, so I will keep it as is. I hope it's not too confusing ;-) I agree, however, that it would make things much easier if there was really a standard for the format of confusion matrices.\r\n\r\nIn the second example, the rate rates were indeed off for the second example. It should be fixed now :-) Thanks for having a keen eye!"
+date: '2018-12-02T09:52:12.069Z'
