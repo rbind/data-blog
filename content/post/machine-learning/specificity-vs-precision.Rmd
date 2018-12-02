@@ -2,6 +2,7 @@
 title: "The Case Against Precision as a Model Selection Criterion"
 author: Matthias Döring
 date: '2018-11-21'
+lastMod: "2018-12-01"
 description: "Precision and recall are frequently used for model selection. However, compared to sensitivity and recall, these performance metrics are not generally valid and should only be used in certain settings."
 thumbnail: "/post/machine-learning/sensitivity-vs-precision_cover.png"
 slug: "specificity-vs-precision"
@@ -17,12 +18,12 @@ Recently, I have introduced [sensitivity and specificity as performance measures
 
 For a binary classification problems with classes 0 and 1, the resulting confusion matrix has the following structure:
 
-| Prediction/Reference | 0  | 1  |
+| Prediction/Reference | 1  | 0  |
 |----------------------|----|----|
-| 0                    | TN | FN |
-| 1                    | FP | TP |
+| 1                    | TP | FP |
+| 0                    | FN | TN |
 
-where TN indicates the number of true negatives (model predicts negative class correctly), FN indicates the number of false negatives (model incorrectly predicts negative class), FP indicates the number of false positives (model incorrectly predicts positive class), and TP indicates the number of true positives (model correctly predicts positive class). The definitions of sensitivity (recall), precision (positive predictive value, PPV), and specificity (true negative rate, TNV) are as follows:
+where TP indicates the number of true positives (model correctly predicts positive class), FP indicates the number of false positives (model incorrectly predicts positive class), FN indicates the number of false negatives (model incorrectly predicts negative class), and TN indicates the number of true negatives (model predicts negative class correctly). The definitions of sensitivity (recall), precision (positive predictive value, PPV), and specificity (true negative rate, TNV) are as follows:
 
 \begin{align*}
 \text{sensitivity} &= \text{recall} = TPR = \frac{TP}{TP + FN} \\
@@ -30,11 +31,17 @@ where TN indicates the number of true negatives (model predicts negative class c
 \text{specificity} &= TNR = 1 - FPR = 1 - \frac{FP}{FP + TN} \\
 \end{align*}
 
-Sensitivity and precision are related in that they are both using TP in the enumerator. However, while sensitivity identifies the rate at which observations from the positive class are correctly predicted, precision indicates the rate at which positive predictions are correct. Specificity, on the other hand, is based on the rate of false positives and indicates the rate at which observations from the negative class are correctly predicted.
+Sensitivity and precision are related in that they are both using TP in the enumerator. While sensitivity identifies the rate at which observations from the positive class are correctly predicted, precision indicates the rate at which positive predictions are correct. Specificity, on the other hand, is based on the number of false positives and indicates the rate at which observations from the negative class are correctly predicted.
 
 ## The advantage of sensitivity and specificity
 
-Evaluating a model based on both, sensitivity and specificity, is a generally valid approach because these measures consider all entries in the confusion matrix. While sensitivity deals with true positives and false negatives, specificity deals with false positives and true negatives. This means that the combination of sensitivity and specificity is a holistic measure when both true positives and true negatives should be considered.
+Evaluating a model based on both, sensitivity and specificity, is appropriate for most data sets because these measures consider all entries in the confusion matrix. While sensitivity deals with true positives and false negatives, specificity deals with false positives and true negatives. This means that the combination of sensitivity and specificity is a holistic measure when both true positives and true negatives should be considered.
+
+Sensitivity and specificity can be summarized by a single quantity, the balanced accuracy, which is defined as the mean of both measures:
+
+\[\text{balanced accuracy} = \frac{\text{sensitivity + specificity}}{2} \]
+
+The balanced accuracy is in the range $[0,1]$ where a values of 0 and 1 indicate whe worst-possible and the best-possible classifier, respectively.
 
 ## The disadvantage of recall and precision
 
@@ -42,7 +49,13 @@ Evaluating a model using recall and precision does not use all cells of the conf
 
 \[\text{precision} = {\frac {|\{{\text{relevant documents}}\}\cap \{{\text{retrieved documents}}\}|}{|\{{\text{retrieved documents}}\}|}}\,.\]
 
-Here, it does not matter at which rate irrelevant documents are correctly discarded (true negative rate) because it is of no consequence.
+Here, it does not matter at which rate irrelevant documents are correctly discarded (true negative rate) because it is of no consequence. 
+
+Precision and recall are often summarized as a single quantity, the F1-score, which is the harmonic mean of both measures:
+
+\[F1 = 2 \frac{\text{recall} \cdot \text{precision}}{\text{recall} + \text{precision}} \]
+
+F1 is in the range $[0,1]$ and will be 1 for a classifier maximizing precision and recall. Since it is based on the harmonic mean, the F1-score is very sensitive towards disparate values for precision and recall. Assume a classifier has a sensitivity of 90% and a precision of 30%. Then the conventional mean would be $\frac{0.9 + 0.3}{2} = 0.6$ but the harmonic mean (F1 score) would be $2 \frac{0.9 \cdot 0.3}{0.9 + 0.3} = 0.45$. 
 
 ## Examples
 
@@ -53,6 +66,9 @@ Here, I provide two examples. The first examples investigates what can go wrong 
 Precision is a particularly bad measure when there are few observations that belong to the positive class. Let us assume a clinical data set in which $90\%$ of persons are diseased (positive class) and only $10\%$ are healthy (negative class). Let us assume we have developed two tests for classifying whether a patient is diseased or healthy. Both tests have an accuracy of 80% but make different types of errors.
 
 ```{r, message = FALSE}
+# to use waffle, you need 
+#   o FontAwesome
+#   o register the fonts using extrafonts::font_import()
 library(waffle)
 ref.colors <- c("#c14141", "#1853b2")
 false.colors <- c("#9b3636", "#0e3168")
@@ -71,17 +87,17 @@ iron(
 
 #### Confusion matrix for the first test
 
-| Prediction/Reference | Healthy  | Diseased  |
+| Prediction/Reference | Diseased  | Healthy  |
 |----------------------|----|----|
-| Healthy                    | TN = 0| FN = 10|
-| Diseased                    | FP = 10 | TP  = 80|
+| Diseased                    | TP = 80 | FP = 10|
+| Healthy                    | FN = 10 | TN  = 0|
 
 #### Confusion matrix for the second test
 
-| Prediction/Reference | Healthy  | Diseased  |
+| Prediction/Reference | Diseased  | Healthy  |
 |----------------------|----|----|
-| Healthy                    | TN = 10| FN = 20 |
-| Diseased                    | FP = 0 | TP  = 70|
+| Diseased                    | TP = 70 | FP = 0 |
+| Healthy                    | FN = 20 | TN  = 10|
 
 #### Comparison of the two tests
 
@@ -95,7 +111,7 @@ Let us compare the performance of the two tests:
 
 Considering sensitivity and specificity, we would not select the first test because its balanced accuracy is merely $\frac{0 + 0.889}{2} = 44.5\%$, while that of the second test is $\frac{0.777 + 1}{2} = 88.85\%$. 
 
-Using precision and recall, however, the first test would have an F1 score of $2 \cdot \frac{0.889 \cdot 0.889}{0.889 + 0.889} = 0.889$, while the second test has a lower score of $2 \cdot \frac{0.777 \cdot 1}{0.777 + 1} \approx 0.87$. Thus, we would find the first test to be superior over the second test although its specificity is a 0%. Thus, when using this test, **all of the healthy patients would be classified as diseased**. This would be a big problem because all of these patients would undergo severe psychological stress and expensive treatment due to the misdiagnosis. If we had used specificity instead, we would have selected the second model, which does not produce any false postives at a competitive sensitivity.
+Using precision and recall, however, the first test would have an F1-score of $2 \cdot \frac{0.889 \cdot 0.889}{0.889 + 0.889} = 0.889$, while the second test has a lower score of $2 \cdot \frac{0.777 \cdot 1}{0.777 + 1} \approx 0.87$. Thus, we would find the first test to be superior over the second test although its specificity is a 0%. Thus, when using this test, **all of the healthy patients would be classified as diseased**. This would be a big problem because all of these patients would undergo severe psychological stress and expensive treatment due to the misdiagnosis. If we had used specificity instead, we would have selected the second model, which does not produce any false postives at a competitive sensitivity.
 
 ### Use of precision when true negatives do not matter
 
@@ -110,7 +126,7 @@ iron(
     waffle(c("Relevant (TP)" = 25, "Irrelevant (FN)" = 5, "Relevant (FP)" = 15, "Irrelevant (TN)" = 55), 
         rows = 5, use_glyph = "file", 
         glyph_size = 5, title = "Retrieval Algorithm 1", colors = c(true.colors[1], false.colors[2], false.colors[1], true.colors[2])),
-    waffle(c("Relevant (TP)" = 20, "Irrelevant (FN)" = 15, "Relevant (FP)" = 5, "Irrelevant (TN)" = 60), 
+    waffle(c("Relevant (TP)" = 20, "Irrelevant (FN)" = 10, "Relevant (FP)" = 10, "Irrelevant (TN)" = 60), 
         rows = 5, use_glyph = "file", 
         glyph_size = 5, title = "Retrieval Algorithm 2", colors = c(true.colors[1], false.colors[2], false.colors[1], true.colors[2]))
 )
@@ -118,29 +134,31 @@ iron(
 
 #### Confusion matrix for the first algorithm
 
-| Prediction/Reference | Irrelevant  | Relevant  |
+| Prediction/Reference | Relevant  | Irrelevant  |
 |----------------------|----|----|
-| Irrelevant                    | TN = 55 | FN = 5 |
-| Relevant                    | FP = 15 | TP  = 25|
+| Relevant                    | TP = 25 | FP = 15 |
+| Irrelevant                    | FN = 5 | TN  = 55|
 
 #### Confusion matrix for the second algorithm
 
-| Prediction/Reference | Irrelevant  | Relevant  |
+| Prediction/Reference | Relevant  | Irrelevant  |
 |----------------------|----|----|
-| Irrelevant                    | TN = 60| FN = 15 |
-| Relevant                    | FP = 5 | TP  = 20|
+| Relevant                    | TP = 20| FP = 10 |
+| Irrelevant                    | FN = 10 | TN  = 60|
 
 #### Comparison of the two algorithms
 
-Let us calculate the four quantities again:
+Let us calculate the performance of the two algorithms from the confusion matrix:
 
 | Measure | Algorithm 1  | Algorithm 2  |
 |----------------------|----|----|
-| Sensitivity (Recall)  | 83.3% | 66.6% |
+| Sensitivity (Recall)  | 83.3% | 66.7% |
 | Specificity  | 78.6% | 85.7%  |
-| Precision     | 50% |  80% |
+| Precision     | 62.5% |  66.7% |
+| Balanced accuracy | 80.95% | 76.2% |
+| F1-score | 71.4% | 66.7% |
 
-The balanced accuracy of algorithms 1 and 2 would be 80.95% and 76.15%, respectively. The F1 statistic for algorithms 1 and 2 would be 62.5% and 72.7%, respectively. Thus, in this example, both approaches would lead to the selection of algorithm 2, which is the better choice for information retrieval because it is the more precise algorithm. This means that the rate of relevant documents among the retrieved documents is higher for algorithm 2 than algorithm 1. Note that the difference between the two algorithms is more pronounced using the F statistic, which is defined using precision and recall.
+In this example, both balanced accuracy and the F1-score would lead to prefering the first over the second algorithm. Note that the reported balanced accuracy is decidedly larger than the F1-score. This is because specificity is high for both algorithms due to the large number of discarded observations from the negative class. Since the F1-score does not consider the rate of true negatives, precision and recall are more appropriate than sensitivity and specificity for this task.
 
 ## Summary
 
