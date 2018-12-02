@@ -1,0 +1,11 @@
+_id: 173c50d0-f5d8-11e8-88a4-4b3e57440cd4
+path: post/machine-learning/specificity-vs-precision.html
+name: Erbo
+email: 208dd608a22ccc893cca311ba02522e6
+message: >-
+  Confusion matrix layouts are confusing. ;) Maybe It's a European thing? I'm
+  used to the top row being TP, FP and columns being "predicted." Anyways in the
+  last section, I'm getting different sensitivity, specificity, etc values for
+  the second algorithm. I think the counts are off in the confusion matrix.
+  Relevant and Irrelevant totals don't match the first algorithm totals.
+date: '2018-12-02T02:15:08.824Z'
