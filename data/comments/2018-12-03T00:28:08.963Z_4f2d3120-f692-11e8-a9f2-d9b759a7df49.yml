@@ -1,0 +1,6 @@
+_id: 4f2d3120-f692-11e8-a9f2-d9b759a7df49
+path: post/data-visualization/lineplot.html
+name: Achim Zeileis
+email: 370732f6c0fee1905ead3ad6b2b08d5b
+message: "Thanks for the post. A couple of additions:\r\n\r\n- The `MTS` package is not involved when using `plot(EuStockMarkets)`. The `mts` class and associated methods is provided by the basic `stats` package.\r\n- The packages `xts` and `zoo` can be helpful when representing time series that are irregular. They also come with coercion functions to/from `mts`/`ts`.\r\n- The `zoo` package also provides a `ggplot2` interface, see e.g., `autoplot(as.zoo(EuStockMarkets))` or `autoplot(as.zoo(EuStockMarkets), facet = NULL)` after loading both packages. The `fortify()` method for `zoo` objects is also helpful for preparing time series data as tidy long data frames for subsequent processing in `ggplot2` and friend"
+date: '2018-12-03T00:28:08.963Z'
