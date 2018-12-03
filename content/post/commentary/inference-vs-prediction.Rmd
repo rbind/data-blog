@@ -26,6 +26,6 @@ To obtain a better intuition about the differences in the way that Bayesian thin
 
 ## References
 http://courses.csail.mit.edu/18.337/2015/docs/50YearsDataScience.pdf
-Leo Breimann: statistical modeling: the two cultures
+Leo Breimann (creator of decision trees): statistical modeling: the two cultures
 https://sahirbhatnagar.com/assets/pdf/stat_ml_jc_july20.pdf
 https://xkcd.com/1838/

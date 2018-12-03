@@ -1,8 +1,14 @@
 ---
-title: "R"
-description: ""
+title: "R for applications in data science"
+description: "R is extremely useful for data science because it is well-suited for applications in machine learning, data visualization, and statistics."
+thumbnail: "/tags/r/r_avatar.png"
 ---
+<figure>
+<img src="/tags/r/r_avatar.png" width = "991" height = "768" alt = "R logo">
+<figcaption>The R logo, licensed under [CC-BY-SA 4.0](https://de.wikipedia.org/wiki/Datei:R_logo.svg).</figcaption>
+</figure>
+
+All posts with the *R* tag deal with applications of [the statistical programming language R](https://www.r-project.org/) in the data science setting. 
 
 ## Posts about R
-
 
