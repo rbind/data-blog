@@ -10,6 +10,7 @@ categories:
   - machine-learning
 tags:
     - performance-measure
+    - R
 ---
 
 
@@ -18,9 +19,7 @@ tags:
 <p>These performance measures arise naturally for binary classification problems. However, what about multi-class problems, that is, classification problems with more than two possible outcomes?</p>
 <div id="micro-and-macro-averages-of-the-f1-score" class="section level2">
 <h2>Micro and macro averages of the F1-score</h2>
-<p>Micro and macro averages provide two interpretations of confusion matrices for multi-class problems. For more than two classes, we need to compute a confusion matrix for every class <span class="math inline">\(g_i \in G = \{1, \ldots, K\}\)</span> such that the <span class="math inline">\(i\)</span>-th confusion matrix considers class <span class="math inline">\(g_i\)</span> as the positive class and all other classes <span class="math inline">\(g_j\)</span> with <span class="math inline">\(j \neq i\)</span> as the negative class. Since this approach relies on pooling all observations with a class other than <span class="math inline">\(g_i\)</span> as the negative class, this approach should
-not
-be used to determine true negatives because true negatives would be inflated, particularly for many classes. Imagine there are 10 classes with 10 observations each. Then the confusion matrix for the first class may look as follows:</p>
+<p>Micro and macro averages provide two interpretations of confusion matrices for multi-class problems. For more than two classes, we need to compute a confusion matrix for every class <span class="math inline">\(g_i \in G = \{1, \ldots, K\}\)</span> such that the <span class="math inline">\(i\)</span>-th confusion matrix considers class <span class="math inline">\(g_i\)</span> as the positive class and all other classes <span class="math inline">\(g_j\)</span> with <span class="math inline">\(j \neq i\)</span> as the negative class. Since this approach relies on pooling all observations with a class other than <span class="math inline">\(g_i\)</span> as the negative class, this approach should not be used to determine true negatives because true negatives would be inflated, particularly for many classes. Imagine there are 10 classes with 10 observations each. Then the confusion matrix for the first class may look as follows:</p>
 <table>
 <thead>
 <tr class="header">
@@ -42,10 +41,8 @@ be used to determine true negatives because true negatives would be inflated, pa
 </tr>
 </tbody>
 </table>
-<p>The specificity would be <span class="math inline">\(\frac{80}{80 + 10} = 88.9\%\)</span> although we only predicted class 1 correctly in 8 out of 18 instances (precision 44.4%). This showcases that the specificity becomes meaningless when the negative class is predominant.
-Thus, micro- and macro averages are only available for the F1-score and not for the balanced accuracy, which relies on the true negative rate.</p>
-<p>In the following we will use <span class="math inline">\(TP_i\)</span>, <span class="math inline">\(FP_i\)</span>, and <span class="math inline">\(FN_i\)</span> to respectively indicate true
-positives, false positives, and false negatives the confusion matrix associated with the <span class="math inline">\(i\)</span>-th class. Precision is indicated by <span class="math inline">\(P\)</span>, while recall is indicated by <span class="math inline">\(R\)</span>.</p>
+<p>The specificity would be <span class="math inline">\(\frac{80}{80 + 10} = 88.9\%\)</span> although we only predicted class 1 correctly in 8 out of 18 instances (precision 44.4%). This showcases that the specificity becomes meaningless when the negative class is predominant. Thus, micro- and macro averages are only available for the F1-score and not for the balanced accuracy, which relies on the true negative rate.</p>
+<p>In the following we will use <span class="math inline">\(TP_i\)</span>, <span class="math inline">\(FP_i\)</span>, and <span class="math inline">\(FN_i\)</span> to respectively indicate true positives, false positives, and false negatives the confusion matrix associated with the <span class="math inline">\(i\)</span>-th class. Precision is indicated by <span class="math inline">\(P\)</span>, while recall is indicated by <span class="math inline">\(R\)</span>.</p>
 <div id="the-micro-average" class="section level3">
 <h3>The micro average</h3>
 <p>The micro average has its name from the fact that it pools the performance over all samples:</p>
@@ -201,8 +198,7 @@ legend(&quot;bottomright&quot;, levels(response), lty=1,
 </div>
 <div id="approach-from-hand" class="section level3">
 <h3>Approach from Hand</h3>
-<p>Assume that the classes are labeled as <span class="math inline">\(0, 1, 2, \ldots, c - 1\)</span> with <span class="math inline">\(c &gt; 2\)</span> (multi-class problem). Let <span class="math inline">\(\hat{A}(i|j)\)</span> indicate the probability tha a randomly drawn member of class <span class="math inline">\(j\)</span> has a lower probaility of belonging to class <span class="math inline">\(i\)</span> than a randomly drawn member of class <span class="math inline">\(i\)</span>. Let <span class="math inline">\(\hat{A}(j|i)\)</span> be defined correspondingly. Since we cannot distinguish
-<span class="math inline">\(\hat{A}(i|j)\)</span> from <span class="math inline">\(\hat{A}(j|i)\)</span>, we define</p>
+<p>Assume that the classes are labeled as <span class="math inline">\(0, 1, 2, \ldots, c - 1\)</span> with <span class="math inline">\(c &gt; 2\)</span> (multi-class problem). Let <span class="math inline">\(\hat{A}(i|j)\)</span> indicate the probability tha a randomly drawn member of class <span class="math inline">\(j\)</span> has a lower probaility of belonging to class <span class="math inline">\(i\)</span> than a randomly drawn member of class <span class="math inline">\(i\)</span>. Let <span class="math inline">\(\hat{A}(j|i)\)</span> be defined correspondingly. Since we cannot distinguish <span class="math inline">\(\hat{A}(i|j)\)</span> from <span class="math inline">\(\hat{A}(j|i)\)</span>, we define</p>
 <p><span class="math display">\[\hat{A}(i,j) = \frac{1}{2} (\hat{A}(i|j) + \hat{A}(j|i))\]</span></p>
 <p>as the measure for the separability for classes <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. The overall performance of a multi-class classifier is then defined by the average value for <span class="math inline">\(\hat{A}(i,j)\)</span>:</p>
 <p><span class="math display">\[ M = \frac{2}{c(c-1)} \sum_{i &lt; j} \hat{A}(i,j) \]</span></p>
@@ -233,7 +229,5 @@ multiclass.roc(aSAH$gos6, aSAH$s100b)</code></pre>
 </div>
 <div id="good-references" class="section level2">
 <h2>Good references</h2>
-<p><a href="https://stats.stackexchange.com/questions/2151/how-to-plot-roc-curves-in-multiclass-classification/2155#2155" class="uri">https://stats.stackexchange.com/questions/2151/how-to-plot-roc-curves-in-multiclass-classification/2155#2155</a>
--&gt; try stars package for cobweb plot
-<a href="https://stats.stackexchange.com/questions/44261/how-to-determine-the-quality-of-a-multiclass-classifier" class="uri">https://stats.stackexchange.com/questions/44261/how-to-determine-the-quality-of-a-multiclass-classifier</a></p>
+<p><a href="https://stats.stackexchange.com/questions/2151/how-to-plot-roc-curves-in-multiclass-classification/2155#2155" class="uri">https://stats.stackexchange.com/questions/2151/how-to-plot-roc-curves-in-multiclass-classification/2155#2155</a> -&gt; try stars package for cobweb plot <a href="https://stats.stackexchange.com/questions/44261/how-to-determine-the-quality-of-a-multiclass-classifier" class="uri">https://stats.stackexchange.com/questions/44261/how-to-determine-the-quality-of-a-multiclass-classifier</a></p>
 </div>
