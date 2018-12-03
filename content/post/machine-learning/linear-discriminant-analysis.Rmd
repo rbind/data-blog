@@ -6,6 +6,7 @@ thumbnail: "/post/machine-learning/linear-discriminant-analysis_cover.png"
 description: "Linear discriminant analysis (LDA) is a classification and dimensionality reduction technique that is particularly useful for multi-class prediction problems. In this post I investigate the properties of LDA and the related methods of quadratic discriminant analysis and regularized discriminant analysis."
 categories:
   - machine-learning
+  - data-visualization
 tags:
     - supervised-learning
     - linear-model

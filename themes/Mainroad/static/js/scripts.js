@@ -38,6 +38,8 @@ function copyToClipboard() {
     ) 
 }
 
+// collapse comment function
+/*
 $(document).ready(function () {
 	const charLimit = 512;
     var collapseComment = function (comment) {
@@ -72,19 +74,17 @@ $(document).ready(function () {
 					//newHtml = pText.substring(0, charLimit - len);
 				} else {
 					newHtml = pHtml;
-					/* this doesn't work because we would again need to truncate the raw HTML
-					console.log(len + pText.length);
-					var childLen = len;
-					children.each(function (j, child ) {
-						var childText = $(child).text(); // use text for counting	
-						if (childLen > charLimit) {
-							console.log("Hiding");
-							child.hide();
-						}
-						childLen += childText.length;
-						console.log(childLen);
-					})
-					*/
+					// console.log(len + pText.length);
+					// var childLen = len;
+					//children.each(function (j, child ) {
+						// var childText = $(child).text(); // use text for counting	
+						// if (childLen > charLimit) {
+							// console.log("Hiding");
+							// child.hide();
+						// }
+						// childLen += childText.length;
+						// console.log(childLen);
+					// })
 				}
                 $p.html(newHtml);  // set text to truncated string
 				//$p.outerHTML = "<span>" + newHtml + "</span>";
@@ -99,11 +99,9 @@ $(document).ready(function () {
     $('.post-comments').on('click', '.expand', function (e) {
 		// show all html elements of the comment:
 		// selected $p is not always correct. sometimes it's the svg path rather than the last elemnt
-		/*
-		console.log("Click on Expand");
-		console.log($(e));
-		console.log($(e.currentTarget)); // NB: don't use target. this is the clicked element (e.g. path, not the svg necessarily)
-		*/
+		// console.log("Click on Expand");
+		// console.log($(e));
+		// console.log($(e.currentTarget)); // NB: don't use target. this is the clicked element (e.g. path, not the svg necessarily)
         var $p = $(e.currentTarget).parent(); 
 		var children = $p.parents('.commentText').children();
 		children.show().children().show();	
@@ -133,7 +131,7 @@ $(document).ready(function () {
         collapseComment($(comment));
     });
 });
-
+*/
 function goBackToOrigin() {
     window.location.href = location.pathname;
 }

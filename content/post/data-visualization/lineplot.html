@@ -2,6 +2,7 @@
 title: "Visualizing Time-Series Data with Line Plots"
 author: Matthias Döring
 date: '2018-11-02'
+lastmod: "2018-12-03"
 description: "Line plots are ideally suited for visualizing time series data. Using some stock market data, I demonstrate how line plots can be generated using native R, the MTS package, and ggplot."
 slug: "line-plot"
 categories:
@@ -29,7 +30,7 @@ summary(EuStockMarkets)</code></pre>
 ##  Max.   :6186   Max.   :8412   Max.   :4388   Max.   :6179</code></pre>
 <pre class="r"><code>class(EuStockMarkets)</code></pre>
 <pre><code>## [1] &quot;mts&quot;    &quot;ts&quot;     &quot;matrix&quot;</code></pre>
-<p>What is interesting is that the data set is not only a matrix but also an <em>mts</em> and <em>ts</em> object, which indicate that this is a <a href="https://cran.r-project.org/web/packages/MTS/MTS.pdf">time series object</a>.</p>
+<p>What is interesting is that the data set is not only a matrix but also an <em>mts</em> and <em>ts</em> object, which indicate that this is a time-series object.</p>
 <p>In the following, I will show how these data can be plotted with native R, the MTS package, and, finally, ggplot.</p>
 </div>
 <div id="creating-a-line-plot-in-native-r" class="section level2">
@@ -57,14 +58,17 @@ for (i in seq_len(ncol(EuStockMarkets))) {
 <p>The plot shows us that all of the European stock exchanges are highly correlated and we could use the plot to explain the stock market variation based on past economic events.</p>
 <p>Note that this is a quick and dirty way of creating the plot because it assumes that the time between all measurements is identical. This approximation is acceptable for this data set because there are (nearly) daily measurements. However, if there were time periods with lower sampling frequency, this should be shown by scaling the axis according to the dates of the measured (see the ggplot example below).</p>
 </div>
-<div id="creating-a-line-plot-with-the-mts-package" class="section level2">
-<h2>Creating a line plot with the MTS package</h2>
-<p>If you have an object of type mts, then it is much easier to use the plot function from the MTS package. It gives a similar but admittedly more beautiful plot than the one I manually created using native R above.</p>
+<div id="creating-a-line-plot-of-an-mts-object" class="section level2">
+<h2>Creating a line plot of an MTS object</h2>
+<p>If you have an object of type mts, then it is much easier to use the plot function associated with the mts object, <code>plots.mts</code>, which is provided by the <code>stats</code> package that is included with every R distribution. This plotting functions gives a similar but admittedly improved plot than the one I manually created above.</p>
 <pre class="r"><code>plot(EuStockMarkets)</code></pre>
 <p><img src="/post/data-visualization/lineplot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
 <div id="creating-a-line-plot-with-ggplot" class="section level2">
 <h2>Creating a line plot with ggplot</h2>
+<p>Creating a ggplot version of the line plot can either be done by hand, which is quite cumbersome, or via the <code>zoo</code> package, which is much more convenient.</p>
+<div id="the-manual-approach" class="section level3">
+<h3>The manual approach</h3>
 <p>To create the same plot with ggplot, we need to construct a data frame first. In this example, we want to consider the dates at which the measurements were taken when scaling the x-axis.</p>
 <p>The problem here is that the mts object doesn’t store the years as dates but as floating point numbers. For example, a value of 1998.0 indicates a day in the beginning of 1998, while 1998.9 indicates a value at the end if 1998. Since I could not find a function that transforms such representations, we will create a function that transforms this numeric representation to dates.</p>
 <pre class="r"><code>scale.value.range &lt;- function(x, old, new) {
@@ -123,4 +127,29 @@ ggplot(dff, aes(x = Date, y = Points)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))</code></pre>
 <p><img src="/post/data-visualization/lineplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>Creating the ggplot visualization for this example involved more work because I wanted to have an improved representation of the dates as for the other two approaches for creating the plot. For a faster, yet less accurate representation, the plot could have also been created by ignoring the months and just using the years, as in the first example.</p>
+</div>
+<div id="creating-the-plot-with-the-zoo-package" class="section level3">
+<h3>Creating the plot with the zoo package</h3>
+<p>To create a ggplot version of the plot, we can use the <code>autoplot</code> function from <code>ggplot2</code>, ater transforming the <code>mts</code> object to a <code>zoo</code> object via <code>as.zoo</code>:</p>
+<pre class="r"><code>library(zoo)
+zooMarkets &lt;- as.zoo(EuStockMarkets)
+#autoplot(zooMarkets) # plot with facets
+autoplot(zooMarkets, facet = NULL) # plot without facets</code></pre>
+<p><img src="/post/data-visualization/lineplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Rather than using the custom <code>mts.to.df</code> function, we could have also used the ggplot2’s <code>fortify</code> function on the zoo object in order to convert it to a data frame:</p>
+<pre class="r"><code>market.df &lt;- fortify(zooMarkets)
+print(head(market.df))</code></pre>
+<pre><code>##      Index     DAX    SMI    CAC   FTSE
+## 1 1991.496 1628.75 1678.1 1772.8 2443.6
+## 2 1991.500 1613.63 1688.5 1750.5 2460.2
+## 3 1991.504 1606.51 1678.6 1718.0 2448.2
+## 4 1991.508 1621.04 1684.1 1708.1 2470.4
+## 5 1991.512 1618.16 1686.6 1723.1 2484.7
+## 6 1991.515 1610.61 1671.6 1714.3 2466.8</code></pre>
+<p>Note, however, that the <em>Index</em> column provides the date as a floating point number rather than as a <code>Date</code> as in the <code>mts.to.df</code> function.</p>
+</div>
+</div>
+<div id="r-packages-for-time-series-data" class="section level2">
+<h2>R Packages for time-series data</h2>
+<p>Additional functions for multivariate time-series data are available via the <a href="https://cran.r-project.org/web/packages/MTS/MTS.pdf">MTS package</a>. For irregular time-series data, the <a href="https://www.datacamp.com/community/blog/r-xts-cheat-sheet">XTS</a> and <a href="https://cran.r-project.org/web/packages/zoo/zoo.pdf">zoo</a> packages are useful.</p>
 </div>
