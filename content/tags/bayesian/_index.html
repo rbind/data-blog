@@ -1,0 +1,41 @@
+---
+title: "Bayesian methods"
+description: "Bayesian methods rely on Bayes' theorem to make inferences according to the posterior distribution. These methods are particularly useful for obtaining insights about the data generation process." 
+thumbnail: "/tags/bayesian/bayesian_cover.png"
+---
+
+
+
+<p>Bayesian methods make use of Bayes’ theorem to perform statistical inference. Bayes’ law states that a conditional probability can be decomposed in the following way:</p>
+<p><span class="math">\[P(A | B) = \frac{P(B|A) P(A)}{P(B)}\]</span></p>
+<p>where <span class="math">\(A\)</span> and <span class="math">\(B\)</span> indicate two events. The following terms are assigned to each of the quantities:</p>
+<ul>
+<li><span class="math">\(P(A|B)\)</span> is the posterior probability</li>
+<li><span class="math">\(P(B|A)\)</span> is the likelihood of <span class="math">\(B\)</span> given <span class="math">\(A\)</span></li>
+<li><span class="math">\(P(A)\)</span> and <span class="math">\(P(B)\)</span> are the marginal probabilities for <span class="math">\(A\)</span> and <span class="math">\(B\)</span>, respectively</li>
+</ul>
+<p>In statistical modeling, another parameterization is typically used. Let <span class="math">\(X\)</span> indicate the data and <span class="math">\(\Theta\)</span> indicate the model parameters. Then Bayes’ rule can be formulated as follows:</p>
+<p><span class="math">\[P(\Theta | X) = \frac{P(X | \Theta) P(\Theta)}{P(X)}\]</span></p>
+<p>These quantities are interpreted as follows:</p>
+<ul>
+<li><span class="math">\(P(\Theta | X)\)</span> is the posterior probability of the model given the data</li>
+<li><span class="math">\(P(X|\Theta)\)</span> is the likelihood of the data given the model</li>
+<li><span class="math">\(P(\Theta)\)</span> gives the prior probabilities for the model parameters</li>
+<li><span class="math">\(P(X)\)</span> indicates the probability of the data</li>
+</ul>
+<p>The proability of the data, <span class="math">\(P(X)\)</span> can be ignored when we are interested in <span class="math">\(P(\Theta | X)\)</span> merely for model selection since <span class="math">\(P(X)\)</span> is independent of the model.</p>
+<p>Due to the use of prior knowledge, Bayesian approaches are always parametric in the sense that these methods specify models based on assumptions about the data generation process. A challenge of Bayesian methods is that the posterior distribution may be very hard to compute explicitly, which is why Markov chain monte carlo (MCMC) is often used to sample from the posterior distribution.</p>
+<div id="inference-vs-prediction" class="section level2">
+<h2>Inference vs prediction</h2>
+<p>Bayesian methods are concerned with statistical inference rather than prediction. Inference is concerned with learning how the observed outcomes are generated as a function of the data. Prediction, on the other hand, is concerned with building a model that can estimate the outcome for unseen data. Note that there are methods that can be used for both tasks. For example, logistic regression can be used to measure the impact of individual features on the outcome (inference) and to estimate the outcome for new observations (prediction).</p>
+<p>In essence, the difference between inference and prediction boils down to model interpretability. If a model is interpretable (i.e. you can understand how the predictions are formed) it probably performs inference, while models that are hard to interpret probably perform prediction. To make the distinction clearer, consider the following examples:</p>
+<ul>
+<li>Inference methods: all Bayesian methods; to a certain extent some machine learning methods (e.g. linear regression or logistic regression)</li>
+<li>Prediction methods: all machine learning models, particularly those that are non-parametric (e.g. decision trees, neural networks, or non-linear support vector machines)</li>
+</ul>
+<p>To obtain a better intuition about the differences in the way that Bayesian thinking is different, <a href="https://stats.stackexchange.com/a/73180">you should read this great post at Stats Exchange</a>.</p>
+</div>
+<div id="posts-about-bayesian-methods" class="section level2">
+<h2>Posts about Bayesian methods</h2>
+<p>The following posts are concerned with Bayesian methods:</p>
+</div>

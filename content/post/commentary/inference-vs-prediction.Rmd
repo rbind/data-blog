@@ -1,0 +1,31 @@
+---
+title: "Inference vs Prediction"
+lead: "Statistical modeling or machine learning?"
+author: Matthias Döring
+draft: true
+date: '2018-12-06'
+description: "Inference is concerned with learning about the data generation process, while prediction is concerned with estimating the outcome for new observations. These contrasting principles originate from the statistical modeling and machine learning communities, respectively. Here, I try to showcase the differences and similarities between the two concepts."
+slug: "inference-vs-prediction"
+thumbnail: "/post/machine-learning/auc_performance.png"
+categories:
+  - commentary
+tags:
+    - R
+---
+
+## Inference vs prediction
+
+Bayesian methods are concerned with statistical inference rather than prediction. Inference is concerned with learning how the observed outcomes are generated as a function of the data. Prediction, on the other hand, is concerned with building a model that can estimate the outcome for unseen data. Note that there are methods that can be used for both tasks. For example, logistic regression can be used to measure the impact of individual features on the outcome (inference) and to estimate the outcome for new observations (prediction).
+
+In essence, the difference between inference and prediction boils down to model interpretability. If a model is interpretable (i.e. you can understand how the predictions are formed) it probably performs inference, while models that are hard to interpret probably perform prediction. To make the distinction clearer, consider the following examples:
+
+* Inference methods: all Bayesian methods; to a certain extent some machine learning methods (e.g.  linear regression or logistic regression)
+* Prediction methods: all machine learning models, particularly those that are non-parametric (e.g. decision trees, neural networks, or non-linear support vector machines)
+
+To obtain a better intuition about the differences in the way that Bayesian thinking is different, [you should read this great post at Stats Exchange](https://stats.stackexchange.com/a/73180).
+
+## References
+http://courses.csail.mit.edu/18.337/2015/docs/50YearsDataScience.pdf
+Leo Breimann: statistical modeling: the two cultures
+https://sahirbhatnagar.com/assets/pdf/stat_ml_jc_july20.pdf
+https://xkcd.com/1838/

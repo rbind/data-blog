@@ -1,5 +1,5 @@
 ---
-title: "Performance Measures for Multi-Class Classification Problems"
+title: "Performance Measures for Multi-Class Problems"
 author: Matthias Döring
 draft: true
 date: '2018-12-04'
@@ -12,30 +12,29 @@ tags:
     - performance-measure
     - R
 ---
-For classification problems, performance measures are typically defined according to the confusion matrix associated with the classifier. Based on the entries of the confusion matrix, we can compute sensitivity (recall), specificity, and precision. For a single cutoff, these quantities lead to balanced accuracy (sensitivity and specificity) or to the [F1-score (recall and precision)](/post/machine-learning/specificity-vs-precision/). For multiple cutoffs, these quantities lead to the [area under the ROC curve (AUC)](/post/machine-learning/performance-measures-model-selection/) or the area under the precision-recall curve (AUCPR). 
+For classification problems, classifier performance is typically defined according to the confusion matrix associated with the classifier. Based on the entries of the matrix, it is possible to compute sensitivity (recall), specificity, and precision. For a single cutoff, these quantities lead to balanced accuracy (sensitivity and specificity) or to the [F1-score (recall and precision)](/post/machine-learning/specificity-vs-precision/). For evaluate a scoring classifier at multiple cutoffs, these quantities can be used to determine the [area under the ROC curve (AUC)](/post/machine-learning/performance-measures-model-selection/) or the area under the precision-recall curve (AUCPR). 
 
-These performance measures arise naturally for binary classification problems. However, what about multi-class problems, that is, classification problems with more than two possible outcomes?
+All of these performance measures are easily obtainable for binary classification problems. For classificatiton problems with more than two classes (multi-class problems), slightly more effort is necessary to derive suitable performance measures. Here, I introduce the notion of micro- and macro-averages of the F1-score, a one-vs-all approach for plotting the precision vs recall curve for multiple classes, and a generalization of the AUC for multiple classes.
 
 ## Micro and macro averages of the F1-score
 
-Micro and macro averages provide two interpretations of confusion matrices for multi-class problems. For more than two classes, we need to compute a confusion matrix for every class $g_i \in G = \{1, \ldots, K\}$ such that the $i$-th confusion matrix considers class $g_i$ as the positive class and all other classes $g_j$ with $j \neq i$ as the negative class. Since this approach relies on pooling all observations with a class other than $g_i$ as the negative class, this approach should
-not
-be used to determine true negatives because true negatives would be inflated, particularly for many classes. Imagine there are 10 classes with 10 observations each. Then the confusion matrix for the first class may look as follows:
+Micro and macro averages represent two ways of interpreting confusion matrices in multi-class settings. Here, we need to compute a confusion matrix for every class $g_i \in G = \{1, \ldots, K\}$ such that the $i$-th confusion matrix considers class $g_i$ as the positive class and all other classes $g_j$ with $j \neq i$ as the negative class. Since each confusion matrix pools all observations labeled with a class other than $g_i$ as the negative class, this approach leads to an increase in the number of true negatives, especially if there are many classes. 
+
+To exemplify why the increase in true negatives is problematic, imagine there are 10 classes with 10 observations each. Then the confusion matrix for one of the classes may have the following structure:
 
 |Prediction/Reference | Class 1 | Other Class |
 |---------------------|---------|-------------|
 |Class 1              |  8      |     10      |
 |Other Class          |  2      |     80       |
 
-The specificity would be $\frac{80}{80 + 10} = 88.9\%$ although we only predicted class 1 correctly in 8 out of 18 instances (precision 44.4%). This showcases that the specificity becomes meaningless when the negative class is predominant.
-Thus, micro- and macro averages are only available for the F1-score and not for the balanced accuracy, which relies on the true negative rate.
+Based on this matrix, the specificity would be $\frac{80}{80 + 10} = 88.9\%$ although class 1 was only correctly predicted in 8 out of 18 instances (precision 44.4%). Thus, since the negative class is predominant, the specificity becomes inflated. Thus, micro- and macro averages are only defined for the F1-score and not for the balanced accuracy, which relies on the true negative rate.
 
 In the following we will use $TP_i$, $FP_i$, and $FN_i$ to respectively indicate true
-positives, false positives, and false negatives the confusion matrix associated with the $i$-th class. Precision is indicated by $P$, while recall is indicated by $R$.
+positives, false positives, and false negatives in the confusion matrix associated with the $i$-th class. Moreover, let precision be indicated by $P$ and recall by $R$.
 
 ### The micro average
 
-The micro average has its name from the fact that it pools the performance over all samples:
+The micro average has its name from the fact that it pools the performance over the smallest possible unit (i.e. over all samples):
 
 \[
 \begin{align*}
@@ -44,15 +43,15 @@ R_{\rm{micro}} &= \frac{\sum_{i=1}^{|G|} TP_i}{\sum_{i=1}^{|G|} TP_i + FN_i}
 \end{align*}
 \]
 
-The micro-averaged precision and recall give rise to the micro F1-score:
+The micro-averaged precision, $P_{\rm{micro}}$, and recall, $R_{\rm{micro}}$, give rise to the micro F1-score:
 
 \[F1_{\rm{micro}} = 2 \frac{P_{\rm{micro}}  \cdot R_{\rm{micro}}}{P_{\rm{micro}} + R_{\rm{micro}}}\]
 
-If $F1_{\rm{micro}}$ has a large value, this indicates that a classifier performs well overall. However, if the classes are imbalanced, this performance metric can be misleading.
+If a classifier obtains a large $F1_{\rm{micro}}$, this indicates that it performs well overall. The micro-average is not sensitive to the predictive performance for individual classes. As a consequence, the micro-average can be particularly misleading when the class distribution is imbalanced.
 
 ### The macro average
 
-The macro average has its name from the fact that it averages over larger entities, namely over the performance for individual classes rather than observations:
+The macro average has its name from the fact that it averages over larger groups, namely over the performance for individual classes rather than observations:
 
 \[
 \begin{align*}
@@ -65,11 +64,11 @@ The macro-averaged precision and recall give rise to the macro F1-score:
 
 \[F1_{\rm{macro}} = 2 \frac{P_{\rm{macro}}  \cdot R_{\rm{macro}}}{P_{\rm{macro}} + R_{\rm{macro}}}\]
 
-If $F1_{\rm{macro}}$ has a large value, this indicates that a classifier performs well for each individual class. The macro-average is therefore more suitable if the class distribution is imbalanced.
+If $F1_{\rm{macro}}$ has a large value, this indicates that a classifier performs well for each individual class. The macro-average is therefore more suitable for data with an imbalanced class distribution.
 
 ### Computing micro- and macro averages in R
 
-Let us assume we have a prediction problem with $N = 100$ and $|G| = 5$, with the following outcomes:
+To showcase the use of micro- and macro averages in R, let us consider a classification problem with $N = 100$ observations and five classes with $G = \{1, \ldots, 5\}$. Assume that the predictions and outcomes are as follows:
 
 ```{r}
 ref.labels <- c(rep("A", 45), rep("B" , 10), rep("C", 15), rep("D", 25), rep("E", 5))
@@ -83,30 +82,31 @@ df <- data.frame("Prediction" = predictions, "Reference" = ref.labels)
 
 #### One-vs-all confusion matrices
 
-We will now compute one-vs-all confusion matrices for each of the five classes. In the $i$-th iteration, class $g_i$ is used as the positive class:
+The first step for finding micro- and macro averages involves computing one-vs-all confusion matrices for each class. We will use the ```confusionMatrix``` function from the ```caret``` package to determine the confusion matrices:
 
 ```{r, message = FALSE}
 library(caret) # for confusionMatrix function
 cm <- vector("list", length(levels(df$Reference)))
 for (i in seq_along(cm)) {
     positive.class <- levels(df$Reference)[i]
+    # in the i-th iteration, use the i-th class as the positive class
     cm[[i]] <- confusionMatrix(df$Prediction, df$Reference, 
                                positive = positive.class)
 }
 ```
 
-Now, all five class-specific confusion matrices are stored in ```cm```. The performance for all classes is summarized by:
+Now that all class-specific confusion matrices are stored in ```cm```, we can summarize the performance across all classes:
 
 ```{r}
 metrics <- c("Precision", "Recall")
 print(cm[[1]]$byClass[, metrics])
 ```
 
-These data indicate that, overall, performance is quite high. However, individual classes such as class B (precision) and class E (both precision and recall) make problems.
+These data indicate that, overall, performance is quite high. However, our hypothetical classifier underperforms for individual classes such as class B (precision) and class E (both precision and recall). We will now investigate how micro- and macro-averages of the F1-score are influenced by the predictions of the model.
 
 #### Overall performance with micro-averaged F1
 
-Let us determine the micro-average F1-score:
+To determine $F1_{\rm{micro}}$, we need to determine $TP_i$, $FP_i$, and $FN_i$ $\forall i \in \{1, \ldots, K\}$. This is done by the ```get.conf.stats``` function. The function ```get.micro.f1``` then simply aggregates the counts and calculates the F1-score as defined above.
 
 ```{r}
 get.conf.stats <- function(cm) {
@@ -138,11 +138,11 @@ micro.f1 <- get.micro.f1(cm)
 print(paste0("Micro F1 is: ", round(micro.f1, 2)))
 ```
 
-With a value of 0.88, the micro-averaged F1 is quite high, indicating a good overall performance. The micro-averaged F1, however, did not really take into account that class E had a very poor performance because there are only 5 measurements in this class. 
+With a value of ```r round(micro.f1, 2)```, $F_1{\rm{micro}}$ is quite high, which indicates a good overall performance. As expected, the micro-averaged F1, did not really consider that the classifier had a poor performance for class E because there are only 5 measurements in this class that influence $F_1{\rm{micro}}$. 
 
 #### Class-specific performance with macro-averaged F1
 
-Let us now calculate the performance of the macro-averaged F1:
+Since each confusion matrix in ```cm``` already stores the one-vs-all prediction performance, we just need to extract these values from one of the matrices and calculate $F1_{\rm{macro}}$ as defined above: 
 
 ```{r}
 get.macro.f1 <- function(cm) {
@@ -156,17 +156,17 @@ macro.f1 <- get.macro.f1(cm)
 print(paste0("Macro F1 is: ", round(macro.f1, 2)))
 ```
 
-With a value of 0.68, the macro-averaged F1 is decidedly smaller than the micro-averaged F1 (0.88). This is because the macro average considers the contributions of individual classes. Since the classifier for class E performs poorly (precision: 16.7%, recall: 20%), the macro-averaged F1 is lower than the micro-averaged F1.
+With a value of ```r round(macro.f1, 2)```, $F_{\rm{macro}}$ is decidedly smaller than the micro-averaged F1 (```r round(micro.f1, 2)```). Since the classifier for class E performs poorly (precision: 16.7%, recall: 20%) and contributes $\frac{1}{5}$ to $F_{\rm{macro}}$, it is lower than $F1_{\rm{micro}}$.
 
-## ROC AUC
+## Precision-recall curves and AUC
 
-In contrast to [suggestions from online discussions], it is not reasonable to plot 2D ROC curves. However, in 2001, [Hand and Till generalized the AUC to multi-class problems] (https://link.springer.com/article/10.1023/A:1010920819831). Their approach works as follows.
+The performance of multi-class models can be visualized according to their one-vs-all precision-recall curves. The AUC can also be generalized to the multi-class settings ([Hand and Till, 2001] (https://link.springer.com/article/10.1023/A:1010920819831).
 
 ### One-vs-all AUC
 
-Should not be used for specificity -> AUCPR
+As discussed in [this StackExchange thread](https://stats.stackexchange.com/questions/71700/how-to-draw-roc-curve-with-three-response-variable), we can visualize the performance of a multi-class model by plotting the performance of $K$ binary classifiers.
 
-This approach is based on fitting $K$ one-vs-all classifiers where in the $i$-th iteration, group $g_i$ is set as the positive class, while all classes $g_j$ with $j \neq i$ are considered to be the negative class. This method should not be used for the ROC AUC since the specificity will be over-estimated. Instead, precision and recall should be considered:
+This approach is based on fitting $K$ one-vs-all classifiers where in the $i$-th iteration, group $g_i$ is set as the positive class, while all classes $g_j$ with $j \neq i$ are considered to be the negative class. Note that this method should not be used to plot conventional ROC curves (TPR vs FPR) since the FPR will be underestimated due to the large number of negative examples resulting from the binarization. Instead, precision and recall should be considered:
 
 ```{r, message = FALSE}
 library(ROCR) # for ROC curves
@@ -186,6 +186,7 @@ aucs <- rep(NA, length(levels(response))) # store AUCs
 for (i in seq_along(levels(response))) {
   cur.class <- levels(response)[i]
   binary.labels <- as.factor(iris.train$Species == cur.class)
+  # binarize the classifier you are using (NB is arbitrary)
   model <- NaiveBayes(binary.labels ~ ., data = iris.train[, -5])
   pred <- predict(model, iris.test[,-5], type='raw')
   score <- pred$posterior[, 'TRUE'] # posterior for  positive class
@@ -206,34 +207,67 @@ legend("bottomright", levels(response), lty=1,
 print(paste0("Mean AUC under the precision-recall curve is: ", round(mean(aucs), 2)))
 ```
 
-The plot indicates that *setosa* can be predicted very well, while *versicolor* and *virginica* are harder to predict.
+The plot indicates that *setosa* can be predicted very well, while *versicolor* and *virginica* are harder to predict. The mean AUC of ```r round(mean(aucs), 2)``` indicates that the model works very well at separating the three classes.
 
-### Approach from Hand
+### Generalization of the AUC (Hand and Till, 2001)
 
-Assume that the classes are labeled as $0, 1, 2, \ldots, c - 1$ with $c > 2$ (multi-class problem). Let $\hat{A}(i|j)$ indicate the probability tha a randomly drawn member of class $j$ has a lower probaility of belonging to class $i$ than a randomly drawn member of class $i$. Let $\hat{A}(j|i)$ be defined correspondingly. Since we cannot distinguish
+Assume that the classes are labeled as $0, 1, 2, \ldots, c - 1$ with $c > 2$. To generalize the AUC, we consider pairs of classes $(i,j)$. A good classifier should assign a high probability to the correct class, while assigning low probabilities to the other classes. This can be formalized in the following way. 
+
+Let $\hat{A}(i|j)$ indicate the probability that a randomly drawn member of class $j$ has a lower probability for class $i$ than a randomly drawn member of class $i$. Let $\hat{A}(j|i)$ be defined correspondingly. Since we cannot distinguish
 $\hat{A}(i|j)$ from $\hat{A}(j|i)$, we define
 
-\[\hat{A}(i,j) = \frac{1}{2} (\hat{A}(i|j) + \hat{A}(j|i))\]
+\[\hat{A}(i,j) = \frac{1}{2} \left(\hat{A}(i|j) + \hat{A}(j|i)\right)\]
 
-as the measure for the separability for classes $i$ and $j$. The overall performance of a multi-class classifier is then defined by the average value for $\hat{A}(i,j)$:
+as the measure for the separability for classes $i$ and $j$. The overall performance of a multi-class classifier is defined by the average value for $\hat{A}(i,j)$:
 
 \[ M = \frac{2}{c(c-1)} \sum_{i < j} \hat{A}(i,j) \]
 
-This measure is implemented in the ```pROC``` package:
+<!-- TODO: mathematical definition of A(i|j) -> formula> -->
 
-```{r}
+#### Generalized AUC in R
+
+The generalized version of the AUC is available through the ```pROC``` package:
+
+```{r, message = FALSE, warning = FALSE}
 library(pROC)
 data(aSAH)
 # Basic example: TODO understand the input (prediction value for predicted class only?) -> try normal pROC function
-multiclass.roc(aSAH$gos6, aSAH$s100b)
+# REF: read this paper for learn more about the hemorrhage (aSAH data) and how to prepare input
+#pROC: an open-source package for R and S+ to analyze and compare
+     #ROC curves
+auc <- multiclass.roc(aSAH$gos6, aSAH$s100b)
+print(auc$auc)
+##
+model <- NaiveBayes(iris.train$Species ~ ., data = iris.train[, -5])
+pred <- predict(model, iris.test[,-5], type='raw')
+test.labels <- iris.test$Species
+# compute score for the correct class
+scores <- unlist(lapply(seq_len(nrow(pred$posterior)), function(x)  {
+            pred$posterior[x, test.labels[x]]}))
+auc <- multiclass.roc(test.labels, scores)
+#auc <- multiclass.roc(test.labels, pred$posterior)
+print(auc$auc)
 ```
+
+TODO: discuss!
+
 ## Weighted accuracy
 
-Weights that sum to 1, then compute accuracy as weighted mean
+Conventionally, multi-class accuracy is defined as the average number of correct predictions:
+
+\[\text{accuracy} = \frac{1}{N} \sum_{k=1}^{|G|} \sum_{x: g(x) = k} I(g(x) = \hat{g}(x))\]
+
+We can also define the importance of individual classes by assigning a weight $w_k$ to every class such that $\sum_{k=1}^{|G|} w_k = 1$. Then, the weighted accuracy is determined by:
+
+\[\text{weighted accuracy} = \sum_{k=1}^{|G|} w_i \sum_{x: g(x) = k} I(g(x) = \hat{g}(x))\]
+
+To weight all classes equally, we can set $w_k = \frac{1}{|G|}\,,\forall k \in \{1, \ldots, G\}$. The higher the value of $w_k$ for an individual class, the greater is the influence of observations from that class on the weighted accuracy. However, when using anything other than uniform weights, it is hard to find a rational argument for a certain combination of weights.
+
 
 ## Good references
 
 https://stats.stackexchange.com/questions/2151/how-to-plot-roc-curves-in-multiclass-classification/2155#2155
 -> try stars package for cobweb plot
 https://stats.stackexchange.com/questions/44261/how-to-determine-the-quality-of-a-multiclass-classifier
+
 
