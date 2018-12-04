@@ -5,7 +5,7 @@ draft: true
 date: '2018-12-04'
 description: ""
 slug: "performance-measures-multi-class-problems"
-thumbnail: "/post/machine-learning/auc_performance.png"
+thumbnail: "/post/machine-learning/performance-measures-multi-class_cover.png"
 categories:
   - machine-learning
 tags:
