@@ -251,7 +251,7 @@ print(auc$auc)
 
 TODO: discuss!
 
-## Weighted accuracy
+## Accuracy and :eighted accuracy
 
 Conventionally, multi-class accuracy is defined as the average number of correct predictions:
 
