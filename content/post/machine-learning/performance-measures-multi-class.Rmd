@@ -1,9 +1,8 @@
 ---
 title: "Performance Measures for Multi-Class Problems"
 author: Matthias Döring
-draft: true
 date: '2018-12-04'
-description: ""
+description: "For multi-class settings, we can use similar performance measures as for binary classification. Here, I explain how we can obtain micro- and macro-averaged F1-scores, a generalization of the AUC, and a weighted accuracy."
 slug: "performance-measures-multi-class-problems"
 thumbnail: "/post/machine-learning/performance-measures-multi-class_cover.png"
 categories:
@@ -14,7 +13,67 @@ tags:
 ---
 For classification problems, classifier performance is typically defined according to the confusion matrix associated with the classifier. Based on the entries of the matrix, it is possible to compute sensitivity (recall), specificity, and precision. For a single cutoff, these quantities lead to balanced accuracy (sensitivity and specificity) or to the [F1-score (recall and precision)](/post/machine-learning/specificity-vs-precision/). For evaluate a scoring classifier at multiple cutoffs, these quantities can be used to determine the [area under the ROC curve (AUC)](/post/machine-learning/performance-measures-model-selection/) or the area under the precision-recall curve (AUCPR). 
 
-All of these performance measures are easily obtainable for binary classification problems. For classificatiton problems with more than two classes (multi-class problems), slightly more effort is necessary to derive suitable performance measures. Here, I introduce the notion of micro- and macro-averages of the F1-score, a one-vs-all approach for plotting the precision vs recall curve for multiple classes, and a generalization of the AUC for multiple classes.
+All of these performance measures are easily obtainable for binary classification problems. Which measure is appropriate depends on the type of classifier. Hard classifiers are non-scoring because they only produce an outcome $g(x) \in \{1, 2, \ldots, K\}$. Soft classifiers, on the other hand, are scoring classifiers that produce quantities on which a cutoff can be applied in order to find $g(x)$. For non-scoring classifiers, I introduce two versions of classifier accuracy as well as the micro- and macro-averages of the F1-score. For scoring classifiers, I describe a one-vs-all approach for plotting the precision vs recall curve and a generalization of the AUC for multiple classes.
+
+## Data of a non-scoring classifier
+
+To showcase the performance metrics for non-scoring classifiers in the multi-class setting, let us consider a classification problem with $N = 100$ observations and five classes with $G = \{1, \ldots, 5\}$:
+
+```{r}
+ref.labels <- c(rep("A", 45), rep("B" , 10), rep("C", 15), rep("D", 25), rep("E", 5))
+predictions <- c(rep("A", 35), rep("E", 5), rep("D", 5),
+                 rep("B", 9), rep("D", 1),
+                 rep("C", 7), rep("B", 5), rep("C", 3),
+                 rep("D", 23), rep("C", 2),
+                 rep("E", 1), rep("A", 2), rep("B", 2))
+df <- data.frame("Prediction" = predictions, "Reference" = ref.labels)
+```
+
+## Accuracy and weighted accuracy
+
+Conventionally, multi-class accuracy is defined as the average number of correct predictions:
+
+\[\text{accuracy} = \frac{1}{N} \sum_{k=1}^{|G|} \sum_{x: g(x) = k} I \left(g(x) = \hat{g}(x)\right)\]
+
+where $I$ is the indicator function, which returns 1 if the classes match and 0 otherwise.
+
+To be more sensitive to the performance for individual classes, we can assign a weight $w_k$ to every class such that $\sum_{k=1}^{|G|} w_k = 1$. The higher the value of $w_k$ for an individual class, the greater is the influence of observations from that class on the weighted accuracy. The weighted accuracy is determined by:
+
+\[\text{weighted accuracy} = \sum_{k=1}^{|G|} w_i \sum_{x: g(x) = k} I\left(g(x) = \hat{g}(x)\right)\,.\]
+
+To weight all classes equally, we can set $w_k = \frac{1}{|G|}\,,\forall k \in \{1, \ldots, G\}$. Note that when anything other than uniform weights are used, it is hard to find a rational argument for a certain combination of weights.
+
+### Calculating accuracy and weighted accuracy
+
+The accuracy is very easy to calculate:
+
+```{r}
+calculate.accuracy <- function(predictions, ref.labels) {
+    return(length(which(predictions == ref.labels)) / length(ref.labels))
+}
+calculate.w.accuracy <- function(predictions, ref.labels, weights) {
+    lvls <- levels(ref.labels)
+    if (length(weights) != length(lvls)) {
+        stop("Number of weights should agree with the number of classes.")
+    }
+    if (sum(weights) != 1) {
+        stop("Weights do not sum to 1")
+    }
+    accs <- lapply(lvls, function(x) {
+        idx <- which(ref.labels == x)
+        return(calculate.accuracy(predictions[idx], ref.labels[idx]))
+    })
+    acc <- mean(unlist(accs))
+    return(acc)
+}
+acc <- calculate.accuracy(df$Prediction, df$Reference)
+print(paste0("Accuracy is: ", round(acc, 2)))
+weights <- rep(1 / length(levels(df$Reference)), length(levels(df$Reference)))
+w.acc <- calculate.w.accuracy(df$Prediction, df$Reference, weights)
+print(paste0("Weighted accuracy is: ", round(w.acc, 2)))
+```
+
+Note that the weighted accuracy with uniform weights is lower (0.69) than the overall accuracy (0.78) because it gives equal contribution to the predictive performance for the five classes, independent of their number of observations.
 
 ## Micro and macro averages of the F1-score
 
@@ -27,7 +86,7 @@ To exemplify why the increase in true negatives is problematic, imagine there ar
 |Class 1              |  8      |     10      |
 |Other Class          |  2      |     80       |
 
-Based on this matrix, the specificity would be $\frac{80}{80 + 10} = 88.9\%$ although class 1 was only correctly predicted in 8 out of 18 instances (precision 44.4%). Thus, since the negative class is predominant, the specificity becomes inflated. Thus, micro- and macro averages are only defined for the F1-score and not for the balanced accuracy, which relies on the true negative rate.
+Based on this matrix, the specificity would be $\frac{80}{80 + 10} = 88.9\%$ although class 1 was only correctly predicted in 8 out of 18 instances (precision 44.4%). Thus, since the negative class is predominant, [the specificity becomes inflated](/post/machine-learning/specificity-vs-precision/). Thus, micro- and macro averages are only defined for the F1-score and not for the balanced accuracy, which relies on the true negative rate.
 
 In the following we will use $TP_i$, $FP_i$, and $FN_i$ to respectively indicate true
 positives, false positives, and false negatives in the confusion matrix associated with the $i$-th class. Moreover, let precision be indicated by $P$ and recall by $R$.
@@ -68,17 +127,7 @@ If $F1_{\rm{macro}}$ has a large value, this indicates that a classifier perform
 
 ### Computing micro- and macro averages in R
 
-To showcase the use of micro- and macro averages in R, let us consider a classification problem with $N = 100$ observations and five classes with $G = \{1, \ldots, 5\}$. Assume that the predictions and outcomes are as follows:
-
-```{r}
-ref.labels <- c(rep("A", 45), rep("B" , 10), rep("C", 15), rep("D", 25), rep("E", 5))
-predictions <- c(rep("A", 35), rep("E", 5), rep("D", 5),
-                 rep("B", 9), rep("D", 1),
-                 rep("C", 7), rep("B", 5), rep("C", 3),
-                 rep("D", 23), rep("C", 2),
-                 rep("E", 1), rep("A", 2), rep("B", 2))
-df <- data.frame("Prediction" = predictions, "Reference" = ref.labels)
-```
+Here, I demonstrate how the micro- and macro averages of the F1-score can be computed in R.
 
 #### One-vs-all confusion matrices
 
@@ -158,15 +207,17 @@ print(paste0("Macro F1 is: ", round(macro.f1, 2)))
 
 With a value of ```r round(macro.f1, 2)```, $F_{\rm{macro}}$ is decidedly smaller than the micro-averaged F1 (```r round(micro.f1, 2)```). Since the classifier for class E performs poorly (precision: 16.7%, recall: 20%) and contributes $\frac{1}{5}$ to $F_{\rm{macro}}$, it is lower than $F1_{\rm{micro}}$.
 
+Note that, for the present data set, micro- and macro-averaged F1 have a similar relationship to each other as the overall (0.78) and weighted accuracy (0.69).
+
 ## Precision-recall curves and AUC
 
-The performance of multi-class models can be visualized according to their one-vs-all precision-recall curves. The AUC can also be generalized to the multi-class settings ([Hand and Till, 2001] (https://link.springer.com/article/10.1023/A:1010920819831).
+The area under the ROC curve (AUC) is a useful tool for evaluating the quality of class separation for soft classifiers.  In the multi-class setting, we can visualize the performance of multi-class models according to their one-vs-all precision-recall curves. The AUC can also be generalized to the multi-class setting.
 
-### One-vs-all AUC
+### One-vs-all precision-recall curves
 
-As discussed in [this StackExchange thread](https://stats.stackexchange.com/questions/71700/how-to-draw-roc-curve-with-three-response-variable), we can visualize the performance of a multi-class model by plotting the performance of $K$ binary classifiers.
+As discussed in [this Stack Exchange thread](https://stats.stackexchange.com/questions/71700/how-to-draw-roc-curve-with-three-response-variable), we can visualize the performance of a multi-class model by plotting the performance of $K$ binary classifiers.
 
-This approach is based on fitting $K$ one-vs-all classifiers where in the $i$-th iteration, group $g_i$ is set as the positive class, while all classes $g_j$ with $j \neq i$ are considered to be the negative class. Note that this method should not be used to plot conventional ROC curves (TPR vs FPR) since the FPR will be underestimated due to the large number of negative examples resulting from the binarization. Instead, precision and recall should be considered:
+This approach is based on fitting $K$ one-vs-all classifiers where in the $i$-th iteration, group $g_i$ is set as the positive class, while all classes $g_j$ with $j \neq i$ are considered to be the negative class. Note that this method should not be used to plot conventional ROC curves (TPR vs FPR) since the FPR will be underestimated due to the large number of negative examples resulting from the dichotimization. Instead, precision and recall should be considered:
 
 ```{r, message = FALSE}
 library(ROCR) # for ROC curves
@@ -207,67 +258,123 @@ legend("bottomright", levels(response), lty=1,
 print(paste0("Mean AUC under the precision-recall curve is: ", round(mean(aucs), 2)))
 ```
 
-The plot indicates that *setosa* can be predicted very well, while *versicolor* and *virginica* are harder to predict. The mean AUC of ```r round(mean(aucs), 2)``` indicates that the model works very well at separating the three classes.
+The plot indicates that *setosa* can be predicted very well, while *versicolor* and *virginica* are harder to predict. The mean AUC of ```r round(mean(aucs), 2)``` indicates that the model separates the three classes very well.
 
-### Generalization of the AUC (Hand and Till, 2001)
+### Generalizations of the AUC for the multi-class setting
 
-Assume that the classes are labeled as $0, 1, 2, \ldots, c - 1$ with $c > 2$. To generalize the AUC, we consider pairs of classes $(i,j)$. A good classifier should assign a high probability to the correct class, while assigning low probabilities to the other classes. This can be formalized in the following way. 
+There are several generalizations of the AUC for the multi-class setting. Here, I will focus on the generalization established by Hand and Till in 2001. 
 
-Let $\hat{A}(i|j)$ indicate the probability that a randomly drawn member of class $j$ has a lower probability for class $i$ than a randomly drawn member of class $i$. Let $\hat{A}(j|i)$ be defined correspondingly. Since we cannot distinguish
-$\hat{A}(i|j)$ from $\hat{A}(j|i)$, we define
+#### Generalized AUC for a single decision value
 
-\[\hat{A}(i,j) = \frac{1}{2} \left(\hat{A}(i|j) + \hat{A}(j|i)\right)\]
-
-as the measure for the separability for classes $i$ and $j$. The overall performance of a multi-class classifier is defined by the average value for $\hat{A}(i,j)$:
-
-\[ M = \frac{2}{c(c-1)} \sum_{i < j} \hat{A}(i,j) \]
-
-<!-- TODO: mathematical definition of A(i|j) -> formula> -->
-
-#### Generalized AUC in R
-
-The generalized version of the AUC is available through the ```pROC``` package:
+The ```multiclass.roc``` function from the ```pROC``` package can be used to determine the AUC when a single quantity allows for the separation of the classes. [In contrast to the documentation of the function](https://cran.r-project.org/web/packages/pROC/pROC.pdf), the function does not seem to implement the approach from Hand and Till
+because the class predictions are not considered. However, the documentation warns about this function being in *beta phase*. I am currently waiting for a response from the package authors about the ```multiclass.roc``` function to verify whether my understanding is correct. 
 
 ```{r, message = FALSE, warning = FALSE}
 library(pROC)
 data(aSAH)
-# Basic example: TODO understand the input (prediction value for predicted class only?) -> try normal pROC function
-# REF: read this paper for learn more about the hemorrhage (aSAH data) and how to prepare input
-#pROC: an open-source package for R and S+ to analyze and compare
-     #ROC curves
 auc <- multiclass.roc(aSAH$gos6, aSAH$s100b)
-print(auc$auc)
-##
-model <- NaiveBayes(iris.train$Species ~ ., data = iris.train[, -5])
-pred <- predict(model, iris.test[,-5], type='raw')
-test.labels <- iris.test$Species
-# compute score for the correct class
-scores <- unlist(lapply(seq_len(nrow(pred$posterior)), function(x)  {
-            pred$posterior[x, test.labels[x]]}))
-auc <- multiclass.roc(test.labels, scores)
-#auc <- multiclass.roc(test.labels, pred$posterior)
 print(auc$auc)
 ```
 
-TODO: discuss!
+The calculated AUC of the function is simply the mean AUC from all pairwise class comparisons.
 
-## Accuracy and :eighted accuracy
+#### Generalization of the AUC by Hand and Till
 
-Conventionally, multi-class accuracy is defined as the average number of correct predictions:
+The following describes the generalization of the AUC from [Hand and Till, 2001](https://link.springer.com/article/10.1023/A:1010920819831).
 
-\[\text{accuracy} = \frac{1}{N} \sum_{k=1}^{|G|} \sum_{x: g(x) = k} I(g(x) = \hat{g}(x))\]
+Assume that the classes are labeled as $0, 1, 2, \ldots, c - 1$ with $c > 2$. To generalize the AUC, we consider pairs of classes $(i,j)$. A good classifier should assign a high probability to the correct class, while assigning low probabilities to the other classes. This can be formalized in the following way. 
 
-We can also define the importance of individual classes by assigning a weight $w_k$ to every class such that $\sum_{k=1}^{|G|} w_k = 1$. Then, the weighted accuracy is determined by:
+Let $\hat{A}(i|j)$ indicate the probability that a randomly drawn member of class $j$ has a lower probability for class $i$ than a randomly drawn member of class $i$. Let $\hat{A}(j|i)$ be defined correspondingly. We can calculate $\hat{A}(i|j)$ using the following definitions:
 
-\[\text{weighted accuracy} = \sum_{k=1}^{|G|} w_i \sum_{x: g(x) = k} I(g(x) = \hat{g}(x))\]
+* $\hat{p}(x_l)$ is the estimated probability that observation $x_l$ originates from class $i$.
+* For all class $i$ observations $x_l$, let $f_l = \hat{p}(x_l)$ be the estimated probability of belonging to class $i$.
+* For all class $j$ observations $x_l$, let $g_l = \hat{p}(x_l)$ be the estimated probability of belonging to class $i$.
 
-To weight all classes equally, we can set $w_k = \frac{1}{|G|}\,,\forall k \in \{1, \ldots, G\}$. The higher the value of $w_k$ for an individual class, the greater is the influence of observations from that class on the weighted accuracy. However, when using anything other than uniform weights, it is hard to find a rational argument for a certain combination of weights.
+Now, we rank the combined set of values $\{g_1, \ldots, g_{n_j}, f_1, \ldots, f_{n_i}\}$ in increasing order. Let $r_l$ be the rank of the $l$-th observation from class $i$. Then, the total number of pairs of points in which the class $j$ point has a smaller estimated probability of belonging to class $i$ than the class $i$ point is given by
+
+\[\sum_{l=1}^{n_i} r_l - l = \sum_{l=1}^{n_i} r_l - \sum_{l=1}^{n_i} l = S_i - n_i(n_i +1)/2 \]
+
+where $S_i$ is the sum of the ranks from the class $i$ samples. Because there are $n_0 n_1$ pairs of points from two classes, the probability that a randomly chosen class $j$ point has a lower estimated probability of belonging to class $i$ than a randomly chosen class $i$ point is:
+
+\[\hat{A}(i|j) = \frac{S_i - n_i(n_i +1)/2}{n_i n_j}\,. \]
+
+Since we cannot distinguish $\hat{A}(i|j)$ from $\hat{A}(j|i)$, we define
+
+\[\hat{A}(i,j) = \frac{1}{2} \left(\hat{A}(i|j) + \hat{A}(j|i)\right)\]
+
+as the measure for the separability for classes $i$ and $j$. The overall AUC of a multi-class classifier is then given by the average value for $\hat{A}(i,j)$:
+
+\[ M = \frac{2}{c(c-1)} \sum_{i < j} \hat{A}(i,j) \]
+
+Here, the multiplier is $\frac{2}{c (c-1)}$ because there are $c (c-1)$ ways in which distinct pairs can be constructed taking different orderings into account. Since only half of these pairs are computed, the enumerator has a value of 2.
+
+##### Implementation of the AUC generalization from Hand and Till
+
+It seems that there is no publicly available implementation of the multi-class generalization of the AUC due to Hand and Till (2001). Thus, I wrote an implementation. The function ```compute.A.conditional``` determines $\hat{A}(i|j)$. The ```multiclass.auc``` function computes $\hat{A}(i,j)$ for all pairs of classes with $i < j$ and then calculates the mean of the resulting values. The output is the generalized AUC, $M$, and the attribute ```pair_AUCs``` indicates the values for $A(i,j)$.
+
+```{r}
+compute.A.conditional <- function(pred.matrix, i, j, ref.outcome) {
+    # computes A(i|j), the probability that a randomly 
+    # chosen member of class j has a lower estimated probability (or score) 
+    # of belonging to class i than a randomly chosen member of class i
+
+    # select predictions of class members
+    i.idx <- which(ref.outcome == i)
+    j.idx <- which(ref.outcome == j)
+    pred.i <- pred.matrix[i.idx, i] # p(G = i) assigned to class i observations
+    pred.j <- pred.matrix[j.idx, i] # p(G = i) assigned to class j observations
+    all.preds <- c(pred.i, pred.j)
+    classes <- c(rep(i, length(pred.i)), rep(j, length(pred.j)))
+    o <- order(all.preds)
+    classes.o <- classes[o]
+    # Si: sum of ranks from class i observations
+    Si <- sum(which(classes.o == i))
+    ni <- length(i.idx)
+    nj <- length(j.idx)
+    # calculate A(i|j)
+    A <- (Si - ((ni * (ni + 1))/2)) / (ni * nj)
+    return(A)
+}
+
+multiclass.auc <- function(pred.matrix, ref.outcome) {
+    labels <- colnames(pred.matrix)
+    A.ij.cond <- utils::combn(labels, 2, function(x, pred.matrix, ref.outcome) {x
+        i <- x[1]
+        j <- x[2]
+        A.ij <- compute.A.conditional(pred.matrix, i, j, ref.outcome)
+        A.ji <- compute.A.conditional(pred.matrix, j, i, ref.outcome)
+        pair <- paste0(i, "/", j)
+        return(c(A.ij, A.ji))
+    }, simplify = FALSE, pred.matrix = pred.matrix, ref.outcome = ref.outcome)
+    c <- length(labels)
+    pairs <- unlist(lapply(combn(labels, 2, simplify = FALSE), function(x) paste(x, collapse = "/")))
+    A.mean <- unlist(lapply(A.ij.cond, mean))
+    names(A.mean) <- pairs
+    A.ij.joint <- sum(unlist(A.mean))
+    M <- 2 / (c * (c-1)) * A.ij.joint 
+    attr(M, "pair_AUCs") <- A.mean
+    return(M)
+}
+model <- NaiveBayes(iris.train$Species ~ ., data = iris.train[, -5])
+pred <- predict(model, iris.test[,-5], type='raw')
+pred.matrix <- pred$posterior
+ref.outcome <- iris.test$Species
+M <- multiclass.auc(pred.matrix, ref.outcome)
+print(paste0("Generalized AUC is: ", round(as.numeric(M), 3)))
+print(attr(M, "pair_AUCs")) # pairwise AUCs
+```
+
+Using this approach, the generalized AUC is 0.988, which is surprisingly similar to the mean value from the precision-recall curves of the binary one-vs-all classifiers. The interpretation of the resulting pairwise AUCs is also similar. While the AUCs for separating *setosa*/*versicolor* and *setosa*/*virginica* are both 1, the AUC for *versicolor*/*virginica* is slightly smaller, which is in line with our previous finding that observations from *versicolor* and *virginica* are harder to predict accurately.
+
+#### Other ROC-based approaches
+
+There are also [other ROC-based approaches available](https://stats.stackexchange.com/a/2155). For brevity's sake, I will, however, not discuss them here at the moment.
 
 
-## Good references
+## Summary
 
-https://stats.stackexchange.com/questions/2151/how-to-plot-roc-curves-in-multiclass-classification/2155#2155
--> try stars package for cobweb plot
-https://stats.stackexchange.com/questions/44261/how-to-determine-the-quality-of-a-multiclass-classifier
+For multi-class problems, similar measures as for binary classification are available. 
 
+* For hard classifiers, you can use the (weighted) accuracy as well as micro or macro-averaged F1 score.
+* For soft classifiers, you can determine one-vs-all precision-recall curves or use the generalization of the AUC from Hand and Till.
 
