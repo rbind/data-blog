@@ -308,6 +308,12 @@ as the measure for the separability for classes $i$ and $j$. The overall AUC of 
 
 Here, the multiplier is $\frac{2}{c (c-1)}$ because there are $c (c-1)$ ways in which distinct pairs can be constructed taking different orderings into account. Since only half of these pairs are computed, the enumerator has a value of 2.
 
+##### Example for computing conditional probabilities
+
+Please condider the following diagram for an example of how the conditional probabilties are computed.
+
+<img src = "/post/machine-learning/performance-measures-multi-class_example.png" alt = "Example for computing conditional AUC probabilities" width = "1172" height = "1662">
+
 ##### Implementation of the AUC generalization from Hand and Till
 
 It seems that there is no publicly available implementation of the multi-class generalization of the AUC due to Hand and Till (2001). Thus, I wrote an implementation. The function ```compute.A.conditional``` determines $\hat{A}(i|j)$. The ```multiclass.auc``` function computes $\hat{A}(i,j)$ for all pairs of classes with $i < j$ and then calculates the mean of the resulting values. The output is the generalized AUC, $M$, and the attribute ```pair_AUCs``` indicates the values for $A(i,j)$.

@@ -274,6 +274,11 @@ print(auc$auc)</code></pre>
 <p>as the measure for the separability for classes <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. The overall AUC of a multi-class classifier is then given by the average value for <span class="math inline">\(\hat{A}(i,j)\)</span>:</p>
 <p><span class="math display">\[ M = \frac{2}{c(c-1)} \sum_{i &lt; j} \hat{A}(i,j) \]</span></p>
 <p>Here, the multiplier is <span class="math inline">\(\frac{2}{c (c-1)}\)</span> because there are <span class="math inline">\(c (c-1)\)</span> ways in which distinct pairs can be constructed taking different orderings into account. Since only half of these pairs are computed, the enumerator has a value of 2.</p>
+<div id="example-for-computing-conditional-probabilities" class="section level5">
+<h5>Example for computing conditional probabilities</h5>
+<p>Please condider the following diagram for an example of how the conditional probabilties are computed.</p>
+<p><img src = "/post/machine-learning/performance-measures-multi-class_example.png" alt = "Example for computing conditional AUC probabilities" width = "1172" height = "1662"></p>
+</div>
 <div id="implementation-of-the-auc-generalization-from-hand-and-till" class="section level5">
 <h5>Implementation of the AUC generalization from Hand and Till</h5>
 <p>It seems that there is no publicly available implementation of the multi-class generalization of the AUC due to Hand and Till (2001). Thus, I wrote an implementation. The function <code>compute.A.conditional</code> determines <span class="math inline">\(\hat{A}(i|j)\)</span>. The <code>multiclass.auc</code> function computes <span class="math inline">\(\hat{A}(i,j)\)</span> for all pairs of classes with <span class="math inline">\(i &lt; j\)</span> and then calculates the mean of the resulting values. The output is the generalized AUC, <span class="math inline">\(M\)</span>, and the attribute <code>pair_AUCs</code> indicates the values for <span class="math inline">\(A(i,j)\)</span>.</p>
