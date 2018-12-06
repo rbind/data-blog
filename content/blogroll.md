@@ -12,6 +12,7 @@ disable_comments: false
 
 ## Data science
 
+* [An excellent essay on the data science field by David Donoho](http://courses.csail.mit.edu/18.337/2015/docs/50YearsDataScience.pdf)
 * [The Stats Geek](http://thestatsgeek.com/): a blog on statistics
 * [Cross Validated](https://stats.stackexchange.com): probably the largest forum for discussing anything related to statistics and machine learning
 * [Data Camp](https://www.datacamp.com): a great resource for training in data science

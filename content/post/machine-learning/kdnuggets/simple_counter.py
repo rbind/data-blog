@@ -101,6 +101,7 @@ if not os.path.exists(os.path.dirname(out_file)):
     os.makedirs(os.path.dirname(out_file))
 # table structure: Model | Year | Count
 models = {
+        "Deep learning": ["deep learning"],
         "Neural Network": ["neural network"],
         "Support Vector Machine": ["support vector machine"],
         "Random Forest": ["random forest"],

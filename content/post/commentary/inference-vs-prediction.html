@@ -15,17 +15,56 @@ tags:
 
 
 
-<div id="inference-vs-prediction" class="section level2">
-<h2>Inference vs prediction</h2>
-<p>Bayesian methods are concerned with statistical inference rather than prediction. Inference is concerned with learning how the observed outcomes are generated as a function of the data. Prediction, on the other hand, is concerned with building a model that can estimate the outcome for unseen data. Note that there are methods that can be used for both tasks. For example, logistic regression can be used to measure the impact of individual features on the outcome (inference) and to estimate the outcome for new observations (prediction).</p>
-<p>In essence, the difference between inference and prediction boils down to model interpretability. If a model is interpretable (i.e. you can understand how the predictions are formed) it probably performs inference, while models that are hard to interpret probably perform prediction. To make the distinction clearer, consider the following examples:</p>
+<p>The terms inference and prediction both describe tasks where we learn from data in a supervised manner in order to find a model that describes the relationship between the independent variables and the outcome. Inference and prediction, however, diverge when it comes to the question what one should do with the resulting model:</p>
 <ul>
-<li>Inference methods: all Bayesian methods; to a certain extent some machine learning methods (e.g. linear regression or logistic regression)</li>
-<li>Prediction methods: all machine learning models, particularly those that are non-parametric (e.g. decision trees, neural networks, or non-linear support vector machines)</li>
+<li><strong>Inference:</strong> Use the model to describe the data generation process and gain insights from this (e.g. inform decision making).</li>
+<li><strong>Prediction:</strong> Use the model to predict the outcomes for new data points (e.g. as a black box).</li>
 </ul>
-<p>To obtain a better intuition about the differences in the way that Bayesian thinking is different, <a href="https://stats.stackexchange.com/a/73180">you should read this great post at Stats Exchange</a>.</p>
+<p>Since the aims of inference and prediction are fundamentally different, the types of models that are used for inference and prediction, respectively, are often different.</p>
+<div id="model-interpretability-is-a-necessity-for-inference" class="section level2">
+<h2>Model interpretability is a necessity for inference</h2>
+<p>In essence, the difference between models that are suitable for inference and those that are not boilds down to model interpretability. What do I mean with <em>interpretable</em>? A model is called interpretable if it is possible to retrace how the model generates its estimates. Consider the following approaches for prediction:</p>
+<ul>
+<li>Interpretable: Generalized linear models (e.g. linear regression, logistic regression), linear discriminant analysis, linear support vector machines (SVMs), decision trees</li>
+<li>Less interpretable: neural networks, non-linear SVMs</li>
+</ul>
+<p>Of these approaches, only a subset of the interpretable methods are useful for inference. For example, linear SVMs are interpretable because they provide a single coefficient for every feature such that it is possible to explain the impact of individual features on the prediction. However, SVMs are non-parametric because they do not assume that the data follow any specific distribution. Therefore, the uncertainty associated with the model coefficients (e.g. the variance) is not available and it is not possible to obtain an implicit measure of model confidence. Note that SVMs may output probabilities but these probabilities are just a transformation of the decision values and do not take into account the confidence about the estimated model parameters. Thus, SVMs are not suitable for inference. The same goes for decision trees.</p>
+<p>In contrast, consider linear regression, which assumes that the data follow a Gaussian distribution. Among other things, <a href="http://127.0.0.1:4321/post/machine-learning/linear_models/">this allows us to find the standard error of the coefficient estimates and output confidence intervals</a>, which indicates our confidence about the parameter estimates as well as our predictions. Since linear regression allows us to understand the probabilistic nature of the data generation process, it is a suitable method for inference.</p>
+</div>
+<div id="examples-for-prediction-and-inference" class="section level2">
+<h2>Examples for prediction and inference</h2>
+<p>Note that, if you are using a model that is suitable for inference, this does not necessarily mean you are actually performing inference but it depends on what you are doing with the model. Consider the following example:</p>
+<ul>
+<li><strong>Prediction example:</strong> You want to predict future ozone levels using historic data. Since you believe that there is a linear relationship between the ozone level and measurements of temperature, solar radiation, and wind, you fit several linear models (e.g. using different sets of features) on the training data and select the model minimizing the loss on the test set. Finally, you use the selected model for predicting the ozone level. Note that you do not care at all about the Gaussian assumption of the model or the additional information that is available on the model estimates because you are only interested in maximizing predictive performance.</li>
+<li><strong>Inference example:</strong> You want to understand how ozone levels are influenced by temperature, solar radiation, and wind. Since you assume that the residuals are normally distributed, you use a linear regression model. Since you want to harness the information from the full data set and accuracy does not play a role, you fit the model on the full data set. On the basis of the fitted model, you interpret the role of the features on the ozone levels, for example, by considering the confidence bands of the estimates.</li>
+</ul>
+<p>Note that <a href="https://projecteuclid.org/euclid.ss/1009213726">machine learning (predictive modeling) is usually concerned with prediction</a>, while statistics relies on stochastic models that perform inference. Therefore, the selection of machine learning models is based on the performance on the test set rather than the theoretical validity of the model. This is why <a href="https://xkcd.com/1838/">machine learning models are often treated as black boxes</a> that can generate the correct answer as long as a sufficient number of data is provided. For inference, the tables are turned. Here, it is of the essence that the model reflects the actual data generation process as close as possible. To achieve this, prior knowledge is often incorporated into inference models.</p>
+</div>
+<div id="workflows-for-inference-and-prediction" class="section level2">
+<h2>Workflows for inference and prediction</h2>
+<p>The basic workflows for inference and prediction are described in the following sections.</p>
+<div id="inference" class="section level3">
+<h3>Inference</h3>
+<ol style="list-style-type: decimal">
+<li>Modeling: reason about the data generation process and choose the stocastic model that approximates the data generation process best.</li>
+<li>Model validation: evaluate the validity of the stochastic model using residual analysis or goodness-of-fit tests.</li>
+<li>Inference: use the stochastic model to understand the data generation process .</li>
+</ol>
+</div>
+<div id="prediction" class="section level3">
+<h3>Prediction</h3>
+<ol style="list-style-type: decimal">
+<li>Modeling: consider several different models and different parameter settings.</li>
+<li>Model selection: Identify the model with the greatest predictive performance using validation/test sets; select the model with the highest performance on the test set.</li>
+<li>Prediction: Apply the selected model on new data with the expectation that the selected model also generalizes to the unseen data.</li>
+</ol>
+</div>
+</div>
+<div id="why-are-bayesian-models-so-popular-for-inference" class="section level2">
+<h2>Why are Bayesian models so popular for inference?</h2>
+<p>Bayesian method</p>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
-<p><a href="http://courses.csail.mit.edu/18.337/2015/docs/50YearsDataScience.pdf">http://courses.csail.mit.edu/18.337/2015/docs/50YearsDataScience.pdf</a> Leo Breimann (creator of decision trees): statistical modeling: the two cultures <a href="https://sahirbhatnagar.com/assets/pdf/stat_ml_jc_july20.pdf">https://sahirbhatnagar.com/assets/pdf/stat_ml_jc_july20.pdf</a> <a href="https://xkcd.com/1838/">https://xkcd.com/1838/</a></p>
+<p><a href="http://courses.csail.mit.edu/18.337/2015/docs/50YearsDataScience.pdf" class="uri">http://courses.csail.mit.edu/18.337/2015/docs/50YearsDataScience.pdf</a> Leo Breimann (creator of decision trees): statistical modeling: the two cultures <a href="https://sahirbhatnagar.com/assets/pdf/stat_ml_jc_july20.pdf" class="uri">https://sahirbhatnagar.com/assets/pdf/stat_ml_jc_july20.pdf</a> <a href="https://xkcd.com/1838/" class="uri">https://xkcd.com/1838/</a></p>
 </div>
