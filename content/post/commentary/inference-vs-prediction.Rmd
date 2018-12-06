@@ -55,6 +55,15 @@ The basic workflows for inference and prediction are described in the following 
 2. Model selection: Identify the model with the greatest predictive performance using validation/test sets; select the model with the highest performance on the test set.
 3. Prediction: Apply the selected model on new data with the expectation that the selected model also generalizes to the unseen data.
 
+## Three problems
+
+1. Rashomon: there is a multiplicity of good models
+2. Occam: we would like to have the simplest possible model but what about the accuracy?
+3. Bellman: curse or blessing of dimensionality?
+
+* Rashomon is a famous 1950 feature film in which various characters depict different and even contradictory versions of the same incident.
+* William of Occam's razor states that *Entities should not be multiplied beyond necessity*, underlining the importance of simplicity.
+* Richard Bellman coined the term *curse of dimensionality*.
 ## Why are Bayesian models so popular for inference?
 
 Bayesian method
