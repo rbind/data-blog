@@ -1,4 +1,4 @@
-"Source","Neural_Network","Support_Vector_Machine","Linear_Regression","Logistic_Regression","Nearest_Neighbor","Linear_Discriminant_Analysis","Poisson_Regression","Cox_Regression","Log_Linear_Model","Ridge_Regression","Lasso_Regression","Decision_Tree","Random_Forest"
-"Biomedical (PubMed)",23883,11061,84850,229956,1613,4222,12978,38801,621,557,310,5892,3981
-"Overall (Google Scholar)",1750000,684000,3580000,2330000,161400,129000,153000,326000,54100,48000,13000,875000,108000
-"Computer Science (DBLP)",63695,7570,1643,1031,1961,648,72,60,"NA",253,201,4074,1863
+Source,Neural_Network,Support_Vector_Machine,Linear_Regression,Logistic_Regression,Nearest_Neighbor,Linear_Discriminant_Analysis,Poisson_Regression,Cox_Regression,Log_Linear_Model,Ridge_Regression,Lasso_Regression,Decision_Tree,Random_Forest,Deep Learning
+Biomedical (PubMed),23883,11061,84850,229956,1613,4222,12978,38801,621,557,310,5892,3981,3003
+Overall (Google Scholar),1750000,684000,3580000,2330000,161400,129000,153000,326000,54100,48000,13000,875000,108000,221000
+Computer Science (DBLP),63695,7570,1643,1031,1961,648,72,60,NA,253,201,4074,1863,10157

@@ -95,26 +95,27 @@ def get_hits_in_year(search_term, year, proxies, proxy_pool, user_agent_list, re
 #print("call:")
 #print(sys.argv)
 if len(sys.argv) != 2: # two args are required ([0] is name of script)
-    sys.exit("Stopping because required args were not supplied: <out_loc_results> <search_term> <year>")
+    sys.exit("Stopping because required args were not supplied: <out_loc_results>")
 out_file = sys.argv[1] # read from 2nd arg
 if not os.path.exists(os.path.dirname(out_file)):
     os.makedirs(os.path.dirname(out_file))
 # table structure: Model | Year | Count
 models = {
         "Deep learning": ["deep learning"],
-        "Neural Network": ["neural network"],
-        "Support Vector Machine": ["support vector machine"],
-        "Random Forest": ["random forest"],
-        "Decision Tree": ["decision tree"],
-        "Linear Regression": ["linear regression"],
-        "Logistic Regression": ["logistic regression"],
-        "Poisson Regression": ["poisson regression"],
-        "Cox Regression": ["cox regression"],
-        "Ridge Regression": ["ridge regression"],
-        "Lasso Regression": ["lasso model", "lasso regression"],
-        "Nearest Neighbor": ["k-nearest neighbor", "k-nearest neighbour"],
-        "Linear Discriminant Analysis": ["linear discriminant analysis"],
-        "Log-Linear Model": ["log-linear model"]}
+        #"Neural Network": ["neural network"],
+        #"Support Vector Machine": ["support vector machine"],
+        #"Random Forest": ["random forest"],
+        #"Decision Tree": ["decision tree"],
+        #"Linear Regression": ["linear regression"],
+        #"Logistic Regression": ["logistic regression"],
+        #"Poisson Regression": ["poisson regression"],
+        #"Cox Regression": ["cox regression"],
+        #"Ridge Regression": ["ridge regression"],
+        #"Lasso Regression": ["lasso model", "lasso regression"],
+        #"Nearest Neighbor": ["k-nearest neighbor", "k-nearest neighbour"],
+        #"Linear Discriminant Analysis": ["linear discriminant analysis"],
+        #"Log-Linear Model": ["log-linear model"]
+        }
 rows = []
 proxies = get_proxies()
 proxy_pool = cycle(proxies)
