@@ -1,0 +1,11 @@
+---
+title: "Interpreting ROC Curves and their AUC"
+author: Matthias Döring
+date: '2018-12-07'
+draft: true
+description: ""
+categories:
+  - machine-learning
+tags:
+    - R
+---
