@@ -1,11 +1,334 @@
 ---
-title: "Interpreting ROC Curves and their AUC"
+title: "Interpreting ROC Curves, precision-recall curves, and their AUCs"
 author: Matthias Döring
-date: '2018-12-07'
-draft: true
-description: ""
+date: '2018-12-08'
+thumbnail: "/post/machine-learning/interpreting_roc_curves_cover.png"
+slug: "interpreting-roc-curves-auc"
+description: "ROC and precision-recall curves are a staple for the interpretation of binary classifiers. This post gives an intuition on how these curves are constructed and their associated AUCs are interpreted."
 categories:
   - machine-learning
 tags:
     - R
+    - performance-measure
 ---
+Receiver operating characteristic (ROC) curves are probably the most commonly used measure for evaluating the predictive performance of scoring classifiers. 
+
+The confusion matrix of a classifier that predicts a positive class (+1) and a negative class (-1) has the following structure:
+
+| Prediction/Reference Class | +1  | -1  |
+|----------------------|----|----|
+| +1                    | TP | FP |
+| -1                    | FN | TN |
+
+Here, TP indicates the number of true positives (model predicts positive class correctly), FP indicates the number of false positives (model incorrectly predicts positive class), FN indicates the number of false negatives (model incorrectly predicts negative class), and TN indicates the number of true negatives (model correctly predicts negative class).
+
+## ROC Curves
+
+In ROC curves, the true positive rate (TPR, y-axis) is plotted against the false positive rate (FPR, x-axis). These quantities are defined as follows:
+
+\[
+\begin{align*}
+TPR &= \frac{TP}{TP + FN} \\
+FPR &= \frac{FP}{FP + TN} \\
+\end{align*}
+\]
+
+Each point in a ROC curve arises from the values in [the confusion matrix](/post/machine-learning/specificity-vs-precision/) associated with the application of a specific cutoff on the predictions (scores) of the classifier. 
+
+To construct a ROC curve, one simply uses each of the classifier estimates as a cutoff for differentiating the positive from the negative class. To exemplify the construction of these curves, we will use a data set consisting of 11 observations of which 4 belong to the positive class ($y_i = +1$) and 7 belong to the negative class ($y_i = -1$). The corresponding ROC curve is constructed by applying cutoffs on the estimates (decision values) of the model. Consider the following example:
+
+
+```{r, eval = FALSE, echo = FALSE}
+df <- data.frame("Y" = c(rep(-1, 7), rep(1, 4)), 
+                 "Y_Hat" = c(c(-3, -2.5, 0.5, 2, -1, -0.5, -1),
+                             c(2, -0.5, 1, 3.5)))
+df$Y <- factor(df$Y)
+plot_roc <- function(df, dir, measure = "tpr", x.measure = "fpr", title = "The ROC Curve") {
+    library(ROCR)
+    pred <- prediction(df$Y_Hat, df$Y)
+    cut <- pred@cutoffs[[1]]
+    perf <- performance(pred, measure = measure, x.measure = x.measure)
+    x <- perf@x.values[[1]]
+    y <- perf@y.values[[1]]
+    o <- order(df$Y_Hat)
+    df.o <- df[o,]
+    library(ggplot2)
+    library(gridExtra) # tableGrob
+    tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
+    x.measure <- toupper(x.measure)
+    measure <- toupper(measure)
+    for (i in c(0,seq_along(x))) {
+        cur.x <- x[1:i]
+        cur.y <- y[1:i]
+        cur.pred <- df.o$Y_Hat[1:i]
+        cur.class <- df.o$Y[1:i]
+        plot.df <- data.frame("FPR" = cur.x, "TPR" = cur.y)
+        colnames(plot.df) <- c(x.measure, measure)
+        cur.cut <- cut[i]
+        classified.idx <- which(df.o$Y_Hat >= cur.cut) # positive class predicted
+        unclassified.idx <- which(df.o$Y_Hat < cur.cut) # negative class predicted
+        tp <- which(df.o$Y[classified.idx] == 1)
+        fp <- which(df.o$Y[classified.idx] == -1)
+        fn <- which(df.o$Y[unclassified.idx] == 1)
+        status <- rep("TN", nrow(df.o))
+        status[classified.idx[tp]] <- "TP"
+        status[classified.idx[fp]] <- "FP"
+        status[unclassified.idx[fn]] <- "FN"
+        pred <- ifelse(df.o$Y_Hat >= cur.cut, "+1", "-1")
+        if (i == 0) {
+            pred <- NA
+            status <- NA
+        }
+        data.df <- data.frame("Estimate" = df.o$Y_Hat, "Class" = df.o$Y, "Prediction" = pred, "Status" = status) #, "Cutoff" = cur.cut)
+        ####
+        # specify style of table
+        ####
+        plot.table <- t(data.df)
+        cols <- matrix("black", nrow(plot.table), ncol(plot.table))
+        # style class color according to class
+        cols[2,] <- ifelse(data.df$Class == 1, "purple", "darkgreen")
+        plot.table[2, ] <- ifelse(plot.table[2,] == 1, "+1", "-1")
+        if (i != 0) {
+            cols[3,] <- ifelse(data.df$Prediction == "+1", "purple", "darkgreen")
+            # style TP and FP
+            cols[4,data.df$Status == "TP"] <- "blue"
+            cols[4,data.df$Status == "TN"] <- "blue"
+            cols[4, data.df$Status == "FP"] <- "red"
+            cols[4, data.df$Status == "FN"] <- "red"
+        }
+        tt <- ttheme_default(core=list(fg_params = list(col = cols),
+                                bg_params = list(col=NA)),
+                      rowhead=list(bg_params = list(col=NA)),
+                      colhead=list(bg_params = list(col=NA)))
+        #show.vlines = TRUE)
+        ####
+        if (i == 0) { # empty state for gif
+            plot.df <- plot.df[FALSE,]
+        }
+        tbl <- tableGrob(plot.table, theme=tt)
+        # show vertical separator at cutoff to differentiate the classes
+        library(gtable)
+        library(grid)
+        # rectangle around data
+        tbl <- gtable_add_grob(tbl,
+                grobs = rectGrob(gp = gpar(fill = NA, lwd = 2)),
+                t = 1, b = nrow(tbl), l = 2, r = ncol(tbl))
+        above.idx <- which(data.df$Estimate >= cur.cut)
+        if (length(above.idx) != 0) {
+            cut.pos <- above.idx[1]
+            #cut.idx <- ncol(plot.table) - (ncol(plot.table) - cut.pos) - 1
+            cut.idx <- cut.pos  + 1
+            #print(paste0("Cut idx is:", cut.idx))
+            # cutoff separator
+            tbl <- gtable_add_grob(tbl,
+                grobs = segmentsGrob( 
+                    x0 = unit(0,"npc"),
+                    x1 = unit(0,"npc"),
+                    y0 = unit(0,"npc"),
+                    y1 = unit(1,"npc"),
+                    gp = gpar(lwd = 5.0)
+                ),
+                t = 1, b = 4, l = cut.idx, r = cut.idx)
+        }
+        p <- ggplot(plot.df) + 
+            geom_point(aes_string(x = x.measure, y = measure)) + 
+            geom_line(aes_string(x = x.measure, y = measure)) +
+            xlim(0,1) + ylim(0,1) + 
+            ggtitle(title)
+        p.final <- grid.arrange(p, tbl, nrow = 2, as.table = TRUE)
+        path <- file.path(dir, paste0("auc_", i, ".png"))
+        ggsave(filename = path, p.final)
+    }
+}
+plot_roc(df, "auc_gif") # store and use https://ezgif.com/maker for create the GIF
+plot_roc(df, "aucpr_gif", measure = "ppv", x.measure = "tpr", 
+         title = "The Precision-Recall Curve")
+```
+
+<img src = "/post/machine-learning/roc-plot.gif" alt = "ROC Curve Animation" width = "1199" height = "1200">
+
+The animation illustrates how correct predictions of the positive class (TPs) lead to increases in the TPR, while false positives (FPs) lead to an increase in the FPR. For example, the TPR first rises to 25% at an FPR of 0% (estimate with $\hat{y}_i = 3.5$ is correctly predicted and there are no false positives) but then incurs an FPR of 9% to reach a TPR of 50% (one of the estimates with $\hat{y}_i = 2$ is correctly predicted, the other is a false positive). 
+
+The predictive performance of a classifier can be quantified in terms of the are under the ROC curve (AUC), which lies in the range $[0,1]$. In the following, I will demonstrate typical AUC values using the following function:
+
+```{r}
+plot.scores.AUC <- function(y, y.hat, measure = "tpr", x.measure = "fpr") {
+    par(mfrow=c(1,2))
+    hist(y.hat[y == 0], col=rgb(1,0,0,0.5), 
+         main = "Score Distribution",
+         breaks=seq(min(y.hat),max(y.hat)+1, 1), xlab = "Prediction")
+    hist(y.hat[y == 1], col = rgb(0,0,1,0.5), add=T, 
+            breaks=seq(min(y.hat),max(y.hat) + 1, 1))
+    legend("topleft", legend = c("Class 0", "Class 1"),  col=c("red", "blue"), lty=1, cex=1)
+    # plot ROC curve
+    library(ROCR)
+    pr <- prediction(y.hat, y)
+    prf <- performance(pr, measure = measure, x.measure = x.measure)
+    # get AUC
+    auc <- performance(pr, measure = "auc")@y.values[[1]]
+    plot(prf, main = paste0("ROC Curve (AUC: ", round(auc, 2), ")"))
+}
+```
+
+### AUC for a perfect classifier
+
+An ideal classifier does not make any prediction errors. This means that the classifier can perfectly separate the two classes such that the model achieves a true positive rate of 100% before producing any false positives. Thus, the AUC of such a classifier is 1, for example:
+
+```{r, message = FALSE}
+set.seed(12345)
+# create binary labels
+y <- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat <- c(rnorm(70, -2, sd = 0.5), rnorm(30, 2, sd = 0.5))
+plot.scores.AUC(y, y.hat)
+```
+
+### AUC of a good classifier
+
+A classifier that separates the two classes well but not perfectly would look like this:
+
+```{r, message = FALSE}
+set.seed(12345)
+# create binary labels
+y <- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat <- c(rnorm(70, -1, sd = 1), rnorm(30, 1, sd = 1.25))
+plot.scores.AUC(y, y.hat)
+```
+
+The visualized classifier would be able to obtain a sensitivity of 60% at a very low FPR. 
+
+### AUC of a bad classifier
+
+A bad classifier will output scores whose values are only slightly associated with the outcome. Such a classifier will reach a high TPR only at the cost of a high FPR. 
+
+```{r, message = FALSE}
+set.seed(12345)
+# create binary labels
+y <- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat <- c(rnorm(70, -0.5, sd = 1.75), rnorm(30, 0.5, sd = 1.25))
+plot.scores.AUC(y, y.hat)
+```
+
+The visualized classifier would reach a sensitivity of 60% only at a FPR of roughly 40%, which is way too high for a classifier that should be of practical use.
+
+### AUC of a random classifier
+
+A random classifier will have an AUC close to 0.5. This is easy to understand: for every correct prediction, the next prediction will be incorrect.
+
+```{r, message = FALSE}
+set.seed(12345)
+# create binary labels
+y <- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat <- c(rnorm(70, 0, sd = 2), rnorm(30, 0, sd = 2))
+plot.scores.AUC(y, y.hat)
+```
+
+### AUC of classifiers that perform worse than random classifiers
+
+Usually, the AUC is in the range $[0.5, 1]$ because useful classifiers should perform better than random. In principle, however, the AUC can also be smaller than 0.5, which indicates that a classifier performs worse than a random classifier. In our example, this would mean that negative values are predicted for the positive class and positive values for the negative class, which would not make much sense. Thus, AUCs lower than 0.5 typically indicate that something has gone wrong, for example, that the labels have been switched. 
+
+```{r, message = FALSE}
+set.seed(12345)
+# create binary labels
+y <- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat <- c(rnorm(70, 2, sd = 2), rnorm(30, -2, sd = 2))
+plot.scores.AUC(y, y.hat)
+```
+
+The visualized classifier incurs an FPR of 80% before reaching a sensitivity above 20%.
+
+## Precision-Recall Curves
+
+Precision-recall curves plot the positive predictive value (PPV, y-axis) against the true positive rate (TPR, x-axis). These quantities are defined as follows:
+
+\[
+\begin{align*}
+\rm{precision} &= PPV = \frac{TP}{TP + FP} \\
+\rm{recall} &= TPR = \frac{TP}{TP + FN} \\
+\end{align*}
+\]
+
+Since precision-recall curves do not consider true negatives, they should only be used [when specificity is of no concern for the classifier](/post/machine-learning/specificity-vs-precision/). As an example, consider the following data set:
+
+<img src = "/post/machine-learning/precision-recall-curve.gif" alt = "Precision-Recall Curve Animation" width = "1199" height = "1200">
+
+Note that there is no value for a TPR of 0% because the PPV is not defined when the denominator (TP + FP) is zero. For the first plotted point, the PPV is still at 100% because, at this cutoff, the model does not make any false alarms. However, to reach a sensitivity of 50%, the precision of the model is reduced to $\frac{2}{3} = 66.5$ since a false positive prediction is made. 
+
+In the following, I will demonstrate how the area under the precision-recall curve (AUC-PR) is influenced by the predictive performance.
+
+### AUC-PR for a perfect classifier
+
+An ideal classifier does not make any prediction errors. Thus, it will obtain an AUC-PR of 1:
+
+```{r, message = FALSE}
+set.seed(12345)
+# create binary labels
+y <- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat <- c(rnorm(70, -2, sd = 0.5), rnorm(30, 2, sd = 0.5))
+plot.scores.AUC(y, y.hat, "ppv", "tpr")
+```
+
+### AUC-PR of a good classifier
+
+A classifier that separates the two classes well but not perfectly would have the following precision-recall curve:
+
+```{r, message = FALSE}
+set.seed(12345)
+# create binary labels
+y <- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat <- c(rnorm(70, -1, sd = 1), rnorm(30, 1, sd = 1.25))
+plot.scores.AUC(y, y.hat, "ppv", "tpr")
+```
+
+The visualized classifier reaches a recall of roughly 50% without any false posiive predictions.
+
+### AUC-PR of a bad classifier
+
+A bad classifier will output scores whose values are only slightly associated with the outcome. Such a classifier will reach a high recall only at a low precision:
+
+```{r, message = FALSE}
+set.seed(12345)
+# create binary labels
+y <- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat <- c(rnorm(70, -0.5, sd = 1.75), rnorm(30, 0.5, sd = 1.25))
+plot.scores.AUC(y, y.hat, "ppv", "tpr")
+```
+
+At a recall of only 20% the precision of the classifier is merely at 60%.
+
+### AUC-PR of a random classifier
+
+A random classifier has an AUC-PR close to 0.5. This is easy to understand: for every correct prediction, the next prediction will be incorrect.
+
+```{r, message = FALSE}
+set.seed(12345)
+# create binary labels
+y <- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat <- c(rnorm(70, 0, sd = 2), rnorm(30, 0, sd = 2))
+plot.scores.AUC(y, y.hat, "ppv", "tpr")
+```
+
+### AUC-PR of classifiers that perform worse than random classifiers
+
+Simlarly to the AUC of ROC curves, AUC-PR is typically in the range $[0.5, 1]$. If a classifier obtain an AUC-PR smaller than 0.5, the labels should be controlled. Such a classifier could have a precision-recall curve as follows:
+
+```{r, message = FALSE}
+set.seed(12345)
+# create binary labels
+y <- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat <- c(rnorm(70, 2, sd = 2), rnorm(30, -2, sd = 2))
+plot.scores.AUC(y, y.hat, "ppv", "tpr")
+```
+
+## ROC curves for multi-class settings
+
+For classification problems where there are more than two labels, please consider a [previous article in which I discussed ROC-based approaches in the multi-class setting](/post/machine-learning/performance-measures-multi-class-problems/).

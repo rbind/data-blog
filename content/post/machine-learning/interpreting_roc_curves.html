@@ -1,0 +1,204 @@
+---
+title: "Interpreting ROC Curves, precision-recall curves, and their AUCs"
+author: Matthias Döring
+date: '2018-12-08'
+thumbnail: "/post/machine-learning/interpreting_roc_curves_cover.png"
+slug: "interpreting-roc-curves-auc"
+description: "ROC and precision-recall curves are a staple for the interpretation of classifiers. This post gives an intuition on how these curves are constructed and their associated AUCs are interpreted."
+categories:
+  - machine-learning
+tags:
+    - R
+    - performance-measure
+---
+
+
+
+<p>Receiver operating characteristic (ROC) curves are probably the most commonly used measure for evaluating the predictive performance of scoring classifiers.</p>
+<p>The confusion matrix of a classifier that predicts a positive class (+1) and a negative class (-1) has the following structure:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Prediction/Reference Class</th>
+<th>+1</th>
+<th>-1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>+1</td>
+<td>TP</td>
+<td>FP</td>
+</tr>
+<tr class="even">
+<td>-1</td>
+<td>FN</td>
+<td>TN</td>
+</tr>
+</tbody>
+</table>
+<p>Here, TP indicates the number of true positives (model predicts positive class correctly), FP indicates the number of false positives (model incorrectly predicts positive class), FN indicates the number of false negatives (model incorrectly predicts negative class), and TN indicates the number of true negatives (model correctly predicts negative class).</p>
+<div id="roc-curves" class="section level2">
+<h2>ROC Curves</h2>
+<p>In ROC curves, the true positive rate (TPR, y-axis) is plotted against the false positive rate (FPR, x-axis). These quantities are defined as follows:</p>
+<p><span class="math display">\[
+\begin{align*}
+TPR &amp;= \frac{TP}{TP + FN} \\
+FPR &amp;= \frac{FP}{FP + TN} \\
+\end{align*}
+\]</span></p>
+<p>Each point in a ROC curve arises from the values in <a href="/post/machine-learning/specificity-vs-precision/">the confusion matrix</a> associated with the application of a specific cutoff on the predictions (scores) of the classifier.</p>
+<p>To construct a ROC curve, one simply uses each of the classifier estimates as a cutoff for differentiating the positive from the negative class. To exemplify the construction of these curves, we will use a data set consisting of 11 observations of which 4 belong to the positive class (<span class="math inline">\(y_i = +1\)</span>) and 7 belong to the negative class (<span class="math inline">\(y_i = -1\)</span>). The corresponding ROC curve is constructed by applying cutoffs on the estimates (decision values) of the model. Consider the following example:</p>
+<p><img src = "/post/machine-learning/roc-plot.gif" alt = "ROC Curve Animation" width = "1199" height = "1200"></p>
+<p>The animation illustrates how correct predictions of the positive class (TPs) lead to increases in the TPR, while false positives (FPs) lead to an increase in the FPR. For example, the TPR first rises to 25% at an FPR of 0% (estimate with <span class="math inline">\(\hat{y}_i = 3.5\)</span> is correctly predicted and there are no false positives) but then incurs an FPR of 9% to reach a TPR of 50% (one of the estimates with <span class="math inline">\(\hat{y}_i = 2\)</span> is correctly predicted, the other is a false positive).</p>
+<p>The predictive performance of a classifier can be quantified in terms of the are under the ROC curve (AUC), which lies in the range <span class="math inline">\([0,1]\)</span>. In the following, I will demonstrate typical AUC values using the following function:</p>
+<pre class="r"><code>plot.scores.AUC &lt;- function(y, y.hat, measure = &quot;tpr&quot;, x.measure = &quot;fpr&quot;) {
+    par(mfrow=c(1,2))
+    hist(y.hat[y == 0], col=rgb(1,0,0,0.5), 
+         main = &quot;Score Distribution&quot;,
+         breaks=seq(min(y.hat),max(y.hat)+1, 1), xlab = &quot;Prediction&quot;)
+    hist(y.hat[y == 1], col = rgb(0,0,1,0.5), add=T, 
+            breaks=seq(min(y.hat),max(y.hat) + 1, 1))
+    legend(&quot;topleft&quot;, legend = c(&quot;Class 0&quot;, &quot;Class 1&quot;),  col=c(&quot;red&quot;, &quot;blue&quot;), lty=1, cex=1)
+    # plot ROC curve
+    library(ROCR)
+    pr &lt;- prediction(y.hat, y)
+    prf &lt;- performance(pr, measure = measure, x.measure = x.measure)
+    # get AUC
+    auc &lt;- performance(pr, measure = &quot;auc&quot;)@y.values[[1]]
+    plot(prf, main = paste0(&quot;ROC Curve (AUC: &quot;, round(auc, 2), &quot;)&quot;))
+}</code></pre>
+<div id="auc-for-a-perfect-classifier" class="section level3">
+<h3>AUC for a perfect classifier</h3>
+<p>An ideal classifier does not make any prediction errors. This means that the classifier can perfectly separate the two classes such that the model achieves a true positive rate of 100% before producing any false positives. Thus, the AUC of such a classifier is 1, for example:</p>
+<pre class="r"><code>set.seed(12345)
+# create binary labels
+y &lt;- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat &lt;- c(rnorm(70, -2, sd = 0.5), rnorm(30, 2, sd = 0.5))
+plot.scores.AUC(y, y.hat)</code></pre>
+<p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="auc-of-a-good-classifier" class="section level3">
+<h3>AUC of a good classifier</h3>
+<p>A classifier that separates the two classes well but not perfectly would look like this:</p>
+<pre class="r"><code>set.seed(12345)
+# create binary labels
+y &lt;- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat &lt;- c(rnorm(70, -1, sd = 1), rnorm(30, 1, sd = 1.25))
+plot.scores.AUC(y, y.hat)</code></pre>
+<p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>The visualized classifier would be able to obtain a sensitivity of 60% at a very low FPR.</p>
+</div>
+<div id="auc-of-a-bad-classifier" class="section level3">
+<h3>AUC of a bad classifier</h3>
+<p>A bad classifier will output scores whose values are only slightly associated with the outcome. Such a classifier will reach a high TPR only at the cost of a high FPR.</p>
+<pre class="r"><code>set.seed(12345)
+# create binary labels
+y &lt;- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat &lt;- c(rnorm(70, -0.5, sd = 1.75), rnorm(30, 0.5, sd = 1.25))
+plot.scores.AUC(y, y.hat)</code></pre>
+<p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>The visualized classifier would reach a sensitivity of 60% only at a FPR of roughly 40%, which is way too high for a classifier that should be of practical use.</p>
+</div>
+<div id="auc-of-a-random-classifier" class="section level3">
+<h3>AUC of a random classifier</h3>
+<p>A random classifier will have an AUC close to 0.5. This is easy to understand: for every correct prediction, the next prediction will be incorrect.</p>
+<pre class="r"><code>set.seed(12345)
+# create binary labels
+y &lt;- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat &lt;- c(rnorm(70, 0, sd = 2), rnorm(30, 0, sd = 2))
+plot.scores.AUC(y, y.hat)</code></pre>
+<p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="auc-of-classifiers-that-perform-worse-than-random-classifiers" class="section level3">
+<h3>AUC of classifiers that perform worse than random classifiers</h3>
+<p>Usually, the AUC is in the range <span class="math inline">\([0.5, 1]\)</span> because useful classifiers should perform better than random. In principle, however, the AUC can also be smaller than 0.5, which indicates that a classifier performs worse than a random classifier. In our example, this would mean that negative values are predicted for the positive class and positive values for the negative class, which would not make much sense. Thus, AUCs lower than 0.5 typically indicate that something has gone wrong, for example, that the labels have been switched.</p>
+<pre class="r"><code>set.seed(12345)
+# create binary labels
+y &lt;- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat &lt;- c(rnorm(70, 2, sd = 2), rnorm(30, -2, sd = 2))
+plot.scores.AUC(y, y.hat)</code></pre>
+<p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>The visualized classifier incurs an FPR of 80% before reaching a sensitivity above 20%.</p>
+</div>
+</div>
+<div id="precision-recall-curves" class="section level2">
+<h2>Precision-Recall Curves</h2>
+<p>Precision-recall curves plot the positive predictive value (PPV, y-axis) against the true positive rate (TPR, x-axis). These quantities are defined as follows:</p>
+<p><span class="math display">\[
+\begin{align*}
+\rm{precision} &amp;= PPV = \frac{TP}{TP + FP} \\
+\rm{recall} &amp;= TPR = \frac{TP}{TP + FN} \\
+\end{align*}
+\]</span></p>
+<p>Since precision-recall curves do not consider true negatives, they should only be used <a href="/post/machine-learning/specificity-vs-precision/">when specificity is of no concern for the classifier</a>. As an example, consider the following data set:</p>
+<p><img src = "/post/machine-learning/precision-recall-curve.gif" alt = "Precision-Recall Curve Animation" width = "1199" height = "1200"></p>
+<p>Note that there is no value for a TPR of 0% because the PPV is not defined when the denominator (TP + FP) is zero. For the first plotted point, the PPV is still at 100% because, at this cutoff, the model does not make any false alarms. However, to reach a sensitivity of 50%, the precision of the model is reduced to <span class="math inline">\(\frac{2}{3} = 66.5\)</span> since a false positive prediction is made.</p>
+<p>In the following, I will demonstrate how the area under the precision-recall curve (AUC-PR) is influenced by the predictive performance.</p>
+<div id="auc-pr-for-a-perfect-classifier" class="section level3">
+<h3>AUC-PR for a perfect classifier</h3>
+<p>An ideal classifier does not make any prediction errors. Thus, it will obtain an AUC-PR of 1:</p>
+<pre class="r"><code>set.seed(12345)
+# create binary labels
+y &lt;- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat &lt;- c(rnorm(70, -2, sd = 0.5), rnorm(30, 2, sd = 0.5))
+plot.scores.AUC(y, y.hat, &quot;ppv&quot;, &quot;tpr&quot;)</code></pre>
+<p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="auc-pr-of-a-good-classifier" class="section level3">
+<h3>AUC-PR of a good classifier</h3>
+<p>A classifier that separates the two classes well but not perfectly would have the following precision-recall curve:</p>
+<pre class="r"><code>set.seed(12345)
+# create binary labels
+y &lt;- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat &lt;- c(rnorm(70, -1, sd = 1), rnorm(30, 1, sd = 1.25))
+plot.scores.AUC(y, y.hat, &quot;ppv&quot;, &quot;tpr&quot;)</code></pre>
+<p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>The visualized classifier reaches a recall of roughly 50% without any false posiive predictions.</p>
+</div>
+<div id="auc-pr-of-a-bad-classifier" class="section level3">
+<h3>AUC-PR of a bad classifier</h3>
+<p>A bad classifier will output scores whose values are only slightly associated with the outcome. Such a classifier will reach a high recall only at a low precision:</p>
+<pre class="r"><code>set.seed(12345)
+# create binary labels
+y &lt;- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat &lt;- c(rnorm(70, -0.5, sd = 1.75), rnorm(30, 0.5, sd = 1.25))
+plot.scores.AUC(y, y.hat, &quot;ppv&quot;, &quot;tpr&quot;)</code></pre>
+<p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>At a recall of only 20% the precision of the classifier is merely at 60%.</p>
+</div>
+<div id="auc-pr-of-a-random-classifier" class="section level3">
+<h3>AUC-PR of a random classifier</h3>
+<p>A random classifier has an AUC-PR close to 0.5. This is easy to understand: for every correct prediction, the next prediction will be incorrect.</p>
+<pre class="r"><code>set.seed(12345)
+# create binary labels
+y &lt;- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat &lt;- c(rnorm(70, 0, sd = 2), rnorm(30, 0, sd = 2))
+plot.scores.AUC(y, y.hat, &quot;ppv&quot;, &quot;tpr&quot;)</code></pre>
+<p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+<div id="auc-pr-of-classifiers-that-perform-worse-than-random-classifiers" class="section level3">
+<h3>AUC-PR of classifiers that perform worse than random classifiers</h3>
+<p>Simlarly to the AUC of ROC curves, AUC-PR is typically in the range <span class="math inline">\([0.5, 1]\)</span>. If a classifier obtain an AUC-PR smaller than 0.5, the labels should be controlled. Such a classifier could have a precision-recall curve as follows:</p>
+<pre class="r"><code>set.seed(12345)
+# create binary labels
+y &lt;- c(rep(0, 70), rep(1, 30))
+# simulate scoring classifier
+y.hat &lt;- c(rnorm(70, 2, sd = 2), rnorm(30, -2, sd = 2))
+plot.scores.AUC(y, y.hat, &quot;ppv&quot;, &quot;tpr&quot;)</code></pre>
+<p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+</div>
+<div id="roc-curves-for-multi-class-settings" class="section level2">
+<h2>ROC curves for multi-class settings</h2>
+<p>For classification problems where there are more than two labels, please consider a <a href="/post/machine-learning/performance-measures-multi-class-problems/">previous article in which I discussed ROC-based approaches in the multi-class setting</a>.</p>
+</div>
