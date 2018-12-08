@@ -1,10 +1,10 @@
 ---
-title: "Interpreting ROC Curves, precision-recall curves, and their AUCs"
+title: "Interpreting ROC Curves, Precision-Recall Curves, and AUCs"
 author: Matthias Döring
 date: '2018-12-08'
 thumbnail: "/post/machine-learning/interpreting_roc_curves_cover.png"
 slug: "interpreting-roc-curves-auc"
-description: "ROC and precision-recall curves are a staple for the interpretation of classifiers. This post gives an intuition on how these curves are constructed and their associated AUCs are interpreted."
+description: "ROC and precision-recall curves are a staple for the interpretation of binary classifiers. This post gives an intuition on how these curves are constructed and their associated AUCs are interpreted."
 categories:
   - machine-learning
 tags:
@@ -66,7 +66,7 @@ FPR &amp;= \frac{FP}{FP + TN} \\
     prf &lt;- performance(pr, measure = measure, x.measure = x.measure)
     # get AUC
     auc &lt;- performance(pr, measure = &quot;auc&quot;)@y.values[[1]]
-    plot(prf, main = paste0(&quot;ROC Curve (AUC: &quot;, round(auc, 2), &quot;)&quot;))
+    plot(prf, main = paste0(&quot;Curve (AUC: &quot;, round(auc, 2), &quot;)&quot;))
 }</code></pre>
 <div id="auc-for-a-perfect-classifier" class="section level3">
 <h3>AUC for a perfect classifier</h3>

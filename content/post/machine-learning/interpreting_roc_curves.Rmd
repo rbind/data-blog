@@ -1,5 +1,5 @@
 ---
-title: "Interpreting ROC Curves, precision-recall curves, and their AUCs"
+title: "Interpreting ROC Curves, Precision-Recall Curves, and AUCs"
 author: Matthias Döring
 date: '2018-12-08'
 thumbnail: "/post/machine-learning/interpreting_roc_curves_cover.png"
@@ -166,7 +166,7 @@ plot.scores.AUC <- function(y, y.hat, measure = "tpr", x.measure = "fpr") {
     prf <- performance(pr, measure = measure, x.measure = x.measure)
     # get AUC
     auc <- performance(pr, measure = "auc")@y.values[[1]]
-    plot(prf, main = paste0("ROC Curve (AUC: ", round(auc, 2), ")"))
+    plot(prf, main = paste0("Curve (AUC: ", round(auc, 2), ")"))
 }
 ```
 
