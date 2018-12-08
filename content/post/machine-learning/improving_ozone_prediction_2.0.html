@@ -1,0 +1,60 @@
+---
+title: "Improving Ozone Prediction 2.0"
+author: Matthias Döring
+downloadRmd: true
+draft: true
+date: '2018-12-09T15:00:00Z'
+description: ""
+categories:
+  - machine-learning
+tags:
+    - analysis
+    - linear model
+    - supervised learning
+    - R
+thumbnail: "/post/machine-learning/improving_ozone_prediction_cover.png"
+---
+
+
+
+<p>Recently, I have worked on finding a suitable linear model for ozone prediction](/post/machine-learning/improving_ozone_prediction/). At that time, I did not take the longitudinal nature of the measurements into account but instead assume that all the measurements are independent of one another. However, a more reasonable assumption is that, when the ozone level was high the day before, it is likely going to be high the following day.</p>
+<div id="exploring-the-temporal-nature-of-the-data" class="section level2">
+<h2>Exploring the temporal nature of the data</h2>
+<p>Let us load the ozone data set and divide it into test and training set:</p>
+<pre class="r"><code>data(airquality)
+ozone &lt;- subset(na.omit(airquality))
+set.seed(123)
+N.train &lt;- ceiling(0.7 * nrow(ozone))
+N.test &lt;- nrow(ozone) - N.train
+trainset &lt;- sample(seq_len(nrow(ozone)), N.train)
+testset &lt;- setdiff(seq_len(nrow(ozone)), trainset)</code></pre>
+<p>We are interested in finding out whether the observed value of ozone depends on the previous measurements, that is, whether</p>
+<p><span class="math display">\[Pr(Y = y | X = x^1, \ldots, x^t) \neq Pr(Y = y | X = x)\]</span></p>
+<p>For this purpose, we will create a new column in the ozone data set, which reflects the relative point in time:</p>
+<pre class="r"><code>year &lt;- 1973
+months &lt;- unique(ozone$Month)
+months &lt;- c(months, max(months) + 1)
+dates &lt;- sapply(paste0(year, &quot;-&quot;, months, &quot;-&quot;, &quot;01&quot;), as.Date)
+days.per.month &lt;- as.numeric(diff(dates))
+names(days.per.month) &lt;- unique(ozone$Month)
+t &lt;- rep(NA, nrow(ozone))
+for (i in seq_len(nrow(ozone))) {
+    month.days &lt;- days.per.month[as.character(ozone$Month[i])]
+    offset &lt;- ozone$Month[i] - min(ozone$Month)
+    days.before &lt;- 0
+    if (offset != 0) {
+        days.before &lt;- sum(days.per.month[1:offset])
+    }
+    t[i] &lt;- ozone$Day[i] + days.before
+
+}
+ozone &lt;- cbind(ozone, &quot;t&quot; = t)</code></pre>
+<p>Let us now plot the time trend of ozone:</p>
+<pre class="r"><code>library(ggplot2)
+ggplot(ozone, aes(x = t, y = Ozone)) + geom_line() +
+        geom_point()</code></pre>
+<p><img src="/post/machine-learning/improving_ozone_prediction_2.0_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Idea:
+* use kNN on validation set to find number of neighbors to consider to predict ozone level (neighbors according to t only)
+* then, in model use this encoding</p>
+</div>
