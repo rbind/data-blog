@@ -1,0 +1,42 @@
+---
+title: "Prediction vs Forecasting"
+lead: "Predictions do not always concern the future ..."
+author: Matthias Döring
+downloadRmd: false
+date: '2018-12-09T15:00:00Z'
+description: "Prediction and forecasting are similar, yet distinct areas for which machine learning techniques can be used. Here, I differentiate the two approaches using weather forecasting as an example."
+categories:
+  - machine-learning
+tags:
+    - supervised learning
+thumbnail: "/post/machine-learning/forecasting_vs_prediction_avatar.jpg"
+---
+In supervised learning, we are often concerned with prediction. However, there is also the concept of forecasting. Here, I will discuss the differences between the two concepts so that we can answer the question why weather forecasting is not called weather prediction.
+
+## Predicion and forecasting
+
+Prediction is concerned with estimating the outcomes for unseen data. For this purpose, you fit a model to a training data set, which results in an estimator $\hat{f}(x)$ that can make predictions for new samples $x$. 
+
+Forecasting is a sub-discipline of prediction in which we are making predictions about the future, on the basis of time-series data. Thus, the only difference between prediction and forecasting is that we consider the temporal dimension. An estimator for forecasting has the form $\hat{f}(x^1, \ldots, x^t)$ where $x^1, \ldots, x^t$ indicate historic measurements at time points $1, \ldots, t$, while the estimate relates to time point $t+1$ or some other time in the future. Since the model
+depends on previous observations, $x^i$, this is called an autoregressive model.
+
+## Why weather forecasting and not weather prediction?
+
+With these definitions, we can now appreciate why weather forecasting is not called weather prediction: weather forecasting predicts the whether in the future using temporal information. For example, if there is a downpour at the moment, what is the likelihood that it will still rain in five minutes? Independent of all other features that influence the weather (e.g. atmospheric pressure and temperature), the likelihood that it will still rain in five minutes will be high because it is raining at the moment.
+
+Imagine that we would perform weather prediction rather than forecasting. This would mean we were to ignore any temporal dimension and just consider the other physical features that influence the weather. Imagine that is still raining outside. Oddly the atmospheric pressure i quite high, which is associated with clear skies. So, when you are asking your prediction model to estimate whether it is currently raining, the model would probably respond that it is unlikely to rain due to the high atmospheric pressure. 
+
+## Challenges of forecasting
+
+One of the challenges of forecasting is finding the number of previous events that should be considered when making predictions about the future. This also depends on whether you are making about the immediate or the distant future. Let us consider the weather forecasting example again.
+
+In order to predict the weather in 5 minutes, the most recent information about the weather carries the greatest weight. Most other physical features that are predictive of the weather can be ignored because, within such a short time span, the weather is probably not going to change much. Also, we do not need to look at the weather the day before to answer how the weather is going to be in five minutes. 
+
+However, imagine that you would like to know the weather for the next day. In this case, it would be wrong to only consider that is currently raining: maybe the rain is just an exception and the weather in the last days was very sunny. Thus, to make forecasts for the more distant future, we need to consider more distant historic events in order to capture the current weather trend. For example, if the historic trend indicates that the weather is becoming worse, this should be incorporated into the forecast. 
+
+So, for a forecasting model with exogenous inputs (e.g. weather features) you basically need to model two things:
+
+1. Model the exogenous, non-temporal features (the feature model).
+2. Model the historical, temporal data (the temporal model). 
+
+To obtain accurate forecasts, these models have to be combined judiciously such that the estimates of the temporal model are adjusted by the estimates from the feature model.
