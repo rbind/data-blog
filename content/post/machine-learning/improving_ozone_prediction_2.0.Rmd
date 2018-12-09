@@ -14,7 +14,7 @@ tags:
     - R
 thumbnail: "/post/machine-learning/improving_ozone_prediction_cover.png"
 ---
-Recently, I have worked on finding a suitable linear model for ozone prediction](/post/machine-learning/improving_ozone_prediction/). At that time, I did not take the longitudinal nature of the measurements into account but instead assume that all the measurements are independent of one another. However, a more reasonable assumption is that, when the ozone level was high the day before, it is likely going to be high the following day.
+Recently, I have worked on [finding a suitable linear model for ozone prediction](/post/machine-learning/improving_ozone_prediction/). At that time, I did not take the longitudinal nature of the measurements into account but instead assume that all the measurements are independent of one another. However, a more reasonable assumption is that, when the ozone level was high the day before, it is likely going to be high the following day.
 
 ## Exploring the temporal nature of the data
 
@@ -26,7 +26,8 @@ ozone <- subset(na.omit(airquality))
 set.seed(123)
 N.train <- ceiling(0.7 * nrow(ozone))
 N.test <- nrow(ozone) - N.train
-trainset <- sample(seq_len(nrow(ozone)), N.train)
+# ensure to take only subsequent measurements for time-series analysis:
+trainset <- seq_len(nrow(ozone))[1:N.train]
 testset <- setdiff(seq_len(nrow(ozone)), trainset)
 ```
 
@@ -37,7 +38,7 @@ We are interested in finding out whether the observed value of ozone depends on 
 For this purpose, we will create a new column in the ozone data set, which reflects the relative point in time:
 
 ```{r}
-year <- 1973
+year <- 1973 # known from data documentation
 months <- unique(ozone$Month)
 months <- c(months, max(months) + 1)
 dates <- sapply(paste0(year, "-", months, "-", "01"), as.Date)
@@ -65,6 +66,138 @@ ggplot(ozone, aes(x = t, y = Ozone)) + geom_line() +
         geom_point()
 ```
 
-Idea: 
-* use kNN on validation set to find number of neighbors to consider to predict ozone level (neighbors according to t only)
-* then, in model use this encoding
+We see that there is a temporal trend, although there are also many outliers. 
+
+## The backshift operator
+
+To understand the autocorrelation, we need to introduce the backshift operator.
+
+Given the time series $X = \{X_1, X_2, \ldots \}$, the lag operator is defined as
+
+\[L X_t = X_{t-1}\,, \forall t > 1\]
+
+Instead of $L$, $B$ is sometimes used equivalently to indicate the backshift operator. 
+
+Raising the lag operator to a power $k > 0$ performs multiple shifts at once:
+
+\[
+\begin{align*}
+L^k X_t &= X_{t-k}  \\ 
+L^{-k} X& = X_{t+k}
+\end{align*}
+\]
+
+## Autocorrelation
+
+Let us plot the autocorrelation to find whether the distribution is stationary.
+
+```{r}
+library(TSA)
+acf(ozone$Ozone, lag.max = 10)
+```
+
+The autocorrelation function shows us the autocorrelation of the ozone levels for different lags. That is, for a lag of 1, this is the correlation of the ozone level at time $t$ with those at $t-1$. The horizontal lines indicate the significance bands. The plot shows that for differences where $t =1$, the autocorrelation is the highest and that autocorrelation does not play a role anymore when looking back more than 8 days into the past.
+
+Since there is no clear trend in the autocorrelation (it is decreasing but not steadily), we conclude that there we do not need to find non-seasonal differences for stationarity.
+
+Since previous measurements are correlated withe each other, we can calculate the partial autocorrelation to find the corrected correlation taking into account this propagation:
+```{r}
+acf(ozone$Ozone, lag.max = 10, type = "partial")
+```
+
+The partial autocorrelation demonstrates that most of the autocorrelation comes from the previous day and that the effect from earlier days before is negligible. Thus, an AR (autoregression) term of order 1 seems warranted.
+
+## AR and MA terms: do this in previous part!
+
+To find the AR and MA term order, we consider again the previous autocorrelation.
+
+```{r}
+acf(ozone$Ozone, lag.max = 10)
+```
+
+To model features, we will define them as
+
+```{r}
+features <- c("Solar.R", "Wind", "Temp")
+```
+
+and specify them as exogenous features in an ARMAX model:
+
+
+```{r}
+#library(forecast)
+library(TSA)
+# does not matter much which is chosen ...
+# arima(0,1,1): exponential smoothing
+# arima(1,0,0): stationary, autocorrelated
+#A <- arimax(x = ozone$Ozone[trainset], 
+       #xreg = ozone[trainset,features],
+        #order = c(0,1,1))
+A <- arimax(x = ozone$Ozone[trainset], 
+       xreg = ozone[trainset,features],
+        order = c(1,0,0)) # 1 AR term, no term for non-seasonal stationarity, and no term for lagged forecast errors (MA term)
+# seasonal adjustment doesn't make any sense because we dont have data for multiple years
+# outlier types:
+# additive outlier: subsequent values are unaffected by additive outliers
+# innovational outlier: initial impact, with effect lingering over the next observations.
+# not feasible to predict using io specification
+#A <- arimax(x = ozone$Ozone[trainset], 
+       #xreg = ozone[trainset,features],
+        #order = c(1,0,0),
+        #io = list(23, 34, 63, 77))
+#A <- arimax(x = ozone$Ozone[trainset], 
+       #xreg = ozone[trainset,features],
+        #order = c(1,0,0),
+        #seasonal = c(0, 0, 1)) # moving average for season effect, doesn't help
+preds.temporal <- predict(A, newxreg = ozone[testset, features])
+
+
+```
+
+### Comparison with previous model
+
+Let us load our previous model (GLM with negative binomial distribution):
+
+```{r}
+library(MASS)
+get.weights <- function(ozone) {
+    z.scores <- (ozone$Ozone - mean(ozone$Ozone)) / sd(ozone$Ozone)
+    weights <- exp(z.scores)
+    weights <- weights / mean(weights) # normalize to mean 1
+    return(weights)
+}
+weights <- get.weights(ozone)
+# train weighted negative binomial model
+model.nb <- glm.nb(Ozone ~ Solar.R + Temp + Wind, data = ozone, subset = trainset, weights = weights)
+preds.nb <- predict(model.nb, newdata = ozone[testset,], type = "response")
+```
+
+Let us plot:
+
+```{r}
+plot.df <- data.frame("Reference" = ozone[testset, "Ozone"],
+                      "Forecasting" = as.numeric(preds.temporal$pred),
+                      "Prediction" = as.numeric(preds.nb),
+                      "t" = ozone[testset, "t"])
+library(reshape2)
+p.df <- melt(plot.df, "t")
+library(ggplot2)
+p1 <- ggplot(p.df, aes(x = t, y = value, colour = variable)) + 
+    geom_point(alpha = 0.8) + geom_line()
+p1
+```
+Let us determine the performance of both models:
+
+```{r}
+Rsquared.linear <- cor(preds.nb, ozone[testset, "Ozone"])^2
+Rsquared.temporal <- cor(preds.temporal$pred, ozone[testset, "Ozone"])^2
+print(Rsquared.linear)
+print(Rsquared.temporal)
+```
+
+We see that the prediction model slightly outperforms the forecasting model.
+
+## References
+
+http://people.duke.edu/~rnau/411arim.htm
+https://robjhyndman.com/hyndsight/arimax/
