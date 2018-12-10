@@ -6,6 +6,9 @@ description: "The field of machine learning has changed enormously in the last d
 draft: true
 categories:
   - machine-learning
+output:
+    html_document:
+        self_contained: no
 ---
 The field of machine learning has gone through enormous changes in the last decades. Admittedly, there are some methods that have been around for a long time and are still a staple of the field. For example, the concept of least squares was already proposed in the early 19th century by [Legendre](https://archive.org/details/nouvellesmthode00legegoog/) and [Gauss](https://www.e-rara.ch/zut/content/titleinfo/142787). Other approaches such as neural networks, [whose most basic form was introduced in 1958](http://psycnet.apa.org/record/1959-09865-001), were substantially advanced in the last decades, while other methods such as [support vector machines (SVMs)](https://link.springer.com/article/10.1007/BF00994018) are even more recent.
 
@@ -21,13 +24,13 @@ For the purposes of this article, I will define popularity using a frequentist a
 
 For this piece, I performed two analyses. The first analysis is a longitudinal analysis of publication frequencies, while the second analysis compares the overall number of publication associated with machine learning models across different fields. 
 
-For the first analysis, I determined the number of publications by scraping data from Google Scholar, which considers the titles and abstracts of scientific publications. To identify the number of publications associated with individual supervised learning approaches, I determined the number of Google Scholar hits between 1950 and 2018. Since data scraping from Google Scholar is notoriously hard, I relied on [helpful advice from ScrapeHero](https://www.scrapehero.com/how-to-fake-and-rotate-user-agents-using-python-3/) to gather the data.
+For the first analysis, I determined the number of publications by scraping data from Google Scholar, which considers the titles and abstracts of scientific publications. To identify the number of publications associated with individual supervised learning approaches, I determined the number of Google Scholar hits between 1950 and 2017. Since data scraping from Google Scholar is notoriously hard, I relied on [helpful advice from ScrapeHero](https://www.scrapehero.com/how-to-fake-and-rotate-user-agents-using-python-3/) to gather the data.
 
 I included the following 13 supervised approaches in the analysis: neural networks, deep learning, SVMs, random forests, decision trees, linear regression, logistic regression, Poisson regression, ridge regression, lasso regression, k-nearest neighbors, linear discriminant analysis, and log-linear models. Note that for lasso regression, the terms *lasso regression* and *lasso model* were considered. For nearest neighbors, the terms *k-nearest neighbor* and *k-nearest neighbour* were considered. The resulting data set indicates the [number of publications associated with each supervised model from 1950 until now](https://www.datascienceblog.net/data-sets/ml_models_timeline.csv).
 
 ## Use of supervised models from 1950 until now
 
-To analyze the longitudinal data, I will differentiate two periods: the early days of machine learning (1950 to 1980), in which few models were available, and the formative years (1980 until now), in which interest in machine learning surged and many new models were developed.
+To analyze the longitudinal data, I will differentiate two periods: the early days of machine learning (1950 to 1980), in which few models were available, and the formative years (1980 until now), in which interest in machine learning surged and many new models were developed. Note that in the following visualizations only the most relevant methods are shown.
 
 ```{r, echo = FALSE, fig.height = 8}
 get.top.models <- function(df, k) {
@@ -53,77 +56,95 @@ plot.df <- df[df$Model %in% top.models, ]
 library(ggplot2)
 early.idx <- which(df$Year >= 1950 & df$Year < 1980)
 top.models.early <- get.top.models(df[early.idx, ], k) # early top models
+### Adjust df to pool DL + Neural Network
+add.df <- df[df$Model == "Neural Network", ]
+add.df$Count <- add.df$Count + df$Count[df$Model == "Deep Learning"]
+add.df$Model <- "Neural Network/Deep Learning"
+df <- rbind(df, add.df)
+###
 p.df.early <- df[early.idx, ]
 early.summary <- ddply(p.df.early, "Model", summarize, Total = sum(Count))
 o <- order(early.summary$Total, decreasing = TRUE)
-p.df.early$Model <- factor(p.df.early$Model, levels = early.summary$Model[o])
-p.df.early <- p.df.early[p.df.early$Model %in% top.models.early, ]
-#p.df.early <- p.df.early[p.df.early$Model %in% top.models, ]
-p1 <- ggplot(p.df.early, aes(x = Year, y = Count, color = Model)) + 
-        geom_point() + geom_line() + 
-        ggtitle("Early days of machine learning: 1950 to 1980")
-# zoom into the plot, starting from the 80s
-late.idx <- which(df$Year >= 1980)
+#p.df.early$Model <- factor(p.df.early$Model, levels = early.summary$Model[o])
+#p.df.early <- p.df.early[p.df.early$Model %in% top.models.early, ]
+late.idx <- which(df$Year >= 1980 & df$Year <= 2017)
 top.models.late <- get.top.models(df[late.idx, ], k) # late top models
 # include deep learning
-top.models.late <- c(as.character(top.models.late), "Deep Learning")
+#top.models.late <- c(as.character(top.models.late), "Deep Learning")
+top.models.late <- c("Decision Tree", "Deep Learning", "Linear Regression", "Logistic Regression", "Neural Network", "Neural Network/Deep Learning", "Support Vector Machine")
 p.df.late <- df[late.idx, ]
 late.summary <- ddply(p.df.late, "Model", summarize, Total = sum(Count))
 o <- order(late.summary$Total, decreasing = TRUE)
 p.df.late$Model <- factor(p.df.late$Model, levels = late.summary$Model[o])
-
 p.df.late <- p.df.late[p.df.late$Model %in% top.models.late, ]
+p.df.early$Model <- factor(p.df.early$Model, levels = late.summary$Model[o])
+p.df.early <- p.df.early[p.df.early$Model %in% top.models.late, ]
 #p.df.late <- p.df.late[p.df.late$Model %in% top.models, ]
 p2 <- ggplot(p.df.late, aes(x = Year, y = Count, color = Model)) + 
         geom_point() + geom_line() + 
         ggtitle("Formative years of machine learning: 1980 until now")
-# summarize neural networks and deep learning
-p.df.sum <- p.df.late
-p.df.sum$Count[p.df.late$Model == "Neural Network"] <- p.df.late$Count[p.df.late$Model == "Neural Network"] + p.df.late$Count[p.df.late$Model == "Deep Learning"]
-p.df.sum <- p.df.sum[p.df.sum$Model != "Deep Learning",]
-p3 <- ggplot(p.df.sum, aes(x = Year, y = Count, color = Model)) + 
+library(RColorBrewer)
+pair.colors <- brewer.pal(4, "Paired")
+other.colors <- brewer.pal(9, "Set3")
+my.colors1 <- c("Neural Network/Deep Learning" = pair.colors[2],
+               "Deep Learning" = other.colors[5],
+               "Neural Network" = pair.colors[2],
+               "Linear Regression" = pair.colors[4],
+               "Logistic Regression" = pair.colors[3])
+my.colors2 <- c("Support Vector Machine" = other.colors[6], 
+                  "Decision Tree" = other.colors[4])
+my.colors <- c(my.colors1, my.colors2)
+
+plot_timeline <- function(data, title, caption, my.colors) {
+    p <- ggplot(data, aes(x = Year, y = Count, color = Model, shape = Model)) + 
         geom_point() + geom_line() + 
-        ggtitle("Formative years of machine learning: 1980 until now")
+        ggtitle(title) +
+        labs(caption = caption)  +
+        scale_color_manual(values = my.colors) +
+        ylab("Number of publication mentions")
+    return(p)
+}
+p1 <-  plot_timeline(p.df.early, "Early days of machine learning: 1950 to 1980", 
+        "Figure 1: Overall publication rates of machine learning models from 1950 to 1980.", my.colors) 
+p.df.late <- p.df.late[p.df.late$Model != "Neural Network",] # show only pooled values for DL and NN
+p4 <- plot_timeline(p.df.late, "Formative years of machine learning: 1980 until now", 
+                    "Figure 2: Overall publication rates for machine learning models from 1980 until now.", my.colors)
 #library(gridExtra)
 #grid.arrange(p1, p2, p3)
 ```
 
-### Dominance of linear regression, logistic regression, and neural networks
+### Early days: dominance of linear regression
 
-```{r, echo = FALSE, fig.cap="\\label{fig:models_early}Overall publication rates of machine learning models from 1950 to 1980."}
-p1
+<img src = "figure1-early-ml.png" width = "700" height = "500" alt = "Early days of ML">
+
+```{r, echo = FALSE}
+#p1
 ```
 
-Linear regression was particularly dominant from 1950 to 1980 (Figure 1). During this time, other methods were rarely used, while the use of linear regression was surging (Figure 1). 
+As we can see from Figure 1, linear regression was the dominating method between 1950 and 1980. In comparison, other machine learning models were mentioned extremely rarely in the scientific literature. Starting from the 1960s, however, we can see that the popularity of neural networks and decision trees began to grow. We can also see that logistic regression was not widely available yet, with only slight increases in the number of mentions at the end of the 1970s. 
 
-```{r, echo = FALSE, fig.cap="\\label{fig:models_late}Overall publication rates of machine learning models from 1980 until now."}
-p2
+<img src = "figure2-formative-ml.png" width = "700" height = "500" alt = "Formative years of ML">
+
+```{r, echo = FALSE}
+#p4
 ```
 
-The publication frequencies became considerably more diverse starting from the late 1980s (Figure 2) when neural networks and logistic regression grew in popularity. 
-Starting from the early 2000s, the popularity of logistic regression and neural networks increased considerably, approaching the popularity of linear regression. Neural networks even surpassed the popularity of linear regression in 2016. All three methods, linear regression, logistic regression, and neural networks are characterized by similarly steep increases in popularity. The overall number of machine learning publications peaked in 2013 (589,803 publications) and has slightly decreased since then (462,045 publications in 2017).
+### Formative years: diversification and rise of neural networks
 
-### The competitors: decision trees, SVMs, and Cox regression
+Figure 2 demonstrates that the supervised models that were mentioned in scientific publiations became considerably more diverse starting from the late 1980s. Importantly, the rate at which machine learning models were mentioned in the scientific literature has steadily increased until 2013. The plot particularly demonstrates the popularity of linear regression, logistic regression, and neural networks. As we have seen before, linear regression has already been popular way before 1980. In 1980, however, the popularity of neural networks and logistic regression started growing rapidly. While the popularity of logistic regression reached its peak in 2010 where the method nearly became as popular as linear regression, the pooled popularity of neural networks and deep learning (curve *Neural Network/Deep Learning* in Figure 2) even surpassed the popularity of linear regression in 2015. 
 
-The other three, slightly less popular approaches consist of decision trees, SVMs, and Cox regression. The popularity of these methods is associated with a decidedly slower growth pattern. On the other hand, there also seems to be less fluctuation in the frequency at which these methods are mentioned in the literature. Notably, the popularity of these methods has not declined as much as that of some other methods in the last three years (e.g. logistic regression). Among decision trees, SVMs, and Cox regression, SVMs managed to overtake both approaches within only 15 years after their invention in 1995.
+Neural networks have become immensely popular because they have led to breakthroughs in machine learning applications such as image recognition ([ImageNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks), 2012), face recognition ([DeepFace](https://www.cv-foundation.org/openaccess/content_cvpr_2014/html/Taigman_DeepFace_Closing_the_2014_CVPR_paper.html), 2014), and gaming
+([AlphaGo](https://ai.googleblog.com/2016/01/alphago-mastering-ancient-game-of-go.html), 2016). The data from Google Scholar suggest that the frequency at which neural networks have been mentioned in scientific articles has slightly decreased in the last years (not shown in Figure 2). This is likely since the term *deep learning* (multilayered neural networks) has supplanted the use of the term *neural network* to some extent. The same finding can be made using [Google Trends](https://trends.google.com/trends/explore?date=all&q=deep%20learning,neural%20network). 
 
-### Has the neural network bubble burst?
+The remaining, slightly less popular supervised approaches are decision trees and SVMs. In contrast to the top-3 methods, the rates at which these approaches are mentioned are decidedly smaller. On the other hand, there also seems to be less fluctuation in the frequency at which these methods are mentioned in the literature. Notably, neither the popularity of decision trees nor SVMs has yet declined. This is in contrast to other methods such as linear and logistic regression whose number of mentions has decreased considerably in the last years. Between decision trees and SVMs, SVM mentions seem to exhibit the more favorable growth trend as SVMs managed to overtake decision trees merely 15 years after their invention.
 
-Neural networks have become immensely popular because they have led to breakthroughs in machine learning applications such as image recognition ([ImageNet](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks), 2012), face recognition ([DeepFace](https://www.cv-foundation.org/openaccess/content_cvpr_2014/html/Taigman_DeepFace_Closing_the_2014_CVPR_paper.html), 2014), and gaming ([AlphaGo](https://ai.googleblog.com/2016/01/alphago-mastering-ancient-game-of-go.html), 2016). In recent years, however, the frequency at which neural networks have been mentioned in scientific articles has decreased. Does this mean that the fascination about neural networks has subsided? 
-
-To answer this question let us consider Figure 2 once again. Here, we can see that the number of mentions of *deep learning*, which is concerned with multilayered neural networks, has drastically increased, while the number of mentions of *neural network* has decreased at the same time. The same finding can be made using [Google Trends](https://trends.google.com/trends/explore?date=all&q=deep%20learning,neural%20network). Thus, due to the focus on deep architectures in recent years, it seems that the term *deep learning* has supplanted the term *neural network* to some extent. Figure 3 shows the number of mentions of neural networks when the two terms are pooled.
-
-```{r, echo = FALSE, fig.cap="\\label{fig:models_late_pooled}Overall publication rates of machine learning models from 1980 until now (deep learning and neural networks are pooled)."}
-p3
-```
-
-The plot suggests that neural networks are as popular as ever. However, for the current year, 2018, we still see a sharp drop in the total mentions of deep learning and neural networks. A likely explanation for this drop is the variety of specialized neural networks that were not considered in this analysis because they are usually referenced by their acronyms (e.g. convolutional neural networks, CNN; deep belief networks, DBN; deep stacking networks, DSN). Thus, it seems that deep learning research is currently branching out into different specializations rather than distancing itself from neural networks.
+The number of mentions of the considered machine learning models peaked in 2013 (589,803 publications) and has slightly decreased since then (462,045 publications in 2017).
 
 ## Popularity of supervised learning models across different fields
 
-In the second analysis, I wanted to investigate whether different communities rely on different machine learning techniques. For this purpose, I relied on three repositories for scientific publications: [Google Scholar](https://scholar.google.com) for general publications, [dblp](https://dblp.uni-trier.de/) for computer science publications, and [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/) for publications in the biomedical sciences. In each of the three repositories, I determined [the frequency at which hits for the 13 machine learning models were found](https://www.datascienceblog.net/data-sets/ml_models_overall.csv). The results are shown in Figure 4.
+In the second analysis, I wanted to investigate whether different communities rely on different machine learning techniques. For this purpose, I relied on three repositories for scientific publications: [Google Scholar](https://scholar.google.com) for general publications, [dblp](https://dblp.uni-trier.de/) for computer science publications, and [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/) for publications in the biomedical sciences. In each of the three repositories, I determined [the frequency at which hits for the 13 machine learning models were found](https://www.datascienceblog.net/data-sets/ml_models_overall.csv). The results are shown in Figure 3.
 
-```{r, message = FALSE, echo = FALSE, warning = FALSE, fig.cap="\\label{fig:models_across_fields}Rates at which supervised models are mentioned across different fields."}
+```{r, message = FALSE, echo = FALSE, warning = FALSE}
 df <- read.csv("ml_models_overall.csv")
 library(reshape2)
 df.m <- melt(df, "Source")
@@ -135,10 +156,12 @@ colnames(df.m) <- c("Source", "Model", "Count", "Percentage")
 overall.idx <- which(df.m$Source == "Overall (Google Scholar)")
 o <- order(df.m$Count[overall.idx], decreasing = TRUE)
 df.m$Model <- factor(gsub("[_.]", " ", df.m$Model), levels = gsub("[_.]", " ", levels(df.m$Model))[o])
-ggplot(df.m, aes(x = Model, y = Percentage, fill = Source)) + geom_bar(stat = "identity") +
+p.fields <- ggplot(df.m, aes(x = Model, y = Percentage, fill = Source)) + geom_bar(stat = "identity") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
     scale_y_continuous(labels = scales::percent_format()) +
-    ggtitle("Use of machine learning models in different fields")
+    ggtitle("Use of machine learning models in different fields") + 
+    labs(caption = "Figure 3: Rates at which supervised models are mentioned across different fields.")
+#p.fields
 # top 6 models by source
 #n <- 6
 #for (source in unique(df.m$Source)) {
@@ -148,6 +171,9 @@ ggplot(df.m, aes(x = Model, y = Percentage, fill = Source)) + geom_bar(stat = "i
     #print(top.df)
 #}
 ```
+<img src = "figure3-ml-fields.png" width = "700" height = "500" alt = "ML models in different fields">
+
+Figure 3 demonstrates that many methods are quite specific to individual fields. In the following, let us analyze the most popular models in each field.
 
 ### Overall use of supervised learning models
 
@@ -171,7 +197,7 @@ According to PubMed, the five most popular machine learning models in the biomed
 4. **Neural networks:** 23,883 (5.7%) papers
 5. **Poisson regression:** 12,978 (3.1%) papers
 
-Overall, we see an overrepresentation of linear models in biomedical publications: four of of the five most popular methods are linear. This is probably due to two
+In the biomedical sciences, we see an overrepresentation in the number of mentions relating to linear models: four of of the five most popular methods are linear. This is probably due to two
 reasons. First, in medical settings, the number of samples is often too small to allow for fitting complex non-linear models. Second, the ability to interpret the results is critical for medical applications. Since non-linear methods are typically harder to interpret, they are less suited for medical applications because high predictive performance alone is typically not sufficient.
 
 The popularity of logistic regression in the PubMed data is likely due to the large number of publications presenting clinical studies. In these studies, the categorical outcome (i.e. treatment success) is often analyzed using logistic regression because it is well-suited for interpreting the impact of the features on the outcome. 
@@ -187,11 +213,11 @@ The five most popular models in the computer science bibliography retrieved from
 4. **Decision trees:** 4,074 (4.4%) papers
 5. **Nearest neighbors:** 3,839 (2.1%) papers
 
-The distribution of machine learning models mentioned in computer science publications is quite distinct: the majority of publications seems to deal with recent, non-linear methods such as neural networks, deep learning, and support vector machines. It is particularly noteworthy that more than three quarters of all retrieved publications deal with neural networks (including deep learning).
+The distribution of machine learning models mentioned in computer science publications is quite distinct: the majority of publications seems to deal with recent, non-linear methods (e.g. neural networks, deep learning, and support vector machines). If we include deep learning, more than three quarters of the retrieved computer science publications deal with neural networks.
 
 ### A cleavage between communities
 
-```{r, echo = FALSE, warning = FALSE, fig.cap="\\label{fig:models_fields_parametric}Types of supervised learning methods used in different fields."}
+```{r, echo = FALSE, warning = FALSE}
 ###
 # group parametric and non-parametric methods
 ###
@@ -205,14 +231,16 @@ df.m$Class <- ifelse(df.m$Model %in% param.methods, "Parametric", "Non-Parametri
 p.parametric <- ggplot(df.m, aes(x = Source, y = Percentage, fill = Class)) + geom_bar(stat = "identity") +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
     scale_y_continuous(labels = scales::percent_format()) +
-    ggtitle("Use of machine learning models in different fields")
-p.parametric
+    ggtitle("Use of machine learning models in different fields") + 
+    labs(caption = "Figure 4: Use of non-parametric and parametric models in different fields.")
+#p.parametric
 # total percentages
 percentage.df <- ddply(df.m, .(Source, Class), summarize, Total = sum(Percentage))
 ```
+<img src = "figure4-ml-fields.png" width = "700" height = "500" alt = "Types of ML models in different fields">
 
-Figure 5 summarizes the percentage of parametric (including semi-parametric) and non-parametric models that are mentioned in the literature. The bar plot demonstrates that there is a big difference between the models investigated in machine learning research (as evidenced by computer science publications) and the types of models that are applied (as evidenced by biomedical and overall publications). While more than 90% of computer science publications deal with non-parametric models, roughly 90% of biomedical publications deal with parametric models. This showcases that machine learning research is heavily focused on state-of-the-art methods such as deep neural networks, while users of machine learning often rely on more interpretable, parametric models.
+Figure 4 summarizes the percentage of parametric (including semi-parametric) and non-parametric models that are mentioned in the literature. The bar plot demonstrates that there is a big difference between the models investigated in machine learning research (as evidenced by computer science publications) and the types of models that are applied (as evidenced by biomedical and overall publications). While more than 90% of computer science publications deal with non-parametric models, roughly 90% of biomedical publications deal with parametric models. This showcases that machine learning research is heavily focused on state-of-the-art methods such as deep neural networks, while users of machine learning often rely on more interpretable, parametric models.
 
 ## Summary
 
-This analysis of mentions of individual supervised learning models in the scientific literature showcases the high popularity of artificial neural networks. However, we also see that different types of machine learning models are used in different fields. Particularly researchers in the biomedical sciences still heavily rely on parametric models. It will be interesting to see whether more complex models will find widespread use in the biomedical field or whether these models are simply not interpretable enough for the typical applications in this sector.
+This analysis of mentions of individual supervised learning models in the scientific literature showcases the high popularity of artificial neural networks. However, we also see that different types of machine learning models are used in different fields. Particularly researchers in the biomedical sciences still heavily rely on parametric models. It will be interesting to see whether more complex models will find widespread use in the biomedical field or whether these models are simply not appropriate for typical applications in this sector (e.g. due to insufficient interpretability of these models and low generalizability when the sample size is small).
