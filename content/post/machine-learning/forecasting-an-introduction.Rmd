@@ -1,0 +1,425 @@
+---
+title: "An Introduction to Forecasting"
+author: Matthias Döring
+downloadRmd: false
+date: '2018-12-10'
+draft: true
+description: ""
+categories:
+  - machine-learning
+tags:
+    - supervised learning
+thumbnail: "/post/machine-learning/forecasting_vs_prediction_avatar.jpg"
+---
+Previously, I have [discussed the difference between prediction and forecasting](http://127.0.0.1:4321/post/machine-learning/forecasting_vs_prediction/). In short, forecasting makes predictions about the future by relying on past measurements. In this article, I will give an introductiong how ARMA, ARIMA (Box-Jenkins), and ARIMAX models can be used for forecasting of time-series data.
+
+## The ARMA model
+
+ARMA stands for *autoregressive moving average*. ARMA models are only appropriate for stationary processes and have two parameteres:
+
+* **p:** the order of the autoregressive (AR) model 
+* **q**: the order of the moving-average (MA) model
+
+
+The ARMA model can be specified as
+
+\[\hat{y}_t = c + \epsilon_t + \sum_{i=1}^p \phi_i y_{t-i} - \sum_{j=1}^q \theta_j \epsilon_{t-j}\,.\]
+
+with the following variables:
+
+* $c$: the intercept of the model (e.g. the mean)
+* $\epsilon_t$: random error (white noise, residual) associated with measurement $t$ with $\epsilon_t \sim N(0, \sigma^2)$.
+* $\phi \in \mathbb{R}^p$: a vector of coefficients for the AR terms. In R, these parameters are called *AR1*, *AR2*, and so forth.
+* $y_t$: outcome measured at time $t$
+* $\theta \in \mathbb{R}^q$: a vector of coefficients for the MA terms. In R, these parameters are called *MA1*, *MA2*, and so forth.
+* $\epsilon_t$: noise associated with measurement $t$
+
+Note that the there is no term here for the $d$ parameter, that is, non-stationarity is not allowed because differencing is not performed. To simplify the model formulation, we will introduce the backshift operator now.
+
+To understand how the ARIMA model uses differencing to deal with non-stationariy, we will introduce the lag operator.
+
+### The backshift (lag) operator
+
+Given the time series $X = \{X_1, X_2, \ldots \}$, the backshift operator is defined as
+
+\[B X_t = X_{t-1}\,, \forall t > 1\,.\]
+
+This means that one application of the lag operator yields the previous measurement in the time series. Raising the lag operator to a power $k > 0$ performs multiple shifts at once:
+
+\[
+\begin{align*}
+B^k X_t &= X_{t-k}  \\ 
+B^{-k} X& = X_{t+k}
+\end{align*}
+\]
+
+For example $B^2 X_t$ yields the measurement that was observed two time periods earlier. 
+
+Instead of $B$, $L$ is used equivalently to indicate the lag operator. 
+
+### Formulating the ARMA model using the backshift operator
+
+Using the backshift operator, we can formulate the ARMA model in the following way:
+
+\[\left(1 - \sum_{i=1}^p \phi_i B^i \right) y_t = \left(1 - \sum_{j=1}^q \theta_j B^j\right) \epsilon_j\]
+
+By defining $\phi_p(B) = 1 - \sum_{i=1}^p \phi_i B^i$ and $\theta_q(B) = 1 - \sum_{j=1}^q \theta_j B^j$, the ARMA model simplifies to:
+
+\[\phi_p(B) y_t = \theta_q(B) \epsilon_t\,.\]
+
+### Stationary vs non-stationary processes
+
+The ARMA model is only valid for stationary processes. A process is stationary if [its mean and variance are not shifting along the timeline](https://www.r-bloggers.com/stationarity/). Consider the following examples:
+
+```{r}
+par(mfrow = c(1,2))
+# climate values 
+library(tseries)
+data(nino)
+x <- nino3.4
+plot(x, main = "Stationary process")
+# Global mean land-ocean temperature deviations
+library(astsa)
+data(gtemp) 
+plot(gtemp, main = "Non-stationary process")
+```
+
+The left plot shows a stationary process in which the data behaves similarly throughout all measurements. The right plot shows a non-stationary process in which the mean value is increasing along time.
+
+## The ARIMA model
+
+ARIMA stands for *autoregressive integrated moving average* and is a generalization of the ARMA model. In contrast to ARMA models, ARIMA models are capable of dealing with non-stationary data, that is, time-series where the mean or the variance changes over time. This feature is in the *I* (integrated) of ARIMA: an initial differencing step can eliminate the non-stationarity.
+
+An ARIMA model is specified by three parameters:
+
+* **p:** the order of the autoregressive (AR) model 
+* **d:** the degree of differencing
+* **q**: the order of the moving-average (MA) model
+
+In the ARIMA model, outcomes are transformed to differences by replacing $y_t$ with differences of the form
+
+\[(1 - B)^d y_t\,.\]
+
+The model is then specified by 
+
+\[\phi_p(B)(1 - B)^d y_t = \theta_q(B) \epsilon_t\,. \]
+
+When $d = 0$, then the model simplifies to the ARMA model since $(1 - B)^0 y_t = y_t$. For other choices of $d$ we obtain backshift polynomials, for example:
+
+\[
+\begin{align*}
+(1-B)^1 y_t &= y_t - y_{t-1} \\
+(1-B)^2 y_t &= (1 - 2B + B^2) y_t = y_t - 2 y_{t-1} + y_{t-2} \\
+\end{align*}
+\]
+
+### Components of the ARIMA model
+
+#### The AR model and $p$
+
+The parameter $p \in \mathbb{N}_0$ specifies the order of the autoregressive model. The term *order* refers to the number of lagged differences that the model considers. For simplicitly, let us assume that $d = 0$ (no differencing). Then, an AR model of order 1 considers only the most recent difference, that is, $B y_t = y_t - y_{t-1}$ via the parameter $\phi_1$. An AR model of order 2 would consider both $B y_t$ and $B^2 y_t$ via $\phi_1$ and $\phi_2$, respectively.
+
+The number of autoregressive terms indicates the extent to which previous measurements influence the current outcome. For example, ARIMA(1,0,0) ($p =1$, $d = 0$, $q = 0$) considers only autoregression with order 1, which means that the outcome is influenced only by the most recent previous measurements. In this case, the model would simplify to
+
+\[\hat{y}_t =  \mu  \epsilon_t +  \phi_1 y_{t-1}\]
+
+#### Examples for the impact of autoregression
+
+We can simulate autoregressive processes using the ```arima.sim``` function. Here, the model can be specified by providing the coefficients for the MA and AR terms to be used. To find the impact of autoregression, it is best to use the partial autocorrelation:
+
+```{r, fig.height = 8}
+set.seed(5)
+par(mfrow = c(2, 2))
+# Example for ARIMA(1,0,0)
+x <- arima.sim(list(ar = 0.75),
+                n = 1000)
+plot(x, main = "ARIMA(1,0,0)")
+# plot partial acf
+acf(x, type = "partial", main = "Partial autocorrelation")
+# Example for ARIMA(2,0,0) 
+x <- arima.sim(list(ar = c(0.65, 0.3)), 
+        n = 1000)
+plot(x, main = "ARIMA(2,0,0)")
+acf(x, type = "partial", main = "Partial autocorrelation")
+```
+
+#### The degree of differencing and $d$
+
+The parameter $d \in mathbb{N}_0$ specifies how often the outcomes are differenced via $(1 - B)^d y_t$. In practice, $d$ should be chosen such that we obtain a stationary process. An ARIMA(0,1,0) model would simplifies to the random walk model
+
+\[\hat{y}_t = \mu + \epsilon_t + y_{t-1} \,.\]
+
+This model is random because for every point in time $t$, the mean is simply adjusted by $y_{t-1}$, which leads to random changes of $\hat{y}_t$ over time.
+
+#### Examples for the impact of differencing
+
+The following example demonstrates the impact of the degree of diferencing:
+
+```{r, fig.height = 8}
+par(mfrow = c(2, 2))
+# Example for non-stationary process:
+x <- arima.sim(list(order = c(0,0,0)), n = 1000)
+#stationary.test(x) 
+plot(x, main = "ARIMA(0,0,0)")
+acf(x, type = "partial", main = "Partial autocorrelation")
+# Example for ARIMA(0,1,0)
+x <- arima.sim(list(order = c(0,1,0)), n = 1000)
+plot(x, main = "ARIMA(0,1,0)")
+acf(diff(x), type = "partial", main = "Partial autocorrelation")
+```
+
+The greater the degree of differencing $d$ is, the smoother the time-series becomes. 
+
+#### The MA model and $q$
+
+The moving average model is specified via $q \in \mathbb{N}_0$. The MA term models the past error, $\epsilon_t$ using coefficients $\theta$. An ARIMA(0,0,1) model simplifies to
+
+\[\hat{y}_t = \mu + \epsilon_t + \theta_1 \epsilon_{t-1} \]
+
+in which the current estimate depends on the residual of the previous measurement.
+
+#### Examples for the impact of the moving average
+
+To study the impact of the moving average, we should consider the autoregression function:
+```{r, fig.height = 8}
+par(mfrow = c(2, 2))
+# Example for ARIMA(0,0,1)
+x <- arima.sim(list(ma = 0.75),
+                n = 1000)
+plot(x, main = "ARIMA(0,0,1)")
+acf(x, main = "Autocorrelation")
+# Example for ARIMA(0,0,2)
+x <- arima.sim(list(ma = c(0.65, 0.3)), 
+        n = 1000)
+plot(x, main = "ARIMA(0,0,2)")
+acf(x, main = "Autocorrelation")
+```
+
+### Choosing between AR and MA terms
+
+To decide which is more appropriate, AR or MA terms, we consider the ACF (autocorrelation function) and PACF (partial ACF). Using these plots we can find
+
+* AR signature: The PACF of the differenced time series displays a sharp cutoff or lag 1 in the PACF is positive. The parameter $p$ is determined by the lag at which the PACF cuts off (last significant autocorrelation).
+* MA signature: commonly associated with a negative autocorrelation at lag 1 in the ACF of the differenced time series. The parameter $r$ is determined by the lag at which the ACF cuts off (last significant autocorrelation).
+
+Combinations of AR and MA terms lead to the following time-series data:
+
+```{r, fig.height = 10}
+par(mfrow = c(3, 2))
+# ARIMA(1,0,1)
+x <- arima.sim(list(order = c(1,0,1), ar = 0.8, ma = 0.8), n = 1000)
+plot(x, main = "ARIMA(1,0,1)")
+acf(x, main = "Autocorrelation")
+# ARIMA(2,0,1)
+x <- arima.sim(list(order = c(2,0,1), ar = c(0.6, 0.3), ma = 0.8), n = 1000)
+plot(x, main = "ARIMA(2,0,1)")
+acf(x, main = "Autocorrelation")
+# ARIMA(2,0,2)
+x <- arima.sim(list(order = c(2,0,2), ar = c(0.6, 0.3), ma = c(0.6, 0.3)), n = 1000)
+plot(x, main = "ARIMA(2,0,2)")
+acf(x, main = "Autocorrelation")
+```
+
+### Automatically fitting ARIMA models
+
+In R, you can automatically fit ARIMA models using the ```auto.arima``` function from the ```forecast``` package. This approach considers reasonable settings for $p$, $d$, and $q$, as well as the sesaonal parameters, $P$, $D$, and $Q$. Note that you should set the parameters ```stepwise``` and ```approximation``` parameters to ```FALSE``` if you are dealing with a single data set. 
+
+## The SARIMA Model
+
+To model seasonal trends, we need to expand the ARIMA model with the additional parameters $P$, $D$, and $Q$, which correspond to $p$, $d$, and $q$ in the original model:
+
+* **P:** number of seasonal autoregressive (SAR) terms
+* **D:** degree of seasonal differencing
+* **Q:** number of seasonal moving average (SMA) terms
+
+Accordingly, a seasonal ARIMA (SARIMA) model is denoted by ARIMA(p,d,q)x(P,D,Q).
+
+TODO: define SARIMA model
+
+## The ARIMAX model
+
+ARIMAX stands for *autoregressive integrated moving average with exogenous variables*. Here, exogenous variable refer to other covariates $x_t$ that influence the observed time-series values, $y_t$. ARIMAX can be specified by including these $r$ exogenous variables with the coefficient vector $\beta \in \mathbb{R^r}$:
+
+\[\phi_p(B)(1 - B)^d y_t = \beta^T x_t \theta_q(B) \epsilon_t\,. \]
+
+## Time-series decomposition
+
+To interpret time-series data, it is useful to decompose the observations $y_t$ into three components:
+
+* Seasonality $S_t$: seasonal trends (e.g. gym memberships rise at the start of the new year)
+* Trend $T_t$: overall trends (e.g. the global temperature is increasing)
+* Error $\epsilon_t$: unexplained noise
+
+Thus, additive time-series data can be described by
+
+\[y_t = S_t + T_t + \epsilon_t\]
+
+and multiplcative time-series data as
+
+\[y_t = S_t T_t \epsilon_t\]
+
+## TODO: multiplicative vs additive time-series: impact on modeling?
+
+### Intuition about decomposing time-series data
+
+For example, for the stock market data, the following decomposition can be found:
+
+```{r}
+daxData <- EuStockMarkets[, 1] # DAX data
+decomposed <- decompose(daxData) # decompose into three components
+plot(decomposed)
+```
+
+The plot demonstrates the following in the DAX data from 1992 to 1998:
+
+* There is a strong increasing trend in the overall value.
+* There is a strong seasonal trend: at the beginng of each year, the stock price is relatively low and reaches its relative maximum at the end of summer.
+* The contribution of random noise is negligible, except for 1997 to 1998.
+
+
+
+## Forecasting in R
+
+To perform forecasting in R, we will start with a simple ARMA model. ARMA models are only appropriate when the process generating the time-series data is stationary. Otherwise, we have to use ARIMA models.
+
+### ARIMA model for a stationary process
+
+We will showcase the use of ARMA  using the ```nino``` data from the ```tseries``` package, which gives sea-surface temperatures for the Nino Region 3.4 index. Let us verify that the data are stationary:
+
+```{r}
+plot(nino3.4)
+```
+
+Since the data is stationary, we can set $d = 0$.
+
+To verify whether there is any seasonal trend, let us decompose the data:
+
+```{r}
+nino.components <- decompose(nino3.4)
+plot(nino.components)
+```
+
+Since this is a stationary process, the overall trend is fluctuating. However, there is a strong seasonal component to the data. Thus, we definitely want to include parameters modeling the seasonal effects. 
+
+#### Seasonal model
+
+Since the seasonal component is very pronounced, we need to include a seasonal model. Since the seasonal trend does not dominate the time-series data, we will set $D = 0$.  Note that the seasonal parameters $(P, D, Q)$ are associated with a certain period. Since the seasonal trend in the ```nino``` data is a yearly trend, the parameters refer to 12 months, i.e. $(P, D, Q)_{12}$. To determine the other parameters for the seasonal model, let us consider the plots for the seasonal component:
+
+```{r}
+nino.season <- nino.components$seasonal
+#acfpl <- acf(diff(nino.season), main = "pACF", plot = FALSE)
+# transform lag from years to months
+#acfpl$lag <- acfpl$lag * 12
+acf(nino.season, type = "partial")
+```
+
+We will use an AR term of order 2 for the seasonal component, that is, we set $P = 2$ and $Q = 0$. Thus, the seasonal model is specified by (2,0,0).
+
+### Non-seasonal model
+
+For the non-seasonal model, we still need to find $p$ and $q$. 
+Next, we will plot the ACF and pACF to identify the values for the AR and MA parameters:
+
+```{r}
+# TODO: plot ACF
+acfpl <- acf(nino3.4, main = "pACF", type = "partial", plot = FALSE)
+# transform lag from years to months
+acfpl$lag <- acfpl$lag * 12
+plot(acfpl)
+#auto.arima(nino3.4)
+```
+
+We will set the AR order to $2$ and and the MA order to $1$. This gives the final model: $(2,0,1)x(2,0,0)_{12}$. 
+
+We can fit the model using the ```Arima``` function from the ```forecast``` package. 
+
+```{r}
+library(forecast)
+order.non.seasonal <- c(2,0,1)
+order.seasonal <- c(2,0,0)
+A <- Arima(nino3.4, order = order.non.seasonal,
+            seasonal = order.seasonal)
+# A.best <- auto.arima(nino3.4, stepwise = FALSE, approximation = FALSE) # very different results in plot ... could easily be overfitted!
+```
+
+We can now use the model to forecast how the temperatures in the Nino 3.4 region will change in the next year:
+```{r}
+# to construct a custom plot, we can use the predict function:
+forecast <- predict(A, n.ahead = 12) # predict 1 year into the future
+library(ggplot2)
+plot.df <- rbind(cbind(fortify(nino3.4), sd = 0), cbind(fortify(forecast$pred), sd = as.numeric(forecast$se)))
+plot.df$upper <- plot.df$y + plot.df$sd * 1.96
+plot.df$lower <- plot.df$y - plot.df$sd * 1.96
+ggplot(plot.df, aes(x = x ,y = y)) + 
+        geom_line() + geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+        ylab("Temperature") + xlab("Year")
+# use the forecast function to use the built-in plotting function:
+forecast <- forecast(A, h = 60) # predict 5 years into the future
+plot(forecast)
+```
+
+### ARIMA model for non-stationary data
+
+To demonstrate an ARIMA mdoel for non-stationary data, we will use the ```gtemp``` data set from the ```astsa``` package. The data set provides yearly measurements of global mean land-ocean temperature deviations.
+
+```{r}
+library(astsa)
+data(gtemp) 
+plot(gtemp)
+```
+
+To make the data stationary, we will use $d = 1$:
+
+```{r}
+plot(diff(gtemp))
+```
+
+Now, the data seems to be stationary. 
+
+Since the measurements were only taken per year, we cannot identify any seasonal characterstics. Thus, we are only concerned with a non-seasonal model in the following. 
+
+```{r}
+par(mfrow = c(1,2))
+acf(diff(gtemp), main = "ACF")
+acf(diff(gtemp), main = "pACF", type = "partial")
+#auto.arima(gtemp)
+```
+
+Since the first lag's autocorrelation is negative, we will use a moving average model. Thus, we set $p = 0$ and $r = 1$, which leads us to an ARIMA(0,1,1) model. Since the model shows an increase in the mean temperature, we will include a drift term. 
+
+```{r}
+A <- Arima(gtemp, order = c(0,1,1), include.drift = TRUE)
+#A.best <- auto.arima(gtemp)
+```
+
+Let us forecast now:
+
+```{r}
+forecast <- forecast(A, h = 30) # predict 30 years into the future
+plot(forecast)
+```
+
+### ARIMAX
+
+To showcase the use of an ARIMAX model, we will use 
+```{r}
+# Use Arima from forecast pkg instead of arimax (is the same)
+# arimax from TSA: transfer function?
+#library(TSA)
+     #data(airmiles)
+     #plot(log(airmiles),ylab='Log(airmiles)',xlab='Year', main='')
+     #acf(diff(diff(window(log(airmiles),end=c(2001,8)),12)),lag.max=48,main='')
+     #air.m1=arimax(log(airmiles),order=c(0,1,1),seasonal=list(order=c(0,1,1),
+     #period=12),xtransf=data.frame(I911=1*(seq(airmiles)==69),
+     #I911=1*(seq(airmiles)==69)),
+     #transfer=list(c(0,0),c(1,0)),xreg=data.frame(Dec96=1*(seq(airmiles)==12),
+     #Jan97=1*(seq(airmiles)==13),Dec02=1*(seq(airmiles)==84)),method='ML')
+```
+## References
+https://otexts.org/fpp2/backshift.html
+http://people.duke.edu/~rnau/411arim.htm
+https://www.r-bloggers.com/forecasting-arimax-model-exercises-part-5/
+https://forecasters.org/wp-content/uploads/gravity_forms/7-2a51b93047891f1ec3608bdbd77ca58d/2013/07/Kongcharoen_Chaleampong_ISF2013.pdf
+https://onlinecourses.science.psu.edu/stat510/node/67/
+https://support.minitab.com/en-us/minitab/18/help-and-how-to/modeling-statistics/time-series/how-to/partial-autocorrelation/interpret-the-results/partial-autocorrelation-function-pacf/
+https://datascienceplus.com/time-series-analysis-building-a-model-on-non-stationary-time-series/

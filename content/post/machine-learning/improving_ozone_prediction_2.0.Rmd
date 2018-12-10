@@ -68,25 +68,6 @@ ggplot(ozone, aes(x = t, y = Ozone)) + geom_line() +
 
 We see that there is a temporal trend, although there are also many outliers. 
 
-## The backshift operator
-
-To understand the autocorrelation, we need to introduce the backshift operator.
-
-Given the time series $X = \{X_1, X_2, \ldots \}$, the lag operator is defined as
-
-\[L X_t = X_{t-1}\,, \forall t > 1\]
-
-Instead of $L$, $B$ is sometimes used equivalently to indicate the backshift operator. 
-
-Raising the lag operator to a power $k > 0$ performs multiple shifts at once:
-
-\[
-\begin{align*}
-L^k X_t &= X_{t-k}  \\ 
-L^{-k} X& = X_{t+k}
-\end{align*}
-\]
-
 ## Autocorrelation
 
 Let us plot the autocorrelation to find whether the distribution is stationary.
