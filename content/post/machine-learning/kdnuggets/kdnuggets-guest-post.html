@@ -1,132 +1,16 @@
-<!DOCTYPE html>
+---
+title: "Supervised Learning: Model Popularity from Past to Present"
+author: Matthias Döring
+date: '2018-11-26'
+description: "The field of machine learning has changed enormously in the last decades. Here, I investigate the popularity of supervised learning techniques through time and across different scientific fields."
+draft: true
+categories:
+  - machine-learning
+output:
+    html_document:
+        self_contained: no
+---
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-
-<head>
-
-<meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="pandoc" />
-
-
-<meta name="author" content="Matthias Döring" />
-
-<meta name="date" content="2018-11-26" />
-
-<title>Supervised Learning: Model Popularity from Past to Present</title>
-
-<script src="kdnuggets-guest-pod-md_files/jquery-1.11.3/jquery.min.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="kdnuggets-guest-pod-md_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
-<script src="kdnuggets-guest-pod-md_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
-<script src="kdnuggets-guest-pod-md_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
-<script src="kdnuggets-guest-pod-md_files/bootstrap-3.3.5/shim/respond.min.js"></script>
-<script src="kdnuggets-guest-pod-md_files/navigation-1.1/tabsets.js"></script>
-<link href="kdnuggets-guest-pod-md_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
-<script src="kdnuggets-guest-pod-md_files/highlightjs-9.12.0/highlight.js"></script>
-
-<style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
-<script type="text/javascript">
-if (window.hljs) {
-  hljs.configure({languages: []});
-  hljs.initHighlightingOnLoad();
-  if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
-  }
-}
-</script>
-
-
-
-<style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
-
-
-</head>
-
-<body>
-
-<style type = "text/css">
-.main-container {
-  max-width: 940px;
-  margin-left: auto;
-  margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
-}
-img {
-  max-width:100%;
-  height: auto;
-}
-.tabbed-pane {
-  padding-top: 12px;
-}
-.html-widget {
-  margin-bottom: 20px;
-}
-button.code-folding-btn:focus {
-  outline: none;
-}
-</style>
-
-
-
-<div class="container-fluid main-container">
-
-<!-- tabsets -->
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-</script>
-
-<!-- code folding -->
-
-
-
-
-
-
-<div class="fluid-row" id="header">
-
-
-
-<h1 class="title toc-ignore">Supervised Learning: Model Popularity from Past to Present</h1>
-<h4 class="author"><em>Matthias Döring</em></h4>
-<h4 class="date"><em>2018-11-26</em></h4>
-
-</div>
 
 
 <p>The field of machine learning has gone through enormous changes in the last decades. Admittedly, there are some methods that have been around for a long time and are still a staple of the field. For example, the concept of least squares was already proposed in the early 19th century by <a href="https://archive.org/details/nouvellesmthode00legegoog/">Legendre</a> and <a href="https://www.e-rara.ch/zut/content/titleinfo/142787">Gauss</a>. Other approaches such as neural networks, <a href="http://psycnet.apa.org/record/1959-09865-001">whose most basic form was introduced in 1958</a>, were substantially advanced in the last decades, while other methods such as <a href="https://link.springer.com/article/10.1007/BF00994018">support vector machines (SVMs)</a> are even more recent.</p>
@@ -212,34 +96,3 @@ $(document).ready(function () {
 <h2>Summary</h2>
 <p>This analysis of mentions of individual supervised learning models in the scientific literature showcases the high popularity of artificial neural networks. However, we also see that different types of machine learning models are used in different fields. Particularly researchers in the biomedical sciences still heavily rely on parametric models. It will be interesting to see whether more complex models will find widespread use in the biomedical field or whether these models are simply not appropriate for typical applications in this sector (e.g. due to insufficient interpretability of these models and low generalizability when the sample size is small).</p>
 </div>
-
-
-
-
-</div>
-
-<script>
-
-// add bootstrap table styles to pandoc tables
-function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
-}
-$(document).ready(function () {
-  bootstrapStylePandocTables();
-});
-
-
-</script>
-
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script>
-
-</body>
-</html>
