@@ -550,28 +550,67 @@ As we can see the linear model with a negative binomial likelihood outperforms t
 
 ### ARIMAX on the airquality data set
 
-I have obtained the [icecream data set](https://www.datascienceblog.net/data-sets/Icecream.csv) from [R-exercises](https://www.r-bloggers.com/forecasting-arimax-model-exercises-part-5/). 
+#I have obtained the [icecream data set](https://www.datascienceblog.net/data-sets/Icecream.csv) from [R-exercises](https://www.r-bloggers.com/forecasting-arimax-model-exercises-part-5/). 
 
 ```{r}
-library(RCurl)
-f <- getURL('https://www.datascienceblog.net/data-sets/Icecream.csv')
-df <- read.csv(textConnection(f), header=T)
+library(Ecdat)
+data(Icecream)
 ```
 
+The icecream data contains the following variables:
+
+* **cons:** The ice cream consumption in pints per capita.
+* **income:**: The average weekly family income in USD.
+* **price:** The price of ice cream per pint.
+* **temp:** The average temperature in Fahrenheit.
+
+The measurements are four-weekly observations from 1951-03-18 to 1953-07-11.
+
+We will model *cons*, the ice cream consumption as a time series and use *income*, *price*, and *average* as exogenous variables.
+
 ```{r}
-# Use Arima from forecast pkg instead of arimax (is the same)
-# arimax from TSA: transfer function?
-#library(TSA)
-     data(airmiles)
-     xreg <- data.frame(Dec96=1*(seq(airmiles)==12),
-                        Jan97=1*(seq(airmiles)==13),
-                        Dec02=1*(seq(airmiles)==84))
-     #plot(log(airmiles),ylab='Log(airmiles)',xlab='Year', main='')
-     #acf(diff(diff(window(log(airmiles),end=c(2001,8)),12)),lag.max=48,main='')
-     #air.m1=arimax(log(airmiles),order=c(0,1,1),seasonal=list(order=c(0,1,1),
-     #period=12),xtransf=data.frame(I911=1*(seq(airmiles)==69),
-     #I911=1*(seq(airmiles)==69)),
-     #transfer=list(c(0,0),c(1,0)),xreg=,method='ML')
+# create a time-series object
+library(lubridate)
+wk <- week(c(as.Date("1951-03-18"), as.Date("1953-07-11")))
+months <- c(seq(3,12), seq(1,12), seq(1,7))
+wks <- c(seq(wk[1], 52, 4), seq(1, 52, 4), seq(1, 52, 4))
+ice.ts <- ts(Icecream$cons, start = c(1951, 3), end = c(1953, 6), frequency = 52/4)
+plot(ice.ts)
+plot(decompose(ice.ts))
+pacf(ice.ts)
+```
+
+So, there are two trends in the data:
+
+1. Overall, icecream consumption has increased considerably between 1951 and 1953.
+2. Ice cream sales are peaking in the summer.
+
+Without exogenous variables, we would probably fit an ARIMA(1,0,0)(1,0,0) model. However, since we have the temperature and the income, this can probably explain the seasonal trend well:
+
+```{r}
+plot(ice$income) # explains the overall trend
+plot(ice$temp) # explains the seasonal trend
+```
+
+So, we do not need a seasonal model anymore and instead use an ARIMA(1,0,0) model for the forecasting.
+
+```{r}
+train <- 1:20
+test <- 21:30
+A <- Arima(window(ice.ts, c(1951,3), c(1951, 3 + (20-1))),
+        xreg = ice[train, c("income", "temp")],
+        order = c(1,0,0))
+preds <- forecast(A, xreg = ice[test, c("income", "temp")]) # TODO: how to forecast when we don't have additional data for future points?
+plot(preds) # forecast in blue
+lines(window(ice.ts, c(1951, 22), c(1951, 30))) # actual values in black
+# contrast ARIMAX with ARIMA
+A.season <- Arima(window(ice.ts, c(1951,3), c(1951, 3 + (20-1))),
+        order = c(1,0,0),
+        season = c(1,0,0))
+preds <- forecast(A.season, h = 12)
+plot(preds) # forecast in blue
+lines(window(ice.ts, c(1951, 22), c(1951, 30))) # actual values in black
+
 ```
 ## References
 https://otexts.org/fpp2/backshift.html
