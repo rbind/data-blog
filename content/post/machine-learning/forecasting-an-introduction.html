@@ -1,74 +1,165 @@
 ---
 title: "An Introduction to Forecasting"
 author: Matthias Döring
-downloadRmd: false
-date: '2018-12-10'
-draft: true
-description: ""
+downloadRmd: true
+date: '2018-12-18'
+draft: false
+description: "Forecasting is a powerful technique for time-series data. Here, I investigate the most common variants of forecasting algorithms: ARMA, ARIMA, SARIMA, and ARIMAX, which are primarily based on autocorrelation and moving averages."
 categories:
   - machine-learning
 tags:
     - supervised learning
-thumbnail: "/post/machine-learning/forecasting_vs_prediction_avatar.jpg"
+thumbnail: "/post/machine-learning/forecasting-an-introduction_cover.png"
 ---
 
 
 
-<p>Previously, I have <a href="http://127.0.0.1:4321/post/machine-learning/forecasting_vs_prediction/">discussed the difference between prediction and forecasting</a>. In short, forecasting makes predictions about the future by relying on past measurements. In this article, I will give an introductiong how ARMA, ARIMA (Box-Jenkins), and ARIMAX models can be used for forecasting of time-series data.</p>
+<p><a href="/post/machine-learning/forecasting_vs_prediction/">Forecasting is concerned with making predictions about future observations by relying on past measurements</a>. In this article, I will give an introduction how ARMA, ARIMA (Box-Jenkins), SARIMA, and ARIMAX models can be used for forecasting given time-series data.</p>
 <div id="preliminaries" class="section level2">
 <h2>Preliminaries</h2>
 <p>Before we can talk about models for time-series data, we have to introduce two concepts.</p>
-<div id="the-backshift-lag-operator" class="section level3">
-<h3>The backshift (lag) operator</h3>
-<p>Given the time series <span class="math inline">\(X = \{X_1, X_2, \ldots \}\)</span>, the backshift operator is defined as</p>
-<p><span class="math display">\[B X_t = X_{t-1}\,, \forall t &gt; 1\,.\]</span></p>
-<p>This means that one application of the lag operator yields the previous measurement in the time series. Raising the lag operator to a power <span class="math inline">\(k &gt; 0\)</span> performs multiple shifts at once:</p>
+<div id="the-backshift-operator" class="section level3">
+<h3>The backshift operator</h3>
+<p>Given the time series <span class="math inline">\(y = \{y_1, y_2, \ldots \}\)</span>, the backshift operator (also called lag operator) is defined as</p>
+<p><span class="math display">\[B y_t = y_{t-1}\,, \forall t &gt; 1\,.\]</span></p>
+<p>One application of the backshift operator yields the previous measurement in the time series. Raising the backshift operator to a power <span class="math inline">\(k &gt; 0\)</span> performs multiple shifts at once:</p>
 <p><span class="math display">\[
 \begin{align*}
-B^k X_t &amp;= X_{t-k}  \\ 
-B^{-k} X&amp; = X_{t+k}
+B^k y_t &amp;= y_{t-k}  \\ 
+B^{-k} y&amp; = y_{t+k}
 \end{align*}
 \]</span></p>
-<p>For example <span class="math inline">\(B^2 X_t\)</span> yields the measurement that was observed two time periods earlier. Instead of <span class="math inline">\(B\)</span>, <span class="math inline">\(L\)</span> is used equivalently to indicate the lag operator.</p>
-<p>In R, we can perform the backshift operation using the <code>diff</code> function. For example:</p>
-<pre class="r"><code>x &lt;- c(1,3,5,10,20)
-Bx &lt;- diff(x) # B x
-B3x &lt;- diff(x, 3) #B^3 x
-message(paste0(&quot;x is: &quot;, paste(x, collapse = &quot;,&quot;), &quot;\n&quot;,
-        &quot;Bx is: &quot;, paste(Bx, collapse = &quot;,&quot;), &quot;\n&quot;,
-        &quot;B^3x is: &quot;, paste(B3x, collapse = &quot;,&quot;)))</code></pre>
-<pre><code>## x is: 1,3,5,10,20
-## Bx is: 2,2,5,10
-## B^3x is: 9,17</code></pre>
+<p>For example <span class="math inline">\(B^2 y_t\)</span> yields the measurement that was observed two time periods earlier. Instead of <span class="math inline">\(B\)</span>, <span class="math inline">\(L\)</span> is used equivalently to indicate the lag operator.</p>
+<div id="calculating-lagged-differences-with-the-backshift-operator" class="section level4">
+<h4>Calculating lagged differences with the backshift operator</h4>
+<p>We can use the backshift operator to perform calculations. For example, the backshift operator can be used to calculate lagged differences for a time-series of values <span class="math inline">\(y\)</span> via <span class="math inline">\(y_i - B^k(y_i)\,,\forall i \in {k+1, \ldots, t}\)</span> where <span class="math inline">\(k\)</span> indicates the lag of the differences. For <span class="math inline">\(k = 1\)</span>, we obtain ordinary pairwise differences, while for <span class="math inline">\(k = 2\)</span> we obtain the pairwise differences with respect to the pre-predecessor. Let us consider an example in R.</p>
+<p>Using R, we can calculate lagged differences using the <code>diff</code> function. The second argument of the function indicates the desired lag, <span class="math inline">\(k\)</span>, which is set to <span class="math inline">\(k = 1\)</span> by default. For example:</p>
+<pre class="r"><code>y &lt;- c(1,3,5,10,20)
+By &lt;- diff(y) # y_i - B y_i
+B3y &lt;- diff(y, 3) # y_i - B^3 y_i
+message(paste0(&quot;y is: &quot;, paste(y, collapse = &quot;,&quot;), &quot;\n&quot;,
+        &quot;By is: &quot;, paste(By, collapse = &quot;,&quot;), &quot;\n&quot;,
+        &quot;B^3y is: &quot;, paste(B3y, collapse = &quot;,&quot;)))</code></pre>
+<pre><code>## y is: 1,3,5,10,20
+## By is: 2,2,5,10
+## B^3y is: 9,17</code></pre>
+<p><code>By</code> stores the result of <span class="math inline">\(y_i - B(y_i)\)</span>, while <code>B3y</code> stores the result of <span class="math inline">\(y_i - B^3(y_i)\)</span>.</p>
+</div>
 </div>
 <div id="the-autocorrelation-function" class="section level3">
 <h3>The autocorrelation function</h3>
-<p>The autocorrelation function (ACF) defines the correlation of a variable <span class="math inline">\(y_t\)</span> with previous measurements <span class="math inline">\(y_{t-1}, \ldots, t_1\)</span> of the same variable (hence the name autocorrelation). To determine the ACF, correlations are calculated for pairs of measurement vector for several lags. The autocorrelation for lag <span class="math inline">\(k\)</span> is defined as:</p>
+<p>The autocorrelation function (ACF) defines the correlation of a variable <span class="math inline">\(y_t\)</span> to previous measurements <span class="math inline">\(y_{t-1}, \ldots, t_1\)</span> of the same variable (hence the name autocorrelation). To determine the ACF, correlations are calculated for lagged vectors of observations, <span class="math inline">\(y_t\)</span> and <span class="math inline">\(y_{t-k}\)</span>. Here, <span class="math inline">\(k \geq 0\)</span> indicates the lag. For example, for the previous vector <span class="math inline">\(y = \begin{pmatrix}1 &amp; 3 &amp; 5 &amp; 10 &amp; 20\end{pmatrix}^T\)</span>, for <span class="math inline">\(k = 1\)</span>, we would have</p>
+<p><span class="math display">\[
+\begin{align*}
+y_t &amp;= \begin{pmatrix}3 &amp; 5 &amp; 10 &amp; 20\end{pmatrix}^T \\
+y_{t-1} &amp;= \begin{pmatrix}1 &amp; 3 &amp; 5 &amp; 10\end{pmatrix}^T
+\end{align*}
+\]</span></p>
+<p>The autocorrelation for lag <span class="math inline">\(k\)</span> is defined as:</p>
 <p><span class="math display">\[\varphi_{k}:=\operatorname {Corr} (y_{t},y_{t-k})\quad k=0,1,2,\cdots\,.\]</span></p>
-<p>In R, we can manually compute the autocorrelation in the following way:</p>
+<p>To compute the autocorrelation, we can use the following R function:</p>
 <pre class="r"><code>get_autocor &lt;- function(x, lag) {
     x.left &lt;- x[1:(length(x) - lag)]
     x.right &lt;- x[(1+lag):(length(x))]
     autocor &lt;- cor(x.left, x.right)
     return(autocor)
-}
-get_autocor(x, 1) # correlation of measurements 1 time point apart (lag 1)</code></pre>
+}</code></pre>
+<p>The function simply constructs the two vectors, <span class="math inline">\(y_t\)</span> and <span class="math inline">\(y_{t-k}\)</span> according to the <code>lag</code> parameter and then calculates their correlation. When we apply this example to our example, we receive the following results:</p>
+<pre class="r"><code># correlation of measurements 1 time point apart (lag 1)
+get_autocor(y, 1) </code></pre>
 <pre><code>## [1] 0.9944627</code></pre>
-<pre class="r"><code>get_autocor(x, 2) # correlation of measurements 2 time points apart (lag 2)</code></pre>
+<pre class="r"><code># correlation of measurements 2 time points apart (lag 2)
+get_autocor(y, 2)</code></pre>
 <pre><code>## [1] 0.9819805</code></pre>
-<p>Since the correlation of later measurements can be based on the correlation to previous measurements, it is often worthwile to consider partial autocorrelation function (pACF). The idea of the pACF is to compute partial correlations where the correlation is conditioned on earlier observations of the variable, more formally:</p>
+<p>The high autocorrelations of the data demonstrate that the data have a clear time trend.</p>
+<div id="partial-autocorrelations" class="section level4">
+<h4>Partial autocorrelations</h4>
+<p>Since the autocorrelation observed for greater lags can be the results of correlations at lower lags, it is often worthwhile to consider partial autocorrelation function (pACF). The idea of the pACF is to compute partial correlations, which condition the correlation on more recent observations of the variable. The pACF is defined as:</p>
 <p><span class="math display">\[\varphi_{kk}:=\operatorname {Corr} (y_{t},y_{t-k}|y_{t-1},\cdots ,y_{t-k+1})\quad k=0,1,2,\cdots\]</span></p>
 <p>Using the pACF it is possible to identify whether there are actual lagged autocorrelations or whether these autocorrelations are caused by other measurements.</p>
-<p>The simplest way to compute and plot the ACF and the pACF is to use the <code>acf</code> function:</p>
+<p>The simplest way to compute and plot the ACF and the pACF is the use of the <code>acf</code> and <code>pacf</code> functions, respectively:</p>
 <pre class="r"><code>par(mfrow = c(1,2))
-acf(x) # conventional ACF
-pacf(x) # pACF</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+acf(y) # conventional ACF
+pacf(y) # pACF</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>In ACF visualizations, the ACF or pACF is plotted as a function of the lag. The indicated horizontal, dashed blue lines indicate the levels at which the autocorrelation is significant.</p>
+</div>
+</div>
+<div id="decomposing-time-series-data" class="section level3">
+<h3>Decomposing time-series data</h3>
+<p>To interpret time-series data, it is useful to decompose the observations <span class="math inline">\(y_t\)</span> into three components:</p>
+<ul>
+<li>Seasonality <span class="math inline">\(S_t\)</span>: seasonal trends (e.g. gym memberships rise at the start of the new year)</li>
+<li>Trend <span class="math inline">\(T_t\)</span>: overall trends (e.g. the global temperature is increasing)</li>
+<li>Error <span class="math inline">\(\epsilon_t\)</span>: unexplained noise (the less the better for a time-series model to be valid)</li>
+</ul>
+<p>The manner in which the decomposition is performed depends on whether the time-series data are additive or multiplicative.</p>
+<div id="additive-and-multiplicative-time-series-data" class="section level4">
+<h4>Additive and multiplicative time-series data</h4>
+<p>An additive model assumes that the data can be decomposed as</p>
+<p><span class="math display">\[y_t = S_t + T_t + \epsilon_t\,.\]</span></p>
+<p>On the other hand, a multiplicative model assumes that the data can be decomposed as</p>
+<p><span class="math display">\[y_t = S_t T_t \epsilon_t\,.\]</span></p>
+<p>To obtain a multiplicative model, we can simply take the logarithm of the <span class="math inline">\(y_t\)</span>. The main differences between additive and multiplicative time-series is the following:</p>
+<ul>
+<li>Additive: amplitutdes of seasonal effects are similar in each period.</li>
+<li>Multiplicative: seasonal trend changes with the progression of the time series.</li>
+</ul>
+<p>An example for a multiplicative time series is provided by the <code>AirPassengers</code> data set.</p>
+<pre class="r"><code>data(AirPassengers)
+plot(AirPassengers)</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>As we can see, the effect of the seasonal trend is increasing through the years (i.e. more airplane passengers in the summer), which indicates that this data is multiplicative. To adjust for this effect, we have to take the logarithm of the measurements when modeling this data because <span class="math inline">\(\log(S_t T_t \epsilon_t) = \log(S_t) + \log(T_t) + \log(\epsilon_t)\)</span> turns the previously multiplicative model into an additive model. Let us verify whether taking the logarithm changes the seasonal trend in the <code>AirPassengers</code> data set:</p>
+<pre class="r"><code>plot(log(AirPassengers))</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>As we can see, taking the logarithm has equalized the amplitude of the seasonal component along time. Note that the overall increasing trend has not changed.</p>
+</div>
+<div id="decomposing-time-series-data-in-r" class="section level4">
+<h4>Decomposing time-series data in R</h4>
+<p>To decompose time-series data in R, we can use the <code>decompose</code> function. Note that we should provide whether the time series is additive or multiplicative via the <code>type</code> argument.</p>
+<div id="example-1-airpassengers-data-set" class="section level5">
+<h5>Example 1: AirPassengers data set</h5>
+<p>For the <code>AirPassengers</code> data set, we specify that the data are multiplicative and obtain the following decomposition:</p>
+<pre class="r"><code>plot(decompose(AirPassengers, type = &quot;multiplicative&quot;))</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>The decomposition demonstrates that the total number of airline passengers is increasing along the years. Moreover, the seasonal effect, which we have already observed before, is clearly captured.</p>
+</div>
+<div id="example-2-eustockmarkets-data-set" class="section level5">
+<h5>Example 2: EuStockMarkets data set</h5>
+<p>Let us consider the decomposition that can be found for the <code>EuStockMarkets</code> data set:</p>
+<pre class="r"><code>daxData &lt;- EuStockMarkets[, 1] # DAX data
+# data do not seem to be multiplicative, use additive decomposition
+decomposed &lt;- decompose(daxData, type = &quot;additive&quot;)
+plot(decomposed)</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>The plot demonstrates the following in the DAX data from 1992 to 1998:</p>
+<ul>
+<li>The overall value is increasing steadily.</li>
+<li>There is a strong seasonal trend: at the beginning of each year, the stock price is relatively low and reaches its relative maximum at the end of summer.</li>
+<li>The contribution of random noise is negligible, except for the final measurements between 1997 and 1998.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="stationary-vs-non-stationary-processes" class="section level3">
+<h3>Stationary vs non-stationary processes</h3>
+<p>A process generating time-series data can be either stationary or non-stationary. A process is stationary if <a href="https://www.r-bloggers.com/stationarity/">its mean and variance are not shifting along the timeline</a>. For example, the <code>EuStockMarkets</code> and the <code>AirPassengers</code> data are both non-stationary because there is an increasing trend in the data. For a better intuition for differentiating stationary and non-stationary processes, consider the following example:</p>
+<pre class="r"><code>par(mfrow = c(1,2))
+# climate data 
+library(tseries)
+data(nino)
+x &lt;- nino3.4
+plot(x, main = &quot;Stationary process&quot;)
+# aircraft passenger data
+plot(AirPassengers, main = &quot;Non-stationary process&quot;)</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>The left plot shows a stationary process in which the data behaves similarly throughout all measurements. The right plot shows a non-stationary process in which the mean value is increasing along time.</p>
+<p>Having introduced the most important concepts relating to the analysis of time-series data, we can now start investigating models for forecasting.</p>
 </div>
 </div>
 <div id="the-arma-model" class="section level2">
 <h2>The ARMA model</h2>
-<p>ARMA stands for <em>autoregressive moving average</em>. ARMA models are only appropriate for stationary processes and have two parameteres:</p>
+<p>ARMA stands for <em>autoregressive moving average</em>. ARMA models are only appropriate for stationary processes and have two parameters:</p>
 <ul>
 <li><strong>p:</strong> the order of the autoregressive (AR) model</li>
 <li><strong>q</strong>: the order of the moving-average (MA) model</li>
@@ -84,8 +175,6 @@ pacf(x) # pACF</code></pre>
 <li><span class="math inline">\(\theta \in \mathbb{R}^q\)</span>: a vector of coefficients for the MA terms. In R, these parameters are called <em>MA1</em>, <em>MA2</em>, and so forth.</li>
 <li><span class="math inline">\(\epsilon_t\)</span>: noise associated with measurement <span class="math inline">\(t\)</span></li>
 </ul>
-<p>Note that the there is no term here for the <span class="math inline">\(d\)</span> parameter, that is, non-stationarity is not allowed because differencing is not performed. To simplify the model formulation, we will introduce the backshift operator now.</p>
-<p>To understand how the ARIMA model uses differencing to deal with non-stationarity, we will introduce the lag operator.</p>
 <div id="formulating-the-arma-model-using-the-backshift-operator" class="section level3">
 <h3>Formulating the ARMA model using the backshift operator</h3>
 <p>Using the backshift operator, we can formulate the ARMA model in the following way:</p>
@@ -93,27 +182,11 @@ pacf(x) # pACF</code></pre>
 <p>By defining <span class="math inline">\(\phi_p(B) = 1 - \sum_{i=1}^p \phi_i B^i\)</span> and <span class="math inline">\(\theta_q(B) = 1 - \sum_{j=1}^q \theta_j B^j\)</span>, the ARMA model simplifies to:</p>
 <p><span class="math display">\[\phi_p(B) y_t = \theta_q(B) \epsilon_t\,.\]</span></p>
 </div>
-<div id="stationary-vs-non-stationary-processes" class="section level3">
-<h3>Stationary vs non-stationary processes</h3>
-<p>The ARMA model is only valid for stationary processes. A process is stationary if <a href="https://www.r-bloggers.com/stationarity/">its mean and variance are not shifting along the timeline</a>. Consider the following examples:</p>
-<pre class="r"><code>par(mfrow = c(1,2))
-# climate values 
-library(tseries)
-data(nino)
-x &lt;- nino3.4
-plot(x, main = &quot;Stationary process&quot;)
-# Global mean land-ocean temperature deviations
-library(astsa)
-data(gtemp) 
-plot(gtemp, main = &quot;Non-stationary process&quot;)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p>The left plot shows a stationary process in which the data behaves similarly throughout all measurements. The right plot shows a non-stationary process in which the mean value is increasing along time.</p>
-</div>
 </div>
 <div id="the-arima-model" class="section level2">
 <h2>The ARIMA model</h2>
-<p>ARIMA stands for <em>autoregressive integrated moving average</em> and is a generalization of the ARMA model. In contrast to ARMA models, ARIMA models are capable of dealing with non-stationary data, that is, time-series where the mean or the variance changes over time. This feature is in the <em>I</em> (integrated) of ARIMA: an initial differencing step can eliminate the non-stationarity.</p>
-<p>An ARIMA model is specified by three parameters:</p>
+<p>ARIMA stands for <em>autoregressive integrated moving average</em> and is a generalization of the ARMA model. In contrast to ARMA models, ARIMA models are capable of dealing with non-stationary data, that is, time-series where the mean or the variance changes over time. This feature is indicated by the <em>I</em> (integrated) of ARIMA: an initial differencing step can eliminate the non-stationarity. For this purpose, ARIMA models require an additional parameter, <span class="math inline">\(d\)</span>, which defines the degree of differencing.</p>
+<p>Taken together, an ARIMA model has the following three parameters:</p>
 <ul>
 <li><strong>p:</strong> the order of the autoregressive (AR) model</li>
 <li><strong>d:</strong> the degree of differencing</li>
@@ -123,21 +196,22 @@ plot(gtemp, main = &quot;Non-stationary process&quot;)</code></pre>
 <p><span class="math display">\[(1 - B)^d y_t\,.\]</span></p>
 <p>The model is then specified by</p>
 <p><span class="math display">\[\phi_p(B)(1 - B)^d y_t = \theta_q(B) \epsilon_t\,. \]</span></p>
-<p>When <span class="math inline">\(d = 0\)</span>, then the model simplifies to the ARMA model since <span class="math inline">\((1 - B)^0 y_t = y_t\)</span>. For other choices of <span class="math inline">\(d\)</span> we obtain backshift polynomials, for example:</p>
+<p>For <span class="math inline">\(d = 0\)</span>, the model simplifies to the ARMA model since <span class="math inline">\((1 - B)^0 y_t = y_t\)</span>. For other choices of <span class="math inline">\(d\)</span> we obtain backshift polynomials, for example:</p>
 <p><span class="math display">\[
 \begin{align*}
 (1-B)^1 y_t &amp;= y_t - y_{t-1} \\
 (1-B)^2 y_t &amp;= (1 - 2B + B^2) y_t = y_t - 2 y_{t-1} + y_{t-2} \\
 \end{align*}
 \]</span></p>
-<div id="the-ar-model-and-p" class="section level3">
-<h3>The AR model and <span class="math inline">\(p\)</span></h3>
-<p>The parameter <span class="math inline">\(p \in \mathbb{N}_0\)</span> specifies the order of the autoregressive model. The term <em>order</em> refers to the number of lagged differences that the model considers. For simplicitly, let us assume that <span class="math inline">\(d = 0\)</span> (no differencing). Then, an AR model of order 1 considers only the most recent difference, that is, <span class="math inline">\(B y_t = y_t - y_{t-1}\)</span> via the parameter <span class="math inline">\(\phi_1\)</span>. An AR model of order 2 would consider both <span class="math inline">\(B y_t\)</span> and <span class="math inline">\(B^2 y_t\)</span> via <span class="math inline">\(\phi_1\)</span> and <span class="math inline">\(\phi_2\)</span>, respectively.</p>
-<p>The number of autoregressive terms indicates the extent to which previous measurements influence the current outcome. For example, ARIMA(1,0,0) (<span class="math inline">\(p =1\)</span>, <span class="math inline">\(d = 0\)</span>, <span class="math inline">\(q = 0\)</span>) considers only autoregression with order 1, which means that the outcome is influenced only by the most recent previous measurements. In this case, the model would simplify to</p>
+<p>In the following, let us consider the interpretation of the three parameters of ARIMA models.</p>
+<div id="the-autoregressive-model-and-p" class="section level3">
+<h3>The autoregressive model and <span class="math inline">\(p\)</span></h3>
+<p>The parameter <span class="math inline">\(p \in \mathbb{N}_0\)</span> specifies the order of the autoregressive model. The term <em>order</em> refers to the number of lagged differences that the model considers. For simplicity, let us assume that <span class="math inline">\(d = 0\)</span> (no differencing). Then, an AR model of order 1 considers only the most recent measurements, that is, <span class="math inline">\(B y_t = y_{t-1}\)</span> via the parameter <span class="math inline">\(\phi_1\)</span>. An AR model of order 2, on the other hand, would consider the last two points in time, that is, measurements <span class="math inline">\(y_{t-1}\)</span> as well as <span class="math inline">\(y_{t-2}\)</span> through <span class="math inline">\(\phi_1\)</span> and <span class="math inline">\(\phi_2\)</span>, respectively.</p>
+<p>The number of autoregressive terms indicates the extent to which previous measurements influence the current outcome. For example, ARIMA(1,0,0), which has <span class="math inline">\(p =1\)</span>, <span class="math inline">\(d = 0\)</span>, and <span class="math inline">\(q = 0\)</span>, has an autoregressive term of order 1, which means that the outcome is influenced only by the most recent previous measurements. In this case, the model simplifies to</p>
 <p><span class="math display">\[\hat{y}_t =  \mu  \epsilon_t +  \phi_1 y_{t-1}\]</span></p>
 <div id="impact-of-autoregression" class="section level4">
 <h4>Impact of autoregression</h4>
-<p>We can simulate autoregressive processes using the <code>arima.sim</code> function. Here, the model can be specified by providing the coefficients for the MA and AR terms to be used. To find the impact of autoregression, it is best to use the partial autocorrelation:</p>
+<p>We can simulate autoregressive processes using the <code>arima.sim</code> function. Via the function, the model can be specified by providing the coefficients for the MA and AR terms to be used. In the following we will plot the autocorrelation, because it is best-suited for finding the impact of autoregression.</p>
 <pre class="r"><code>set.seed(5)
 par(mfrow = c(2, 2))
 # Example for ARIMA(1,0,0)
@@ -151,41 +225,35 @@ x &lt;- arima.sim(list(ar = c(0.65, 0.3)),
         n = 1000)
 plot(x, main = &quot;ARIMA(2,0,0)&quot;)
 acf(x, type = &quot;partial&quot;, main = &quot;Partial autocorrelation&quot;)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>The first example demonstrates that for an ARIMA(1,0,0) process, the pACF for order 1 is exceedingly high, while for an ARIMA(2,0,0) process, both order 1 and order 2 autocorrelations are significant. Thus, the order of the AR term can be selected according to the largest lag at which the pACF was significant.</p>
 </div>
 </div>
 <div id="the-degree-of-differencing-and-d" class="section level3">
 <h3>The degree of differencing and <span class="math inline">\(d\)</span></h3>
-<p>The parameter <span class="math inline">\(d \in mathbb{N}_0\)</span> specifies how often the outcomes are differenced via <span class="math inline">\((1 - B)^d y_t\)</span>. In practice, <span class="math inline">\(d\)</span> should be chosen such that we obtain a stationary process. An ARIMA(0,1,0) model would simplifies to the random walk model</p>
+<p>The parameter <span class="math inline">\(d \in \mathbb{N}_0\)</span> specifies the degree of differencing in the model term <span class="math inline">\((1 - B)^d y_t\)</span>. In practice, <span class="math inline">\(d\)</span> should be chosen such that we obtain a stationary process.</p>
+<p>An ARIMA(0,1,0) model simplifies to the random walk model</p>
 <p><span class="math display">\[\hat{y}_t = \mu + \epsilon_t + y_{t-1} \,.\]</span></p>
 <p>This model is random because for every point in time <span class="math inline">\(t\)</span>, the mean is simply adjusted by <span class="math inline">\(y_{t-1}\)</span>, which leads to random changes of <span class="math inline">\(\hat{y}_t\)</span> over time.</p>
 </div>
 <div id="impact-of-differencing" class="section level3">
 <h3>Impact of differencing</h3>
-<p>The following example demonstrates the impact of the degree of diferencing:</p>
-<pre class="r"><code>par(mfrow = c(2, 2))
-# Example for non-stationary process:
-x &lt;- arima.sim(list(order = c(0,0,0)), n = 1000)
-#stationary.test(x) 
-plot(x, main = &quot;ARIMA(0,0,0)&quot;)
-acf(x, type = &quot;partial&quot;, main = &quot;Partial autocorrelation&quot;)
-# Example for ARIMA(0,1,0)
-x &lt;- arima.sim(list(order = c(0,1,0)), n = 1000)
-plot(x, main = &quot;ARIMA(0,1,0)&quot;)
-# note: use diff() to perform differencing before calculating ACF
-acf(diff(x), type = &quot;partial&quot;, main = &quot;Partial autocorrelation&quot;)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<p>The greater the degree of differencing <span class="math inline">\(d\)</span> is, the smoother the time-series becomes.</p>
+<p>The following example demonstrates the impact of differencing for the <code>AirPassengers</code> data set:</p>
+<pre class="r"><code>par(mfrow = c(1, 2))
+plot(AirPassengers, main = &quot;Before differencing&quot;)
+plot(diff(AirPassengers, 1), main = &quot;After differencing&quot;)</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>While the first plot demonstrates that the data is clearly non-stationary, the second plot, indicates that the differenced time series is rather stationary.</p>
 </div>
-<div id="the-ma-model-and-q" class="section level3">
-<h3>The MA model and <span class="math inline">\(q\)</span></h3>
+<div id="the-moving-average-model-and-q" class="section level3">
+<h3>The moving-average model and <span class="math inline">\(q\)</span></h3>
 <p>The moving average model is specified via <span class="math inline">\(q \in \mathbb{N}_0\)</span>. The MA term models the past error, <span class="math inline">\(\epsilon_t\)</span> using coefficients <span class="math inline">\(\theta\)</span>. An ARIMA(0,0,1) model simplifies to</p>
-<p><span class="math display">\[\hat{y}_t = \mu + \epsilon_t + \theta_1 \epsilon_{t-1} \]</span></p>
+<p><span class="math display">\[\hat{y}_t = \mu + \epsilon_t + \theta_1 \epsilon_{t-1}\,,\]</span></p>
 <p>in which the current estimate depends on the residual of the previous measurement.</p>
 </div>
 <div id="impact-of-the-moving-average" class="section level3">
 <h3>Impact of the moving average</h3>
-<p>To study the impact of the moving average, we should consider the autoregression function:</p>
+<p>The impact of the moving average can be studied by plotting the autoregression function:</p>
 <pre class="r"><code>par(mfrow = c(2, 2))
 # Example for ARIMA(0,0,1)
 x &lt;- arima.sim(list(ma = 0.75),
@@ -197,145 +265,105 @@ x &lt;- arima.sim(list(ma = c(0.65, 0.3)),
         n = 1000)
 plot(x, main = &quot;ARIMA(0,0,2)&quot;)
 acf(x, main = &quot;Autocorrelation&quot;)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Note that for the autoregression plots, we need to be aware that the first x-axis position indicates a lag of 0 (i.e. the identity vector). In the first plot, only the autocorrelation at the first lag is significant, while the second plots indicates that the autocorrelation at the first two lags are significant. To find the number of MA terms, a similar rule as for AR terms applies: the order of the MA term corresponds to the largest lag at which the autocorrelation is significant.</p>
 </div>
 <div id="choosing-between-ar-and-ma-terms" class="section level3">
 <h3>Choosing between AR and MA terms</h3>
-<p>To decide which is more appropriate, AR or MA terms, we consider the ACF (autocorrelation function) and PACF (partial ACF). Using these plots we can find</p>
+<p>To decide which is more appropriate, AR or MA terms, we need to consider both the ACF (autocorrelation function) and PACF (partial ACF). Using these plots we can differentiate two signatures:</p>
 <ul>
-<li>AR signature: The PACF of the differenced time series displays a sharp cutoff or lag 1 in the PACF is positive. The parameter <span class="math inline">\(p\)</span> is determined by the lag at which the PACF cuts off (last significant autocorrelation).</li>
-<li>MA signature: commonly associated with a negative autocorrelation at lag 1 in the ACF of the differenced time series. The parameter <span class="math inline">\(r\)</span> is determined by the lag at which the ACF cuts off (last significant autocorrelation).</li>
+<li><strong>AR signature:</strong> The PACF of the differenced time series displays a sharp cutoff or the value at lag 1 in the PACF is positive. The parameter <span class="math inline">\(p\)</span> is determined by the lag at which the PACF cuts off (last significant autocorrelation).</li>
+<li><strong>MA signature:</strong> commonly associated with a negative autocorrelation at lag 1 in the ACF of the differenced time series. The parameter <span class="math inline">\(r\)</span> is determined by the lag at which the ACF cuts off (last significant autocorrelation).</li>
 </ul>
+<div id="impact-of-ar-and-ma-terms-together" class="section level4">
+<h4>Impact of AR and MA terms together</h4>
 <p>Combinations of AR and MA terms lead to the following time-series data:</p>
-<pre class="r"><code>par(mfrow = c(3, 2))
+<pre class="r"><code>par(mfrow = c(3, 3))
 # ARIMA(1,0,1)
 x &lt;- arima.sim(list(order = c(1,0,1), ar = 0.8, ma = 0.8), n = 1000)
 plot(x, main = &quot;ARIMA(1,0,1)&quot;)
-acf(x, main = &quot;Autocorrelation&quot;)
+acf(x, main = &quot;ACF&quot;)
+pacf(x, main = &quot;pACF&quot;)
 # ARIMA(2,0,1)
 x &lt;- arima.sim(list(order = c(2,0,1), ar = c(0.6, 0.3), ma = 0.8), n = 1000)
 plot(x, main = &quot;ARIMA(2,0,1)&quot;)
-acf(x, main = &quot;Autocorrelation&quot;)
+acf(x, main = &quot;ACF&quot;)
+pacf(x, main = &quot;pACF&quot;)
 # ARIMA(2,0,2)
 x &lt;- arima.sim(list(order = c(2,0,2), ar = c(0.6, 0.3), ma = c(0.6, 0.3)), n = 1000)
 plot(x, main = &quot;ARIMA(2,0,2)&quot;)
-acf(x, main = &quot;Autocorrelation&quot;)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+acf(x, main = &quot;ACF&quot;)
+pacf(x, main = &quot;pACF&quot;)</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-13-1.png" width="960" /></p>
+<p>As we can see from the plots, it can be very challenging to derive suitable values for <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span> based on visual inspection. Thus, it is often useful to apply a more quantitative approach for determining these parameters. In a few paragraphs, we will see how this can be done in practice by using the <code>auto.arima</code> function from the <code>forecast</code> package.</p>
+</div>
 </div>
 </div>
 <div id="the-sarima-model" class="section level2">
 <h2>The SARIMA Model</h2>
-<p>To model seasonal trends, we need to expand the ARIMA model with the additional parameters <span class="math inline">\(P\)</span>, <span class="math inline">\(D\)</span>, and <span class="math inline">\(Q\)</span>, which correspond to <span class="math inline">\(p\)</span>, <span class="math inline">\(d\)</span>, and <span class="math inline">\(q\)</span> in the original model:</p>
+<p>To model seasonal trends, we need to expand the ARIMA model with the seasonal parameters <span class="math inline">\(P\)</span>, <span class="math inline">\(D\)</span>, and <span class="math inline">\(Q\)</span>, which correspond to <span class="math inline">\(p\)</span>, <span class="math inline">\(d\)</span>, and <span class="math inline">\(q\)</span> in the original model:</p>
 <ul>
 <li><strong>P:</strong> number of seasonal autoregressive (SAR) terms</li>
 <li><strong>D:</strong> degree of seasonal differencing</li>
 <li><strong>Q:</strong> number of seasonal moving average (SMA) terms</li>
 </ul>
-<p>Accordingly, a seasonal ARIMA (SARIMA) model is denoted by ARIMA(p,d,q)x(P,D,Q)S where <span class="math inline">\(S\)</span> is the period at which the seasonal trend occurs. The additional parameters are included into the ARIMA model in the following way:</p>
-<p><span class="math display">\[\Phi_P(B^S) \phi_p(B) (1 - B)^d (1 - B^S) y_t = \Theta_Q(B^S) \theta_q(B) \epsilon_t\,.\]</span></p>
+<p>Accordingly, a seasonal ARIMA (SARIMA) model is denoted by ARIMA(p,d,q)<span class="math inline">\(\times\)</span>(P,D,Q)<span class="math inline">\(_S\)</span> where <span class="math inline">\(S\)</span> is the period at which the seasonal trend occurs. For example, for <span class="math inline">\(S = 12\)</span> there is a yearly trend, while for <span class="math inline">\(S = 3\)</span> there is a quarterly trend. The additional parameters are included into the ARIMA model in the following way:</p>
+<p><span class="math display">\[\Phi_P(B^S) \phi_P(B) (1 - B)^d (1 - B^S) y_t = \Theta_Q(B^S) \theta_q(B) \epsilon_t\,.\]</span></p>
 <p>Here, <span class="math inline">\(\Phi_P\)</span> and <span class="math inline">\(\Theta_Q\)</span> are the coefficients for the seasonal AR and MA components, respectively.</p>
 </div>
 <div id="the-arimax-model" class="section level2">
 <h2>The ARIMAX model</h2>
-<p>ARIMAX stands for <em>autoregressive integrated moving average with exogenous variables</em>. Here, exogenous variable refer to other covariates <span class="math inline">\(x_t\)</span> that influence the observed time-series values, <span class="math inline">\(y_t\)</span>. ARIMAX can be specified by including these <span class="math inline">\(r\)</span> exogenous variables with the coefficient vector <span class="math inline">\(\beta \in \mathbb{R}^r\)</span>:</p>
+<p>ARIMAX stands for *autoregressive integrated moving average with exogenous variables. An exogenous variable is a covariate, <span class="math inline">\(x_t\)</span>, that influence the observed time-series values, <span class="math inline">\(y_t\)</span>. ARIMAX can be specified by considering these <span class="math inline">\(r\)</span> exogenous variables according to the coefficient vector <span class="math inline">\(\beta \in \mathbb{R}^r\)</span>:</p>
 <p><span class="math display">\[\phi_p(B)(1 - B)^d y_t = \beta^T x_t \theta_q(B) \epsilon_t\,. \]</span></p>
 <p>Here, <span class="math inline">\(x_t \in \mathbb{R}^r\)</span> is the <span class="math inline">\(t\)</span>-th vector of exogenous features.</p>
 </div>
-<div id="time-series-decomposition" class="section level2">
-<h2>Time-series decomposition</h2>
-<p>To interpret time-series data, it is useful to decompose the observations <span class="math inline">\(y_t\)</span> into three components:</p>
-<ul>
-<li>Seasonality <span class="math inline">\(S_t\)</span>: seasonal trends (e.g. gym memberships rise at the start of the new year)</li>
-<li>Trend <span class="math inline">\(T_t\)</span>: overall trends (e.g. the global temperature is increasing)</li>
-<li>Error <span class="math inline">\(\epsilon_t\)</span>: unexplained noise</li>
-</ul>
-<div id="additive-and-multiplicative-time-series-data" class="section level3">
-<h3>Additive and multiplicative time-series data</h3>
-<p>An additive model assumes that the data can be decomposed as</p>
-<p><span class="math display">\[y_t = S_t + T_t + \epsilon_t\]</span></p>
-<p>while a multiplicative model assumes that the data can be decomposed as</p>
-<p><span class="math display">\[y_t = S_t T_t \epsilon_t\,.\]</span></p>
-<p>To obtain a multiplicative model, we can simply take the logarithm of the <span class="math inline">\(y_t\)</span>. The main differences between additive and multiplicative time-series is the following:</p>
-<ul>
-<li>Additive: amplitutdes of seasonal effects are similar in each period.</li>
-<li>Multiplicative: seasonal trend changes with the progression of the time series.</li>
-</ul>
-<p>An example for multiplicative time-series data is provided by the following data set:</p>
-<pre class="r"><code>data(AirPassengers)
-plot(AirPassengers)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<p>As we can see, the effect of the seasonal trend is increasing through the years, which indicates that this data is multiplicative. To remove this effect, we have to take the logarithm of the measurements when we are modeling this data:</p>
-<pre class="r"><code>plot(log(AirPassengers))</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
-<p>As we can see, taking the logarithm has equalized the amplitude of the seasonal component along time.</p>
-</div>
-<div id="example-of-a-decomposition" class="section level3">
-<h3>Example of a decomposition</h3>
-<p>For example, for the stock market data, the following decomposition can be found:</p>
-<pre class="r"><code>daxData &lt;- EuStockMarkets[, 1] # DAX data
-# data do not seem to be multiplicative, use additive decomposition
-decomposed &lt;- decompose(daxData, type = &quot;additive&quot;)
-plot(decomposed)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<p>The plot demonstrates the following in the DAX data from 1992 to 1998:</p>
-<ul>
-<li>There is a strong increasing trend in the overall value.</li>
-<li>There is a strong seasonal trend: at the beginng of each year, the stock price is relatively low and reaches its relative maximum at the end of summer.</li>
-<li>The contribution of random noise is negligible, except for 1997 to 1998.</li>
-</ul>
-</div>
-</div>
 <div id="forecasting-in-r" class="section level2">
 <h2>Forecasting in R</h2>
-<p>To perform forecasting in R, we will start with a simple ARMA model. ARMA models are only appropriate when the process generating the time-series data is stationary. Otherwise, we have to use ARIMA models. Manually selecting all the parameters of an ARIMA model can be hard. In R, you can automatically fit ARIMA models using the <code>auto.arima</code> function from the <code>forecast</code> package. This approach considers reasonable settings for <span class="math inline">\(p\)</span>, <span class="math inline">\(d\)</span>, and <span class="math inline">\(q\)</span>, as well as the sesaonal parameters, <span class="math inline">\(P\)</span>, <span class="math inline">\(D\)</span>, and <span class="math inline">\(Q\)</span>. Note that you should set the parameters <code>stepwise</code> and <code>approximation</code> parameters to <code>FALSE</code> if you are dealing with a single data set.</p>
-<div id="arima-model-for-a-stationary-process" class="section level3">
-<h3>ARIMA model for a stationary process</h3>
+<p>Manually selecting all the parameters of an ARIMA model can be challenging. In R, you can automatically fit ARIMA models using the <code>auto.arima</code> function from the <code>forecast</code> package. This approach considers reasonable settings for <span class="math inline">\(p\)</span>, <span class="math inline">\(d\)</span>, and <span class="math inline">\(q\)</span>, as well as the seasonal parameters, <span class="math inline">\(P\)</span>, <span class="math inline">\(D\)</span>, and <span class="math inline">\(Q\)</span>. Note that you should set the parameters <code>stepwise</code> and <code>approximation</code> parameters to <code>FALSE</code> if you are dealing with a single data set to ensure that you obtain a well-fitting model.</p>
+<div id="sarima-model-for-a-stationary-process" class="section level3">
+<h3>SARIMA model for a stationary process</h3>
 <p>We will showcase the use of ARMA using the <code>nino</code> data from the <code>tseries</code> package, which gives sea-surface temperatures for the Nino Region 3.4 index. Let us verify that the data are stationary:</p>
 <pre class="r"><code>plot(nino3.4)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p>Since the data is stationary, we can set <span class="math inline">\(d = 0\)</span>.</p>
-<p>To verify whether there is any seasonal trend, let us decompose the data:</p>
+<p>To verify whether there is any seasonal trend, we will decompose the data:</p>
 <pre class="r"><code>nino.components &lt;- decompose(nino3.4)
 plot(nino.components)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
-<p>Since this is a stationary process, the overall trend is fluctuating. However, there is a strong seasonal component to the data. Thus, we definitely want to include parameters modeling the seasonal effects.</p>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>There is no overall trend, which is typical for a stationary process. However, there is a strong seasonal component to the data. Thus, we definitely want to include parameters modeling the seasonal effects.</p>
 <div id="seasonal-model" class="section level4">
 <h4>Seasonal model</h4>
-<p>Since the seasonal component is very pronounced, we need to include a seasonal model. Since the seasonal trend does not dominate the time-series data, we will set <span class="math inline">\(D = 0\)</span>. Note that the seasonal parameters <span class="math inline">\((P, D, Q)_S\)</span> are associated with a certain period <span class="math inline">\(S\)</span>. Since the seasonal trend in the <code>nino</code> data is a yearly trend, the parameters refer to <span class="math inline">\(S = 12\)</span> months, i.e. <span class="math inline">\((P, D, Q)_{12}\)</span>. To determine the other parameters for the seasonal model, let us consider the plots for the seasonal component:</p>
+<p>For the seasonal model, we need to specify additional parameters parameters <span class="math inline">\((P, D, Q)_S\)</span>. Since the seasonal trend does not dominate the time-series data, we will set <span class="math inline">\(D = 0\)</span>. Additionally, because the seasonal trend in the <code>nino</code> data is a yearly trend, we can se <span class="math inline">\(S = 12\)</span> months. To determine the other parameters for the seasonal model, let us consider the plots for the seasonal component:</p>
 <pre class="r"><code>nino.season &lt;- nino.components$seasonal
-#acfpl &lt;- acf(diff(nino.season), main = &quot;pACF&quot;, plot = FALSE)
-# transform lag from years to months
-#acfpl$lag &lt;- acfpl$lag * 12
 acf(nino.season, type = &quot;partial&quot;)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 <p>We will use an AR term of order 2 for the seasonal component, that is, we set <span class="math inline">\(P = 2\)</span> and <span class="math inline">\(Q = 0\)</span>. Thus, the seasonal model is specified by (2,0,0).</p>
 </div>
 <div id="non-seasonal-model" class="section level4">
 <h4>Non-seasonal model</h4>
-<p>For the non-seasonal model, we still need to find <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>. Next, we will plot the ACF and pACF to identify the values for the AR and MA parameters:</p>
-<pre class="r"><code># TODO: plot ACF
+<p>For the non-seasonal model, we still need to find <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>. For this purpose, we will plot the ACF and pACF to identify the values for the AR and MA parameters:</p>
+<pre class="r"><code>par(mfrow = c(1,2))
+acfp &lt;- acf(nino3.4, main = &quot;pACF&quot;, plot = FALSE)
+# transform lag from years to months
+acfp$lag &lt;- acfp$lag * 12
+plot(acfp, main = &quot;ACF&quot;)
 acfpl &lt;- acf(nino3.4, main = &quot;pACF&quot;, type = &quot;partial&quot;, plot = FALSE)
 # transform lag from years to months
 acfpl$lag &lt;- acfpl$lag * 12
-plot(acfpl)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
-<pre class="r"><code>#auto.arima(nino3.4)</code></pre>
+plot(acfpl, main = &quot;pACF&quot;)</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 <p>We will set the AR order to <span class="math inline">\(2\)</span> and and the MA order to <span class="math inline">\(1\)</span>. This gives the final model: <span class="math inline">\((2,0,1)x(2,0,0)_{12}\)</span>.</p>
 <p>We can fit the model using the <code>Arima</code> function from the <code>forecast</code> package.</p>
-<pre class="r"><code>library(forecast)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;forecast&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:astsa&#39;:
-## 
-##     gas</code></pre>
-<pre class="r"><code>order.non.seasonal &lt;- c(2,0,1)
+<pre class="r"><code>library(forecast)
+# non-seasonal model: (p,d,q)
+order.non.seasonal &lt;- c(2,0,1)
+# seasonal model: (P,D,Q)
 order.seasonal &lt;- c(2,0,0)
 A &lt;- Arima(nino3.4, order = order.non.seasonal,
-            seasonal = order.seasonal)
-# A.best &lt;- auto.arima(nino3.4, stepwise = FALSE, approximation = FALSE) # very different results in plot ... could easily be overfitted!</code></pre>
-<p>We can now use the model to forecast how the temperatures in the Nino 3.4 region will change in the next year:</p>
+            seasonal = order.seasonal)</code></pre>
+<p>We can now use the model to forecast how the temperatures in the Nino 3.4 region will change in the future. There are two ways to obtain predictions from a forecasting model. The first approach relies on the <code>predict</code> function, while the second approach uses the <code>forecast</code> function from the <code>forecast</code> package. Using the <code>predict</code> function, we can forecast and visualize the results in the following way:</p>
 <pre class="r"><code># to construct a custom plot, we can use the predict function:
-forecast &lt;- predict(A, n.ahead = 12) # predict 1 year into the future
+forecast &lt;- predict(A, n.ahead = 60) # predict 5 years into the future
 library(ggplot2)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;ggplot2&#39;</code></pre>
@@ -348,57 +376,167 @@ plot.df$lower &lt;- plot.df$y - plot.df$sd * 1.96
 ggplot(plot.df, aes(x = x ,y = y)) + 
         geom_line() + geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
         ylab(&quot;Temperature&quot;) + xlab(&quot;Year&quot;)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
-<pre class="r"><code># use the forecast function to use the built-in plotting function:
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>If we do not require a custom plot, we can obtain the predictions and corresponding visualization more easily, by using the <code>forecast</code> function:</p>
+<pre><code># use the forecast function to use the built-in plotting function:
 forecast &lt;- forecast(A, h = 60) # predict 5 years into the future
 plot(forecast)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-17-2.png" width="672" /></p>
 </div>
 </div>
 <div id="arima-model-for-non-stationary-data" class="section level3">
 <h3>ARIMA model for non-stationary data</h3>
-<p>To demonstrate an ARIMA mdoel for non-stationary data, we will use the <code>gtemp</code> data set from the <code>astsa</code> package. The data set provides yearly measurements of global mean land-ocean temperature deviations.</p>
+<p>To demonstrate the use of an ARIMA model for non-stationary data, we will use the <code>gtemp</code> data set from the <code>astsa</code> package. The data set provides yearly measurements of global mean land-ocean temperature deviations.</p>
 <pre class="r"><code>library(astsa)
 data(gtemp) 
 plot(gtemp)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
-<p>To make the data stationary, we will use <span class="math inline">\(d = 1\)</span>:</p>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>As you can see, the values are increasing over time. Thus, it is necessary to difference the data. To make the data stationary, we will use <span class="math inline">\(d = 1\)</span>:</p>
 <pre class="r"><code>plot(diff(gtemp))</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 <p>Now, the data seems to be stationary.</p>
-<p>Since the measurements were only taken per year, we cannot identify any seasonal characterstics. Thus, we are only concerned with a non-seasonal model in the following.</p>
+<p>Since a single measurement was taken per year, it is not possible to identify any seasonal characteristics. Thus, we do not need a seasonal model for this data set. To identify <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>, we consider the ACF and pACF plots:</p>
 <pre class="r"><code>par(mfrow = c(1,2))
 acf(diff(gtemp), main = &quot;ACF&quot;)
 acf(diff(gtemp), main = &quot;pACF&quot;, type = &quot;partial&quot;)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
-<pre class="r"><code>#auto.arima(gtemp)</code></pre>
-<p>Since the first lag’s autocorrelation is negative, we will use a moving average model. Thus, we set <span class="math inline">\(p = 0\)</span> and <span class="math inline">\(r = 1\)</span>, which leads us to an ARIMA(0,1,1) model. Since the model shows an increase in the mean temperature, we will include a drift term.</p>
-<pre class="r"><code>A &lt;- Arima(gtemp, order = c(0,1,1), include.drift = TRUE)
-#A.best &lt;- auto.arima(gtemp)</code></pre>
-<p>Let us forecast now:</p>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<p>Since the first lag’s autocorrelation is negative, we will use a moving average model. Thus, we set <span class="math inline">\(p = 0\)</span> and <span class="math inline">\(q = 1\)</span>, which leads to an ARIMA(0,1,1) model. Since the data are subject to increasing values, we will include a drift term in the model to take this effect into account:</p>
+<pre class="r"><code>A &lt;- Arima(gtemp, order = c(0,1,1), include.drift = TRUE)</code></pre>
+<p>We can now forecast how the mean land-ocean temperature deviation will change in the next years:</p>
 <pre class="r"><code>forecast &lt;- forecast(A, h = 30) # predict 30 years into the future
 plot(forecast)</code></pre>
-<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<p>The model suggests that the mean land-ocean temperature deviation will further increase in the next years.</p>
 </div>
-<div id="arimax" class="section level3">
-<h3>ARIMAX</h3>
-<p>To showcase the use of an ARIMAX model, we will use</p>
-<pre class="r"><code># Use Arima from forecast pkg instead of arimax (is the same)
-# arimax from TSA: transfer function?
-#library(TSA)
-     data(airmiles)
-     xreg &lt;- data.frame(Dec96=1*(seq(airmiles)==12),
-                        Jan97=1*(seq(airmiles)==13),
-                        Dec02=1*(seq(airmiles)==84))
-     #plot(log(airmiles),ylab=&#39;Log(airmiles)&#39;,xlab=&#39;Year&#39;, main=&#39;&#39;)
-     #acf(diff(diff(window(log(airmiles),end=c(2001,8)),12)),lag.max=48,main=&#39;&#39;)
-     #air.m1=arimax(log(airmiles),order=c(0,1,1),seasonal=list(order=c(0,1,1),
-     #period=12),xtransf=data.frame(I911=1*(seq(airmiles)==69),
-     #I911=1*(seq(airmiles)==69)),
-     #transfer=list(c(0,0),c(1,0)),xreg=,method=&#39;ML&#39;)</code></pre>
+<div id="arimax-on-the-airquality-data-set" class="section level3">
+<h3>ARIMAX on the airquality data set</h3>
+<p>To showcase the use of an ARIMAX model, we will use ozone data set, <a href="/post/machine-learning/improving_ozone_prediction/">which I had investigated previously</a>.</p>
+<p>Let us load the ozone data set and divide it into test and training set. Note that we have ensured that training and test data consist of consecutive temporal measurements.</p>
+<pre class="r"><code>data(airquality)
+ozone &lt;- subset(na.omit(airquality))
+set.seed(123)
+N.train &lt;- ceiling(0.7 * nrow(ozone))
+N.test &lt;- nrow(ozone) - N.train
+# ensure to take only subsequent measurements for time-series analysis:
+trainset &lt;- seq_len(nrow(ozone))[1:N.train]
+testset &lt;- setdiff(seq_len(nrow(ozone)), trainset)</code></pre>
+<p>Since the data set does not indicate the relative point in time, we will manually create such an annotation:</p>
+<p>For this purpose, we will create a new column in the ozone data set, which reflects the relative point in time:</p>
+<pre class="r"><code># create a time-series object
+year &lt;- 1973 # known from data documentation
+dates &lt;- as.Date(paste0(year, &quot;-&quot;, ozone$Month, &quot;-&quot;, ozone$Day))
+min.date &lt;- as.numeric(format(min(dates), &quot;%j&quot;))
+max.date &lt;- as.numeric(format(max(dates), &quot;%j&quot;))
+ozone.ts &lt;- ts(ozone$Ozone, start = min.date, end = max.date, frequency = 1)
+ozone.ts &lt;- window(ozone.ts, 121, 231) # deal with repetition due to missing time values
+ozone$t &lt;- seq(start(ozone.ts)[1], end(ozone.ts)[1]) # assumes that measurements are consecutive although they are not</code></pre>
+<p>Now that we have a temporal dimension, we can plot the longitudinal behavior of the ozone level:</p>
+<pre class="r"><code>library(ggplot2)
+ggplot(ozone, aes(x = t, y = Ozone)) + geom_line() +
+        geom_point()</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<p>The time-series data seem to be stationary. Let us consider the ACF and pACF plots to see which AR and MA terms we should consider</p>
+<pre class="r"><code>par(mfrow = c(1,2))
+acf(ozone.ts)
+acf(ozone.ts, type = &quot;partial&quot;)</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p>The autocorrelation plots are very unclear, suggesting that there is actually no time trend in the data. Thus, we would opt for an ARIMA(0,0,0) model. Since an ARIMAX model with the parameters (0,0,0) does not have a benefit over a conventional linear regression model, we can conclude that the temporal trend in the ozone data is not sufficient to improve the prediction of ozone levels. Let us verify this:</p>
+<pre class="r"><code># ARIMAX(0,0,0) model
+library(TSA)
+features &lt;- c(&quot;Solar.R&quot;, &quot;Wind&quot;, &quot;Temp&quot;) # exogenous features
+A &lt;- arimax(x = ozone$Ozone[trainset], 
+       xreg = ozone[trainset,features],
+        order = c(0,0,0))
+preds.temporal &lt;- predict(A, newxreg = ozone[testset, features])
+# Previously developed weighted negative binomial model
+library(MASS)
+get.weights &lt;- function(ozone) {
+    z.scores &lt;- (ozone$Ozone - mean(ozone$Ozone)) / sd(ozone$Ozone)
+    weights &lt;- exp(z.scores)
+    weights &lt;- weights / mean(weights) # normalize to mean 1
+    return(weights)
+}
+weights &lt;- get.weights(ozone)
+# train weighted negative binomial model
+model.nb &lt;- glm.nb(Ozone ~ Solar.R + Temp + Wind, data = ozone, subset = trainset, weights = weights)
+preds.nb &lt;- predict(model.nb, newdata = ozone[testset,], type = &quot;response&quot;)
+# Performance:
+Rsquared.linear &lt;- cor(preds.nb, ozone[testset, &quot;Ozone&quot;])^2
+Rsquared.temporal &lt;- cor(preds.temporal$pred, ozone[testset, &quot;Ozone&quot;])^2
+print(Rsquared.linear)</code></pre>
+<pre><code>## [1] 0.7676977</code></pre>
+<pre class="r"><code>print(Rsquared.temporal)</code></pre>
+<pre><code>## [1] 0.7569718</code></pre>
+<p>As we can see the linear model with a negative binomial likelihood outperforms the ARIMAX model.</p>
+</div>
+<div id="arimax-on-the-airquality-data-set-1" class="section level3">
+<h3>ARIMAX on the airquality data set</h3>
+<p>To demonstrate an ARIMAX model on a better suited set of data, let us load the <code>Icecream</code> data set from the <code>Ecdat</code> package:</p>
+<pre class="r"><code>library(Ecdat)
+data(Icecream)</code></pre>
+<p>The <code>Icecream</code> data set contains the following variables:</p>
+<ul>
+<li><strong>cons:</strong> The ice cream consumption in pints per capita.</li>
+<li><strong>income:</strong>: The average weekly family income in USD.</li>
+<li><strong>price:</strong> The price of ice cream per pint.</li>
+<li><strong>temp:</strong> The average temperature in Fahrenheit.</li>
+</ul>
+<p>The measurements are four-weekly observations from 1951-03-18 to 1953-07-11.</p>
+<p>We will model <em>cons</em>, the ice cream consumption as a time series and use <em>income</em>, <em>price</em>, and <em>average</em> as exogenous variables. Before beginning to model, we will create a time-series object from the data frame.</p>
+<pre class="r"><code># create a time-series object
+library(lubridate) # for week function
+wk &lt;- week(c(as.Date(&quot;1951-03-18&quot;), as.Date(&quot;1953-07-11&quot;)))
+months &lt;- c(seq(3,12), seq(1,12), seq(1,7))
+wks &lt;- c(seq(wk[1], 52, 4), seq(1, 52, 4), seq(1, 52, 4))
+ice.ts &lt;- ts(Icecream$cons, start = c(1951, 3), end = c(1953, 6), frequency = 52/4)</code></pre>
+<p>Let us investigate the data now:</p>
+<pre class="r"><code>plot(decompose(ice.ts))</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<p>So, there are two trends in the data:</p>
+<ol style="list-style-type: decimal">
+<li>Overall, ice cream consumption has increased considerably between 1951 and 1953.</li>
+<li>Ice cream sales are peaking in the summer.</li>
+</ol>
+<p>We will now investigate ACF and pACF to choose <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>:</p>
+<pre class="r"><code>par(mfrow = c(1,2))
+acf(ice.ts)
+acf(ice.ts, type = &quot;partial&quot;)</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+<p>Due to the seasonal trend, we would probably fit an ARIMA(1,0,0)(1,0,0) model. However, since we know the temperature and the income from exogenous variables, they can probably explain the trends of the data:</p>
+<pre class="r"><code>plot(Icecream$income) # explains the overall trend</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<pre class="r"><code>plot(Icecream$temp) # explains the seasonal trend</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-34-2.png" width="672" /></p>
+<p>Since <code>income</code> explains the overall trend, we do not need a drift term. Furthermore, since <code>temp</code> explains the seasonal trend, we do not need a seasonal model. Thus, we should use an ARIMAX(1,0,0) model for forecasting. To investigate whether these assumptions are true, we will compare the ARIMAX(1,0,0) model with an ARIMA(1,0,0)(1,0,0) model using the following code</p>
+<pre class="r"><code>train &lt;- 1:20
+test &lt;- 21:30
+A &lt;- Arima(window(ice.ts, c(1951,3), c(1951, 3 + (20-1))),
+        xreg = Icecream[train, c(&quot;income&quot;, &quot;temp&quot;)],
+        order = c(1,0,0))
+preds &lt;- forecast(A, xreg = Icecream[test, c(&quot;income&quot;, &quot;temp&quot;)]) 
+plot(preds)
+lines(window(ice.ts, c(1951, 22), c(1951, 30))) # actual values in black
+# contrast ARIMAX with ARIMA
+A.season &lt;- Arima(window(ice.ts, c(1951,3), c(1951, 3 + (20-1))),
+        order = c(1,0,0),
+        season = c(1,0,0))
+preds &lt;- forecast(A.season, h = 24)
+lines(x = as.numeric(rownames(as.data.frame(preds))), y = as.data.frame(preds)[,2], lty = 2)</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<p>The forecast of the ARIMAX(1,0,0) model is shown in blue, while the forecast of the ARIMA(1,0,0)(1,0,0) model is shown as a dashed line. The actual observed values are shown as a black line. The results suggest that the ARIMAX(1,0,0) is decidedly more accurate than the ARIMA(1,0,0)(1,0,0) model.</p>
+<p>Note, however, that the ARIMAX model is, to some extent, not as useful for the purpose of forecasting as a pure ARIMA model. This is because, the ARIMAX model requires exogenous measurements for any new data point it is supposed to forecast. For example, for the ice cream data set, we do not have exogenous data that extends beyond 1953-07-11. Thus, we cannot forecast beyond this point in time using the ARIMAX model, while this is possible with the ARIMA model:</p>
+<pre class="r"><code>preds &lt;- forecast(A.season, h = 60)
+plot(preds)</code></pre>
+<p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
 </div>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
-<p><a href="https://otexts.org/fpp2/backshift.html" class="uri">https://otexts.org/fpp2/backshift.html</a> <a href="http://people.duke.edu/~rnau/411arim.htm" class="uri">http://people.duke.edu/~rnau/411arim.htm</a> <a href="https://www.r-bloggers.com/forecasting-arimax-model-exercises-part-5/" class="uri">https://www.r-bloggers.com/forecasting-arimax-model-exercises-part-5/</a> <a href="https://forecasters.org/wp-content/uploads/gravity_forms/7-2a51b93047891f1ec3608bdbd77ca58d/2013/07/Kongcharoen_Chaleampong_ISF2013.pdf" class="uri">https://forecasters.org/wp-content/uploads/gravity_forms/7-2a51b93047891f1ec3608bdbd77ca58d/2013/07/Kongcharoen_Chaleampong_ISF2013.pdf</a> <a href="https://onlinecourses.science.psu.edu/stat510/node/67/" class="uri">https://onlinecourses.science.psu.edu/stat510/node/67/</a> <a href="https://support.minitab.com/en-us/minitab/18/help-and-how-to/modeling-statistics/time-series/how-to/partial-autocorrelation/interpret-the-results/partial-autocorrelation-function-pacf/" class="uri">https://support.minitab.com/en-us/minitab/18/help-and-how-to/modeling-statistics/time-series/how-to/partial-autocorrelation/interpret-the-results/partial-autocorrelation-function-pacf/</a> <a href="https://datascienceplus.com/time-series-analysis-building-a-model-on-non-stationary-time-series/" class="uri">https://datascienceplus.com/time-series-analysis-building-a-model-on-non-stationary-time-series/</a> <a href="https://stat.ethz.ch/education/semesters/ss2014/atsa/Scriptum_v140523.pdf" class="uri">https://stat.ethz.ch/education/semesters/ss2014/atsa/Scriptum_v140523.pdf</a> <a href="https://rpubs.com/jamesokamoto/300442" class="uri">https://rpubs.com/jamesokamoto/300442</a></p>
+<p>If you would like to read more about forecasting and the use of ARIMA models, you may want to consider the following resources:</p>
+<ul>
+<li><a href="https://otexts.org/fpp2/">An online textbook on forecasting by Rob J Hyndman and George Athanasopoulos</a></li>
+<li><a href="http://people.duke.edu/~rnau/411arim.htm">An excellent overview of different ARIMA models by Robert Nau</a></li>
+<li><a href="https://www.r-bloggers.com/forecasting-arimax-model-exercises-part-5/">ARIMA forecasting exercises at R-bloggers</a></li>
+<li><a href="https://forecasters.org">The International Institute of Forecasters</a></li>
+<li><a href="https://onlinecourses.science.psu.edu/stat510/node/41/">A Penn State online course on time-series analysis</a></li>
+</ul>
 </div>
