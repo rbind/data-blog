@@ -9,6 +9,7 @@ categories:
   - machine-learning
 tags:
     - supervised learning
+    - r
 thumbnail: "/post/machine-learning/forecasting-an-introduction_cover.png"
 ---
 [Forecasting is concerned with making predictions about future observations by relying on past measurements](/post/machine-learning/forecasting_vs_prediction/). In this article, I will give an introduction how ARMA, ARIMA (Box-Jenkins), SARIMA, and ARIMAX models can be used for forecasting given time-series data.
