@@ -1,0 +1,6 @@
+_id: 019f22f0-14c5-11e9-973d-2741f0645b2d
+path: post/other/staticman_comments.html
+name: peko
+email: a777889cb81b1a8d65f040a1b02d24d0
+message: "You can use subfolders. Just access them in the template with \"index .Site.Data.comments $subfolder\"\r\n(.Site.Data.comments is just a map, and the \"index\" function allows you to access arbitrary map elements by key)\r\n\r\nI haven't tried this yet but to fix the sleeping dyno problem, I'm thinking of adding a bit of javascript to ping my server when the user starts typing a comment. Hopefully by the time they're done the server will be awake."
+date: '2019-01-10T10:46:38.147Z'
