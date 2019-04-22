@@ -1,0 +1,6 @@
+_id: 7d0d2af0-651e-11e9-b42c-652ca57a009c
+path: post/machine-learning/performance-measures-multi-class.html
+name: savvas
+email: 8380ed3d6f019abd85a62e569d71222e
+message: "this publication is a bit old. i had to use microsoft's checkpoint.(2016-01-01)\r\nstill i ran onto an error.Maybe you can help\r\n\r\nprint(cm[[1]]$byClass[, metrics]) resulted in\r\nError in cm[[1]]$byClass[, metrics] : subscript out of bounds\r\n\r\nplease help.I find it interesting.there are so many classifiers you have to compare them and mix and match later.It's an interesting article i have to complete it"
+date: '2019-04-22T16:48:43.503Z'
