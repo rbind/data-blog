@@ -5,7 +5,6 @@ languageCode = "en-us"
 paginate = "10" # Number of posts per page
 theme = "Mainroad"
 # enable staticman comments (staticman.net)
-StaticmanComments = "true"
 #disqusShortname = "datascienceblog-net" # Enable comments by entering your Disqus shortname
 disqusShortname = ""
 googleAnalytics = "" # Enable Google Analytics by entering your tracking id
@@ -32,7 +31,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   post_navigation = true
   postSections = ["post"]
   mathjax = true # Enable MathJax
-  staticman_comments_api = "https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/comments"
+  staticman_comments_api = "" #"https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/comments" # disabled due to spam
   staticman_polls_api = "https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/polls"
 
 
