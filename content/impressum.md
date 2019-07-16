@@ -8,16 +8,15 @@ disable_comments: true
 no_index: true
 ---
 <h2>Angaben gem&auml;&szlig; &sect; 5 TMG</h2>
-<p>Matthias D&ouml;ring<br />
-Schumannstr. 48<br />
-66111 Saarbr&uuml;cken</p>
+<p>Dr. Matthias D&ouml;ring<br />
+Liebigstr. 56<br />
+60323 Frankfurt/Main</p>
 
 <h2>Kontakt</h2>
-<p>Telefon: 06816871100<br />
-E-Mail: matthias-doering@gmx.de</p>
+<p>E-Mail: matthias-doering@gmx.de</p>
 
 <h2>Verantwortlich f&uuml;r den Inhalt nach &sect; 55 Abs. 2 RStV</h2>
-<p>D&ouml;ring, Matthias<br />
+<p>Dr. Matthias D&ouml;ring<br />
 Liebigstr. 56<br />
 60323 Frankfurt/Main</p>
 
