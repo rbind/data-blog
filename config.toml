@@ -13,7 +13,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
 
 [Author]
   name = "Matthias Döring"
-  bio = "I've obtained a BSc and MSc in Bioinformatics from Saarland University. Currently, I am pursuing a PhD at the Max Planck Institute for Informatics where I'm researching computational methods for improving treatment and prevention of viral infections."
+  bio = "I am currently working as a software developer at DB Systel where I'm supporting the digitalization of the German railway system. Previously, I completed my PhD at the Max Planck Institute for Informatics where I researched computational methods for improving treatment and prevention of viral infections."
   avatar = "img/matthias_doering.jpg"
   url = "https://matthias-doering.netlify.com/"
 
