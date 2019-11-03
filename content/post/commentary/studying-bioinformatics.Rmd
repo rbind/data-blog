@@ -1,0 +1,74 @@
+---
+title: "Studying Bioinformatics: Is it Worth it?"
+lead: "Prospects as a bioinformatics graduate"
+author: Matthias Döring
+date: '2019-11-03'
+description: "Bioinformatics is an interdisciplinary field at the junction of computer science and biology. Considering aspects such as job options, however, is it worth studying bioinformatics?"
+slug: "studying-bioinformatics-is-it-worth-it"
+downloadRmd: false
+categories:
+  - commentary
+tags:
+thumbnail: "/post/commentary/studying-bioinformatics.jpeg"
+---
+Having obtained both a Bachelor's and a Master's degree in bioinformatics, I would like to describe how I experienced studying bioinformatics. Moreover, I would like to discuss whether it was worth studying in the first place, and, finally, to offer some advice to prospective students and graduates.
+
+## What is Bioinformatics?
+Bioinformatics is an interdisciplinary field that is concerned with developing and applying methods from computer science on biological problems. For example, the [Human Genome Project](https://en.wikipedia.org/wiki/Human_Genome_Project), which was completed in 2001, wouldn't have been possible without the contribution of intricate bioinformatic algorithms, which were critical for the assembly of millions of short molecular sequences.
+
+Bioinformaticians need a solid background in computer science but also a good understanding of biology. Since bioinformaticians work closely with biologists, they need the ability to communicate complex topics in an understandable way and keep up-to-date with new developments in biology.
+
+## Why Did I Decide to Study Bioinformatics?
+In my last year of school, I started thinking about possible university programs. If I remember correctly, my approach to selecting a program was based on two aspects. First, my performance in school, and, second, my personal interests.
+
+Looking at school, I was performing best in humanities such as history and politics but I also really liked life sciences such as biology and biotechnology. In fact, I always struggled the most with the natural sciences such as maths and physics, although I like to blame that on my teachers in these subjects.
+
+Looking at my personal interests, I was into sports and I was on the computer a lot. Although my computer activities were largely limited to browsing the web and playing games, I began to learn Python and HTML at some point. This made me realize that I was also capable of doing something more meaningful on the computer and that studying a computer-science related topic would be an option.
+
+When choosing a study program, I did not really consider any of the humanities, mainly because I knew that job prospects with a humanities degree would be poor. Additionally, I also didn't feel interested enough in any of the fields. For example, if I had studied history, I would surely have been bored by having to learn intricate and somewhat meaningless details such the biographies of Henry VIII's six wives. 
+
+So, instead, I considered my interests, from which I knew that I wanted to do something with computers. Since my brother was already studying computer science, I had the impression that it could be quite theoretic and dry. When I was looking into alternatives to computer science, I stumbled upon bioinformatics, which seemed great because it would give me exposure to computer science in an area where I felt comfortable.
+
+## Studying Bioinformatics
+
+Before I began to study Bioinformatics at Saarland University, I took part in a preparatory maths course at university. It turned out to be smart decision to take that course because I realized that my high-school education was not as comprehensive as necessary to prepare me for university. For example, only in the preparatory course I learned about proofs by induction or set theory. 
+
+When I started my studies, I understood why the university offered preparatory courses for maths: the maths lectures were brutal. There would usually be two lectures a week, each spanning two hours. In terms of the teaching, the approach was the following. The lecturer would scribble definitions and proofs onto the blackboard and the students would try to keep up with the dizzying pace of writing. Due to the fast pace of the lecture, I always felt that attending the lectures didn't help much with learning the material.
+
+In my Bachelor's bioinformatics curriculum, roughly 70% of the program's credit points had to be earned in computer science (e.g. programming, algorithms and data structures, concurrency) and maths courses (e.g. analysis, algebra, stochastics), while the remainder of the credits could be obtained from the life sciences. I felt that the first three terms at university were the hardest because each semester featured a maths and a basic computer science course. The later semesters featured a greater share of Bioinformatics courses as well as seminars, which were more hands-on.
+
+Comparing computer-science and life-science courses, I found the life-science courses much easier and there was less effort involved. While life-science lectures just required attending the lectures and passing the exam, computer-science courses involved much more work because there are weekly tutorials where the solutions to the weekly assignments are discussed. Additionally, some classes featured short (15 minutes) tests. In these classes, it was usually necessary to reach 50% of the maximum score in the assignments and tests in order to be permitted to take the exam (either only a single exam or a mid-term and end-term exam).
+
+What differentiates the Master's from the Bachelor's program is that it is more research-oriented and allows for much greater specialization. For example, I used my Master's to place a focus on machine learning methods such as supervised learning or reinforcement learning. In terms of research, the Master's thesis takes up a much larger part of the total credit points than the Bachelor's thesis, so skills such as literature analysis, method development, and scientific writing
+become even more important.
+
+## Job Prospects as a Bioinformatics Graduate
+Studying bioinformatics, I was often asked where you can work as a bioinformatician. In my experience, about 80% of bioinformatics position are in research or the public sector. The problem with research positions is that they are usually fixed-term (e.g. two years) because these positions are often financed using project funds. In the public sector, bioinformaticians are often sought after in the medical field (e.g. in hospitals) and in health-related government institutions. The advantage of positions in the public-sector is that they are frequently permanent. However, a job in a public institution such as a hospital often involves system administration duties such as setting up computers and databases - tasks that have little to do with bioinformatics itself. Moreover, both research and public-sector positions offer relatively low salaries compared to industry.
+
+In my estimation, only about 20% of bioinformatics positions are in industry. Why is the percentage so low? In my view, the main reason is that only industry sector that employs bioinformaticians is big pharma. Here, bioinformaticians are needed to perform tasks such as:
+
+* **Modeling:** Estimation of protein structures and simulation of molecular interactions
+* **Data processing:** processing and analyzing sequencing data, for example, from next-generation sequencing or single-cell sequencing
+* **Virtual screening:** discovery of leads (potential new drugs) using computational methods
+* **Data science:** analysis and interpretation of data
+
+Since bioinformatics is very research-oriented and jobs in industry are few, many graduates (maybe 40%) join PhD programs. The ones joining industry usually work in non-bioinformatics positions, for example, as IT consultants, software developers, solutions architects, or data scientists.
+
+Some people [advise against studying bioinformatics](https://www.reddit.com/r/bioinformatics/comments/3ennsp/dont_study_bioinformatics/) because it is supposed to be difficult to find a job afterwards. I didn't have that experience at all and I received many job offers from recruiters. I would argue that, having a bioinformatics degree, job prospects are fine, considering that bioinformaticians have a special skill set, which makes them attractive for companies:
+
+* Bioinformatics graduates exhibit the characteristics of [T-shaped professionals](https://medium.com/@warren2lynch/scrum-team-i-shaped-vs-t-shaped-people-569de6fa494e). This allows them to perform a variety of tasks and to act as facilitators in interdisciplinary teams.
+* Bioinformatics graduates often have more practical experience writing software than computer-science graduates.
+* Bioinformatics graduates are keen learners. Their proficiency in multiple disciplines demonstrates that they can easily adapt to new situations.
+
+## Advice to Prospective Bioinformatics Students and Graduates
+
+If you asked me whether I would study bioinformatics again, I would be torn back and forth. On the one hand, I really liked the diversity of the bioinformatics program, and, with a degree in bioinformatics, there are many possible career paths. On the other hand, the economic reality is that there are few bioinformatics positions, so when you take a non-bioinformatics job, all your specialized knowledge goes down the drain. Thus, I could also imagine studying a less specialized subject such as computer or data science.
+
+If you are thinking about studying bioinformatics, here are some pieces of advice: 
+
+* Do not study Bioinformatics if you abhor maths. Especially the first semesters will be maths-intensive.
+* Do no study Bioinformatics if you think that it is very similar to studying biology. Note that bioinformatics is more related to computer science than biology. There are extremely few biologists who make the transition to bioinformatics.
+* If you aim to to work as a bioinformatician in industry, plan in advance. Make sure to take industry-relevant courses and forge industry connections, for example, through internships. 
+* Be flexible in your career ambitions. After graduating, you may possibly not work as a bioinformatician. However, if you have good programming and data analysis skills, you won't have problems finding a position.
+
+
