@@ -18,7 +18,10 @@ comments:
   transforms:
     body: "frontmatterContent"
     email: "md5" # encrypt email addresses
-
+  reCaptcha:
+    enabled:true
+    sitekey: "6LejJsMUAAAAAGDlJ_02LI0Y8oQJmLpmbhsvxIED"
+    secret: "dWg4uCDsrGT9vnrESuOg7tgOObPavc7b9a4AMn6ZnfN6fuXvHV09VRbS+dRf2uFTknwm+9JLhTjdf+oCeOtL32pXGnWQtW3wpRun8Sk6aA6PyU252ZGBn2XDm5AWHIT6UvFpA3Et4VYBnhqROt3+mh8S2PMBOLFO5RIH5QKrzuPYjo2anDFRGvdwPEzXAYKxfeBtxTWQNKeo7l0Sk06Ls5SrqNdmKYIcNjpoTpCfcQ2crJU9Z3u1UNxWCXLsAjiajpOpSbiTXZJ/R5XouOOsZcCTWV3l0DbvtSYC5hjQizAw4ILegFx8FZ3xP2EmuMzSybSv4vfKjPhgPZ2ZCNWH4A=="
 
 poll:
   allowedFields: ["path"]

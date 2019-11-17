@@ -30,7 +30,7 @@
     <h4 class="widget__title">{{ T "poll_title" }}</h4>
     <div class="widget__content">
     <div id="poll-container">
-        <form id='poll' action="{{ .Site.Params.staticman_polls_api }}" method="post" accept-charset="utf-8">
+        <form id='poll' action="{{ .Site.Params.staticman.polls_api }}" method="post" accept-charset="utf-8">
         <fieldset id = "poll_fieldset">
             <legend>{{ $pollQuestion | markdownify}}</legend>
             <input type="hidden" name="knownIPs" value="{{ $.Scratch.Get "IPs" }}">
