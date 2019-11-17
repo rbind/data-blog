@@ -42,6 +42,13 @@ rssLimit = 20 # max nbr of entries shown in rss feed
 [Params.staticman]
   comments_api = "https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/comments" # was disabled due to spam
   polls_api = "https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/polls"
+  # recaptcha v2 sitekey and encrypted secret
+  sitekey_V2 = "6LdZJ8MUAAAAAK5m-4z53KjV4rWTk8kY4FXtHwV4"
+  secret_V2 = "P4bD88S7eebi4thAE3wDF2eQay+loQKhO6ObuvO02ZRXoAVfquKkhx7Y1aaMNGNZZ2ryM+lpKGehJq9LSGofjdvl/9IFS1v/t5wQ0uDMMcOwuLxJw9AWctCERN7BOzKPW5c9vPD3fLdLaFLKhDfz3aGNSqnOlqK8AcS2aojhB+YBLA1Pbn+NcGY0W4ffDmGyyMV/hN7nj35hCkyKIWPkGNCFFxr64L0SYmuws8o4rBTRFYi+mhoma5AzHWl3FcpyWnD5EWCE0zrkjKYFHBGM/xmEaRHjqwmnKFjUZcdIvQ9DqkNcPha/2C7RoYyMryDAEvxXc4v87wIPMRqDP8vtvA=="
+  # TODO switch to staticman v3 for recaptcha v3 support
+  # recaptcha v3
+  sitekey_V3 = "6LejJsMUAAAAAGDlJ_02LI0Y8oQJmLpmbhsvxIED"
+  secret_V3 = "dWg4uCDsrGT9vnrESuOg7tgOObPavc7b9a4AMn6ZnfN6fuXvHV09VRbS+dRf2uFTknwm+9JLhTjdf+oCeOtL32pXGnWQtW3wpRun8Sk6aA6PyU252ZGBn2XDm5AWHIT6UvFpA3Et4VYBnhqROt3+mh8S2PMBOLFO5RIH5QKrzuPYjo2anDFRGvdwPEzXAYKxfeBtxTWQNKeo7l0Sk06Ls5SrqNdmKYIcNjpoTpCfcQ2crJU9Z3u1UNxWCXLsAjiajpOpSbiTXZJ/R5XouOOsZcCTWV3l0DbvtSYC5hjQizAw4ILegFx8FZ3xP2EmuMzSybSv4vfKjPhgPZ2ZCNWH4A=="
 
 [Params.sidebar]
   home = "right"   # Configure layout for home page
