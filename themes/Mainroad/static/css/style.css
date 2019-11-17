@@ -1370,3 +1370,7 @@ textarea {
     margin: 1px;
     padding: 0px;
 }
+
+.disabled {
+   cursor: not-allowed !important;
+}
