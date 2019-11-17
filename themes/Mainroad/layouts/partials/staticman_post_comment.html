@@ -1,5 +1,8 @@
-<div class="g-recaptcha" data-sitekey="{{ .Site.Params.staticman.sitekey_V2 }}"></div>
-<script src='https://www.google.com/recaptcha/api.js'></script>
+<script> 
+function recaptchaCallback() {
+    $('#commentSubmitButton').removeAttr('disabled');
+};
+</script>
 
 <section class="post-comments">
   <h2>Comments</h2>
@@ -35,7 +38,9 @@
     <input name="fields[name]" type="text" class="post-comment-field" placeholder="Your name" title = "Name">
     <input name="fields[email]" type="email" class="post-comment-field" placeholder="Your email address" title = "Email">
     <textarea name="fields[message]" class="post-comment-field" placeholder="Your message. Feel free to use Markdown." rows="3" title = "Comment"></textarea>
-    <input id = "commentSubmitButton" type="submit" class="post-comment-field btn" value="Submit" onclick="changeCommentButton()">
+    <div class="g-recaptcha" data-callback="recaptchaCallback" data-sitekey="{{ .Site.Params.staticman.sitekey_V2 }}"></div>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+    <input id = "commentSubmitButton" disabled type="submit" class="post-comment-field btn" value="Submit" onclick="changeCommentButton()">
   </form>
 </section>
 <div id="comment-submitted" class="dialog">
