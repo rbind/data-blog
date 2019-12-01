@@ -1,0 +1,105 @@
+---
+title: "My Experiences When Transitioning from Academia to Industry"
+lead: "The greatest differences between a data science role in academia and a software engineering role in industry."
+author: Matthias Döring
+date: '2019-11-17'
+description: "Transitioning from academia to industry can be challenging. Based on working as a data scientist in research and as a DevOps engineer in industry, I share what I find are the greatest differences between working in academia vs industry."
+slug: "transitioning-from-academia-to-industry"
+downloadRmd: false
+categories:
+  - commentary
+tags:
+thumbnail: "/post/commentary/TODO.jpg"
+---
+Having recently transitioned from academia to industry, I'd like to share what I found are the greatest differences between working in industry and academia. Since this article is based on my personal experiences, I would first like introduce my respective roles in research and in industry. After that, I will summarize the main differences between industry and academia. Finally, I offer some pieces of advice regarding how to prepare for an industry job when transitioning from academia.
+
+## My Roles in Academia and Industry
+
+### Academia
+My experiences in research comes from my time at the [Max Planck Institute for Informatics](http://www.mpi-inf.mpg.de) where I spent more than four years as a PhD student in bioinformatics. This role was basically a data science role where the applications where mainly in the virological and immunological domain. In contrast to many PhD positions, I had the privilege of not having to do any teaching, so I could invest all off my time into my research projects. I was also quite content with my supervision because I had the freedom to work on the aspects I was interested in, while being provided sufficient guidance when it was necessary.
+
+As a bioinformatics PhD student, I distributed my time roughly in the following way:
+
+* 40%: Development of algorithms and their implementation as software tools
+* 25%: Development of machine learning models
+* 15%: Provision of services in statistics and bioinformatics (e.g. NGS data analysis and evaluation of clinical studies)
+* 15%: Activities in the scientific community (e.g. attending conferences or working on reviews, papers, talks, and posters)
+* 5%: Development of soft skills via grad school trainings
+
+### Industry
+
+Having handed in my dissertation in January 2019, I joined [DB Systel](http://www.dbsystel.de), the IT-subsidiary of Deutsche Bahn, in the following month. After about a month of networking within the company I found a promising project that I could join as a DevOps C++ software engineer. In this role, my time was rougly distributed like this:
+
+* 40%: Software engineering with C++ (including testing and code reviews)
+* 20%: Development of Jenkins pipelines using Groovy
+* 20%: Scrum (e.g. daily, planning, retro, refinement) and other project events (developer meeting, communities of practice)
+* 10%: DevOps duties (e.g. deployments, monitoring, configuration)
+* 5%: Company events (e.g. workshops, coding dojos/retreats, department meetings)
+* 5%: Professional trainings 
+
+## The Main Differences between Academia and Industry
+
+### Size of Organizations
+
+One of the main differences between academia and industry is the size of their respective organizations. Most research organizations correspond to medium-sized companies - they frequently have less than 250 employees. Corporations, on the other hand, are frequently much larger than that. For example, Walmart, the largest privately owned employer, has more than two million employees.
+
+In my case, I moved from an institution with about 250 employees to a company with roughly 4,400 employees whose parent enterprise has about 320,000 employees. This makes many matters more complex. For example, in large corporations one must adhere to a multitude of standardized processes and there usually are many hierarchical layers. Even the IT infrastructure is more complex. Let's consider the intranet as an example. At my previous institute, the only available intranet services were
+email and group web pages. At my current company, on the other hand, there are probably more than twenty available services for tasks such as finding contacts, taking vacation, booking working hours, or ordering soft- and hardware.
+
+So, when you join a large corporation, be prepared to spend your first days getting accustomed to the more complex organizational structure. 
+
+### Importance of Networking
+
+Networking is important in both academia and industry. However, I find that networking is more important in industry. One reason for this is that academic organizations are usually smaller than industrial organizations. In academia, you implicitly get to know your colleagues because they are probably sitting in a room nearby, so it's easy to drop in and have a chat. Since industry organizations often have locations in multiple cities throughout the world, one must put more effort into forming connections.
+
+Another difference lies in the potential benefits of networking in academia and industry. Although successful, large-scale collaborations exist in academia, they are not the norm. Possible reasons for this include the fact that research is often theoretical and so focused that there are few candidates for collaboration. In industry, on the other hand, the work tends to be more practical and more manpower is needed. Thus, collaboration is a must and synergies can only be hoisted within a
+highly connected enterprise.
+
+For an individual, the importance of networking stems from the fact that his path within the corporation may be heavily influenced by his network. Imagine that there is a really cool, innovative new project starting at your company. However, if you don't know any person involved in the project, you will likely never get the opportunity to join. 
+
+Thus, when you join industry, make sure to forge as many substantial connections as you can.
+
+#### Atmosphere at Work
+
+The atmosphere in academic and industry office spaces can be quite different. The archetype of academic work is serene and quiet, while industry is bustling with life. In my experiences, this is true for the most part. In academia I had my own private office in which I was seldomly disturbed. In industry, on the other hand, I'm situated in an open-plan office that I share with about twenty people, which means there is a lot going on: phones are ringing, people are talking, and there are more interruptions.
+
+Both working styles have their pros and cons. While academic isolation allows for focused thought, industrial openness fosters collaboration. I, however, prefer to have my quiet when I'm working. So, if you're like me, I'd recommend you to get your hands on some good noise-cancelling earphones.
+
+### Amount of Meetings
+
+In industry there are way more meetings than in academia. Let's consider the meetings I attended as a PhD student. I attended the weekly meeting with my supervisor and the weekly group seminar. And that's about it.
+
+In my current position in industry, on the other hand, I have about two meetings per day. Most of these meetings are Scrum meetings and project-specific meetings but there are also organizational meetings.
+
+So, when you join industry, don't expect that you can work as much on your projects as you did in academia.
+
+### Diversity
+
+People in industry have much more diverse backgrounds than in academia. Let's consider some examples showcasing aspects in which industry is more diverse than academia:
+
+| Characteristic            | Academia                           | Industry         |
+|-------------------|------------------------------------|------------------------------------|
+| Position                | PhD students, postdocs, professors | software engineers, software architects, testers, operations, business analysts/engineers, data scientists, project leads, department heads                 |
+| Age                       | Ages concentrated between 25 and 40     | Broad age spectrum |
+| Education | University-trained | Self-trained, vocational training, technical college, university                 |
+
+Although [diversity brings many benefits](https://www.wonolo.com/blog/6-benefits-of-having-a-diverse-workforce), there are also challenges associated with diversity. One of these is communication. As an example, consider people with different professional backgrounds such as a software engineer and a project manager. While a conversation with the first could involve many intricate details, a conversation with the latter would likely entail only the few aspects that are actually relevant for the business.
+
+So, when you join industry be prepared to meet diverse people and know how to communicate effectively with them.
+
+### Hierarchies
+
+Academia: used to flat hierarchies
+Industry: multiple tiers of hierarchy
+
+How to navigate?
+
+### Scale of Projects
+
+Influence as an individual vs impact of the team
+
+## How to prepare for an industry job?
+
+* Expect to become accustomed to the organization in the first few weeks
+* Improve soft skills: networking, leadership, negotiation, moderation (for meetings)
+* Get used to working in noisy environments or prepare for this
