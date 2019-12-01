@@ -1,0 +1,6 @@
+_id: 1d0e4570-1064-11ea-be51-b51f60be40c3
+path: post/machine-learning/specificity-vs-precision.html
+name: Fluff
+email: 32fa9a82b87ac847e071f81fd9c91042
+message: "This is an excellent article!  There are very few posts out there comparing specificity vs precision approaches from a \"Why\" perspective and in such a well thought out way.  Thank you!\r\n\r\nThere is a mistake under \"What can go wrong when using precision\"\r\nYou say\r\n\"Precision is a particularly bad measure when there are few observations that belong to the **positive** class. Let us assume a clinical data set in which 90% of persons are diseased (positive class) and only 10% are healthy (negative class)\"\r\n\r\n(You're firstly saying that precision is a bad measure when the positive class is a minority.  You then go on to give an example where 90% of population are in positive class.)"
+date: '2019-11-26T15:47:56.115Z'
