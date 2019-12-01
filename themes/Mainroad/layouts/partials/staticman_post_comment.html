@@ -1,10 +1,15 @@
 <script> 
 function recaptchaCallback() {
-    $('#commentSubmitButton').removeAttr('disabled');
-    $('#commentSubmitButton').removeClass('disabled');
-
+    var response = grecaptcha.getResponse();
+    if(response.length != 0) {
+        //reCaptcha verified
+        $('#commentSubmitButton').removeAttr('disabled');
+        $('#commentSubmitButton').removeClass('disabled');
+    }
 };
 </script>
+
+<script src='https://www.google.com/recaptcha/api.js' async defer></script>
 
 <section class="post-comments">
   <h2>Comments</h2>
@@ -41,7 +46,6 @@ function recaptchaCallback() {
     <input name="fields[email]" type="email" class="post-comment-field" placeholder="Your email address" title = "Email">
     <textarea name="fields[message]" class="post-comment-field" placeholder="Your message. Feel free to use Markdown." rows="3" title = "Comment"></textarea>
     <div class="g-recaptcha" data-callback="recaptchaCallback" data-sitekey="{{ .Site.Params.staticman.sitekey_V2 }}"></div>
-    <script src='https://www.google.com/recaptcha/api.js'></script>
     <input id = "commentSubmitButton" disabled type="submit" class="post-comment-field btn disabled" value="Submit" onclick="changeCommentButton()">
   </form>
 </section>
