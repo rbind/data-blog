@@ -56,10 +56,8 @@ function changeCommentButton() {
 function validateRecaptcha() {
     var response = grecaptcha.getResponse();
     if (response.length === 0) {
-        console.log("recaptcha not verified")
         return false;
     } else {
-        alert("recaptcha validated");
         return true;
     }
 }
