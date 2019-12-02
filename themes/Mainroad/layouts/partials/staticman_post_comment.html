@@ -33,7 +33,7 @@ function recaptchaCallback() {
     <p>There aren't any comments yet. Be the first to comment!</p>
   {{- end }}
   <h3 style = "margin-top:20px">Leave a comment</h3>
-  <form class="post-comment" method="POST" action="{{ .Site.Params.staticman.comments_api }}">
+  <form class="post-comment" method="POST" action="{{ .Site.Params.staticman.comments_api }}" onsubmit="return validateRecaptcha();">
   <!--<form class="post-comment" method="POST" action="">-->
     Please enter your information. Your email address will not be published.
     <input type="hidden" name="options[reCaptcha][siteKey]" value="{{ .Site.Params.staticman.sitekey_V2 }}">
