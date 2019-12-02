@@ -44,11 +44,9 @@ function sleepFor( sleepDuration ){
 }
 function changeCommentButton() {
     // change comment submit button upon press
-    console.log("Function triggered!");
     var oldHtml = $("#commentSubmitButton").val();
     $("#commentSubmitButton").val("Submitting comment, please be patient ...");
     // restore old html when time has passed
-    console.log(oldHtml); 
     setTimeout(function(oldHtml) {
         $("#commentSubmitButton").val(oldHtml)},
         15000, oldHtml

@@ -1,8 +1,7 @@
 <script> 
 function recaptchaCallback() {
     var response = grecaptcha.getResponse();
-    console.log(response)
-    if(response.success) {
+    if(response.length != 0) {
         //reCaptcha verified
         $('#commentSubmitButton').removeAttr('disabled');
         $('#commentSubmitButton').removeClass('disabled');
@@ -42,7 +41,7 @@ function recaptchaCallback() {
     <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#comment-submitted">
     <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#post-error">
     <input type="hidden" name="options[entryId]" value="{{ .UniqueID }}">
-  <input name="fields[path]" type="hidden" value="{{ .File.Path }}">
+    <input name="fields[path]" type="hidden" value="{{ .File.Path }}">
     <input name="fields[name]" type="text" class="post-comment-field" placeholder="Your name" title = "Name">
     <input name="fields[email]" type="email" class="post-comment-field" placeholder="Your email address" title = "Email">
     <textarea name="fields[message]" class="post-comment-field" placeholder="Your message. Feel free to use Markdown." rows="3" title = "Comment"></textarea>
