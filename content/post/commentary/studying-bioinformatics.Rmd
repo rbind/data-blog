@@ -9,7 +9,7 @@ downloadRmd: false
 categories:
   - commentary
 tags:
-thumbnail: "/post/commentary/studying-bioinformatics.jpeg"
+thumbnail: "/post/commentary/studying-bioinformatics_avatar.jpeg"
 ---
 Having obtained both a Bachelor's and a Master's degree in bioinformatics, I would like to describe how I experienced studying bioinformatics. Moreover, I would like to discuss whether it was worth studying in the first place, and, finally, to offer some advice to prospective students and graduates.
 
