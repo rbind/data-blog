@@ -1,5 +1,5 @@
 <script> 
-function recaptchaCallback(response) {
+function recaptchaCallback() {
     var response = grecaptcha.getResponse();
     console.log(response)
     if(response.success) {
