@@ -1,7 +1,8 @@
 <script> 
-function recaptchaCallback() {
+function recaptchaCallback(response) {
     var response = grecaptcha.getResponse();
-    if(response.length != 0) {
+    console.log(response)
+    if(response.success) {
         //reCaptcha verified
         $('#commentSubmitButton').removeAttr('disabled');
         $('#commentSubmitButton').removeClass('disabled');
