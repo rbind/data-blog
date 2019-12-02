@@ -74,7 +74,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
     [[menu.main]]
     name = "Home"
     identifier = "home"
-    url = ""
+    url = "https://www.datascienceblog.net"
     weight = 1
 
     [[menu.main]]
