@@ -39,12 +39,10 @@ function recaptchaCallback() {
     <p>There aren't any comments yet. Be the first to comment!</p>
   {{- end }}
   <h3 style = "margin-top:20px">Leave a comment</h3>
-  <form id="write_comment" class="post-comment" method="POST" action="javascript:void(0);" onsubmit="return validateRecaptcha();">
-  <!--<form class="post-comment" method="POST" action="">-->
+  <form id="write_comment" class="post-comment" method="POST" action="{{ .Site.Params.staticman.comments_api }}" onsubmit="return validateRecaptcha();">
     Please enter your information. Your email address will not be published.
     <input type="hidden" name="verify_url" id="verify_url" value="{{.Site.Params.staticman.recaptcha_verify_lambda}}">
     <input type="hidden" name="gRecaptchaResponse" id="gRecaptchaResponse"> 
-    <input type="hidden" name="options[reCaptcha][siteKey]" value="{{ .Site.Params.staticman.sitekey_V3 }}">
     <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#comment-submitted">
     <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#post-error">
     <input type="hidden" name="options[entryId]" value="{{ .UniqueID }}">
@@ -75,7 +73,7 @@ function getRecaptchaToken(form) {
 
 write_comment.addEventListener('submit', event => {
     event.preventDefault()
-    validate(write_comment)
+    validate(write_comment) // this is executed too late: no token available on first call! TODO
 });
 </script>
 
