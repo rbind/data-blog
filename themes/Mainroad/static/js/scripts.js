@@ -53,13 +53,26 @@ function changeCommentButton() {
     );
 }
 
-function validateRecaptcha() {
-    var response = grecaptcha.getResponse();
-    if (response.length === 0) {
-        return false;
-    } else {
-        return true;
-    }
+async function validateRecaptcha() {
+    var token = document.getElementById("gRecaptchaResponse").value;
+    var verify_api = document.getElementById("verify_url").value;
+    console.log("token is : " + token);
+    var data = {
+        token: token
+    };
+    const response = await fetch(verify_api+token, {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        mode: 'cors',
+        method: 'post'
+        //body: JSON.stringify(data)
+    })
+    var result = await response;
+    console.log(response);
+    alert("Data:" + JSON.stringify(result.json()));
+    return false;
 }
 
 // collapse comment function

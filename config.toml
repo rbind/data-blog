@@ -47,8 +47,9 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   secret_V2 = "P4bD88S7eebi4thAE3wDF2eQay+loQKhO6ObuvO02ZRXoAVfquKkhx7Y1aaMNGNZZ2ryM+lpKGehJq9LSGofjdvl/9IFS1v/t5wQ0uDMMcOwuLxJw9AWctCERN7BOzKPW5c9vPD3fLdLaFLKhDfz3aGNSqnOlqK8AcS2aojhB+YBLA1Pbn+NcGY0W4ffDmGyyMV/hN7nj35hCkyKIWPkGNCFFxr64L0SYmuws8o4rBTRFYi+mhoma5AzHWl3FcpyWnD5EWCE0zrkjKYFHBGM/xmEaRHjqwmnKFjUZcdIvQ9DqkNcPha/2C7RoYyMryDAEvxXc4v87wIPMRqDP8vtvA=="
   # TODO switch to staticman v3 for recaptcha v3 support
   # recaptcha v3
-  sitekey_V3 = "6LejJsMUAAAAAGDlJ_02LI0Y8oQJmLpmbhsvxIED"
-  secret_V3 = "dWg4uCDsrGT9vnrESuOg7tgOObPavc7b9a4AMn6ZnfN6fuXvHV09VRbS+dRf2uFTknwm+9JLhTjdf+oCeOtL32pXGnWQtW3wpRun8Sk6aA6PyU252ZGBn2XDm5AWHIT6UvFpA3Et4VYBnhqROt3+mh8S2PMBOLFO5RIH5QKrzuPYjo2anDFRGvdwPEzXAYKxfeBtxTWQNKeo7l0Sk06Ls5SrqNdmKYIcNjpoTpCfcQ2crJU9Z3u1UNxWCXLsAjiajpOpSbiTXZJ/R5XouOOsZcCTWV3l0DbvtSYC5hjQizAw4ILegFx8FZ3xP2EmuMzSybSv4vfKjPhgPZ2ZCNWH4A=="
+  sitekey_V3 = "6LdDs8YUAAAAAAgheyTlk-d1ejvfJYhliB4L6Tg-"
+  secret_V3 = "VZba2wBm9D2ykUn8iKPf8SH57LqONmVwBSZt+hqvKbt42h1ecYjK/yJ6BZ27NMKF/4ZWvyh/OvZ8AcL+sBFlv6Vu2FwO1Vf651+8gq0WalJrAUmKI1t2/pwX/ltOgbTq6vo6LrvyBmNVCnHIosB0EcrXAin41psQkSOEv+6pouLL1UHZW2T7BpXieghANL2u9XSw9V++KdaayMYjJrI+cGBmbA0oOXvZWLNabi11P5TTXoMCBL56gzk51I120Af0M2ze9+RjDcbrcE7QykU2V+r/NrEigm9I77b5kqpczxPbgFyWS39DgS+HjAxhE+327eKmPgbDysGuayEupDmlIQ=="
+  recaptcha_verify_lambda = "https://wlfj7kd590.execute-api.us-east-2.amazonaws.com/Prod/verify?token="
 
 [Params.sidebar]
   home = "right"   # Configure layout for home page

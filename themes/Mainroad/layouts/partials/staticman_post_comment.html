@@ -9,7 +9,13 @@ function recaptchaCallback() {
 };
 </script>
 
+<!-- recpatcha v2 -->
+<!--
 <script src='https://www.google.com/recaptcha/api.js' async defer></script>
+-->
+<!-- recaptcha v3 -->
+<script src="https://www.google.com/recaptcha/api.js?render={{.Site.Params.staticman.sitekey_V3}}"></script>
+
 
 <section class="post-comments">
   <h2>Comments</h2>
@@ -33,11 +39,12 @@ function recaptchaCallback() {
     <p>There aren't any comments yet. Be the first to comment!</p>
   {{- end }}
   <h3 style = "margin-top:20px">Leave a comment</h3>
-  <form class="post-comment" method="POST" action="{{ .Site.Params.staticman.comments_api }}" onsubmit="return validateRecaptcha();">
+  <form id="write_comment" class="post-comment" method="POST" action="javascript:void(0);" onsubmit="return validateRecaptcha();">
   <!--<form class="post-comment" method="POST" action="">-->
     Please enter your information. Your email address will not be published.
-    <input type="hidden" name="options[reCaptcha][siteKey]" value="{{ .Site.Params.staticman.sitekey_V2 }}">
-    <input type="hidden" name="options[reCaptcha][secret]" value="{{ .Site.Params.staticman.secret_V2 }}">
+    <input type="hidden" name="verify_url" id="verify_url" value="{{.Site.Params.staticman.recaptcha_verify_lambda}}">
+    <input type="hidden" name="gRecaptchaResponse" id="gRecaptchaResponse"> 
+    <input type="hidden" name="options[reCaptcha][siteKey]" value="{{ .Site.Params.staticman.sitekey_V3 }}">
     <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#comment-submitted">
     <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#post-error">
     <input type="hidden" name="options[entryId]" value="{{ .UniqueID }}">
@@ -46,8 +53,32 @@ function recaptchaCallback() {
     <input name="fields[email]" type="email" class="post-comment-field" placeholder="Your email address" title = "Email">
     <textarea name="fields[message]" class="post-comment-field" placeholder="Your message. Feel free to use Markdown." rows="3" title = "Comment"></textarea>
     <div class="g-recaptcha" data-callback="recaptchaCallback" data-sitekey="{{ .Site.Params.staticman.sitekey_V2 }}"></div>
-    <input id = "commentSubmitButton" disabled type="submit" class="post-comment-field btn disabled" value="Submit" onclick="changeCommentButton()">
+    <input id = "commentSubmitButton" type="submit" class="post-comment-field btn" value="Submit" onclick="changeCommentButton()">
   </form>
+
+<script>
+function validate(form) {
+    //perform optional error checking on form. If no errors then request a token and put it into the hidden field
+    getRecaptchaToken(form)
+}
+
+//some other (optional) form validation functions
+
+function getRecaptchaToken(form) {
+    grecaptcha.ready(function() {
+        grecaptcha.execute('{{.Site.Params.staticman.sitekey_V3}}', {action: 'comment'}).then(function(token) {
+            gRecaptchaResponse.value = token //set the value of the hidden field
+            form.submit() //submit the form
+        });
+    });
+}
+
+write_comment.addEventListener('submit', event => {
+    event.preventDefault()
+    validate(write_comment)
+});
+</script>
+
 </section>
 <div id="comment-submitted" class="dialog">
 <h3>Thank you</h3>
