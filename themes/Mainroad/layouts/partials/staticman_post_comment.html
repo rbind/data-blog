@@ -10,11 +10,12 @@ function recaptchaCallback() {
 </script>
 
 <!-- recpatcha v2 -->
-<script src='https://www.google.com/recaptcha/api.js'></script>
-<!-- recaptcha v3 -->
 <!--
-<script src="https://www.google.com/recaptcha/api.js?render={{.Site.Params.staticman.sitekey_V3}}"></script>
+<script src='https://www.google.com/recaptcha/api.js' async defer></script>
 -->
+<!-- recaptcha v3 -->
+<script src="https://www.google.com/recaptcha/api.js?render={{.Site.Params.staticman.sitekey_V3}}"></script>
+
 
 <section class="post-comments">
   <h2>Comments</h2>
@@ -38,9 +39,7 @@ function recaptchaCallback() {
     <p>There aren't any comments yet. Be the first to comment!</p>
   {{- end }}
   <h3 style = "margin-top:20px">Leave a comment</h3>
-  <form id="write_comment" class="post-comment" method="POST" action="{{ .Site.Params.staticman.comments_api }}"> <!-- onsubmit="return validateRecaptcha();">-->
-      <input type="hidden" name="options[reCaptcha][siteKey]" value="{{.Site.Params.staticman.sitekey_V2}}">
-      <input type="hidden" name="options[reCaptcha][secret]" value="{{.Site.Params.staticman.secret_V2}}">
+  <form id="write_comment" class="post-comment" method="POST" action="{{ .Site.Params.staticman.comments_api }}" onsubmit="return validateRecaptcha();">
     Please enter your information. Your email address will not be published.
     <input type="hidden" name="verify_url" id="verify_url" value="{{.Site.Params.staticman.recaptcha_verify_lambda}}">
     <input type="hidden" name="gRecaptchaResponse" id="gRecaptchaResponse"> 
@@ -51,7 +50,7 @@ function recaptchaCallback() {
     <input name="fields[name]" type="text" class="post-comment-field" placeholder="Your name" title = "Name">
     <input name="fields[email]" type="email" class="post-comment-field" placeholder="Your email address" title = "Email">
     <textarea name="fields[message]" class="post-comment-field" placeholder="Your message. Feel free to use Markdown." rows="3" title = "Comment"></textarea>
-    <div class="g-recaptcha" data-callback="recaptchaCallback" data-sitekey="{{.Site.Params.staticman.sitekey_V2}}"></div>
+    <div class="g-recaptcha" data-callback="recaptchaCallback" data-sitekey="{{ .Site.Params.staticman.sitekey_V2 }}"></div>
     <input id = "commentSubmitButton" type="submit" class="post-comment-field btn" value="Submit" onclick="changeCommentButton()">
   </form>
 
@@ -72,12 +71,10 @@ function getRecaptchaToken(form) {
     });
 }
 
-/*
 write_comment.addEventListener('submit', event => {
     event.preventDefault()
-    validate(write_comment)
+    validate(write_comment) // this is executed too late: no token available on first call! TODO
 });
-*/
 </script>
 
 </section>

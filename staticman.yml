@@ -59,7 +59,3 @@ polls:
   transforms:
     ipAddress: "md5"
     
-reCaptcha:
-	enabled: true
-	siteKey: "6LdZJ8MUAAAAAK5m-4z53KjV4rWTk8kY4FXtHwV4"
-	secret: "6LdZJ8MUAAAAAFmf_lkVlUKKJpMLkF6GzBUtXFS0"
