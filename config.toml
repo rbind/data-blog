@@ -42,8 +42,6 @@ rssLimit = 20 # max nbr of entries shown in rss feed
 [Params.staticman]
   comments_api = "https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/comments" # was disabled due to spam
   polls_api = "https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/polls"
-  # recaptcha v2
-  sitekey_V2 = "6LdZJ8MUAAAAAK5m-4z53KjV4rWTk8kY4FXtHwV4"
   # recaptcha v3
   sitekey_V3 = "6LdDs8YUAAAAAAgheyTlk-d1ejvfJYhliB4L6Tg-"
   recaptcha_verify_lambda = "https://47faaa67p2.execute-api.us-east-1.amazonaws.com/dev/verify?token="
