@@ -44,6 +44,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   polls_api = "https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/polls"
   # recaptcha v2
   sitekey_V2 = "6LdZJ8MUAAAAAK5m-4z53KjV4rWTk8kY4FXtHwV4"
+  secret_V2 = "dRy4qXKPafIWAUBq0pNU19DFc6ev0InbcdClDyhvnWzy0ZzNhhO2oYFSyWPfVzMEgnZdNRWUra3ETl4XzoDE7rAJTEeT/kWQFkwTJ/b0cZScDSo5d/uYGgHTSlsOkvD4S2CotQMNWTL8r1DqcKPRaNmIzuSeILywJ/j5Pgeb66iGiZ+2nSDIOVlkVvywCqGEv9nu9DBLWY73UQr/8hhP3xRcqjrm0G6dpvZwM7NZOC3WoFZOHAL/E4IWVUgDjRLZ2oMz8yR71OZKIH+gIiauPmE8CdZQNj1vmbdcqGJMJxCj5ta2pgmTwHlDT041xsEZ395O3iH7qtYQ0mXxXyhsdA=="
   # recaptcha v3
   sitekey_V3 = "6LdDs8YUAAAAAAgheyTlk-d1ejvfJYhliB4L6Tg-"
   recaptcha_verify_lambda = "https://47faaa67p2.execute-api.us-east-1.amazonaws.com/dev/verify?token="
