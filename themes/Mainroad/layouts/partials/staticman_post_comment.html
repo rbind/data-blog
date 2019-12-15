@@ -38,12 +38,10 @@
   </form>
 
 <script>
-function validate(form) {
-    //perform optional error checking on form. If no errors then request a token and put it into the hidden field
-    getRecaptchaToken(form)
-}
 
-//some other (optional) form validation functions
+function validate(form) {
+   getRecaptchaToken(form) 
+}
 
 function getRecaptchaToken(form) {
     grecaptcha.ready(function() {
@@ -58,6 +56,7 @@ write_comment.addEventListener('submit', event => {
     event.preventDefault()
     validate(write_comment)
 });
+
 </script>
 
 </section>

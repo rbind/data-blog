@@ -56,17 +56,22 @@ function changeCommentButton() {
 async function validateRecaptcha() {
     var token = document.getElementById("gRecaptchaResponse").value;
     var verify_api = document.getElementById("verify_url").value;
-    // console.log("token is : " + verify_api + token);
-    const response = await fetch(verify_api+token, {
-        headers: {
-             'Accept': 'application/json',
-             'Content-Type': 'application/json'
-        },
-        mode: 'cors',
-        method: 'GET'
-    })
+    // alert("token is : " + verify_api + token)
+    try {
+        const response = await fetch(verify_api+token, {
+            headers: {
+                 'Accept': 'application/json',
+                 'Content-Type': 'application/json'
+            },
+            mode: 'cors',
+            method: 'GET'
+        })
+    } catch(exception) {
+        console.log(exception);
+        return false;
+    }
     var result = await response.json();
-    console.log("Data:" + JSON.stringify(result));
+    alert("Data:" + JSON.stringify(result));
     return (result.success == "true" && result.score >= 0.6);
 }
 
