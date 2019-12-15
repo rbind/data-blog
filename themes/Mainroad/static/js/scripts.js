@@ -53,26 +53,31 @@ function changeCommentButton() {
     );
 }
 
-async function validateRecaptcha() {
+function validateRecaptcha() {
     var token = document.getElementById("gRecaptchaResponse").value;
     var verify_api = document.getElementById("verify_url").value;
     // alert("token is : " + verify_api + token)
-    try {
-        const response = await fetch(verify_api+token, {
+    const response = fetch(verify_api+token, {
             headers: {
                  'Accept': 'application/json',
                  'Content-Type': 'application/json'
             },
             mode: 'cors',
             method: 'GET'
-        })
-    } catch(exception) {
-        console.log(exception);
-        return false;
-    }
-    var result = await response.json();
-    alert("Data:" + JSON.stringify(result));
-    return (result.success == "true" && result.score >= 0.6);
+        }).then(function(response) {
+            return response.json();
+        }).then(function(json) {
+            // alert("Data:" + JSON.stringify(json));
+            if (json.hasOwnProperty("success") && json.hasOwnProperty("score")) {
+                return (json.success && json.score >= 0.6);
+            } else {
+                return false;
+            }
+        }).catch(function(err) {
+            console.log("error: " + err);
+            return false;
+        });
+    return response;
 }
 
 // collapse comment function

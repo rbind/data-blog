@@ -23,7 +23,7 @@
     <p>There aren't any comments yet. Be the first to comment!</p>
   {{- end }}
   <h3 style = "margin-top:20px">Leave a comment</h3>
-  <form id="write_comment" class="post-comment" method="POST" action="{{ .Site.Params.staticman.comments_api }}" onsubmit="return validateRecaptcha();">
+  <form id="write_comment" class="post-comment" method="POST" action="{{ .Site.Params.staticman.comments_api }}">
     Please enter your information. Your email address will not be published.
     <input type="hidden" name="verify_url" id="verify_url" value="{{.Site.Params.staticman.recaptcha_verify_lambda}}">
     <input type="hidden" name="gRecaptchaResponse" id="gRecaptchaResponse"> 
@@ -47,7 +47,13 @@ function getRecaptchaToken(form) {
     grecaptcha.ready(function() {
         grecaptcha.execute('{{.Site.Params.staticman.sitekey_V3}}', {action: 'comment'}).then(function(token) {
             gRecaptchaResponse.value = token //set the value of the hidden field
-            form.submit() //submit the form
+            validateRecaptcha().then(val => {
+                if (val) {
+                    form.submit(); //submit the form
+                } else {
+                    alert("Sorry, but your comment was not submitted because you seem to be a robot.")
+                }
+            });
         });
     });
 }
