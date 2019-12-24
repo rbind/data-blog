@@ -44,7 +44,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   polls_api = "https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/polls"
   # recaptcha v2
   sitekey_V2 = "6LdZJ8MUAAAAAK5m-4z53KjV4rWTk8kY4FXtHwV4"
-  secret_V2 = "WrssU6/6B6CnGgnXB5yYey2bSRzTg5tOKvHyhAmCctIo5CslMdpLsID+5AHn0u3kqcmUsTmwjWpPGzOvMjfc3zkv1C1TEcFlWxQ/PyoFXOF5G89VqDJWWDfeerGFwMkx2WsvCCZubmC6vSI7p68VURe+NgLy2wGQsxrPPn1RczmpnzB1J1ANjAZ89DRWdYPjbqKOcW2LmfsysS0pBRH89hlM/yV73yoZmlhyXHrr0n/8kz90HvKKQEwCqXBFxrbkqbvfsWgStCk84/zyI9b2vhcYcKgcZbgm3CM0/XpjOc3fPfVb1Bs"
+  secret_V2 = "D3kdrm7o9shsl4ZemXYKwCiQz3pvsTP/VcxiKklVPgLzIXQjrTSdxQuXaP6IPOZ0n9Ooe4osJ2xgduO7smEgXD8zcICJjvW9fRdSUdxhUdn7bwlGygA/LYqZqal9snO1rPlPIdmLdnFO19QD2Pz7UoUwcKsbwR5ZwFzmZFSwGUTaqkwlzdZe7saQ5/RM+SmhquOD+wylZSiPJW66yYGavMPmi4abn6sDfTnC7fgXlu75TtvMEEYNd2EvpjxkvzHxAzrb7u3IxqKYRkp5p0fN4rwV6tUzVmvdkDpOt4+QsmPQDFHWPoZTztuXB6WSAp9QLTyokwW7a4ZHaB4chPz7ZA=="
   # recaptcha v3
   sitekey_V3 = "6LdDs8YUAAAAAAgheyTlk-d1ejvfJYhliB4L6Tg-"
   recaptcha_verify_lambda = "https://47faaa67p2.execute-api.us-east-1.amazonaws.com/dev/verify?token="
