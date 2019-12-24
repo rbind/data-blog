@@ -1,0 +1,6 @@
+_id: 72aa9f70-20b7-11ea-948a-ad8aec376e54
+path: post/statistical_test/signed_wilcox_rank_test.html
+name: al
+email: dbcb1f26bcceb68141bb8f73cb610cf7
+message: "The assumptions of Student’s t-test may not be met for small sample sizes. In this case, it is often safer to select a parametric test. However, if the assumptions of the t-test are met, it has greater statistical power than Wilcoxon’s test.\r\n\r\ndon' you wanna say non parametric"
+date: '2019-12-17T10:24:46.480Z'
