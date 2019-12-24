@@ -1,0 +1,143 @@
+---
+title: "Preventing Spam Using ReCAPTCHA and Staticman"
+author: Matthias Döring
+date: '2019-12-24'
+downloadRmd: false
+description: "Staticman makes it easy to implement commenting systems. However, spam can be a big problem. One way to prevent comments from bots is to integrate ReCAPTCHA and Staticman. In this post, I delineate my journey towards ReCAPTCHA verification."
+thumbnail: "/post/other/recaptcha_v3.png"
+categories:
+  - other
+---
+
+
+
+<p>As you probably know, I’m a big fan of <a href="https://www.datascienceblog.net/post/other/staticman_comments/">Staticman’s approach</a> to enable dynamic content on static web sites. When I introduced comments on this blog, things quickly got out of hand: Each day, I would receive roughly five comments that were posted by bots.</p>
+<div class="figure">
+<img src="../pull_requests_comments.png" alt="" />
+<p class="caption">Spam comments as pull requests in GitHub</p>
+</div>
+<p>Manually approving each post quickly became a nuisance, which is why I deactivated Staticman again after some time. Some time later, I decided to install a standard solution for dealing with spam - Google’s ReCAPTCHA approach. Setting up ReCAPTCHA with Staticman, however, didn’t go as smoothly as expected. In this post, I describe my journey to get ReCAPTCHA working with Staticman and what I learned in the process.</p>
+<div id="introduction-to-recaptcha" class="section level2">
+<h2>Introduction to ReCAPTCHA</h2>
+<p>ReCAPTCHA aims at differentiating between human users and bots. It is most often used in the context of forms, which are intended as a form of communication between human users. However, there are also people that exploit forms for the purpose of spamming. These people don’t spam form fields by hand but instead use automated approaches, so called bots, that automatically fill in the forms and then submit it. Bots are great for spammers but a real nuisance for web site owners like me who would like to offer a nice platform for people to hang out where one is not constantly advised to buy ominous drugs or invest in bitcoin.</p>
+<p>When you register your site with ReCAPTCHA, you will receive two tokens. A public site key, which is used for client-side identification and a secret token, which is intended for server-side verification. The approach that ReCAPTCHA uses to identify bots evolved over the years.</p>
+<div id="recaptcha-v1" class="section level3">
+<h3>ReCAPTCHA v1</h3>
+<div class="figure">
+<img src="../recaptcha_v1.png" alt="" />
+<p class="caption"></p>
+</div>
+<p>Users are presented by visually distorted words and have to transcribe them. Usability was low because it was tedious to get the CAPTCHA right. Moreover, smart bots could easily overcome the challenge.</p>
+</div>
+<div id="recaptcha-v2" class="section level3">
+<h3>ReCAPTCHA v2</h3>
+<p>With ReCAPTCHA v2, users are presented by a checkmark, which allows for verifying that one is not a robot.</p>
+<div class="figure">
+<img src="../recaptcha_v2_robot.png" alt="" />
+<p class="caption"></p>
+</div>
+<p>After pressing the checkmark, the system assesses whether the interaction was natural or not. If it wasn’t, then the user has to select the appropriate elements from a grid.</p>
+<div class="figure">
+<img src="../recaptcha_v2_verify.png" alt="" />
+<p class="caption"></p>
+</div>
+<p>ReCAPTCHA v2 greatly improved the user experience over v1 because humans usually just have to check the box and do not have to solve a riddle.</p>
+</div>
+<div id="recaptcha-v3" class="section level3">
+<h3>ReCAPTCHA v3:</h3>
+<div class="figure">
+<img src="../recaptcha_v3.png" alt="" />
+<p class="caption"></p>
+</div>
+<p>ReCAPTCHA v3 revolutionized the the ReCAPTCHA system because this is the first version where no challenge is posed to the client. Instead, Google relies solely on their vast amount of user data in order to evaluate the client’s behavior.</p>
+<p>The output of these evaluations is a risk score, which ranges from from 0 (definitely a bot) to 1 (definitely human). With this, user experience is as smooth as possible.
+Moreover, website owners can regulate the stringency of spam protection by selecting an appropriate cutoff on the computed score. For example, one could use a stringent cutoff for account creation but a less stringent cutoff for registering for a newsletter.</p>
+</div>
+</div>
+<div id="how-not-to-implement-recaptcha" class="section level2">
+<h2>How not to Implement ReCAPTCHA</h2>
+<p>Now that we share a common understanding about ReCAPTCHA, let’s talk about how not to implement ReCAPTCHA. To solve my spam problems, I tried to implement a solution using ReCAPTCHA v2. After <a href="https://www.google.com/recaptcha/">registering my blog at ReCAPTCHA</a>, I stumbled upon a <a href="https://github.com/eduardoboucas/staticman-recaptcha">Edouardo Bouca’s GitHub repo</a> where he explains how Staticman can be setup using ReCAPTCHA v2. At this point, I thought all my problems would easily be solved. However, for some reason, I couldn’t get the setup to work. That’s where my odyssey into ReCAPTCHA verification started.</p>
+<p>The first thing I investigated was whether I could verify the ReCAPTCHA on the client-side. For this purpose, I implemented a JavaScript function that would return true if the ReCAPTCHA challenge was solved correctly and false otherwise:</p>
+<pre class="javascript"><code>function validateRecaptcha() {
+    var response = grecaptcha.getResponse();
+    if (response.length === 0) {
+        console.log(&quot;recaptcha not verified&quot;)
+        return false;
+    } else {
+        alert(&quot;recaptcha validated&quot;);
+        return true;
+    }
+}</code></pre>
+<p>To integrate the validation function into the form submission of the commenting system,
+I used the <code>onSubmit</code> event. Only if the <code>onSubmit</code> event evaluates to true will the action of the form be triggered:</p>
+<pre class="javascript"><code>&lt;form class=&quot;post-comment&quot; method=&quot;POST&quot; action=&quot;{{ .Site.Params.staticman.comments_api }}&quot; onsubmit=&quot;return validateRecaptcha();&quot;&gt;</code></pre>
+<p>However, after some further research, I realized that there was something fundamentally wrong with this approach. What could be the problem? Well, the verification function I implemented actually never checks the ReCAPTCHA response token using the secret key provided by ReCAPTCHA. As such, the verification function always returns true, as long as any ReCAPTCHA token is generated - the challenge doesn’t have to be solved correctly.</p>
+<p>In general, client-side verification of ReCAPTCHA tokens should never be performed because this would require making the secret ReCAPTCHA key public, which should never be done.That’s because if the secret is publicly available via the client-side code, anyone could verify the generated tokens for your site. So, you should definitely not verify ReCAPTCHAs on the client-side.</p>
+</div>
+<div id="getting-closer-to-a-correct-implementation" class="section level2">
+<h2>Getting Closer to a Correct Implementation</h2>
+<p>After failing to get ReCAPTCHA working for such a long time, I was close to giving up. However, I was even more frustrated about not being able to get something simple like this to work, which is why I made another attempt to get it right.</p>
+<p>What became clear to me was that I would need to have a service for verifying the ReCAPTCHA response on the server side. Since I’m hosting a static site, I don’t have a server at my disposal. Luckily, nowadays, cloud computing is all the rage, which is why it’s relatively easy to set up some serverless code for verifying the ReCAPTCHA response. In the following, I will show you how to setup a service for verifying ReCAPTCHA responses on AWS.</p>
+<p>When I investigated ReCAPTCHA investigation using AWS, <a href="https://recaptcha-verify-public-bucket.s3.amazonaws.com/recaptcha-verify/1.0.0/2483c78bf137bc292cc27099f8064231">I found some lambda code from lighthacker in the public repository</a>. This code is based on Node.js and utilizes Express to offer a REST API whose endpoint is <code>verify</code>, which takes the token that is generated by ReCAPTCHA as a parameter. The service then performs the verification <a href="https://developers.google.com/recaptcha/docs/verify">through Google’s siteverify API</a>.</p>
+<p>Although the implementation sets <code>Access-Control-Allow-Origin</code> to an asterisk, I still encountered problems with <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">CORS</a> when I copied the AWS lambda code and deployed it. I tried many things such as adapting the CORS capabilities in the AWS API gateway but nothing worked, so I decided to redeploy the code rather than simply copying the application’s setup in AWS. For this purpose, I performed the following steps:</p>
+<ul>
+<li><a href="https://recaptcha-verify-public-bucket.s3.amazonaws.com/recaptcha-verify/1.0.0/2483c78bf137bc292cc27099f8064231">Download the Node.js project</a></li>
+<li>Install the dependencies using <code>npm install</code></li>
+<li>Verify the implementation (including CORS) by running the API using <code>node app.js</code> and posting requests via Postman</li>
+</ul>
+<p>To do the AWS setup on the command line, I used the serverless approach described in <a href="https://medium.com/aws-factory/recaptcha-form-with-an-amazon-aws-serverless-backend-environment-809cdb788424">Marc Logemann’s Medium post</a>. I first installed serverless via <code>npm install -g serverless</code> and then created a <code>serverless.yml</code> file with the following content:</p>
+<pre><code>service: recaptcha-less
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1
+  memorySize: 128
+functions:
+  app:
+    handler: app/index.handler
+    events: 
+      - http: 
+          path: /
+          method: ANY
+          cors: true
+</code></pre>
+<p>Then, I just ran <code>serverless config credentials -p aws -k {personalKey} -s {secretToken}</code>, followed by <code>serverless deploy</code> in order to configure the deployment on AWS. After the API was running on AWS, I implemented a client-side function for interacting with the API:</p>
+<pre class="javascript"><code>async function validateRecaptcha() {
+    // read hidden form fields
+    var token = document.getElementById(&quot;gRecaptchaResponse&quot;).value;
+    var verify_api = document.getElementById(&quot;verify_url&quot;).value;
+    // call verification API using captcha token
+    const response = await fetch(verify_api+token, {
+        headers: {
+             &#39;Accept&#39;: &#39;application/json&#39;,
+             &#39;Content-Type&#39;: &#39;application/json&#39;
+        },
+        mode: &#39;cors&#39;,
+        method: &#39;GET&#39;
+    })
+    var result = await response.json();
+    return (result.success == &quot;true&quot; &amp;&amp; result.score &gt;= 0.6);
+}</code></pre>
+<p>The function only returns true if the server-side ReCAPTCHA verification did not yield an error (<code>success</code> is set to <code>true</code>) and the score is sufficiently high.</p>
+<p>When I deployed this system on my blog, something unexpected happened. While I definitely received less spam than before, I still received bursts of spam at specific times. Since the ReCAPTCHA verification was correctly implemented, I quickly identified the problem: the Staticman API was not protected by the ReCAPTCHA: I had spent all this time barricading the front door (i.e. the commenting system on the blog) but I had left the back door white open because the Staticman API was still publicly accessible without any spam protection.</p>
+<p>Moreover, I also wasn’t really happy with using ReCAPTCHA v3 because <a href="https://medium.com/@jsoverson/thoughts-on-recaptcha-v3-e837d4a0a63">it takes away human control</a>: if your score is too low, you do not get a chance to prove that you’re human. I’d prefer an invisible CAPTCHA where you can still prove your humanity rather than being simply blocked but it seems that something like this is currently not available, so ReCAPTCHA v2 is the better alternative.</p>
+</div>
+<div id="implementing-spam-protection-for-staticman" class="section level2">
+<h2>Implementing Spam Protection for Staticman</h2>
+<p>Having reckoned that I needed to protect my instance of the the Staticman API rather than the commenting system itself, I investigated solutions for this. Since I didn’t get ReCAPTCHA to work with Staticman the first time around, I configured Akismet with Staticman, which showed the expected result directly.</p>
+<p>Again, I wasn’t really happy with this solution because now I was using two services that serve the same purpose: ReCAPTCHA v3 on the website and Akismet on the Staticman API. So, to clean the mess up, I decided to give the Staticman ReCAPTCHA integration another shot. Again, I followed <a href="https://github.com/eduardoboucas/staticman-recaptcha">Edouardo’s guide</a> and this time I got it working - probably because I had previously entered incorrect data into the Staticman configuration.</p>
+<p>So, with all the work done, I am now simply using Staticman’s ReCAPTCHA v2 verification rather than the custom ReCAPTCHA v3 implementation I used before. This way, the API cannot be accessed with a correct ReCAPTCHA v2 token.</p>
+</div>
+<div id="lessons-learned" class="section level2">
+<h2>Lessons Learned</h2>
+<p>Staticman’s ReCAPTCHA verification works well - if you should have problems getting your configuration to work, make sure you have entered all the details correctly. Of course, there are also other methods but those are time-intensive and may still leave the API endpoint unprotected.</p>
+<p>My general learnings from working with the ReCAPTCHA system are as follows:</p>
+<ul>
+<li>Do not try to verify ReCAPTCHAs on the client-side</li>
+<li>Spammers are more intelligent than one would expect: they quickly figure out how to abuse unprotected APIs for their purposes</li>
+<li>It’s useless to protect your web frontend using ReCAPTCHA if the API you are relying on is not protected using ReCAPTCHA or some other form of spam protection</li>
+<li>ReCAPTCHA v3 may be more user friendly than ReCAPTCHA v2 but undermines free choice</li>
+</ul>
+<p>If you have any questions about the use of ReCAPTCHA with Staticman or ReCAPTCHA in general, don’t hesitate to contact me.</p>
+</div>
