@@ -30,15 +30,15 @@ develOverflow
 
 ## Machine Learning
 
-* [The Elements Of Statistical Learning](https://www.amazon.de/gp/product/0387848576/ref=as_li_tl?ie=UTF8&tag=datasciencebl-21&camp=1638&creative=6742&linkCode=as2&creativeASIN=0387848576&linkId=52db56d2e7c9fe69dc12c776e63e7a64): the fundamental book on statistical learning
-* [Introduction to Statistical Learning](https://www.amazon.de/gp/product/B01IBM7790/ref=as_li_tl?ie=UTF8&tag=datasciencebl-21&camp=1638&creative=6742&linkCode=as2&creativeASIN=B01IBM7790&linkId=80a2e9001a36184fc0357f2616d3a06c): an introduction to machine learning with applications in R
+* [The Elements Of Statistical Learning](https://www.amazon.com/gp/product/0387848576/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0387848576&linkCode=as2&tag=datasciencebl-20&linkId=7d306d02888156c52ffa6f5c622ce7f0): the fundamental text book on statistical learning
+* [Introduction to Statistical Learning](https://www.amazon.com/gp/product/1461471370/ref=as_li_tl?ie=UTF8&tag=datasciencebl-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=1461471370&linkId=e644c5422de8bb68638ef4336fdd5b73): an introduction to statistical learning with applications in R
 
 ## Programming
 
 * [Stack Overflow](https://stats.stackexchange.com): if you have a programming problem, you'll probably find the solution here
-* [Introduction to Algorithms](https://www.amazon.de/gp/product/8120340078/ref=as_li_tl?ie=UTF8&tag=datasciencebl-21&camp=1638&creative=6742&linkCode=as2&creativeASIN=8120340078&linkId=181cab8ce76a63d59f8b1c43fcaed7a5): a book providing a theoretical, comprehensive introduction to algorithms and data structures
-* [Head First Design Patterns](https://www.amazon.de/gp/product/0596007124/ref=as_li_tl?ie=UTF8&tag=datasciencebl-21&camp=1638&creative=6742&linkCode=as2&creativeASIN=0596007124&linkId=b8f75b281c12f9d45f3eaf20422a99ac): a learner-friendly introduction to the most important design pattern
-* [Clean Code](https://www.amazon.de/gp/product/0132350882/ref=as_li_tl?ie=UTF8&tag=datasciencebl-21&camp=1638&creative=6742&linkCode=as2&creativeASIN=0132350882&linkId=ba3d0d698912f2a7e31f5339668e7e9c): learn how to become a better coder
+* [Introduction to Algorithms](https://www.amazon.com/gp/product/8120340078/ref=as_li_tl?ie=UTF8&tag=datasciencebl-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=8120340078&linkId=3f82772d85cb26d73371c987da913fc9): a book providing a theoretical, comprehensive introduction to algorithms and data structures
+* [Head First Design Patterns](https://www.amazon.com/gp/product/0596007124/ref=as_li_tl?ie=UTF8&tag=datasciencebl-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=0596007124&linkId=316fb8a49533e1133188eed54496aa6c): a learner-friendly introduction to the most important design pattern
+* [Clean Code](https://www.amazon.com/gp/product/0132350882/ref=as_li_tl?ie=UTF8&tag=datasciencebl-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=0132350882&linkId=da683e3d0400dfad2e69634394965db1): learn coding principles to become a clean coder
 
 ## Other
 
