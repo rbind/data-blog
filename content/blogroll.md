@@ -10,7 +10,7 @@ disable_comments: false
 --- 
 <img src="/img/resources.jpg" alt = "Resources" width = "1000" height = "668">
 
-## Data science
+## Data Science
 
 * [An excellent essay on the data science field by David Donoho](http://courses.csail.mit.edu/18.337/2015/docs/50YearsDataScience.pdf)
 * [The Stats Geek](http://thestatsgeek.com/): a blog on statistics
@@ -18,7 +18,6 @@ disable_comments: false
 * [Data Camp](https://www.datacamp.com): a great resource for training in data science
 * [Data Science Reader](https://rushter.com/dsreader/): an aggregator for data science content
 * [DataTau](http://www.datatau.com/): a data science forum
-* [Analisted](https://www.analisted.com): a data science aggregator
 
 ## R
 
@@ -31,13 +30,15 @@ develOverflow
 
 ## Machine Learning
 
-* [The Elements Of Statistical Learning](https://web.stanford.edu/~hastie/ElemStatLearn/): a book on machine learning from a statistical perspective (free PDF available!)
-* [Introduction to Statistical Learning](https://www-bcf.usc.edu/~gareth/ISL/): an introduction to machine learning with applications in R
+* [The Elements Of Statistical Learning](https://www.amazon.de/gp/product/0387848576/ref=as_li_tl?ie=UTF8&tag=datasciencebl-21&camp=1638&creative=6742&linkCode=as2&creativeASIN=0387848576&linkId=52db56d2e7c9fe69dc12c776e63e7a64): the fundamental book on statistical learning
+* [Introduction to Statistical Learning](https://www.amazon.de/gp/product/B01IBM7790/ref=as_li_tl?ie=UTF8&tag=datasciencebl-21&camp=1638&creative=6742&linkCode=as2&creativeASIN=B01IBM7790&linkId=80a2e9001a36184fc0357f2616d3a06c): an introduction to machine learning with applications in R
 
 ## Programming
 
 * [Stack Overflow](https://stats.stackexchange.com): if you have a programming problem, you'll probably find the solution here
-* [Introduction to Algorithms](https://mitpress.mit.edu/books/introduction-algorithms-third-edition]): a book providing a theoretical, comprehensive introduction to algorithms and data structures
+* [Introduction to Algorithms](https://www.amazon.de/gp/product/8120340078/ref=as_li_tl?ie=UTF8&tag=datasciencebl-21&camp=1638&creative=6742&linkCode=as2&creativeASIN=8120340078&linkId=181cab8ce76a63d59f8b1c43fcaed7a5): a book providing a theoretical, comprehensive introduction to algorithms and data structures
+* [Head First Design Patterns](https://www.amazon.de/gp/product/0596007124/ref=as_li_tl?ie=UTF8&tag=datasciencebl-21&camp=1638&creative=6742&linkCode=as2&creativeASIN=0596007124&linkId=b8f75b281c12f9d45f3eaf20422a99ac): a learner-friendly introduction to the most important design pattern
+* [Clean Code](https://www.amazon.de/gp/product/0132350882/ref=as_li_tl?ie=UTF8&tag=datasciencebl-21&camp=1638&creative=6742&linkCode=as2&creativeASIN=0132350882&linkId=ba3d0d698912f2a7e31f5339668e7e9c): learn how to become a better coder
 
 ## Other
 
