@@ -1,0 +1,15 @@
+@startuml
+package "High-Level Module" {
+[High-Level Component] as M11
+}
+
+package "Low-Level Module" {
+[Low-Level Component] as M21
+[Low-Level Component] as M22
+[Low-Level Component] as M23
+}
+
+M11 --> M21
+M11 --> M22
+M11 --> M23
+@enduml

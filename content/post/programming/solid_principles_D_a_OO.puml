@@ -1,0 +1,15 @@
+@startuml
+[BikeFactory] as R
+[Bike] as bike
+
+
+R -> bike
+
+[RoadBike] as M21
+[DirtBike] as M22
+[CityBike] as M23
+
+M21 --|> bike
+M22 --|> bike
+M23 --|> bike
+@enduml

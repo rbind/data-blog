@@ -1,0 +1,28 @@
+@startuml
+package "High-Level Module" {
+[High-Level Component] as M11
+}
+
+
+[Interface] as i1
+[Interface] as i2
+[Interface] as i3
+
+package "Low-Level Module" {
+[Low-Level Component] as M21
+[Low-Level Component] as M22
+[Low-Level Component] as M23
+}
+
+M11 --> i1
+M11 --> i2
+M11 --> i3
+
+M21 --|> i1
+M22 --|> i2
+M23 --|> i3
+
+i1 -[hidden]- M21
+i2 -[hidden]- M22
+i3 -[hidden]- M23
+@enduml

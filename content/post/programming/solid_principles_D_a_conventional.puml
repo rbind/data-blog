@@ -1,0 +1,20 @@
+@startuml
+[BikeFactory] as R
+[blub] as blub
+[blab] as blab
+hide blub
+hide blab
+[RoadBike] as M21
+[DirtBike] as M22
+[CityBike] as M23
+
+R -> M21
+R -> M22
+R -> M23
+
+R -[hidden]- blub
+R -[hidden]- blab
+blub -[hidden]- M21
+blub -[hidden]- M22
+blab -[hidden]- M23
+@enduml
