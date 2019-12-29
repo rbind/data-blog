@@ -1,0 +1,457 @@
+---
+title: "The SOLID Principles: a Guide for Object-Oriented Design"
+author: Matthias Döring
+date: '2019-12-27'
+description: "Writing high-quality software can be hard. Luckily, there are principles that can guide object-oriented software design such as the SOLID principles, which consist of the single-responsibility principle, the open-closed principle, the Liskov substitution principle, the interface segregation principle, and the dependency inversion principle. In this post, I give a short explanation of each principle and give practical examples of their application."
+slug: "object-oriented-design-solid-principles"
+categories:
+- programming
+thumbnail: "/post/programming/solid_principles.png"
+---
+
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<script src="/rmarkdown-libs/elevate-section-attrs/elevate-section-attrs.js"></script>
+
+
+<p>For designing object-oriented software, five principles have emerged over the years. These principles are summarized by the acronym <em>SOLID</em>, which stands for:</p>
+<ul>
+<li><strong>S</strong>: The single-responsibility principle</li>
+<li><strong>O</strong>: The open-closed principle</li>
+<li><strong>L</strong>: The Liskov substitution principle</li>
+<li><strong>I</strong>: The interface segregation principle</li>
+<li><strong>D</strong> The dependency inversion principle</li>
+</ul>
+<p>In this post, I aim to give a succinct summary of the principles together with practical examples on how to apply them.</p>
+<div id="the-single-responsibility-principle" class="section level2">
+<h2>1. The Single-Responsibility Principle</h2>
+<p>According to the single-responsibility principle, <strong>each class should have only a single responsibility</strong>. This principle is one of the foundations for good object-oriented design:</p>
+<ul>
+<li>It fosters object reuse and replaceability</li>
+<li>It enables delegation of work to other objects</li>
+<li>It improves the structure of the code, allowing for further improvements (e.g. use of design patterns)</li>
+</ul>
+<p>To apply the single-responsibility principle, you should consider the responsibilities of each class you are implementing. When you realize that a class has more than one responsibility, you should move these additional responsibilities to other classes.</p>
+<div id="applying-the-single-responsibility-principle" class="section level3">
+<h3>Applying the Single-Responsibility Principle</h3>
+<p>Let’s consider the example of a bike rental system. The idea is that registered customers should be able to rent a bike. Then they can unlock the bike and drive around. Upon returning the bike, the duration of the lease is calculated and an invoice, whose amount depends on the lease duration, is generated. Finally, the bike is locked one again and becomes available for other customers.</p>
+<p>To implement this software system, we’ll use the following class to represent a bike that can be leased:</p>
+<pre class="cpp"><code>class Bike {
+
+public: 
+    void lock(); // prevent physical access to the bike
+    void unlock(); // allow physical access to the bike
+
+    void startLease(Customer customer); // prevent other customers from leasing the bike
+    void endLease(); // make the bike available to other customers again
+    
+    double calculateCosts(); // how much does the customer have to pay?
+    void addInvoice(); // add invoice to customer account
+    Invoice createInvoice();
+
+private:
+    int leaseDurationSeconds; // how long the bike has been on lease
+    bool isLocked; // whether the bike is currenty locked
+    Customer leasingCustomer; // details of customer leasing the bike
+};</code></pre>
+<p>How does the <code>Bike</code> class fare with respect to the single-responsibility principle? Looking at the Bike class, I see three responsibilities:</p>
+<ol style="list-style-type: decimal">
+<li>The <code>lock</code> and <code>unlock</code> methods control <strong>physical access to the bike</strong></li>
+<li>The <code>startLease</code> and <code>endLease</code> methods provide <strong>functionality for leasing</strong></li>
+<li>The <code>calculateCosts</code> and <code>sendInvoice</code> are used for <strong>accounting</strong></li>
+</ol>
+<p>To reduce the number of responsibilities, let’s introduce the following (modified/new) classes:</p>
+<ul>
+<li>The <code>Bike</code> class should only model the <strong>physical properties</strong> of the bike</li>
+<li>A <code>Lease</code> class should deal with <strong>lease-specific information</strong></li>
+<li>An <code>InvoiceGenerator</code> class should deal with the <strong>accounting</strong></li>
+</ul>
+<p>The sequence diagram for the redesigned bike rental scheme would look like this:</p>
+<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_S.puml" /></p>
+<p>To implement, the new design, we’ll start with declaring the <code>Lease</code> class:</p>
+<pre class="cpp"><code>class Lease {
+
+public:
+    void startLease(Customer customer);
+    void endLease();
+    
+private:
+    Customer leasingCustomer;
+    InvoiceGenerator invoice;
+    Time leaseStart;
+    Time leaseEnd;
+};</code></pre>
+<p>The idea is that the lease class is used to register/deregister the customer that is leasing a bike. Since every lease should result in an invoice, the lease class contains an <code>InvoiceGenerator</code> object, which performs all accounting tasks. The <code>InvoiceGenerator</code> can be written as follows:</p>
+<pre class="cpp"><code>class InvoiceGenerator {
+public:
+    void setLeaseDuration(int leaseDurationSeconds);
+    void setCustomer(Customer customer);
+    void addInvoice(); // register invoice with customer
+    Invoice createInvoice(); 
+private:
+    int leaseDurationSeconds;
+    int dollarCostsPerSecond = 0.001;
+    Customer customer; // customer data such as name, address, ...
+    double calculateCost(); // cost of lease
+};</code></pre>
+<p>With these two classes prepared, we can simplify the <code>Bike</code> class:</p>
+<pre class="cpp"><code>class Bike {
+
+public: 
+    void lock();
+    void unlock();
+
+    void startLease(Customer customer);
+    void endLease();
+
+private:
+    bool isLocked;
+    Lease lease;
+};</code></pre>
+<p>Notice that the bike class is now much simpler because it doesn’t have to provide the accounting functionalities anymore.</p>
+<p>Having redesigned the classes, let’s take a look at the implementation of these classes. For bike, the implementation is as follows.</p>
+<pre class="cpp"><code>void Bike::lock() {
+    // (logic for locking the bike)
+    isLocked = true;
+}
+
+void Bike::unlock() {
+    // (logic for unlocking the bike)
+    isLocked = false;
+}
+
+void Bike::startLease(Customer c) {
+    lease.startLease(c)
+}
+
+void Bike::endLease() {
+    lease.endLease()
+}</code></pre>
+<p><code>Lease</code> could be implemented like this:</p>
+<pre class="cpp"><code>void Lease::startLease(Customer c) {
+    // (additional logic for starting the lease)
+    leasingCustomer = c;
+    invoice.setCustomer(c);
+    leaseStart = time::now();
+}
+
+void Lease::endLease() {
+    // (additional logic for ending the lease)
+    leaseEnd = time::now();
+    int leaseDuration = (leaseEnd - leaseStart).inSeconds();
+    invoice.setLeaseDuration(leaseDuration);
+    leasingCustomer = null;
+}</code></pre>
+<p>Now, the only that’s left is the implementation of the <code>InvoiceGenerator</code> class:</p>
+<pre class="cpp"><code>void InvoiceGenerator::setLeaseDuration(int leaseDuration) {
+    leaseDurationSeconds = leaseDuration;
+}
+
+void InvoiceGenerator::setCustomer(Customer c) {
+    customer = c;
+}
+
+double InvoiceGenerator::calculateCost() {
+    return leaseDurationSeconds * dollarCostsPerSecond;
+}
+
+Invoice InvoiceGenerator::createInvoice() {
+    double cost = calculateCost();
+    HTMLDocument invoice = HTMLDocument(&quot;&lt;HTML&gt;\n&quot; + &quot;Name : &quot; + customer.getName() + &quot;\nNet Amount: &quot; + cost + &quot; ... &quot;\n&lt;/HTML&gt;&quot;);
+    return invoice;
+}
+void InvoiceGenerator::addInvoice() {
+    customer.addInvoice(createInvoice());
+}</code></pre>
+<p>As you can see, having introduced the additional classes <code>Lease</code> and <code>InvoiceGenerator</code>, individual objects can often dispatch work to those objects whose responsibility lies in performing a specific task. Moreover, with the new design, we are prepared for extending the functionality of our program. For example, since we have an <code>InvoiceGenerator</code> class, it would be easy to implement other types of invoices rather than HTML invoices.</p>
+</div>
+</div>
+<div id="the-open-closed-principle" class="section level2">
+<h2>2. The Open-Closed Principle</h2>
+<p>The open-closed principle states that software should be <strong>open for extension</strong> but <strong>closed to modification</strong>. When I first heard this principle, it sounded like an oxymoron to me: how can software be extensible but closed for modification? Doesn’t every extension require modification?</p>
+<p>What the open-closed principle tries to say is that, if you want to extend the functionality of your software, you shouldn’t have to modify existing building blocks of the software (i.e. the software is closed for modification). Instead, new functionality should be introduced through new entities (i.e. the software is open for extension).</p>
+<p>One way to come closer to implementing the open-closed principle is to follow the guideline of</p>
+<pre><code>Encapsulate what varies</code></pre>
+<p>This guideline states that code elements that are subject to variation throughout software development should be encapsulated in appropriate classes.</p>
+<p>Note that the open-closed principles is one of the principles that you shouldn’t apply to all of your code because this would lead to overengineered software with unnecessary abstractions. Instead, you should focus your effort on those building blocks for which you can expect some degree of change in the future.</p>
+<div id="applying-the-open-closed-principle" class="section level3">
+<h3>Applying the Open-Closed Principle</h3>
+<p>To study the open-closed principle in practice, let’s study the <code>InvoiceGenerator</code> class from the previous bike rental example.</p>
+<pre class="cpp"><code>class InvoiceGenerator {
+public:
+    void setLeaseDuration(int leaseDurationSeconds);
+    void setCustomer(Customer customer);
+    void invoice();
+private:
+    int leaseDurationSeconds;
+    int dollarCostsPerSecond = 0.001;
+    Customer customer;
+    double calculateCost();
+};</code></pre>
+<p>Here, the <code>createInvoice()</code> method generates the invoice as an HTML document. In our case, we would like to use <em>Comic Sans MS</em> for all customers whose age is less than 14 and <em>Arial</em> for all others. Because we don’t want to modify the <code>createInvoice()</code> method to implement the new behavior, we will refactor <code>InvoiceGenerator</code> in order to satisfy the open-closed principle.</p>
+<p>One way to achieve this is to use the decorator pattern. By applying this pattern, we can modify the style of the generated invoice by introducing decorator classes. To implement the pattern, we turn <code>InvoiceGenerator</code> into an abstract class and let <code>InvoiceDecorator</code> implement the <code>InvoiceGenerator</code> interface:</p>
+<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_O_OO.puml" /></p>
+<p>The new design results in the following classes:</p>
+<pre class="cpp"><code>class InvoiceGenerator {
+public:
+    void setCustomer(Customer customer);
+    void setLeaseDuration(int leaseDurationSeconds);
+    virtual void createInvoice() = 0;
+private:
+    Invoice invoice;
+    int leaseDurationSeconds;
+    int dollarCostsPerSecond = 0.001;
+    Customer customer;
+    double calculateCost();
+};
+
+class InvoiceGeneratorImpl : InvoiceGenerator {
+public:
+    void createInvoice() override;
+};
+
+class InvoiceDecorator : InvoiceGenerator {
+public:
+    InvoiceDecorator(InvoiceGenerator invoiceGenerator);
+private:
+    InvoiceGenerator generator;
+};
+
+class InvoiceDecoratorComicSansMS: InvoiceDecorator {
+public:
+    Invoice createInvoice();
+};
+
+class InvoiceDecoratorArial: InvoiceDecorator {
+public:
+    Invoice createInvoice();
+};</code></pre>
+<p>We can now specify the basic behavior of the invoice generator using <code>InvoiceGeneratorImpl</code>. Furthermore, we define the decorators for modifying the font.</p>
+<pre class="cpp"><code>InvoiceGeneratorImpl::createInvoice() {
+    // create the basic invoice structure, e.g. like so
+    invoice.setContent(&quot;&lt;HTML&gt; &quot; + &quot;Name : &quot; + customer.getName() + &quot;, Net Amount: &quot; + cost + &quot; ... &quot; + &quot;&lt;/HTML&gt;&quot;);
+}
+
+InvoiceDecoratorComicSansMS::createInvoice() {
+    invoice.setFont(&quot;ComicSansMS&quot;);
+    if (generator != null) {
+        generator.createInvoice();
+    }
+}
+
+InvoiceDecoratorArial::createInvoice() {
+    invoice.setFont(&quot;Arial&quot;);
+    if (generator != null) {
+        generator.createInvoice();
+    }
+}</code></pre>
+<p>With the new design, <code>InvoiceGeneratorImpl::createInvoice()</code> is closed for modification but remains open for extension because new functionality can be added without changing the <code>createInvoice</code> method. Rather, we can simply instantiate a decorator and use that decorator to modify the behavior of <code>InvoiceGeneratorImpl</code>.</p>
+<p>Let’s see how we can change the font of the invoice through the new font decorators:</p>
+<pre class="cpp"><code>InvoiceGenerator invoiceGenerator = InvoiceGeneratorImpl();
+if (customer.age &lt; 14) {
+    // use comic sans ms for the invoice
+    invoiceGenerator = InvoiceDecoratorComicSansMS(invoiceGenerator);
+} else {
+    // use arial for the invoice
+    invoiceGenerator = InvoiceDecoratorArial(invoiceGenerator);
+}
+// ... use &#39;invoiceGenerator&#39; to create fancy invoices</code></pre>
+<p>With the new design, we can simply implement new decorators to meet additional layout needs (e.g. for adjusting font size or background color) - all without having to do any changes to the <code>createInvoice</code> method.</p>
+</div>
+</div>
+<div id="the-liskov-substitution-principle" class="section level2">
+<h2>3. The Liskov Substitution Principle</h2>
+<p>The Liskov substitution principle states that <strong>derived classes should not modify the behavior of the superclass</strong>. In more lax terms, the Liskov substitution principle states that</p>
+<pre><code>    A duck should look like a duck, swim like a duck, and quack like a duck. Otherwise it&#39;s not really a duck.</code></pre>
+<div id="applying-the-liskov-substitution-principle" class="section level3">
+<h3>Applying the Liskov Substitution Principle</h3>
+<p>Let’s make the Liskov substitution principle more concrete with an example. Imagine you have a class for rectangles:</p>
+<pre class="cpp"><code>class Rectangle {
+public:
+    void setWidth(int w) {
+       width = w ;
+    }
+    void setHeight(int h) {
+        height = h;
+    }
+
+private:
+    int width;
+    int height;
+};</code></pre>
+<p>The respective invariants of the <code>setWidth</code> and <code>setHeight</code> methods are that only the width or only the height of the rectangle are set.</p>
+<p>Imagine that you would also like to have an implementation for squares. Squares are a special type of rectangle where the width equals the height. Since squares have the same attributes as rectangles, you decide to derive from the rectangle class. To uphold the invariant of the square, you have to adjust the <code>setWidth</code> and <code>setHeight</code> methods as follows:</p>
+<pre class="cpp"><code>class Square : Rectangle {
+public:
+    void setWidth(int w) {
+        width = w;
+        // also set height s.t. height = width
+        height = w;
+    }
+
+    void setHeight(int h) {
+        height = h;
+        // also set width s.t. width = height
+        width = h;
+    }
+};</code></pre>
+<p>What’s the problem with the implementation of <code>Square</code>? In fact, <code>Square</code> modifies the behavior of the inherited methods from <code>Rectangle</code>: <code>setWidth</code> and <code>setHeight</code> always change both width and height.</p>
+<p>This means that the substitution principle is broken: due to the changed behavior of <code>Square</code> you cannot treat it the same way as <code>Rectangle</code>. Thus, we should never have subclassed <code>Rectangle</code> to create a <code>Square</code> class in the first place but should have created a custom <code>Square</code> class instead.</p>
+</div>
+</div>
+<div id="the-interface-segregation-principle" class="section level2">
+<h2>4. The Interface Segregation Principle</h2>
+<p>The interface segregation principle states that <strong>a client should not be forced to implement superfluous interface methods</strong>. This means that smaller interfaces (i.e. interfaces providing few methods) should be favored over larger interfaces (i.e. interfaces providing many methods).</p>
+<p>Software fulfilling the interface segregation principle will be easier to maintain. First, the software will be more understandable because smaller interfaces communicate the intent better. Second, it will be less burdensome to extend a lean interface that is implemented by few classes than to extend a bloated interface that is implemented by many clients.</p>
+<div id="applying-the-interface-segregation-principle" class="section level3">
+<h3>Applying the Interface Segregation Principle</h3>
+<p>To illustrate the interface segregation principle, let’s consider a rental agency as an example. To represent the objects we rent out, let’s create an interface <code>Rentable</code>. At first, we have a lean interface requiring only the implementation of two methods:</p>
+<pre class="cpp"><code>class Rentable {
+public:
+    virtual void startLease() = 0;
+    virtual void endLease() = 0;
+};</code></pre>
+<p>After implementing the interface, we quickly realize that we need new functionality, namely:</p>
+<ul>
+<li>For <strong>battery-driven products</strong> (e.g. smartphones), we would like to know the capacity of the built-in battery</li>
+<li>For <strong>products with age restrictions</strong> (e.g. DVDs, computer games), we would like to know the minimum age required to be allowed to rent these items</li>
+<li>For <strong>clothes</strong>, we would like to know the size of the piece of clothing</li>
+</ul>
+<p>Since we already have the <code>Rental</code> interface, we do a very lazy and dumb thing: put all of these methods into the interface. So the new interface looks like this:</p>
+<pre class="cpp"><code>class BloatedRentable {
+public:
+    virtual void startLease() = 0;
+    virtual void endLease() = 0;
+
+    virtual int getBatteryCapacity() = 0; // for battery-driven devices only
+    virtual int getAgeLimit() = 0; // for age-limited products only
+    virtual int getSize() = 0; // for clothes only
+};</code></pre>
+<p>Why is this bad design? Well, look what happens when we want to implement a class for jeans:</p>
+<pre class="cpp"><code>class BloatedJeans : BloatedRentable {
+   void startLease {
+        // start lease logic
+   }
+
+    void endLease {
+        // end lease logic 
+    }
+
+    int getBatteryCapacity() {
+        // no battery in most jeans, let&#39;s return something unusual
+        return -1;
+    }
+
+    int getAgeLimit() {
+        // no age limit on jeans
+        return 0;
+    }
+    
+    int getSize() {
+        return size;
+    }
+};</code></pre>
+<p>There are two things that are wrong with the <code>BloatedJeans</code> class. The first problem is that we have to waste time implementing methods such as <code>getBatteryCapacity()</code> and <code>getSize()</code> that we don’t need. The second problem is that a client using the <code>BloatedRentable</code> interface has to deal with the (nonsensical) values that are returned for inappropriate method calls. For example, the client would have to ignore all results from <code>getBatteryCapacity</code> where the value is negative because this indicates that the method was called on an inappropriate object.</p>
+<p>To illustrate the hassle that the client has to go through, let’s assume the client wants to count the different types of wearable objects that are in stock:</p>
+<pre class="cpp"><code>void printWearableCount() {
+    int nbrOfWearables = 0;
+    for (BloatedRentable r: rentables) {
+        if (r.getSize() &gt;=0) {
+            // assume this is a wearable
+            ++nbrOfWearables;
+        }
+    }
+    std::cout &lt;&lt; &quot;No of wearables: &quot; &lt;&lt; nbrOfWearables;
+}</code></pre>
+<p>How can we improve our design? Let’s apply the interface segregation principle. To do this, we keep the <code>Rentable</code> interface lean and create interfaces for specific rentable items:</p>
+<pre class="cpp"><code>// interface to be implemented by all rentable objects
+class LeanRentable {
+public:
+    virtual void startLease() = 0;
+    virtual void endLease() = 0;
+};
+
+// interface to be implemented by all battery-driven devices
+class Chargeable {
+public:
+    virtual int getBatteryCapacity() = 0;
+};
+
+// interface to be implemented by all age-limited products
+class AgeLimited {
+public:
+    virtual int getAgeLimit() = 0;
+};
+
+// interface to be implemented by all pieces of clothing
+class Wearable {
+public:
+    virtual int getSize() = 0;
+};</code></pre>
+<p>With these lean interfaces we can now implement the class for rentable jeans as follows:</p>
+<pre class="cpp"><code>// Jeans are both a rentable and a wearable
+class LeanJeans : LeanRentable, Wearable {
+     void startLease {
+        // logic for starting the lease (LeanRentable interface)
+    }
+
+    void endLease {
+        // logic for ending the lease (LeanRentable interface)
+    }
+    
+    int getSize() {
+        // method from the Wearable interface
+        return size;
+    } 
+};</code></pre>
+<p>The implementation of <code>LeanJeans</code> was already much easier than the one of <code>BoatedJeans</code> because we had to implement fewer methods. What about the client though? Let’s revisit our method for printing the number of wearables in stock:</p>
+<pre class="cpp"><code>void printWearableCount() {
+    int nbrOfWearables = 0;
+    for (LeanRentable* r: rentables) {
+        Wearable* w = 
+        if (std::dynamic_cast&lt;Wearable*&gt;(r)) {
+            // cast was successful -&gt; r is a wearable
+            ++nbrOfWearables;
+        }
+    }
+    std::cout &lt;&lt; &quot;No of wearables: &quot; &lt;&lt; nbrOfWearables;
+}</code></pre>
+<p>With the new implementation, the client has less hassle. To count the number of wearables in stock, we can rely on the object’s type rather than on some inherent assumptions.</p>
+</div>
+</div>
+<div id="the-dependency-inversion-principle" class="section level2">
+<h2>5. The Dependency Inversion Principle</h2>
+<p>The dependency inversion principle is often misunderstood. One reason for this is that the name of the principle is not really very informative. What is meant by <em>dependency inversion</em>?</p>
+<p>In conventional software design, high-level modules often depend on low-level modules. So, what happens if we invert this design scheme? Then, we would have low-level modules depend on high-level modules and high-level modules would be independent of low-level modules. This is the essence of the dependency inversion principle, which states the following:</p>
+<ol style="list-style-type: decimal">
+<li>Both high-level and low-level modules should depend on abstractions.</li>
+<li>Abstractions should not depend on details. Details should depend on abstractions.</li>
+</ol>
+<div id="applying-dependency-inversion-to-module-dependencies" class="section level3">
+<h3>Applying Dependency Inversion to Module Dependencies</h3>
+<p>This example demonstrates the first aspect of the dependency inversion principle, which states that both high- and low-level modules should depend on abstractions. A traditional dependency structure would be as follows:</p>
+<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_traditional.puml" /></p>
+<p>Here, the high-level module depends directly on low-level components. This means that there is strong coupling, with all its disadvantages. Applying the dependency-inversion principle, we would obtain the following dependency structure:</p>
+<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_OO.puml" /></p>
+<p>Here, the high-level module depends on abstraction (interfaces) rather than concrete implementations. Since the low-level modules implement interfaces, they also depend on abstractions.</p>
+</div>
+<div id="applying-dependency-inversion-to-abstractions" class="section level3">
+<h3>Applying Dependency Inversion to Abstractions</h3>
+<p>This example demonstrates the second aspect of the dependency inversion principle, which states that abstractions should not depend on details but that details should depend on abstractions.</p>
+<p>Let’s consider an example where the principle is not fulfilled, that is, where abstractions depend on details. Let’s assume we are concerned with bikes. To encapsulate the creation of different types of bikes, we create a class <code>BikeFactory</code>, which generates objects of the concrete classes <code>RoadBike</code>, <code>DirtBike</code>, and <code>CityBike</code>:</p>
+<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_a_conventional.puml" /></p>
+<p>To apply the dependency inversion principle, we create a <code>Rentable</code> interface that is implemented by each type of bike. Then, the factory can simply generate objects of type <code>Rentable</code>:</p>
+<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_a_OO.puml" /></p>
+<p>The new design fulfills the dependency inversion principle because the details (i.e. the specific types of bikes) depend on abstractions (<code>Bike</code>), rather than the other way around.</p>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>At the end of this article, I would like to shortly summarize how each of the five SOLID principles can be applied in practice:</p>
+<ul>
+<li><strong>Single-responsibility principle:</strong> Each class should only have a single responsibility. If you see a class with many lines of code, this can be an indicator that the class serves more than one responsibility.</li>
+<li><strong>Open-closed principle:</strong> Extending the functionality of your software shouldn’t require you to modify (a lot) of existing code. If you have to modify (several) existing files to extend functionality, you are probably not following the open-closed principle. To satisfy the open-closed principle, think about appropriate design patterns for your problem.</li>
+<li><strong>Liskov substitution principle:</strong> The behavior of subclasses should not deviate from the behavior that is implemented by the superclass. So, when you are overriding a method of the superclass, make sure that you are not breaking the invariants of the superclass. If that would be the case, use of inheritance is not appropriate.</li>
+<li><strong>Interface segregation principle:</strong> To implement the interface segregation principle, don’t lump different types of functionality in the same interface. Instead, try to write lean interfaces.</li>
+<li><strong>Dependency inversion principle:</strong> The dependency inversion principle can be satisfied by coding against interfaces rather than concrete implementations.</li>
+</ul>
+</div>

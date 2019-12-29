@@ -1,0 +1,15 @@
+@startuml
+[InvoiceGeneratorImpl] as InvoiceGeneratorImpl
+[InvoiceGenerator] as InvoiceGenerator
+
+[InvoiceDecorator] as InvoiceDecorator
+[InvoiceDecoratorArial] as InvoiceDecoratorArial
+[InvoiceDecoratorComicSansMS] as InvoiceDecoratorComicSansMS
+
+InvoiceGeneratorImpl --|> InvoiceGenerator
+
+InvoiceDecorator --|> InvoiceGenerator
+
+InvoiceDecoratorArial --|> InvoiceDecorator
+InvoiceDecoratorComicSansMS --|> InvoiceDecorator
+@enduml

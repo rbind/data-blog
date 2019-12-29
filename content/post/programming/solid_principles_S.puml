@@ -8,7 +8,7 @@ activate Lease
 Customer -> Bike: unlock()
 Customer -> Bike: endLease()
 Bike -> Lease : endLease()
-Lease -> InvoiceGenerator : invoice()
+Lease -> InvoiceGenerator : addInvoice()
 activate InvoiceGenerator
 deactivate InvoiceGenerator
 deactivate Lease
