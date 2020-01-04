@@ -69,7 +69,7 @@ To reduce the number of responsibilities, let's introduce the following (modifie
 
 The sequence diagram for the redesigned bike rental scheme would look like this:
 
-![](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_S.puml)
+![](../solid_principles_S.png)
 
 To implement, the new design, we'll start with declaring the `Lease` class:
 
@@ -230,7 +230,7 @@ Here, the `createInvoice()` method generates the invoice as an HTML document. In
 One way to achieve this is to use the decorator pattern. By applying this pattern, we can modify the style of the generated invoice by introducing decorator classes. To implement the pattern, we turn `InvoiceGenerator` into an abstract class and let `InvoiceDecorator` implement the `InvoiceGenerator` interface:
 
 
-![](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_O_OO.puml)
+![](../solid_principles_O_OO.png)
 
 The new design results in the following classes:
 
@@ -527,11 +527,11 @@ In conventional software design, high-level modules often depend on low-level mo
 
 This example demonstrates the first aspect of the dependency inversion principle, which states that both high- and low-level modules should depend on abstractions. A traditional dependency structure would be as follows:
 
-![](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_traditional.puml)
+![](../solid_principles_D_traditional.png)
 
 Here, the high-level module depends directly on low-level components. This means that there is strong coupling, with all its disadvantages. Applying the dependency-inversion principle, we would obtain the following dependency structure:
 
-![](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_OO.puml)
+![](../solid_principles_D_OO.png)
 
 Here, the high-level module depends on abstraction (interfaces) rather than concrete implementations. Since the low-level modules implement interfaces, they also depend on abstractions.
 
@@ -541,11 +541,11 @@ This example demonstrates the second aspect of the dependency inversion principl
 
 Let's consider an example where the principle is not fulfilled, that is, where abstractions depend on details. Let's assume we are concerned with bikes. To encapsulate the creation of different types of bikes, we create a class `BikeFactory`, which generates objects of the concrete classes `RoadBike`, `DirtBike`, and `CityBike`:
 
-![](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_a_conventional.puml)
+![](../solid_principles_D_a_conventional.png)
 
 To apply the dependency inversion principle, we create a `Rentable` interface that is implemented by each type of bike. Then, the factory can simply generate objects of type `Rentable`:
 
-![](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_a_OO.puml)
+![](../solid_principles_D_a_OO.png)
 
 The new design fulfills the dependency inversion principle because the details (i.e. the specific types of bikes) depend on abstractions (`Bike`), rather than the other way around.
 

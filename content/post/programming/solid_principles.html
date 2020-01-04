@@ -66,7 +66,7 @@ private:
 <li>An <code>InvoiceGenerator</code> class should deal with the <strong>accounting</strong></li>
 </ul>
 <p>The sequence diagram for the redesigned bike rental scheme would look like this:</p>
-<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_S.puml" /></p>
+<p><img src="../solid_principles_S.png" /></p>
 <p>To implement, the new design, we’ll start with declaring the <code>Lease</code> class:</p>
 <pre class="cpp"><code>class Lease {
 
@@ -189,7 +189,7 @@ private:
 };</code></pre>
 <p>Here, the <code>createInvoice()</code> method generates the invoice as an HTML document. In our case, we would like to use <em>Comic Sans MS</em> for all customers whose age is less than 14 and <em>Arial</em> for all others. Because we don’t want to modify the <code>createInvoice()</code> method to implement the new behavior, we will refactor <code>InvoiceGenerator</code> in order to satisfy the open-closed principle.</p>
 <p>One way to achieve this is to use the decorator pattern. By applying this pattern, we can modify the style of the generated invoice by introducing decorator classes. To implement the pattern, we turn <code>InvoiceGenerator</code> into an abstract class and let <code>InvoiceDecorator</code> implement the <code>InvoiceGenerator</code> interface:</p>
-<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_O_OO.puml" /></p>
+<p><img src="../solid_principles_O_OO.png" /></p>
 <p>The new design results in the following classes:</p>
 <pre class="cpp"><code>class InvoiceGenerator {
 public:
@@ -429,18 +429,18 @@ class LeanJeans : LeanRentable, Wearable {
 <div id="applying-dependency-inversion-to-module-dependencies" class="section level3">
 <h3>Applying Dependency Inversion to Module Dependencies</h3>
 <p>This example demonstrates the first aspect of the dependency inversion principle, which states that both high- and low-level modules should depend on abstractions. A traditional dependency structure would be as follows:</p>
-<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_traditional.puml" /></p>
+<p><img src="../solid_principles_D_traditional.png" /></p>
 <p>Here, the high-level module depends directly on low-level components. This means that there is strong coupling, with all its disadvantages. Applying the dependency-inversion principle, we would obtain the following dependency structure:</p>
-<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_OO.puml" /></p>
+<p><img src="../solid_principles_D_OO.png" /></p>
 <p>Here, the high-level module depends on abstraction (interfaces) rather than concrete implementations. Since the low-level modules implement interfaces, they also depend on abstractions.</p>
 </div>
 <div id="applying-dependency-inversion-to-abstractions" class="section level3">
 <h3>Applying Dependency Inversion to Abstractions</h3>
 <p>This example demonstrates the second aspect of the dependency inversion principle, which states that abstractions should not depend on details but that details should depend on abstractions.</p>
 <p>Let’s consider an example where the principle is not fulfilled, that is, where abstractions depend on details. Let’s assume we are concerned with bikes. To encapsulate the creation of different types of bikes, we create a class <code>BikeFactory</code>, which generates objects of the concrete classes <code>RoadBike</code>, <code>DirtBike</code>, and <code>CityBike</code>:</p>
-<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_a_conventional.puml" /></p>
+<p><img src="../solid_principles_D_a_conventional.png" /></p>
 <p>To apply the dependency inversion principle, we create a <code>Rentable</code> interface that is implemented by each type of bike. Then, the factory can simply generate objects of type <code>Rentable</code>:</p>
-<p><img src="http://www.plantuml.com/plantuml/proxy?cache=no&amp;src=https://raw.githubusercontent.com/rbind/data-blog/master/content/post/programming/solid_principles_D_a_OO.puml" /></p>
+<p><img src="../solid_principles_D_a_OO.png" /></p>
 <p>The new design fulfills the dependency inversion principle because the details (i.e. the specific types of bikes) depend on abstractions (<code>Bike</code>), rather than the other way around.</p>
 </div>
 </div>
