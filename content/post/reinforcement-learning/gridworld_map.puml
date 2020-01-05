@@ -1,0 +1,7 @@
+@startuml
+MapParser --> Map
+Map *-- Cell
+EmptyCell --|> Cell
+GoalCell --|> Cell
+Wall --|> Cell
+@enduml
