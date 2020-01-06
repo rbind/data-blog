@@ -1,5 +1,5 @@
 ---
-title: "Reinforcement Learning in a Gridworld"
+title: "Dynamic Programming for Solving a Markov Decision Process in Gridworld"
 author: Matthias Döring
 downloadRmd: true
 date: '2020-01-05'
@@ -8,8 +8,7 @@ description: "TODO"
 categories:
   - machine-learning
 tags:
-    - supervised learning
-    - r
+    - reinforcement learning
 thumbnail: "/post/reinforcement-learning/TODO"
 ---
 In reinforcement learning, we are interested in identifying a policy that maximizes the obtained reward. Assuming a perfect model of the environment as a Markov decision process (MDPs), we can apply dynamic programming methods to solve reinforcement learning problems.
@@ -366,7 +365,7 @@ Calling the function gives us the following result:
 
 ![](../policy_value_function.png)
 
-For non-goal cells, the plot is annotated with the actions specified by the policy. The goal is indicated by the `Goal` label. The value of the individual cells is indicated by their color. Walls (infinite value) are shown in white. The worst states (with the lowest reward) are shown in purple, bad states in blue, intermediate states in turquois, good states in green, and very good states (with the highest reward) are shown in yellow. 
+For non-goal cells, the plot is annotated with the actions specified by the policy. The goal in the upmost right cell is indicated by the `X` label. The value of the individual cells is indicated by their color. Walls (infinite value) are shown in white. The worst states (with the lowest reward) are shown in purple, bad states in blue, intermediate states in turquois, good states in green, and very good states (with the highest reward) are shown in yellow. 
 
 Looking at the values, we can see that the results are reasonable as they match the actions dicated by the policy. For example, the state directly to the west of the goal has a very low value because this state's action (`GO_WEST`) leads to an extreme detour. The cell directly south of the goal has a very high value because its action (`GO_NORTH`) leads directly to the goal.
 
@@ -451,6 +450,10 @@ def policyIteration(policy, gridWorld):
 ```
 
 Running the algorithm on the gridworld leads to the optimal solution within 20 iterations, which equate roughly 4,5 seconds on my notebook. The termination after 20 iterations doesn't come as a surprise: the width of the gridworld map is 19. So we need 19 iterations to optimize the values of the horizontal corridor. Then, we need one additional iteration to determine that the algorithm can terminate because the policy hasn't changed.
+
+A great tool for understanding policy iteration is the visualization of individual iterations of the procedure:
+
+![](../policy_iteration.gif)
 
 The following figure shows the optimal value function that has been constructed using policy iteration:
 
