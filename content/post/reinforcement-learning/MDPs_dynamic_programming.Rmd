@@ -6,9 +6,9 @@ date: '2020-01-05'
 draft: false
 description: "TODO"
 categories:
-  - machine-learning
+    - machine-learning
 tags:
-    - reinforcement learning
+    - reinforcement-learning
 thumbnail: "/post/reinforcement-learning/TODO"
 ---
 In reinforcement learning, we are interested in identifying a policy that maximizes the obtained reward. Assuming a perfect model of the environment as a Markov decision process (MDPs), we can apply dynamic programming methods to solve reinforcement learning problems.
@@ -145,6 +145,22 @@ Note that the policy file retains the walls and the goal cell for better readabi
 
 To load the policy, I implemented a [policy parser](https://github.com/matdoering/gridworld/blob/master/src/PolicyParser.py), which stores the policy as a [policy object](https://github.com/matdoering/gridworld/blob/master/src/Policy.py).
 
+The policy object has a function for modeling $\pi(s,a)$:
+
+```python
+def pi(self, cell, action):
+    if len(self.policy) == 0:
+        # no policy: try all actions
+        return 1
+
+    if self.policyActionForCell(cell) == action:
+        # policy allows this action
+        return  1
+    else:
+        # policy forbids this action
+        return 0
+```
+
 ## Preparations for Reinforcement Learning
 
 To prepare the implementation of the reinforcement learning algorithms, we still need to provide a transition and a reward function.
@@ -261,7 +277,7 @@ def findConvergedCells(self, V_old, V_new, theta = 0.01):
     return np.where(diff < theta)[0]
 ```
 
-The function determines the indices of grid cells whose value function difference was less than $\theta$. When the values of all states have converged to a stable value, we can stop. Since this is not always the case (e.g. if there are states that cannot reach the goal), we need another stopping criterion. For this, I simply limit the number of maximal iterations. Once the stopping criterion is reached, `evaluatePolicy` returns the last computed state-value function.
+The function determines the indices of grid cells whose value function difference was less than $\theta$. When the values of all states have converged to a stable value, we can stop. Since this is not always the case (e.g. if the policy specifies states with actions that do not lead to the goal or when the transition probabilities/rewards are configured inappropriately), we need another stopping criterion. For this, I simply limit the number of maximal iterations. Once the stopping criterion is reached, `evaluatePolicy` returns the last computed state-value function.
 
 ```python
 def evaluatePolicy(self, gridWorld, gamma = 1):
@@ -279,7 +295,6 @@ def evaluatePolicy(self, gridWorld, gamma = 1):
         V_new = self.evaluatePolicySweep(gridWorld, V_old, gamma, convergedCellIndices)
         convergedCellIndices = self.findConvergedCells(V_old, V_new)
         if iter > maxIterations:
-            print("Terminated policy evaluation after " + str(maxIterations) + " iterations")
             break
     print("Policy evaluation converged after iteration: " + str(iter))
     return V_new
@@ -288,21 +303,23 @@ def evaluatePolicy(self, gridWorld, gamma = 1):
 Now, we still need to implement the function that is doing one sweep of policy evaluation, the `evaluatePolicySweep` function. The function iterates over all cells in the grid and determines the new value of the state. To optimize the computation, values of converged cells are not updated in consecutive sweeps and only cells that can be entered (i.e. non-walls) are considered:
 
 ```python
-    def evaluatePolicySweep(self, gridWorld, V_old, gamma, ignoreCellIndices):
-        V = initValues(gridWorld)
-        # evaluate policy for every state (i.e. for every viable actor position)
-        for (i,cell) in enumerate(gridWorld.getCells()):
-            if np.any(ignoreCellIndices == i):
-                V[i] = V_old[i]
-            else:
-                if cell.canBeEntered():
-                    gridWorld.setActor(cell)
-                    V_s = self.evaluatePolicyForState(gridWorld, V_old, gamma)
-                    gridWorld.unsetActor(cell)
-                    V[i] = V_s
-        self.setValues(V)
-        return V
+def evaluatePolicySweep(self, gridWorld, V_old, gamma, ignoreCellIndices):
+    V = initValues(gridWorld)
+    # evaluate policy for every state (i.e. for every viable actor position)
+    for (i,cell) in enumerate(gridWorld.getCells()):
+        if np.any(ignoreCellIndices == i):
+            V[i] = V_old[i]
+        else:
+            if cell.canBeEntered():
+                gridWorld.setActor(cell)
+                V_s = self.evaluatePolicyForState(gridWorld, V_old, gamma)
+                gridWorld.unsetActor(cell)
+                V[i] = V_s
+    self.setValues(V)
+    return V
 ```
+
+Note that the `ignoreCellIndices` parameter represents the indices of cells for which subsequent sweeps didn't change the value function. These cells are ignored in further iterations to improve the performance. This is fine for our gridworld example because we are just interested in finding the shortest path. So, the first time that a state's value function doesn't change, this is its optimal value.
 
 The value of a state is then computed using the `evaluatePolicyForState` function. An important idea for this function is that we do not want to scan all states $s'$ when computing the value function for state $s$. This is why the [state generator](https://github.com/matdoering/gridworld/blob/master/src/StateGenerator.py) generates only those states that can actually occur (i.e. have transition probabilities different from zero). Otherwise, the method simply implements the equations from
 Bellman:
@@ -463,7 +480,75 @@ Visual inspection shows that the value function is correct, as it chooses the sh
 
 ## Value Iteration
 
-With the tools we have explored until now, a new question arises: why do we need to consider an initial policy at all? The idea of the [value iteration algorithm](http://incompleteideas.net/book/first/ebook/node44.html) is that we can compute the value function without a policy. Instead of letting the policy, $\pi$, dicate which actions are selected, we will instead select those actions that maximize the expected reward: 
+With the tools we have explored until now, a new question arises: why do we need to consider an initial policy at all? The idea of the [value iteration algorithm](http://incompleteideas.net/book/first/ebook/node44.html) is that we can compute the value function without a policy. Instead of letting the policy, $\pi$, dictate which actions are selected, we will select those actions that maximize the expected reward: 
 
 \[V_{k+1}(s) = \max_{a} \sum_{s'} P_{ss'}^a [R_{ss'}^a + \gamma V_k(s')] \]
+
+If this formula looks familar to you, this is not surprising. Remember that policy evaluation is defined as
+
+\[V_{k+1}(s) = \sum_{a} \pi(s,a) \sum_{s'} P_{ss'}^a [R_{ss'}^a + \gamma V^{\pi}_k(s')] \]
+
+In fact, I already sneaked the functionality for doing value iteration into the `evaluatePolicyForState` method that I defined earlier:
+
+```python
+def evaluatePolicyForState(self, gridWorld, V_old, gamma):
+    V = 0
+    cell = gridWorld.getActorCell()
+    stateGen = StateGenerator()
+    transitionRewards = [-np.inf] * len(Actions)
+    for (i, actionType) in enumerate(Actions):
+        gridWorld.setActor(cell) # set state
+        actionProb = self.pi(cell, actionType)
+        if actionProb == 0 or actionType == Actions.NONE:
+            continue
+        newStates = stateGen.generateState(gridWorld, actionType, cell)
+        transitionReward = 0
+        for newActorCell in newStates:
+            V_newState = V_old[newActorCell.getIndex()]
+            # Bellman equation
+            newStateReward = getTransitionProbability(cell, newActorCell, actionType, gridWorld) *\
+                                (R(cell, newActorCell, actionType) +\
+                                gamma * V_newState)
+            transitionReward += newStateReward
+        transitionRewards[i] = transitionReward
+        V_a = actionProb * transitionReward
+        V += V_a
+    if len(self.policy) == 0:
+        V = max(transitionRewards)
+    return V
+```
+
+This function performs the value iteration algorithm as long as no policy is available. In this case, `len(self.policy)` will be zero such that `pi` always returns a value of one and such that `V` is determined as the maximum over the expected rewards for all actions.
+
+So, to implement value iteration, we don't have to do a lot of coding. We just have to iteratively call the `evaluatePolicySweep` function on a `Policy` object whose value function is unknown until the procedure gives us the optimal result. Then, to determine the corresponding policy, we merely call the `findGreedyPolicy` function that we've defined earlier:
+
+```python
+def valueIteration(self, gridWorld, gamma = 1):
+    self.resetPolicy() # ensure empty policy before calling evaluatePolicy
+    V_old = None
+    V_new = np.repeat(0, gridWorld.size())
+    convergedCellIndices = np.zeros(0) # cells where values don't change anymore
+    while len(convergedCellIndices) != len(V_new):
+        V_old = V_new
+        V_new = self.evaluatePolicySweep(gridWorld, V_old, gamma, convergedCellIndices)
+        convergedCellIndices = self.findConvergedCells(V_old, V_new)
+    greedyPolicy = findGreedyPolicy(V_new, gridWorld, self.gameLogic)
+    self.setPolicy(greedyPolicy)
+    self.setWidth(gridWorld.getWidth())
+    self.setHeight(gridWorld.getHeight())
+    return(V_new)
+```
+
+So, how does value iteration perform? For our gridworld example, only 25 iterations are necessary and the result is available within less than half a second. Remember that this is roughly the same time that was needed to run `evaluatePolicy` once for our badly designed initial policy. The reason why value iteration is much faster than policy iteration is that we immediately select the optimal action rather than cycling between the policy evaluation and policy
+improvement steps.
+
+When performing value iteration, the reward (high: yellow, low: dark) spreads from the terminal state at the goal (top right `X`) to the other states:
+
+![](../value_iteration.gif)
+
+## Summary
+
+We have seen how reinforcement learning can be applied in the context of MDPs. We worked under the assumption that we have total knowledge of the environment and that the agent is fully aware of the environment. Based on this, we were able to facilitate dynamic programming to solve two problems. First, we used the policy improvement algorithm to improve upon an existing policy. Second, we applied value iteration to find an optimal value function and policy from scratch.
+
+Note that these algorithms deal with a very basic problem where the agent didn't need to explore the environment. Instead, we were able to precompute the optimal value function, which is also known as *planning*. Still, understanding these concepts is crucial to do reinforcement learning in settings where we have to actively explore the environment in order to modulate the agent's policy.
 
