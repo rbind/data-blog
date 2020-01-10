@@ -1,0 +1,463 @@
+---
+title: "Dynamic Programming for Solving a Markov Decision Process in Gridworld"
+author: Matthias Döring
+downloadRmd: false
+date: '2020-01-10'
+draft: false
+description: "With perfect knowledge of the environment, reinforcement learning can be used to plan the behavior of an agent. In this post, I use gridworld to demonstrate three dynamic progrmaming algorithms for Markov decision processes: policy evaluation, policy iteration, and value iteration."
+categories:
+    - machine-learning
+tags:
+    - reinforcement-learning
+    - python
+thumbnail: "/post/reinforcement-learning/MDPs_dynamic_programming_avatar.jpeg"
+---
+
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<script src="/rmarkdown-libs/elevate-section-attrs/elevate-section-attrs.js"></script>
+
+
+<p>In reinforcement learning, we are interested in identifying a policy that maximizes the obtained reward. Assuming a perfect model of the environment as a <a href="https://en.wikipedia.org/wiki/Markov_decision_process">Markov decision process</a> (MDPs), we can apply dynamic programming methods to solve reinforcement learning problems.</p>
+<p>In this post, I present three dynamic programming algorithms that can be used in the context of MDPs. To make these concepts more understandable, I implemented the algorithms in the context of a gridworld, which is a popular example for demonstrating reinforcement learning.</p>
+<p>Before we being with the application, I would like to quickly provide the theoretical background that is required for the following work on the gridworld.</p>
+<div id="key-reinforcement-learning-terms-for-mdps" class="section level3">
+<h3>Key Reinforcement Learning Terms for MDPs</h3>
+<p>The following sections explain the key terms of reinforcement learning, namely:</p>
+<ul>
+<li><strong>Policy:</strong> Which actions the agent should execute in which state</li>
+<li><strong>State-value function:</strong> The expected value of each state with regard to future rewards</li>
+<li><strong>Action-value function:</strong> The expected value of performing a specific action in a specific state with regard to future rewards</li>
+<li><strong>Transition probability:</strong> The probability to transition from one state to another</li>
+<li><strong>Reward function:</strong> The reward that the agent obtains when transitioning between states</li>
+</ul>
+<div id="policy" class="section level4">
+<h4>Policy</h4>
+<p>A policy, <span class="math inline">\(\pi(s,a)\)</span>, determines the probability of executing action <span class="math inline">\(a\)</span> in state <span class="math inline">\(s\)</span>. In deterministic environments, a policy directly maps from states to actions.</p>
+</div>
+<div id="state-value-function" class="section level4">
+<h4>State-Value Function</h4>
+<p>Given a policy <span class="math inline">\(\pi\)</span>, the state-value function <span class="math inline">\(V^{\pi}(s)\)</span> maps each state <span class="math inline">\(s\)</span> to the expected return that the agent can obtain in this state:</p>
+<p><span class="math display">\[V^{\pi}(s) = E_{\pi} \{R_t | s_t = s\} = E_{\pi} \{\sum_{k=0}^{\infty} \gamma^k r_{t+k+1} | s_t = s\}\]</span></p>
+<p>In the formula, <span class="math inline">\(s_t\)</span> indicates the state at time <span class="math inline">\(t\)</span>. The parameter <span class="math inline">\(\gamma \in [0,1]\)</span> is called the <strong>discount factor</strong>. It determines the impact of rewards in the future. If we set <span class="math inline">\(\gamma = 1\)</span>, this indicates that we are sure about the future because we do not have to discount future rewards. For <span class="math inline">\(\gamma &lt; 1\)</span>, we take the uncertainty about the future into account and give greater weight to more recently earned rewards.</p>
+</div>
+</div>
+<div id="action-value-function" class="section level3">
+<h3>Action-Value Function</h3>
+<p>Given a policy <span class="math inline">\(\pi\)</span>, the action-value function <span class="math inline">\(Q{^\pi}(s,a)\)</span> determines the expected reward when executing action <span class="math inline">\(a\)</span> in state <span class="math inline">\(s\)</span>:</p>
+<p><span class="math display">\[Q^{\pi}(s,a) = E_{\pi}\{R_t | s_t = s, a_t = a\} = E_{\pi} \{\sum_{k=0}^{\infty} \gamma^k r_{t+k+1} | s_t = s, a_t = a\} \]</span></p>
+</div>
+<div id="transition-probability" class="section level3">
+<h3>Transition Probability</h3>
+<p>Executing an action <span class="math inline">\(a\)</span> in state <span class="math inline">\(s\)</span> may transition the agent to state <span class="math inline">\(s&#39;\)</span>. The probability that this transition takes place is described by <span class="math inline">\(P_{ss&#39;}^a\)</span>.</p>
+</div>
+<div id="reward-function" class="section level3">
+<h3>Reward Function</h3>
+<p>The reward function, <span class="math inline">\(R_{ss&#39;}^a\)</span>, specifies the reward that is obtained when the agent transitions from state <span class="math inline">\(s\)</span> to state <span class="math inline">\(s&#39;\)</span> via action <span class="math inline">\(a\)</span>.</p>
+</div>
+<div id="demonstration-of-three-basic-mdp-algorithms-in-gridworld" class="section level2">
+<h2>Demonstration of Three Basic MDP Algorithms in Gridworld</h2>
+<p>In this post, you will learn how to apply three algorithms for MDPs in a gridworld:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Policy Evaluation:</strong> Given a policy <span class="math inline">\(\pi\)</span>, what is the value function associated with <span class="math inline">\(\pi\)</span>?</li>
+<li><strong>Policy Iteration:</strong> Given a policy <span class="math inline">\(\pi\)</span>, how can we find the optimal policy <span class="math inline">\(\pi^{\ast}\)</span>?</li>
+<li><strong>Value Iteration:</strong> How can we find an optimal policy <span class="math inline">\(\pi^{\ast}\)</span> from scratch?</li>
+</ol>
+<p>In gridworld, the goal of the agent is to reach a specified location in the grid. The agent can either go north, go east, go south, or go west. These actions are represented by the set : <span class="math inline">\(\{N, E, S, W\}\)</span>. Note that the agent knows the state (i.e. its location in the grid) at all times.</p>
+<p>To make life a bit harder, there are walls in the grid through which the agent cannot pass. Rather, when trying to move through a wall, the agent remains in its position. For example, when the agent chooses action <span class="math inline">\(N\)</span> and there is a wall to the north of the agent, the agent will remain in its place.</p>
+</div>
+<div id="basic-gridworld-implementation" class="section level2">
+<h2>Basic Gridworld Implementation</h2>
+<p>I’ve implemented the gridworld in an object-oriented manner. The following sections describe how I designed the code for the map and the policy entities.</p>
+<div id="representing-the-gridworld-map" class="section level3">
+<h3>Representing the Gridworld Map</h3>
+<p>To implement gridworld, the first thing I started with was a class for representing the map. I defined the following format to represent individual grid cells:</p>
+<ul>
+<li><code>#</code> indicate walls</li>
+<li><code>X</code> indicates the goal</li>
+<li>Blanks indicate empty tiles</li>
+</ul>
+<p>Relying on these symbols, I constructed <a href="https://github.com/matdoering/gridworld/blob/master/data/map01.grid">the following map</a>, which is used in the following work:</p>
+<pre class="text"><code>###################
+#                X#
+#   ###########   #
+#   #         #   #
+#   # ####### #   #
+#   # #     # #   #
+#     #  #  #     #
+#        #        #
+#                 #
+###             ###
+#                 #
+###################</code></pre>
+<p>The map-related entities of the code are structured like this:</p>
+<p><img src="../gridworld_map.png" /></p>
+<p>I implemented <a href="https://github.com/matdoering/gridworld/blob/master/src/MapParser.py">MapParser</a>, which generates a <a href="https://github.com/matdoering/gridworld/blob/master/src/Map.py">Map object</a>. The map object controls the access to the <a href="https://github.com/matdoering/gridworld/blob/master/src/Cell.py">cells</a> of the gridworld. Individual cell subclasses define the behavior of specific cells such as empty cells, walls, and the goal cell. Each cell can be identified using its row and column
+index.</p>
+<p>With this setup, a map can be conveniently loaded:</p>
+<pre class="python"><code>parser = MapParser()
+gridMap = parser.parseMap(&quot;../data/map01.grid&quot;)</code></pre>
+</div>
+<div id="loading-a-policy" class="section level3">
+<h3>Loading a Policy</h3>
+<p>For reinforcement learning, we need to be able to deal with a policy, <span class="math inline">\(\pi(s,a)\)</span>. In gridworld, each state <span class="math inline">\(s\)</span> represents a position of the agent. The actions move the agent one step into one of the four geographic directions. We will use the following symbols to map a policy onto a map:</p>
+<ul>
+<li>N for the action <code>GO_NORTH</code></li>
+<li>E for the action <code>GO_EAST</code></li>
+<li>S for the action <code>GO_SOUTH</code></li>
+<li>W for the action <code>GO_WEST</code></li>
+</ul>
+<p>Unknown symbols are mapped to a <code>NONE</code> <a href="https://github.com/matdoering/gridworld/blob/master/src/Action.py">action</a> in order to obtain a complete policy.</p>
+<p>Using these definitions, I defined <a href="https://github.com/matdoering/gridworld/blob/master/data/map01.policy">the following policy</a>:</p>
+<pre class="text"><code>###################
+#EESWWWWWWWWWWWWWX#
+#EES###########SWN#
+#EES#EEEEEEEES#SWN#
+#EES#N#######S#SWN#
+#EES#N#SSWWW#S#SWN#
+#EEEEN#SS#NN#SWSWN#
+#EENSSSSS#NNWWWWWN#
+#EENWWWWEEEEEEEEEN#
+###NNNNNNNNNNNNN###
+#EENWWWWWWWWWWWWWW#
+###################</code></pre>
+<p>Note that the policy file retains the walls and the goal cell for better readability. The policy was written with two goals in mind:</p>
+<ol style="list-style-type: decimal">
+<li><strong>The agent should be able to reach the goal.</strong> With a policy where this property is not fulfilled, policy evaluation will not give a reasonable result because the reward at the goal will never be earned.</li>
+<li><strong>The policy should be suboptimal</strong>. This means that there are states where the agent doesn’t take the shortest path to the goal. Such a policy allows us to see the effect of algorithms that try to improve upon the initial policy.</li>
+</ol>
+<p>To load the policy, I implemented a <a href="https://github.com/matdoering/gridworld/blob/master/src/PolicyParser.py">policy parser</a>, which stores the policy as a <a href="https://github.com/matdoering/gridworld/blob/master/src/Policy.py">policy object</a>. Using these objects, we can load our initial policy like so:</p>
+<pre class="python"><code>policyParser = PolicyParser()
+policy = policyParser.parsePolicy(&quot;../data/map01.policy&quot;)</code></pre>
+<p>The policy object has a function for modeling <span class="math inline">\(\pi(s,a)\)</span>:</p>
+<pre class="python"><code>def pi(self, cell, action):
+    if len(self.policy) == 0:
+        # no policy: try all actions (for value iteration)
+        return 1
+
+    if self.policyActionForCell(cell) == action:
+        # policy allows this action
+        return  1
+    else:
+        # policy forbids this action
+        return 0</code></pre>
+</div>
+</div>
+<div id="preparations-for-reinforcement-learning" class="section level2">
+<h2>Preparations for Reinforcement Learning</h2>
+<p>To prepare the implementation of the reinforcement learning algorithms, we still need to provide a transition and a reward function.</p>
+<div id="transition-function" class="section level3">
+<h3>Transition Function</h3>
+<p>To define the transition function <span class="math inline">\(P_{ss&#39;}^a\)</span>, we first need to to differentiate between illegal and legal actions. In gridworld, there are two ways that an action can be illegal:</p>
+<ol style="list-style-type: decimal">
+<li>If the action would take the agent off the grid</li>
+<li>If the action would move the agent into a wall</li>
+</ol>
+<p>The gives us the first rule for the transition function:</p>
+<pre><code>1. When an action is illegal, the agent should remain in its previous state.</code></pre>
+<p>Additionally, we must also require:</p>
+<pre><code>2. When an action is illegal, transitions to states other than its previous state should be forbidden.</code></pre>
+<p>So what about legal actions? Of course, state transition must be valid with regard to the chosen action. Since each action moves the agent only a single position, a proposed state <span class="math inline">\(s&#39;\)</span> must have the agent in a cell that is adjacent to the one in state <span class="math inline">\(s\)</span>:</p>
+<pre><code>3. Only allow transitions through actions that would lead the agent to an adjacent cell.</code></pre>
+<p>For this rule, we assume that there is a predicate <span class="math inline">\(adj(s,s&#39;)\)</span> to indicate whether the agent’s transition from <span class="math inline">\(s\)</span> to <span class="math inline">\(s&#39;\)</span> involved adjacent cells.</p>
+<p>Finally, once we have reached the goal state, <span class="math inline">\(s^{\ast}\)</span>, we don’t want the agent to move away again. To stipulate this, we introduce the final rule:</p>
+<pre><code>4. Don&#39;t transition from the goal cell.</code></pre>
+<p>Based on these four rules, we can define the transition function as follows:</p>
+<p><span class="math display">\[P_{ss&#39;}^a =
+\begin{cases}
+1 &amp; \forall \quad \text{illegal action with $s = s&#39;$} &amp; \text{Rule 1} \\
+0 &amp; \forall \quad \text{illegal action with $s \neq s&#39;$} &amp;\text{Rule 2} \\
+1 &amp; \forall \quad \text{legal action with adj(s,s&#39;)} &amp; \text{Rule 3} \\ 
+0 &amp; \forall \quad \text{if $s = s^{\ast}$} &amp; \text{Rule 4}
+\end{cases}
+\]</span></p>
+<p>The Python implementation provided by <code>getTransitionProbability</code> is a not as clear-cut as the mathematical formulation, but I will provide it nonetheless:</p>
+<pre class="python"><code>
+def transitionProbabilityForIllegalMoves(oldState, newState):
+    if newState == oldState:
+        # Rule 1: stay at oldState if action is illegal
+        return 1
+    else:
+        # Rule 2: dont transition to &#39;newState&#39; if action is illegal
+        return 0
+
+def getTransitionProbability(self, oldState, newState, action, gridWorld):
+    proposedCell = gridWorld.proposeMove(action)
+    if proposedCell is None:
+        # Rule 1 and 2: illegal move 
+        return transitionProbabilityForIllegalMoves(oldState, newState)
+    if oldState.isGoal():
+        # Rule 4: stay at goal
+        return 0
+    if proposedCell != newState:
+        # Rule 3: move not possible
+        return 0
+    else:
+        # Rule 3: move possible
+        return 1
+</code></pre>
+<p>Note that <code>proposeMove</code> simulates the successful execution of an action and returns the new grid cell of the agent.</p>
+</div>
+<div id="reward-function-1" class="section level3">
+<h3>Reward Function</h3>
+<p>In gridworld, we want to find the shortest path to the terminal state. We want to maximize the obtained rewards, so the reward at the goal state, <span class="math inline">\(s^{\ast}\)</span> should be higher than the reward at the other states. For the gridworld, we will use the following simple function:</p>
+<p><span class="math display">\[R_{ss&#39;}^a =
+\begin{cases}
+-1 &amp; \forall s&#39; \neq s^{\ast} \\ 
+0 &amp; \forall s&#39; = s^{\ast}
+\end{cases}
+\]</span></p>
+<p>The Python implementation is given by</p>
+<pre class="python"><code>def R(self, oldState, newState, action):
+        # reward for state transition from oldState to newState via action
+        if newState and newState.isGoal():
+            return 0
+        else:
+            return -1</code></pre>
+</div>
+</div>
+<div id="policy-evaluation" class="section level2">
+<h2>Policy Evaluation</h2>
+<p>The goal of the <a href="http://incompleteideas.net/book/first/ebook/node41.html">policy evaluation algorithm</a> is to evaluate a policy <span class="math inline">\(\pi(s,a)\)</span>, that is, to determine the value of all states in terms of <span class="math inline">\(V(s) \forall s\)</span>. The algorithm is based on the Bellman equation:
+<span class="math display">\[V_{k+1}(s) = \sum_{a} \pi(s,a) \sum_{s&#39;} P_{ss&#39;}^a [R_{ss&#39;}^a + \gamma V^{\pi}_k(s&#39;)] \]</span>
+For iteration <span class="math inline">\(k+1\)</span>, the equation yields the value of state <span class="math inline">\(s\)</span> via:</p>
+<ul>
+<li><span class="math inline">\(\pi(s,a)\)</span>: the probability of choosing action <span class="math inline">\(a\)</span> in state <span class="math inline">\(s\)</span></li>
+<li><span class="math inline">\(P_{ss&#39;}^a\)</span>: the probability of transitioning from state <span class="math inline">\(s\)</span> to state <span class="math inline">\(s&#39;\)</span> using action <span class="math inline">\(a\)</span></li>
+<li><span class="math inline">\(R_{ss&#39;}^a\)</span>: the expected reward when transitioning from state <span class="math inline">\(s\)</span> to state <span class="math inline">\(s&#39;\)</span> using action <span class="math inline">\(a\)</span></li>
+<li><span class="math inline">\(\gamma\)</span>: the discount rate</li>
+<li><span class="math inline">\(V^{\pi}_k(s&#39;)\)</span>: the value of state <span class="math inline">\(s&#39;\)</span> in step <span class="math inline">\(k\)</span>, given the policy <span class="math inline">\(\pi\)</span></li>
+</ul>
+<p>For a better understanding of the equations, let’s consider it piece by piece, in the context of gridworld:</p>
+<ul>
+<li><span class="math inline">\(\pi(s,a)\)</span>: Since we’re in a deterministic environment, a policy only specifies a single action, <span class="math inline">\(a\)</span>, with <span class="math inline">\(\pi(s,a) = 1\)</span>, while all other actions, <span class="math inline">\(a&#39;\)</span>, have <span class="math inline">\(\pi(s,a&#39;) = 0\)</span>. So, the multiplication by <span class="math inline">\(\pi(s,a)\)</span> just selects the action that is specified by the policy.</li>
+<li><span class="math inline">\(\sum_{s&#39;}\)</span>: This sum is over all states, <span class="math inline">\(s&#39;\)</span>, that can be reached from the current state <span class="math inline">\(s\)</span>. In gridworld, we merely need to consider adjacent cells and the current cell itself, i.e. <span class="math inline">\(s&#39; \in \{x | adj(x,s) \lor x = s\}\)</span>.</li>
+<li><span class="math inline">\(P_{ss&#39;}^a\)</span>: This is the probability of transitioning from state <span class="math inline">\(s\)</span> to <span class="math inline">\(s&#39;\)</span> via action <span class="math inline">\(a\)</span>.</li>
+<li><span class="math inline">\(R_{ss&#39;}^a\)</span>: This is the reward for the transition from <span class="math inline">\(s\)</span> to <span class="math inline">\(s&#39;\)</span> via <span class="math inline">\(a\)</span>. Note that in gridworld, the reward is merely determined by the next state, <span class="math inline">\(s&#39;\)</span>.</li>
+<li><span class="math inline">\(\gamma\)</span>: The discounting factor modulates the impact of the expected reward.</li>
+<li><span class="math inline">\(V_{k}(s&#39;)\)</span>: The expected reward at the proposed state, <span class="math inline">\(s&#39;\)</span>. The presence of this term is why policy evaluation is dynamic programming: we are using previously computed values to update the current value.</li>
+</ul>
+<p>We will use <span class="math inline">\(\gamma = 1\)</span> because we are in an episodic setting where learning episodes stop when we reach the goal state.
+Because of this, the value function represents the length of the shortest path to the goal cell. More, precisely, let <span class="math inline">\(d(s,s^{\ast})\)</span> indicate the shortest path from state <span class="math inline">\(s\)</span> to the goal. Then, <span class="math inline">\(V^{\pi}(s) = -d(s, s^{\ast}) + 1\)</span> for <span class="math inline">\(s \neq s^{\ast}\)</span>.</p>
+<p>To implement policy evaluation, we will typically perform multiple sweeps of the state space. Each sweep requires the value function from the previous iteration. The difference between the new and old value function is often used as a stopping criterion for the algorithm:</p>
+<pre class="python"><code>def findConvergedCells(self, V_old, V_new, theta = 0.01):
+    diff = abs(V_old-V_new)
+    return np.where(diff &lt; theta)[0]</code></pre>
+<p>The function determines the indices of grid cells whose value function difference was less than <span class="math inline">\(\theta\)</span>. When the values of all states have converged to a stable value, we can stop. Since this is not always the case (e.g. if the policy specifies states with actions that do not lead to the goal or when the transition probabilities/rewards are configured inappropriately), we also specify a maximal number of iterations.</p>
+<p>Once the stopping criterion is reached, <code>evaluatePolicy</code> returns the latest state-value function:</p>
+<pre class="python"><code>def evaluatePolicy(self, gridWorld, gamma = 1):
+    if len(self.policy) != len(gridWorld.getCells()):
+        # sanity check whether policy matches dimension of gridWorld
+        raise Exception(&quot;Policy dimension doesn&#39;t fit gridworld dimension.&quot;)
+    maxIterations = 500
+    V_old = None
+    V_new = initValues(gridWorld) # sets value of 0 for viable cells
+    iter = 0
+    convergedCellIndices = np.zeros(0)
+    while len(ConvergedCellIndices) != len(V_new):
+        V_old = V_new
+        iter += 1
+        V_new = self.evaluatePolicySweep(gridWorld, V_old, gamma, convergedCellIndices)
+        convergedCellIndices = self.findConvergedCells(V_old, V_new)
+        if iter &gt; maxIterations:
+            break
+    print(&quot;Policy evaluation converged after iteration: &quot; + str(iter))
+    return V_new</code></pre>
+<p>Once sweep of policy evaluation is performed by the <code>evaluatePolicySweep</code> function. The function iterates over all cells in the grid and determines the new value of the state:</p>
+<pre class="python"><code>def evaluatePolicySweep(self, gridWorld, V_old, gamma, ignoreCellIndices):
+    V = initValues(gridWorld)
+    # evaluate policy for every state (i.e. for every viable actor position)
+    for (i,cell) in enumerate(gridWorld.getCells()):
+        if np.any(ignoreCellIndices == i):
+            V[i] = V_old[i]
+        else:
+            if cell.canBeEntered():
+                gridWorld.setActor(cell)
+                V_s = self.evaluatePolicyForState(gridWorld, V_old, gamma)
+                gridWorld.unsetActor(cell)
+                V[i] = V_s
+    self.setValues(V)
+    return V</code></pre>
+<p>Note that the <code>ignoreCellIndices</code> parameter represents the indices of cells for which subsequent sweeps didn’t change the value function. These cells are ignored in further iterations to improve the performance. This is fine for our gridworld example because we are just interested in finding the shortest path. So, the first time that a state’s value function doesn’t change, this is its optimal value.</p>
+<p>The value of a state is computed using the <code>evaluatePolicyForState</code> function. At its core, the function implements the equations from Bellman that we talked about earlier. An important idea for this function is that we do not want to scan all states <span class="math inline">\(s&#39;\)</span> when computing the value function for state <span class="math inline">\(s\)</span>. This is why the <a href="https://github.com/matdoering/gridworld/blob/master/src/StateGenerator.py">state generator</a> generates only those states that can actually occur (i.e. have a transition probability greater than zero).</p>
+<pre class="python"><code>def evaluatePolicyForState(self, gridWorld, V_old, gamma):
+    V = 0
+    cell = gridWorld.getActorCell()
+    stateGen = StateGenerator()
+    transitionRewards = [-np.inf] * len(Actions)
+    for (i, actionType) in enumerate(Actions):
+        gridWorld.setActor(cell) # set state
+        actionProb = self.pi(cell, actionType)
+        if actionProb == 0 or actionType == Actions.NONE:
+            continue
+        newStates = stateGen.generateState(gridWorld, actionType, cell)
+        transitionReward = 0
+        for newActorCell in newStates:
+            V_newState = V_old[newActorCell.getIndex()]
+            # Bellman equation
+            newStateReward = getTransitionProbability(cell, newActorCell, actionType, gridWorld) *\
+                                (R(cell, newActorCell, actionType) +\
+                                gamma * V_newState)
+            transitionReward += newStateReward
+        transitionRewards[i] = transitionReward
+        V_a = actionProb * transitionReward
+        V += V_a
+    if len(self.policy) == 0:
+        V = max(transitionRewards)
+    return V</code></pre>
+<div id="results-from-policy-evaluation" class="section level3">
+<h3>Results from Policy Evaluation</h3>
+<p>With the implementation in place, we can find the state-value function of our policy by executing:</p>
+<pre class="python"><code>V = policy.evaluatePolicy(gridMap)</code></pre>
+<p>To draw the value function together with the policy, we can use pyplot from matplotlib after converting the 1-D array that is used to represent the map to a 2D-array:</p>
+<pre class="python"><code>def drawValueFunction(V, gridWorld, policy):
+    fig, ax = plt.subplots()
+    im = ax.imshow(np.reshape(V, (-1, gridWorld.getWidth())))
+    for cell in gridWorld.getCells():
+        p = cell.getCoords()
+        i = cell.getIndex()
+        if not cell.isGoal():
+            text = ax.text(p[1], p[0], str(policy[i]),
+                       ha=&quot;center&quot;, va=&quot;center&quot;, color=&quot;w&quot;)
+        if cell.isGoal():
+            text = ax.text(p[1], p[0], &quot;X&quot;,
+                       ha=&quot;center&quot;, va=&quot;center&quot;, color=&quot;w&quot;)
+    plt.show()</code></pre>
+<p>Using the function, we can visualize the state-value function of our policy:</p>
+<p><img src="../policy_value_function.png" /></p>
+<p>For non-goal cells, the plot is annotated with the actions specified by the policy. The goal in the upmost right cell is indicated by the <code>X</code> label. Walls (infinite value) are shown in white.</p>
+<p>The value of the others cells is indicated by color. The worst states (with the lowest reward) are shown in purple, bad states in blue, intermediate states in turquois, good states in green, and very good states (with the highest reward) are shown in yellow.</p>
+<p>Looking at the values, we can see that the results match the actions that are dictated by the policy. For example, the state directly to the west of the goal has a very low value because this state’s action (<code>GO_WEST</code>) leads to a long detour. The cell directly south of the goal has a very high value because its action (<code>GO_NORTH</code>) leads directly to the goal.</p>
+<p>Note that, for our future work, the performance of <code>evaluatePolicy</code> is of critical concern because we will call it many times. For the computed example, the function requires 61 iterations, which translates to roughly half a second on my laptop. Note that the policy evaluation will require fewer iterations for policies that are closer to the optimal policy because values will propagate faster.</p>
+<p>Being able to determine the state-value function is nice - now we can quantify the merit of a proposed policy is. However, we haven’t yet dealt with the problem of finding an optimal policy. This is where policy iteration comes into play.</p>
+</div>
+</div>
+<div id="policy-iteration" class="section level2">
+<h2>Policy Iteration</h2>
+<p>Now that we are able to compute the state-value function, we should be able to <a href="http://incompleteideas.net/book/first/ebook/node42.html">improve an existing policy</a>. A simple strategy for this is a greedy algorithm that iterates over all the cells in the grid and then chooses the action that maximizes the expected reward according to the value function.</p>
+<p>This approach implicitly determines the action-value function, which is defined as</p>
+<p><span class="math display">\[Q^{\pi}(s,a) = \sum_{s&#39;} P_{ss&#39;}^a [R_{ss&#39;}^a + \gamma V^{\pi}(s&#39;)] \]</span></p>
+<p>The <code>improvePolicy</code> function determines the value function of a policy (if it’s not available yet) and then calls <code>findGreedyPolicy</code> to identify the optimal action for every state:</p>
+<pre class="python"><code>def improvePolicy(policy, gridWorld, gamma = 1):
+    policy = copy.deepcopy(policy) # dont modify old policy
+    if len(policy.values) == 0:
+        # policy needs to be evaluated first
+        policy.evaluatePolicy(gridWorld)
+    greedyPolicy = findGreedyPolicy(policy.getValues(), gridWorld, \
+                    policy.gameLogic, gamma)
+    policy.setPolicy(greedyPolicy)
+    return policy
+
+def findGreedyPolicy(values, gridWorld, gameLogic, gamma = 1):
+    # create a greedy policy based on the values param
+    stateGen = StateGenerator()
+    greedyPolicy = [Action(Actions.NONE)] * len(values)
+    for (i, cell) in enumerate(gridWorld.getCells()):
+        gridWorld.setActor(cell)
+        if not cell.canBeEntered():
+            continue
+        maxPair = (Actions.NONE, -np.inf)
+        for actionType in Actions:
+            if actionType == Actions.NONE:
+                continue
+            proposedCell = gridWorld.proposeMove(actionType)
+            if proposedCell is None:
+                # action is nonsensical in this state
+                continue
+            Q = 0.0 # action-value function
+            proposedStates = stateGen.generateState(gridWorld, actionType, cell)
+            for proposedState in proposedStates:
+                actorPos = proposedState.getIndex()
+                transitionProb = gameLogic.getTransitionProbability(cell, proposedState, actionType, gridWorld)
+                reward = gameLogic.R(cell, proposedState, actionType)
+                expectedValue = transitionProb * (reward + gamma * values[actorPos])
+                Q += expectedValue
+            if Q &gt; maxPair[1]:
+                maxPair = (actionType, Q)
+        gridWorld.unsetActor(cell) # reset state
+        greedyPolicy[i] = Action(maxPair[0])
+    return greedyPolicy</code></pre>
+<p>What <code>findGreedyPolicy</code> does is to consider each cell and to select that action maximizing its expected reward, thereby constructing an improved version of the input policy. For example, after executing <code>improvePolicy</code> once and re-evaluating the policy, we obtain the following result:</p>
+<p><img src="../policy_value_function_improved.png" /></p>
+<p>In comparison to the original value function, all cells next to the goal are giving us a high reward now because the actions have been optimized. However, we can see that these improvements are merely local. So, how can we obtain an optimal policy?</p>
+<p>The idea of the <a href="http://incompleteideas.net/book/first/ebook/node43.html">policy iteration algorithm</a> is that we can find the optimal policy by iteratively evaluating the state-value function of the new policy and to improve this policy using the greedy algorithm until we’ve reached the optimum:</p>
+<pre class="python"><code>def policyIteration(policy, gridWorld):
+    lastPolicy = copy.deepcopy(policy)
+    lastPolicy.resetValues() # reset values to force re-evaluation of policy
+    improvedPolicy = None
+    while True:
+        improvedPolicy = improvePolicy(lastPolicy, gridWorld)
+        if improvedPolicy == lastPolicy:
+            break
+        improvedPolicy.resetValues() # to force re-evaluation of values on next run
+        lastPolicy = improvedPolicy
+    return(improvedPolicy)</code></pre>
+<div id="results-from-policy-iteration" class="section level3">
+<h3>Results from Policy Iteration</h3>
+<p>Running the algorithm on the gridworld leads to the optimal solution within 20 iterations - about 4,5 seconds on my notebook. The termination after 20 iterations doesn’t come as a surprise: the width of the gridworld map is 19. So we need 19 iterations to optimize the values of the horizontal corridor. Then, we need one additional iteration to determine that the algorithm can terminate because the policy hasn’t changed.</p>
+<p>A great tool for understanding policy iteration is by visualizing each iteration:</p>
+<p><img src="../policy_iteration.gif" /></p>
+<p>The following figure shows the optimal value function that has been constructed using policy iteration:</p>
+<p><img src="../policy_value_function_optimal_improved.png" /></p>
+<p>Visual inspection shows that the value function is correct, as it chooses the shortest path for each cell in the grid.</p>
+</div>
+</div>
+<div id="value-iteration" class="section level2">
+<h2>Value Iteration</h2>
+<p>With the tools we have explored until now, a new question arises: why do we need to consider an initial policy at all? The idea of the <a href="http://incompleteideas.net/book/first/ebook/node44.html">value iteration algorithm</a> is that we can compute the value function without a policy. Instead of letting the policy, <span class="math inline">\(\pi\)</span>, dictate which actions are selected, we will select those actions that maximize the expected reward:</p>
+<p><span class="math display">\[V_{k+1}(s) = \max_{a} \sum_{s&#39;} P_{ss&#39;}^a [R_{ss&#39;}^a + \gamma V_k(s&#39;)] \]</span></p>
+<p>Because the computations for value iteration are very similar to policy evaluation, I have already implemented the functionality for doing value iteration into the <code>evaluatePolicyForState</code> method that I defined earlier. I marked the relevant lines with <code>&gt;</code>:</p>
+<pre class="python"><code>def evaluatePolicyForState(self, gridWorld, V_old, gamma):
+    V = 0
+    cell = gridWorld.getActorCell()
+    stateGen = StateGenerator()
+    transitionRewards = [-np.inf] * len(Actions)
+    for (i, actionType) in enumerate(Actions):
+        gridWorld.setActor(cell) # set state
+        actionProb = self.pi(cell, actionType)
+        if actionProb == 0 or actionType == Actions.NONE:
+            continue
+        newStates = stateGen.generateState(gridWorld, actionType, cell)
+        transitionReward = 0
+        for newActorCell in newStates:
+            V_newState = V_old[newActorCell.getIndex()]
+            # Bellman equation
+            newStateReward = getTransitionProbability(cell, newActorCell, actionType, gridWorld) *\
+                                (R(cell, newActorCell, actionType) +\
+                                gamma * V_newState)
+            transitionReward += newStateReward
+&gt;        transitionRewards[i] = transitionReward
+        V_a = actionProb * transitionReward
+        V += V_a
+&gt;   if len(self.policy) == 0:
+&gt;       V = max(transitionRewards)
+    return V</code></pre>
+<p>This function performs the value iteration algorithm as long as no policy is available. In this case, <code>len(self.policy)</code> will be zero such that <code>pi</code> always returns a value of one and such that <code>V</code> is determined as the maximum over the expected rewards for all actions.</p>
+<p>So, to implement value iteration, we don’t have to do a lot of coding. We just have to iteratively call the <code>evaluatePolicySweep</code> function on a <code>Policy</code> object whose value function is unknown until the procedure gives us the optimal result. Then, to determine the corresponding policy, we merely call the <code>findGreedyPolicy</code> function that we’ve defined earlier:</p>
+<pre class="python"><code>def valueIteration(self, gridWorld, gamma = 1):
+    self.resetPolicy() # ensure empty policy before calling evaluatePolicy
+    V_old = None
+    V_new = np.repeat(0, gridWorld.size())
+    convergedCellIndices = np.zeros(0)
+    while len(convergedCellIndices) != len(V_new):
+        V_old = V_new
+        V_new = self.evaluatePolicySweep(gridWorld, V_old, gamma, convergedCellIndices)
+        convergedCellIndices = self.findConvergedCells(V_old, V_new)
+    greedyPolicy = findGreedyPolicy(V_new, gridWorld, self.gameLogic)
+    self.setPolicy(greedyPolicy)
+    self.setWidth(gridWorld.getWidth())
+    self.setHeight(gridWorld.getHeight())
+    return(V_new)</code></pre>
+<div id="results-from-value-iteration" class="section level3">
+<h3>Results from Value Iteration</h3>
+<p>How does value iteration perform? For our gridworld example, only 25 iterations are necessary and the result is available within less than half a second. Remember that this is roughly the same time that was needed to do a single run of <code>evaluatePolicy</code> for our badly designed initial policy.
+The reason why value iteration is much faster than policy iteration is that we immediately select the optimal action rather than cycling between the policy evaluation and policy
+improvement steps.</p>
+<p>When performing value iteration, the reward (high: yellow, low: dark) spreads from the terminal state at the goal (top right <code>X</code>) to the other states:</p>
+<p><img src="../value_iteration.gif" /></p>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>We have seen how reinforcement learning can be applied in the context of MDPs. We worked under the assumption that we have total knowledge of the environment and that the agent is fully aware of the environment. Based on this, we were able to facilitate dynamic programming to solve three problems. First, we used policy evaluation to determine the state-value function for a given policy. Next, we applied the policy iteration algorithm to optimize an existing policy. Third, we applied value iteration to find an optimal policy from scratch.</p>
+<p>Since these algorithms require perfect knowledge of the environment, it’s not necessary for the agent to actually interact with the environment. Instead, we were able to precompute the optimal value function, which is also known as <em>planning</em>. Still, it is crucial to understand these concepts in order to understand reinforcement learning in settings with greater uncertainty, which will be the topic of another blog post.</p>
+</div>
