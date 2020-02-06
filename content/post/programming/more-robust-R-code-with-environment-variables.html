@@ -1,0 +1,101 @@
+---
+title: "Two Environment Variables for More Robust R Code"
+author: Matthias Döring
+date: '2020-02-06'
+description: "R's type system is known to be flexible, which, at the same time makes the language very fragile. Luckily, there are environment variables that can make our code more robust. In this post, you will learn how to use two environment variables in order to prevent mistakes when dealing with conditionals and logical operators."
+lead: "The good, the bad, and the ugly of R's typing system and how environment variables can remedy the situation."
+slug: "more-robust-R-code-with-environment-variables"
+categories:
+- programming
+tags:
+- R 
+thumbnail: "/post/programming/more-robust-R-code-with-environment-variables_avatar.jpeg"
+---
+
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<script src="/rmarkdown-libs/elevate-section-attrs/elevate-section-attrs.js"></script>
+
+
+<p>I was recently contacted because my Bioconductor package <a href="https://bioconductor.org/packages/release/bioc/html/openPrimeR.html">openPrimeR</a> was failing the automated package tests. The reason for this is that the Bioconductor team had decided to set a new environment variable when testing the packages, which is called <code>_R_CHECK_LENGTH_1_LOGIC2_</code>. I then looked into this environment variable a bit more and found that there is also <code>_R_CHECK_LENGTH_1_CONDITION_</code>. Because I really like the idea behind these environment variables, I’d like to share what you can do with them:</p>
+<ol style="list-style-type: decimal">
+<li>Prevent non-scalar conditions using <code>_R_CHECK_LENGTH_1_CONDITION_</code></li>
+<li>Ensure that logical operators <code>&amp;&amp;</code> and <code>||</code> are applied only to scalars: <code>_R_CHECK_LENGTH_1_LOGIC2_</code></li>
+</ol>
+<p>To understand the motivation for the environment variable <code>_R_CHECK_LENGTH_1_CONDITION_</code>, let’s take a look at conditionals in R.</p>
+<div id="conditionals" class="section level2">
+<h2>Conditionals</h2>
+<p>In R, conditionals have the following form:</p>
+<pre><code>if (&lt;condition&gt;) {
+    &lt;statements&gt;
+}</code></pre>
+<p>Only if <code>&lt;condition&gt;</code> evaluates to <code>TRUE</code> will the <code>&lt;statements&gt;</code> be executed. For example:</p>
+<pre class="r"><code>if (TRUE) {
+    print(&quot;yay&quot;)
+}</code></pre>
+<pre><code>## [1] &quot;yay&quot;</code></pre>
+<p>Since R is heavily focused on vectorized operations, R users will often use non-scalar expressions in the <code>&lt;condition&gt;</code> block. However, every <code>&lt;condition&gt;</code> is automatically coerced to a scalar value. Unfortunately, the coercion of conditions with length greater than 1 is a valid operation in R that results only in a warning. This means that we can write something like this:</p>
+<pre class="r"><code>cond &lt;- c(TRUE, FALSE, FALSE)
+if (cond) {
+    print(&quot;First entry was True, so we&#39;re fine ...&quot;)
+}</code></pre>
+<pre><code>## Warning in if (cond) {: the condition has length &gt; 1 and only the first element
+## will be used</code></pre>
+<pre><code>## [1] &quot;First entry was True, so we&#39;re fine ...&quot;</code></pre>
+<p>Note that, when the developer’s intention was anything else than merely checking the first entry of the condition, then something is probably wrong with the program. Even if this was the developer’s intention, he should have explicitly used <code>cond[1]</code> in the condition rather than abusing a “language feature” that is more destructive than helpful.</p>
+<p>What can we do to forbid non-scalar conditions? This is where <code>_R_CHECK_LENGTH_1_CONDITION_</code> comes to the rescue. When activated, the evaluation of non-scalar conditions will cause an error rather than a warning. Let’s see this in action on the previous code snippet:</p>
+<pre class="r"><code># prevent length 1 condition
+Sys.setenv(&quot;_R_CHECK_LENGTH_1_CONDITION_&quot; = &quot;TRUE&quot;)
+cond &lt;- c(TRUE, FALSE, FALSE)
+if (cond) {
+    print(&quot;First entry was True, so we&#39;re fine ...&quot;)
+}</code></pre>
+<p>This gives us the output:</p>
+<pre><code>Error in if (cond) { : the condition has length &gt; 1</code></pre>
+<p>So, by using <code>_R_CHECK_LENGTH_1_CONDITION_</code>, we can find any potential problem in our code relating to non-scalar conditions.</p>
+<p>Next, let’s quickly recapitulate logical operators in order to learn how <code>_R_CHECK_LENGTH_1_LOGIC2_</code> can help us.</p>
+</div>
+<div id="logical-operators-and" class="section level2">
+<h2>Logical Operators &amp;&amp; and ||</h2>
+<p>In R, there are two types of operators for logical conjunctions (AND, <code>&amp;&amp;</code>, <code>&amp;</code>) and disjunctions (OR, <code>||</code>, <code>|</code>). Let’s consider conjunctions as an example. Operator <code>&amp;&amp;</code> evaluates only the first element of each vector, thereby producing a scalar value. Operator <code>&amp;</code>, on the other hand, evaluates each vector element, thereby (potentially) producing a vector.</p>
+<p>Unfortunately, <code>&amp;&amp;</code> can be also be applied to vectors and not only scalars, which can lead to problems. For example, let’s consider that a developer wants to check whether the element-wise conjunction of two vectors evaluates to <code>TRUE</code>. He ends up with the following code:</p>
+<pre class="r"><code>x &lt;- c(TRUE, FALSE)
+y &lt;- c(TRUE, TRUE)
+if (x &amp;&amp; y) {
+    print(&quot;Pairwise conjunction was TRUE&quot;) # CAUTION: this is a false claim
+}</code></pre>
+<pre><code>## [1] &quot;Pairwise conjunction was TRUE&quot;</code></pre>
+<p>However, the result is wrong because <code>&amp;&amp;</code> checks only the first elements of <code>x</code> and <code>y</code>, respectively. In fact, what the developer had intended to do was to write the following code, which yields the correct result:</p>
+<pre class="r"><code>if (all(x &amp; y)) {
+    print(&quot;Conjunction of all values was TRUE&quot;)
+} else {
+    print(&quot;Conjunction of all values was FALSE&quot;)
+}</code></pre>
+<pre><code>## [1] &quot;Conjunction of all values was FALSE&quot;</code></pre>
+<p>To prevent unintended results due to the application of operator <code>&amp;&amp;</code> on non-scalar values, we can activate the environment setting <code>_R_CHECK_LENGTH_1_LOGIC2_</code>. Let’s see how it works in practice with our example from earlier:</p>
+<pre class="r"><code>Sys.setenv(&quot;_R_CHECK_LENGTH_1_LOGIC2_&quot; = &quot;TRUE&quot;)
+if (x &amp;&amp; y) {
+    print(&quot;Pairwise conjunction was TRUE&quot;) # CAUTION: this is a false claim
+}</code></pre>
+<p>The output is:</p>
+<pre><code>Error in x &amp;&amp; y : &#39;length(x) = 2 &gt; 1&#39; in coercion to &#39;logical(1)&#39;</code></pre>
+<p>So, by setting <code>_R_CHECK_LENGTH_1_LOGIC2_</code>, we are protected from mistakenly applying <code>&amp;&amp;</code> on non-scalar values.</p>
+</div>
+<div id="more-configuration-options-for-environment-settings" class="section level2">
+<h2>More Configuration Options for Environment Settings</h2>
+<p>Besides activating environment settings using <code>TRUE</code>, we can also define further behavior. For example:</p>
+<ul>
+<li>Print stack trace and throw error: <code>Sys.setenv("_R_CHECK_LENGTH_1_LOGIC2_" = "verbose")</code></li>
+<li>Abort the R session: <code>Sys.setenv("_R_CHECK_LENGTH_1_LOGIC2_" = "abort")</code></li>
+</ul>
+<p>It can also be useful to set these environment variables on the command-line. For example, before running
+<code>R CMD check</code> on a package, we could activate <code>_R_CHECK_LENGTH_1_LOGIC2_</code> in the following way:</p>
+<pre><code>export _R_CHECK_LENGTH_1_LOGIC2_=TRUE</code></pre>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>Using environment variables such as <code>_R_CHECK_LENGTH_1_CONDITION_</code> and <code>_R_CHECK_LENGTH_1_LOGIC2_</code>, we can write more robust R code by spotting potential errors earlier. This is why I would advise everyone to activate these variables during development. Another benefit is that we can also spot potential errors in libraries that we are using. By reporting/fixing these findings, we can improve the overall quality of R software.</p>
+<p>If you like the idea of always using these environment settings by default, you can insert the following lines into the <code>.Renviron</code> file in your home folder:</p>
+<pre><code>_R_CHECK_LENGTH_1_LOGIC2_=TRUE
+_R_CHECK_LENGTH_1_CONDITION_=TRUE</code></pre>
+<p>And now, happy coding!</p>
+</div>
