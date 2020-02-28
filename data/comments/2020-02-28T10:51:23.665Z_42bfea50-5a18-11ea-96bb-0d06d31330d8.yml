@@ -1,0 +1,6 @@
+_id: 42bfea50-5a18-11ea-96bb-0d06d31330d8
+path: post/statistical_test/contingency_table_tests.html
+name: Hugo L.F.
+email: 7dce885b624dcdb8de340b32ccca05ab
+message: "Dear Matthias,\r\n\r\nThank you for this post. Why do you say that \"chi-square test is more suitable for contingency tables greater than 2x2\"? As far as I know, the Fisher's exact test also works with such tables. Is there any statistical reason for choosing chi-square in these cases?\r\n\r\nThanks in advance,\r\n\r\n      Hugo."
+date: '2020-02-28T10:51:23.665Z'
