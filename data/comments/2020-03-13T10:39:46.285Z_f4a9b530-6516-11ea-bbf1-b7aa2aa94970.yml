@@ -1,0 +1,6 @@
+_id: f4a9b530-6516-11ea-bbf1-b7aa2aa94970
+path: post/statistical_test/contingency_table_tests.html
+name: Matthias
+email: e90d48aac6bcd47b2bcf84b337a118d2
+message: "Dear Hugo,\r\nYou're right - Fisher's exact test also works with tables with dimensionality greater than 2x2. What I meant with my statement is that the application of Fisher's exact test to larger tables is not as straightforward as the chi-squared test. When the dimensionality exceeds 2x2, Fisher's exact test quickly becomes computationally infeasible. Then, the p-value cannot be calculated exactly anymore but one has to resort to Monte Carlo simulation (`simulate.p.value=TRUE` when calling `fisher.test`). Of course, this shouldn't stop you from using the test if you expect that a non-parametric test is more appropriate."
+date: '2020-03-13T10:39:46.285Z'
