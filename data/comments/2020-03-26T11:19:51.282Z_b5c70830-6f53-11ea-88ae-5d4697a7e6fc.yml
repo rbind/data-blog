@@ -1,0 +1,6 @@
+_id: b5c70830-6f53-11ea-88ae-5d4697a7e6fc
+path: post/other/recaptcha.html
+name: Ruann
+email: af7e27d262657a82798d130cb81f30b0
+message: "Hi There,\r\n\r\nThanks for making this article,\r\n\r\nI'm in the same predicament you mentioned here but I'm not using staticman. I've got a s3 static host on AWS I want to use so no server  side scripting.\r\n\r\nRecaptcha seems very difficult to implement like this. The amazon examples are pointless because they don't do anything.\r\n\r\nAll I want is to use a plain html page that checks the user has filled in what they are supposed to and checked the box or do it invisibly and then use the response from google to allow or disallow the form submit.\r\n\r\nYour article is great but i'm just trying to integrate what code you've shared with an actual form as well as the script. I don't know JS  and ajax so well so I'm going in circles !\r\n\r\nAny advice or assistance would be HUGELY appreciated.\r\nThanks"
+date: '2020-03-26T11:19:51.282Z'
