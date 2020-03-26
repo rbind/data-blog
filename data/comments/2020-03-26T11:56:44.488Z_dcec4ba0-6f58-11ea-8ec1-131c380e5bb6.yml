@@ -1,0 +1,6 @@
+_id: dcec4ba0-6f58-11ea-8ec1-131c380e5bb6
+path: post/other/recaptcha.html
+name: Matthias
+email: e90d48aac6bcd47b2bcf84b337a118d2
+message: "Hi there,\r\nif you aren't using Staticman then I'd recommend just hosting your own recaptcha verification service on AWS to get the job done as described in the section \"Getting Closer to a Correct Implementation\". Since there is an implementation available that works well, you don't need to know a lot of Javascript to integrate it into your site so I think you should be fine with this solution. \r\n\r\nShort summary of the steps:\r\n1. Host recaptcha checker on AWS\r\n2. Update your form: need to add  the following hidden field:\r\n<input type=\"hidden\" name=\"gRecaptchaResponse\" id=\"gRecaptchaResponse\"> \r\n3. Write validation function: see \"validateRecaptcha\" in the post. You need to replace the \"verify_api\" variable with the URL of your recaptcha checker on AWS.\r\n4. Call validation function as the \"onSubmit\" action of the form, e.g.: \r\nonsubmit=\"return validateRecaptcha();\">"
+date: '2020-03-26T11:56:44.488Z'
