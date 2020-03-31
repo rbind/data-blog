@@ -1,0 +1,6 @@
+_id: 1c20fac0-7376-11ea-8003-bbe5b72412f3
+path: post/other/recaptcha.html
+name: Ruann
+email: 4ae93c3be18b4660852f28d9c8802121
+message: "Thanks for you clear and well informed reply I've managed to get it working now.\r\n\r\nJust for reference for any future person in my situation:\r\nI ended up:\r\n-Adding some extra code to the Lamda service to verify the captcha response\r\n-I incorporated the response in a Javascript that first verifies all the inputs to the form a user enters, and once those are all in order or OK, checks the token or recaptcha has been submitted or checked\r\n-when it is checked , the response from the google api is used to allow the form to be submitted.\r\n\r\nIt seems to be working now so thanks again for the assistance."
+date: '2020-03-31T17:36:10.666Z'
