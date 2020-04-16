@@ -1,0 +1,6 @@
+_id: d3619110-7fe0-11ea-85f9-493177ea444b
+path: post/data-visualization/boxplot_alternatives.html
+name: Wilbert
+email: 5be3eb0c4d9e52273bfe66247ad00d43
+message: "Nice article!\r\nThe problem observed at the end of this article can be solved by changing the bandwidth using the parameter 'adjust' in 'geom_violin':\r\n\r\ngeom_violin(draw_quantiles = c(0.25, 0.5, 0.75), adjust = .5)"
+date: '2020-04-16T12:50:18.784Z'
