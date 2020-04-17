@@ -1,0 +1,11 @@
+_id: 372d5040-8035-11ea-bca0-f9a650ba1356
+path: post/machine-learning/performance-measures-multi-class.html
+name: Krish S
+email: 7f9971e2f5cee61473a35cb895d50175
+message: >-
+  Thanks for this excellent post -- hard to find good information on this topic
+  that is explained so clearly! Regarding the pROC multiclass.roc function, it
+  seems it still has not been modified...nonetheless, what is the disadvantage
+  to using what it provides -- that is,  the mean AUC from all pairwise class
+  comparisons -- vs using the Hand & Till formulation? Thank you much!
+date: '2020-04-16T22:54:23.851Z'
