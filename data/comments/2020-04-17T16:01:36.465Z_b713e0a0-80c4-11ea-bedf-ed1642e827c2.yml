@@ -1,0 +1,6 @@
+_id: b713e0a0-80c4-11ea-bedf-ed1642e827c2
+path: post/machine-learning/performance-measures-multi-class.html
+name: Matthias Döring
+email: e90d48aac6bcd47b2bcf84b337a118d2
+message: "Your welcome!\r\n\r\nRegarding the approach from Hand and Till: The functionality for Hand and Till should now be available from the pROC package via multiclass.roc, at least it's in the GitHub master at: https://github.com/xrobin/pROC\r\n\r\nWhy is their approach better than taking the mean? Well, it's all about interpretability. If you take the mean you do not take information about the classes into account. Hand and Till, however, considers how far apart the class predictions are, which gives you a more informative value."
+date: '2020-04-17T16:01:36.465Z'
