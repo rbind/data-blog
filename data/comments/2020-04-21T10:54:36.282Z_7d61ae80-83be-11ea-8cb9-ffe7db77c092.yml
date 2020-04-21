@@ -1,0 +1,14 @@
+_id: 7d61ae80-83be-11ea-8cb9-ffe7db77c092
+path: post/statistical_test/effect_size.html
+name: Todd B.
+email: ba0a933d826770fd4a29ed59b353e761
+message: >-
+  Thank god, I've been on the web from sometime looking for this obscure tidbit
+  of knowledge. Can I restate to make sure that I've got it? A small Cramer's V
+  value coupled with a significant effect could be and is most likely the result
+  of a population size that is too big? That the significance is only on account
+  of a huge n value. If so how do you operationalize a "too big". That's to say:
+  What are the values of Cramer's V, n, with a significant effect, that would
+  still be valid in a study. It's been 2 years so I hardly expect a reply, but
+  you never know.
+date: '2020-04-21T10:54:36.282Z'
