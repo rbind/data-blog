@@ -1,0 +1,6 @@
+_id: 5ae7f3f0-8639-11ea-a3ad-7560d69b83ab
+path: post/machine-learning/performance-measures-multi-class.html
+name: Carsten
+email: fa2d48abdf2433a0f286527a1dd09185
+message: "Hi Matthias,\r\nFirst things first: great article!  \r\nBut I might be wrong but are you sure that you haven't switched the explanations for macro/micro average F1 Scores? Because micro avg F1 is preferable if you suspect there is a class imbalance.  Please let me know what you think."
+date: '2020-04-24T14:39:08.737Z'
