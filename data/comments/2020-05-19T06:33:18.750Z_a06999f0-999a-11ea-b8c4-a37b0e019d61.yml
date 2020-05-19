@@ -1,0 +1,6 @@
+_id: a06999f0-999a-11ea-b8c4-a37b0e019d61
+path: post/machine-learning/performance-measures-multi-class.html
+name: Matthias
+email: e90d48aac6bcd47b2bcf84b337a118d2
+message: "Dear Carsten,\r\nGreat that you found the article helpful and sorry for the confusion. With regards to micro and macro averages in case of class imbalance it really comes down to how much you value the samples from the minor classes. Assuming that you want to value the minor class as much as the majority class, the macro average would be the way to go. When you are tuning your classifier, you will receive a model that will perform similarly well for all classes. With the micro average, however, the majority class will dominate the average, so you might select a model that does not perform very well on the minor class."
+date: '2020-05-19T06:33:18.750Z'
