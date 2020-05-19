@@ -1,0 +1,6 @@
+_id: 53c995f0-9968-11ea-93c6-cdb7716e81e8
+path: post/machine-learning/performance-measures-multi-class.html
+name: Pablo
+email: 32d58cd45c32e21a342cd8265431a22a
+message: "Thanks for the useful post.\r\nMaybe there is an error in the function 'calculate.w.accuracy'?  It seems to be insensitive to the weights input."
+date: '2020-05-19T00:33:15.378Z'
