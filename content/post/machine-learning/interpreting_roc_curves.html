@@ -5,6 +5,7 @@ date: '2018-12-08'
 thumbnail: "/post/machine-learning/interpreting_roc_curves_cover.png"
 slug: "interpreting-roc-curves-auc"
 description: "ROC and precision-recall curves are a staple for the interpretation of binary classifiers. This post gives an intuition on how these curves are constructed and their associated AUCs are interpreted."
+lastmod: "2020-06-16"
 categories:
   - machine-learning
 tags:
@@ -12,6 +13,7 @@ tags:
     - performance-measure
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>Receiver operating characteristic (ROC) curves are probably the most commonly used measure for evaluating the predictive performance of scoring classifiers.</p>
@@ -198,7 +200,8 @@ plot.scores.AUC(y, y.hat, &quot;ppv&quot;, &quot;tpr&quot;)</code></pre>
 <p><img src="/post/machine-learning/interpreting_roc_curves_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 </div>
 </div>
-<div id="roc-curves-for-multi-class-settings" class="section level2">
-<h2>ROC curves for multi-class settings</h2>
+<div id="further-reading" class="section level2">
+<h2>Further Reading</h2>
+<p>If you would like to learn more about the differences between performance measures such as the F1 Score and the ROC AUC, be sure to check out <a href="https://neptune.ai/blog/f1-score-accuracy-roc-auc-pr-auc">this article about common metrics for binary classification</a>.</p>
 <p>For classification problems where there are more than two labels, please consider a <a href="/post/machine-learning/performance-measures-multi-class-problems/">previous article in which I discussed ROC-based approaches in the multi-class setting</a>.</p>
 </div>

@@ -5,6 +5,7 @@ date: '2018-12-08'
 thumbnail: "/post/machine-learning/interpreting_roc_curves_cover.png"
 slug: "interpreting-roc-curves-auc"
 description: "ROC and precision-recall curves are a staple for the interpretation of binary classifiers. This post gives an intuition on how these curves are constructed and their associated AUCs are interpreted."
+lastmod: "2020-06-16"
 categories:
   - machine-learning
 tags:
@@ -329,6 +330,10 @@ y.hat <- c(rnorm(70, 2, sd = 2), rnorm(30, -2, sd = 2))
 plot.scores.AUC(y, y.hat, "ppv", "tpr")
 ```
 
-## ROC curves for multi-class settings
+## Further Reading
+
+If you would like to learn more about the differences between performance measures such as the F1 Score and the ROC AUC, be sure to check out [this article about common metrics for binary classification](https://neptune.ai/blog/f1-score-accuracy-roc-auc-pr-auc).
 
 For classification problems where there are more than two labels, please consider a [previous article in which I discussed ROC-based approaches in the multi-class setting](/post/machine-learning/performance-measures-multi-class-problems/).
+
+
