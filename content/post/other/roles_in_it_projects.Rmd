@@ -1,22 +1,22 @@
 ---
-title: "X Roles You will Encounter in All IT Projects"
+title: "The Roles You will Encounter in Most IT Projects"
 author: Matthias Döring
-date: '2020-03-13'
+date: '2020-06-26'
 downloadRmd: false
-description: "TODO"
-thumbnail: "/post/other/_avatar.png"
+description: "In IT projects you will encounter people with various backgrounds. In this post, I shed some light on the Scrum roles, as well as other rules including software architects and machine learning engineers."
+lead: "Are you confused by all the different roles in IT projects? Then this post is for you!"
+thumbnail: "/post/other/roles_in_it_projects_avatar.jpg"
 categories:
   - other
 ---
-When I started working in the IT sector, I was impressed by the diveristy of the roles that exist and it took me quite some time to
-understand the responsibilities of the individual roles. That is why I thought it would be nice to share my understanding of the most
-common roles you will encounter in IT projects. You should definitely read this post if you are thinking about applying
+When I started working in the IT sector, I was impressed by the large number of different roles that exist and it took me quite a bit of time to
+understand their individual responsibilities. That is why I thought it would be nice to share my understanding of the most common roles you will encounter in IT projects.
+
+You should definitely read this post if you are thinking about applying
 for position in the information technology sector but are unsure which one is the right fit for you or if you're already working in IT and want to improve 
 your understanding of other roles.
 
-For each role, I begin with typical statements from persons fulfilling the role, then give a short summary of the role, and finally summarize characteristics of people that excel in the role.
-
-Since most softare development projects are nowadays based on agile practices, I will start with the classical Scrum roles and then go into other positions.
+Since most softare development projects are based on Scrum, I will start with the classical Scrum roles and then give an overview of some other common roles you will encounter.
 
 ## Roles in Scrum
 
@@ -24,79 +24,92 @@ In this section, I introduce the three roles in Scrum: the product owner, the sc
 
 ### Product Owner
 
+![](../product_owner.jpg)
+
 The product owner (PO) is responsible for maximizing the value that is delivered by the team. His tasks include:
 
 * **Developing a product vision**: As a PO, it is crucial to have a clear vision about the product in order to maximize the value for the customer.
-* **Backlog grooming:** ensure that all backlog items are [well-written](https://en.wikipedia.org/wiki/INVEST_(mnemonic)) and [appropriately prioritized](https://techbeacon.com/app-dev-testing/how-prioritize-your-backlog-using-weighted-shortest-job-first).
+* **Backlog grooming:** Ensure that all backlog items are [well-written](https://en.wikipedia.org/wiki/INVEST_(mnemonic)) and [appropriately prioritized](https://techbeacon.com/app-dev-testing/how-prioritize-your-backlog-using-weighted-shortest-job-first).
 * **Communiation with the development team:** Often, the PO has the best understanding of new backlog items. He must ensure that he shares his understanding with the development team, e.g. during refinements.
 * **Verification of acceptance criteria:** Once a backlog item has been completed by the team, it's the PO's responsibility to verify whether all acceptance criteria have been met.
-* **Stakeholder management:** communicate with customers, management, and developers.
+* **Stakeholder management:** Communicate with customers and management.
 
 The main Scrum meeting that lies in the PO's domain is the sprint planning and the sprint review.
 
-Typical statements of POs may include the following:
+#### Typical Statements of Product Owners
 
-```
-- Our customers need this feature as soon as possible
-- Instead of feature X, we will work on feature Y in the next sprint because ...
-- Feature X is important because it ties into epic Y, which delivers enormous value to our clients
-- Is this backlog item still unclear? Let me explain again ...
-- Unfortunately, we couldn't deliver feature X as quickly as we hoped due to ...
-```
+- *Our customers need this feature as soon as possible!*
+- *We should begin working on the new feature now. Our customers are eagerly awaiting it!*
+- *Is this backlog item still unclear? Let me explain again ...*
+- *Unfortunately, we couldn't deliver the feature on time due to the following problems.*
 
-In my opinion, a great PO is characterized by the following attributes:
+#### What Characterizes a Great Product Owner?
 
-- **Passion for the product:** the PO must make it his mission to develiver the best product possible.
-- **Excellent communication skills:** the PO has to communicate with various stakeholders and it is key that he can effectively share his understanding
-- **Basic technical understanding:** Although the role of PO is not a technical role, it is beneficial for the PO to have a basic technical understanding. This allows for better communication with the development team and ensures that technical tasks aiming at software quality are not put on the backburner.
+- **Passion for the product:** The PO must make it his mission to deliver the best product possible.
+- **Excellent communication skills:** The PO has to communicate with various stakeholders and it is key that he can effectively share his understanding.
+- **Basic technical understanding:** Although PO is not a technical role, it is beneficial for the PO to have a basic technical understanding. This allows for better communication with the development team and ensures that technical tasks aiming at software quality are not put on the backburner.
 
 ### Scrum Master
 
+![](../scrum_master.jpg)
+
 The Scrum master (SM) guide the team according to the principles set forth in the [scrum guide](https://www.scrum.org/resources/scrum-guide). The SM is an enabler who ensures that things run smoothly. Typical activities of an SM include:
 
-* Communicate with the development team and the PO
-* Assist the team in removing impediments
-* Empower the team members to implement Scrum effectively
+* **Communication**: Ensure smooth communications between all stakeholders.
+* **Enablement**: Help the the team by removing impediments.
+* **Scrumification**: Empower the team members to implement Scrum effectively.
 
 The main Scrum meeting that lies in the SM's domain is the sprint retrospective.
 
-Typical statements of Scrum masters include:
+#### Typical Statements of Scrum Masters
 
-* Marc, I think that Jacob has already worked on something similar before. I think you guys should talk to each other!
-* Everbody draw a picture of how the last sprint made you feel!
-* The database service from the support team is still not up but I'm in contact with them and will let you know when there are news.
-* Let's try to keep today's daily at 15 minutes.
+* *Marc, I think that Jacob has already worked on something similar before. I think you guys should talk to each other!*
+* *Everbody, please draw a picture of how the last sprint made you feel!*
+* *The database service from the support team is still not up but I'm in contact with them and I will let you know when there's an update.*
+* *Let's try to keep today's daily at 15 minutes.*
 
-What makes a great Scrum master?
+#### What Characterizes a Great Scrum Master?
 
-* **People skills**: the Scrum master must be a very good communicator and must show empathy towards the individual team members.
-* **Creativity**: creativity is a must for removing impediments and developing innovative concepts for sprint retrospectives.
-* **Passion for Scrum**: the Scrum master must be a knowledgeable Scrum devotee that electrifies the team with his passion.
+* **People skills**: The Scrum master must be a very good communicator and must show empathy towards the individual team members.
+* **Creativity**: Creativity is a must for removing impediments and developing innovative concepts for sprint retrospectives.
+* **Passion for Scrum**: The Scrum master must be a knowledgeable Scrum devotee that electrifies the team with his passion.
 
 ### Development Team
 
+![](../development_team.jpg)
+
 The main responsibility of the development team is the technical implementation of backlog items. Typical activities include:
 
-* Technical design and implementation of new software features
-* Implementation of automated tests
-* DevOps: e.g. implementation of CI/CD pipelines
-* Refinement of backlog items
-* Development of software according to the Scrum principles
+* **Implementations:** Technical design and implementation of features.
+* **Automatization:** Implementation of automated tests, CI/CD pipelines, and so on.
+* **Refinements:** Refinement of backlog items.
 
-The development contributes to the daily Scrum meetings, refinements, the sprint plannings, the sprint reviews, and the sprint retrospectives.
+The development team contributes to the daily Scrum meetings, refinements, the sprint plannings, the sprint reviews, and the sprint retrospectives.
 
-Typical statements of a development team member include:
+The composition of the development team members depends on the project. For example, in software projects, development team members are usually software engineers. In other areas, development team members may have more diverse backgrounds. For example, in artificial intelligence projects, data scientists, machine learning engineers, and software engineers may work together.
 
-* For authentication, we could create a new database table and then store the encrypted credentials of our users.
-* Sorry, but I can't estimate this backlog item yet. I just don't understand what the acceptance criteria mean.
-* I was really frustrated during the last sprint because it is so painful to implement to implement new features with the current state of the component. We should completely re-write the component as soon as possible.
-* Today I want to show you the new user interface we developed during the last two sprints. What do you think?
+#### Typical Statements of Development Team Members
 
-What makes a great development team member?
+* *For authentication, we could create a new database table and then store the encrypted credentials of our users.*
+* *Sorry, but I can't estimate this backlog item yet. I just don't understand what the acceptance criteria mean.*
+* *I was really frustrated during the last sprint because it is so painful to implement to implement new features with the current state of the component. We should completely re-write the component as soon as possible.*
+* *Today I want to show you the new user interface we developed during the last two sprints. What do you think?*
+
+#### What Characterizes a Great Development Team Member?
 
 * **Technical skills**: A member of the development team should produce high-quality implementations that stand the test of time.
 * **Communication skills**: The best technical skills can be useless if a developer is not able to work together with the other members of the team.
-* **Technical vision**: While the product owner is responsible for the vision of the product, the development team must have a clear plan about the technical implementation that allows for the realization of that vision.
+* **Technical vision**: While the product owner is responsible for the vision of the product, the development team must have a clear plan for the technology that allows for the realization of that vision.
 
-asdf
+### Other Roles
+
+The following roles are not explicitly mentioned in Scrum. However, the majority of the following roles are found in members of the development team:
+
+* **Software engineers:** Software engineers design and implement software systems. They have deep technical knowledge and are great at problem solving.
+* **Software architects:** Software architects are responsible for designing a software such that it can reach the required quality attributes. To this end, they architect the abstract structure of the software and define the interfaces between individual building blocks. During this process, they have to select technologies that are appropriate for reaching the functional and non-functional requirements.
+* **Data scientists:** Data scientists analyze or model data in order to turn data into insights. Typically, data scientists also develop software but not on the same scale or quality as software engineers.
+* **Data engineers:** Data engineers are experts at big data applications. They have a strong background in databases, data warehousing, and technologies for large-scale data processing.
+* **Machine learning engineers:** A machine learning engineer develops systems for machine learning tasks. While a data scientist would be concerned with the development and analysis of the machine learning model, the machine learning engineer would be concerned with the integration of the model into an application that can be shipped to customers.
+* **Business analysts:** Business analysts are experts about business processes and are responsible for bridging the gap between IT and the business. They are involved with requirements analyses and ensure that economically reasonable solutions are developed.
+* **Software testers:** Software testers are specialists at testing software. Since software engineers typically also write tests, software testers are usually tasked with more comprehensive, integrative tests (e.g. large-scale performance testing or end-to-end testing).
 

@@ -12,8 +12,7 @@ tags:
 thumbnail: "/post/programming/more-robust-R-code-with-environment-variables_avatar.jpeg"
 ---
 
-<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
-<script src="/rmarkdown-libs/elevate-section-attrs/elevate-section-attrs.js"></script>
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>I was recently contacted because my Bioconductor package <a href="https://bioconductor.org/packages/release/bioc/html/openPrimeR.html">openPrimeR</a> was failing the automated package tests. The reason for this is that the Bioconductor team had decided to set a new environment variable when testing the packages, which is called <code>_R_CHECK_LENGTH_1_LOGIC2_</code>. I then looked into this environment variable a bit more and found that there is also <code>_R_CHECK_LENGTH_1_CONDITION_</code>. Because I really like the idea behind these environment variables, I’d like to share what you can do with them:</p>
