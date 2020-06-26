@@ -1,0 +1,102 @@
+---
+title: "X Roles You will Encounter in All IT Projects"
+author: Matthias Döring
+date: '2020-03-13'
+downloadRmd: false
+description: "TODO"
+thumbnail: "/post/other/_avatar.png"
+categories:
+  - other
+---
+When I started working in the IT sector, I was impressed by the diveristy of the roles that exist and it took me quite some time to
+understand the responsibilities of the individual roles. That is why I thought it would be nice to share my understanding of the most
+common roles you will encounter in IT projects. You should definitely read this post if you are thinking about applying
+for position in the information technology sector but are unsure which one is the right fit for you or if you're already working in IT and want to improve 
+your understanding of other roles.
+
+For each role, I begin with typical statements from persons fulfilling the role, then give a short summary of the role, and finally summarize characteristics of people that excel in the role.
+
+Since most softare development projects are nowadays based on agile practices, I will start with the classical Scrum roles and then go into other positions.
+
+## Roles in Scrum
+
+In this section, I introduce the three roles in Scrum: the product owner, the scrum master, and the development team members.
+
+### Product Owner
+
+The product owner (PO) is responsible for maximizing the value that is delivered by the team. His tasks include:
+
+* **Developing a product vision**: As a PO, it is crucial to have a clear vision about the product in order to maximize the value for the customer.
+* **Backlog grooming:** ensure that all backlog items are [well-written](https://en.wikipedia.org/wiki/INVEST_(mnemonic)) and [appropriately prioritized](https://techbeacon.com/app-dev-testing/how-prioritize-your-backlog-using-weighted-shortest-job-first).
+* **Communiation with the development team:** Often, the PO has the best understanding of new backlog items. He must ensure that he shares his understanding with the development team, e.g. during refinements.
+* **Verification of acceptance criteria:** Once a backlog item has been completed by the team, it's the PO's responsibility to verify whether all acceptance criteria have been met.
+* **Stakeholder management:** communicate with customers, management, and developers.
+
+The main Scrum meeting that lies in the PO's domain is the sprint planning and the sprint review.
+
+Typical statements of POs may include the following:
+
+```
+- Our customers need this feature as soon as possible
+- Instead of feature X, we will work on feature Y in the next sprint because ...
+- Feature X is important because it ties into epic Y, which delivers enormous value to our clients
+- Is this backlog item still unclear? Let me explain again ...
+- Unfortunately, we couldn't deliver feature X as quickly as we hoped due to ...
+```
+
+In my opinion, a great PO is characterized by the following attributes:
+
+- **Passion for the product:** the PO must make it his mission to develiver the best product possible.
+- **Excellent communication skills:** the PO has to communicate with various stakeholders and it is key that he can effectively share his understanding
+- **Basic technical understanding:** Although the role of PO is not a technical role, it is beneficial for the PO to have a basic technical understanding. This allows for better communication with the development team and ensures that technical tasks aiming at software quality are not put on the backburner.
+
+### Scrum Master
+
+The Scrum master (SM) guide the team according to the principles set forth in the [scrum guide](https://www.scrum.org/resources/scrum-guide). The SM is an enabler who ensures that things run smoothly. Typical activities of an SM include:
+
+* Communicate with the development team and the PO
+* Assist the team in removing impediments
+* Empower the team members to implement Scrum effectively
+
+The main Scrum meeting that lies in the SM's domain is the sprint retrospective.
+
+Typical statements of Scrum masters include:
+
+* Marc, I think that Jacob has already worked on something similar before. I think you guys should talk to each other!
+* Everbody draw a picture of how the last sprint made you feel!
+* The database service from the support team is still not up but I'm in contact with them and will let you know when there are news.
+* Let's try to keep today's daily at 15 minutes.
+
+What makes a great Scrum master?
+
+* **People skills**: the Scrum master must be a very good communicator and must show empathy towards the individual team members.
+* **Creativity**: creativity is a must for removing impediments and developing innovative concepts for sprint retrospectives.
+* **Passion for Scrum**: the Scrum master must be a knowledgeable Scrum devotee that electrifies the team with his passion.
+
+### Development Team
+
+The main responsibility of the development team is the technical implementation of backlog items. Typical activities include:
+
+* Technical design and implementation of new software features
+* Implementation of automated tests
+* DevOps: e.g. implementation of CI/CD pipelines
+* Refinement of backlog items
+* Development of software according to the Scrum principles
+
+The development contributes to the daily Scrum meetings, refinements, the sprint plannings, the sprint reviews, and the sprint retrospectives.
+
+Typical statements of a development team member include:
+
+* For authentication, we could create a new database table and then store the encrypted credentials of our users.
+* Sorry, but I can't estimate this backlog item yet. I just don't understand what the acceptance criteria mean.
+* I was really frustrated during the last sprint because it is so painful to implement to implement new features with the current state of the component. We should completely re-write the component as soon as possible.
+* Today I want to show you the new user interface we developed during the last two sprints. What do you think?
+
+What makes a great development team member?
+
+* **Technical skills**: A member of the development team should produce high-quality implementations that stand the test of time.
+* **Communication skills**: The best technical skills can be useless if a developer is not able to work together with the other members of the team.
+* **Technical vision**: While the product owner is responsible for the vision of the product, the development team must have a clear plan about the technical implementation that allows for the realization of that vision.
+
+asdf
+
