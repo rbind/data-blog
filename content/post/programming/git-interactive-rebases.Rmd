@@ -1,0 +1,293 @@
+---
+title: "Rewriting History with Git"
+author: Matthias Döring
+date: '2020-07-03'
+description: "Git is the most widely used version control system for software. When collaborating in teams, it is vital that individual commits to the central repository are easily comprehensible. Here you will learn how to manipulate your Git history using interactive rebases."
+lead: "Commits do not always turn out as you'd like them. However, using interactive rebases, you can craft beautiful commits by modifying your commit history."
+slug: "rewriting-history-with-git"
+categories:
+- programming
+thumbnail: "/post/programming/git_avatar.png"
+thumbnailsrc: "Git Logo by Jason Long is licensed under the Creative Commons Attribution 3.0 Unported License."
+downloadRmd: false
+---
+Let's say you are currently adding new arguments to an installation script for your software. After some work, your commit history may look something like this:
+
+```plaintext
+commit 4e8297ef49117693250871473e0dd690e00baecb (HEAD)
+
+    Add another argument
+
+ Dockerfile  | 1 +
+ README.md   | 1 +
+ install.cmd | 2 +-
+
+commit 06088938b51d2546fa668ff0d635a4464baa6d17
+
+    Installation script: fix typo in new argument
+
+ install.cmd | 2 +-
+
+commit 788efd908a74834e23c6ee435553bf556d29835f
+
+    Add argument to installation script
+
+ install.cmd | 3 ++-
+```
+
+Before you continue reading, consider whether you would want to change anything about these commits.
+
+## What are the problems with this series of commits?
+
+There are three problems with this commit series:
+
+1. **Commit amendments as individual commits:** The second commit in the series does not implement new functionality
+   but merely amends the first commit by fixing a typo.
+2. **Incoherent commits:** The last commit also updates a Dockerfile, which does not have anything to do with the modification
+   to the installation script.
+2. **Commit message does not match the content:** The last commit does not mention the Dockerfile change in its message.
+
+## How to improve this series of commits?
+
+We can improve the commit series by adjusting the commits in the following way:
+
+1. Create one commit that introduces the two new install script arguments.
+   This commit shall also contain the update to the README.
+2. Create another commit for the adjustment of the Dockerfile.
+
+Both of these tasks can be achieved using interactive rebases.
+Let's starting with creating a commit that adds the new install script arguments.
+
+Since we want to rebase the last three previous commits, we can use `HEAD~3` as the reference for the rebase (or alternatively `788efd908a74834e23c6ee435553bf556d29835f~`).
+We can start the interactive rebase session by issuing:
+
+```bash
+git rebase -i HEAD~3
+```
+
+This will automatically open a text editor that displays the following text:
+
+```plaintext
+pick 788efd9 Add argument to installation script
+pick 0608893 Installation script: fix typo in new argument
+pick 4e8297e Add another argument
+```
+
+Note that the order in which the commits are outputted here is the reverse order of the output from `git log`, which means that the newest commit in a series is shown at the bottom. 
+
+To fix our commit series, we will perform the following steps:
+
+1. Edit the last commit in order to extract the Dockerfile into a new commit.
+2. Squash the previous commits involving the addition of installation script arguments.
+
+## Editing previous commits
+
+To edit the last commit in the series, we replace `pick` with `e`, which indicates that we want to edit that commit:
+
+```plaintext
+pick 788efd9 Add argument to installation script
+pick 0608893 Installation script: fix typo in new argument
+e 4e8297e Add another argument
+```
+
+Next, we save our changes to the rebase file. Then, Git will display the following message:
+
+```plaintext
+Stopped at 4e8297e...  Add another argument
+```
+
+This means that we're ready to modify the commit. To create a new commit containing only the Dockerfile, we will reset the index to the previous commit:
+
+```plaintext
+git reset HEAD~
+```
+
+After the reset, all of the commit's changes have become unstaged:
+
+```plaintext
+Unstaged changes after reset:
+M       Dockerfile
+M       README.md
+M       install.cmd
+```
+
+We can now split the files into two commits:
+
+1. A commit for the install script containing `README.md` and `install.cmd`
+2. A commit for the Dockerfile containing only `Dockerfile`
+
+To create a commit containing `README.md` and `install.cmd`, we enter:
+
+```plaintext
+git add README.md install.cmd
+git commit -m "Add second argument and update README"
+```
+
+To create a commit containing only `Dockerfile`, we enter:
+
+```plaintext
+git add Dockerfile
+git commit -m "Update dockerfile"
+```
+
+Since we're finished with this commit, we can continue to rebase:
+
+```plaintext
+git rebase --continue
+```
+
+This finishes the rebase and we can go on to verify the effectiveness of our changes using `git log --stat`:
+
+```plaintext
+commit 08c4be384bcd3f360c1c0998f54990116e1c1818 (HEAD)
+
+    Update dockerfile
+
+ Dockerfile | 1 +
+
+commit 80d323410a05d1a6339477d60cd0a529b47eee2e
+
+    Add second argument and update README
+
+ README.md   | 1 +
+ install.cmd | 2 +-
+
+commit 06088938b51d2546fa668ff0d635a4464baa6d17
+
+    Installation script: fix typo in new argument
+
+ install.cmd | 2 +-
+
+commit 788efd908a74834e23c6ee435553bf556d29835f
+
+    Add argument to installation script
+
+ install.cmd | 3 ++-
+```
+
+Things already look cleaner now. However, there are now three commits that are all involved in adding arguments to the install script. Since these are all very small changes, we can improve coherence by squashing the commits that involve the install script.
+
+## Squashing previous commits
+
+Again, we will use rebase. This time, we have to go back 4 commits in history:
+
+```plaintext
+git rebase -i HEAD~4
+```
+
+This gives the following output:
+
+```plaintext
+pick 788efd9 Add argument to installation script
+pick 0608893 Installation script: fix typo in new argument
+pick 80d3234 Add second argument and update README
+pick 08c4be3 Update dockerfile
+```
+
+To squash the oldest three commits together, we will use the `s` marker and store the file:
+
+```plaintext
+pick 788efd9 Add argument to installation script
+s 0608893 Installation script: fix typo in new argument
+s 80d3234 Add second argument and update README
+pick 08c4be3 Update dockerfile
+```
+
+Now, a new file with the following text appears:
+
+```plaintext
+# This is a combination of 3 commits.
+# This is the 1st commit message:
+
+Add argument to installation script
+
+# This is the commit message #2:
+
+Installation script: fix typo in new argument
+
+# This is the commit message #3:
+
+Add second argument and update README
+```
+
+We can now write a new, improved commit message for the three commits:
+
+```plaintext
+Add two new arguments to the installation script
+
+- Argument 1 is used to set the path for library X
+- Argument 2 is used to set the path for library Y
+- README was updated
+```
+
+After confirming the changes, we can contently look at our our new and improved series of commits:
+
+```plaintext
+commit b4de4805ba528c5124d3842cbe04efb3f0021af5 (HEAD)
+
+    Update dockerfile
+
+commit fa50568a6f1e96094eb4999ad10ea73f5ffb0c55
+
+    Add two new arguments to the installation script
+```
+
+Now that we're finished, let's consider a situation in which you should never use rebase.
+
+## When not to use rebase
+
+The major caveat of rebasing is that you are replacing existing commits with new commits, which can have serious consequences when you're working in a team.
+Therefore, the golden rule is that you should never use rebase when your commits are used by other developers.
+
+Let's consider the following example where we have two developers, `Dev A` and `Dev B`, whose merge base is the shared commit `2S`:
+
+```plaintext
+commit 3A                           commit 3B
+  |                                    | 
+commit 2S-------------------------------
+  |
+commit 1S
+  |
+master
+```
+
+Since `Dev A` is not happy with commits `2S` and `1S`, he makes some modifications and squashes the commits, thereby creating a new commit, commit `R`.
+
+```plaintext
+commit 3A                           commit 3B
+  |                                    | 
+commit R                            commit 2S
+  |                                    |
+  |                                 commit 1S
+  |                                    |
+master----------------------------------
+```
+
+After `Dev A` forcefully pushes his work to the master, `Dev B` merges his commits `1S`, `2S`, and `3B`:
+
+```plaintext
+merge_commit----commit 3B
+  |                |
+commit 3A       commit 2S
+  |                |
+commit R        commit 1S
+  |                | 
+old_master---------- 
+```
+
+The problem here is that `Dev B` reintroduces the changes that `Dev A` explicitly didn't want to have in the master, namely commits `1S` and `2S`.
+Assuming that `Dev B` was aware about the fact that `Dev A` had performed a rebase, his best course of action would have been to cherry-pick his new commit
+`3B` onto the master rather than merging all of his commits. Most importantly, the whole problem would not have arisen if
+`Dev A` had never performed the rebase.
+
+In this artificial example, the problem does not look too bad. However, in a real project, multiple developers would be affected and it would be extremely time-consuming to prevent a corruption of the master branch. So, as a general rule, **just refrain from using rebases on commits that are used by others**.
+
+## Why do we want to have well-structured commits?
+
+One question you may ask is, why do we have to go through all of this work just to restructure your commits. The three most important reasons are:
+
+1. Performing **code reviews** becomes highly cumbersome with bloated commits because the reviewer will have a hard time understanding the intentions of the changes.
+2. **Reverting** individual changes becomes impossible: when a large commit leads to a problem, it has to reverted as a whole.
+3. With a clean commit history, developers can **quickly scan the git log** to find out about recent developments.
+
+Let me know if you know other reasons why you'd want to have a clean commit history.
