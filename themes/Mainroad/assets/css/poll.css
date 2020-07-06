@@ -1,0 +1,14 @@
+.bar-title {
+  font-weight: bold;
+}
+.bar-container {
+  margin: 0px 0px 15px;
+  background-color: #cc4440;
+  text-align: left;
+  height: 20px;
+}
+
+fieldset {
+    border: 0;
+}
+
