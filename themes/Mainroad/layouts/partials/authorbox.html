@@ -1,13 +1,13 @@
 {{- if .Param "authorbox" }}
 <div class="authorbox clearfix">
 	{{- if and (not .Site.Author.avatar) (not .Site.Author.name) (not .Site.Author.bio) }}
-	<p class="authorbox__warning"><strong>WARNING:</strong> Authorbox is activated, but [Author] parameters are not specified.</p>
+	<p class="authorbox__warning">
+		<strong>WARNING:</strong> Authorbox is activated, but [Author] parameters are not specified.
+	</p>
 	{{- end }}
 	{{- with .Site.Author.avatar }}
 	<figure class="authorbox__avatar">
-        <a href="{{ $.Site.Author.url }}">
 		<img alt="{{ $.Site.Author.name }} avatar" src="{{ $.Site.Author.avatar | relURL }}" class="avatar" height="90" width="90">
-        </a>
 	</figure>
 	{{- end }}
 	{{- with .Site.Author.name }}
@@ -17,7 +17,7 @@
 	{{- end }}
 	{{- with .Site.Author.bio }}
 	<div class="authorbox__description">
-		{{ . }}
+		{{ . | markdownify }}
 	</div>
 	{{- end }}
 </div>

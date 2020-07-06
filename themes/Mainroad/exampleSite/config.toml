@@ -12,14 +12,16 @@ googleAnalytics = "" # Enable Google Analytics by entering your tracking id
   avatar = "img/avatar.png"
 
 [Params]
-  subtitle = "Just another site" # Subtitle of your site
   description = "John Doe's Personal blog about everything" # Description of your site
   opengraph = true
   twitter_cards = false
   readmore = false # Show "Read more" button in list if true
   authorbox = true
-  post_navigation = true
-  postSections = ["post"]
+  pager = true
+  post_meta = ["date", "categories"] # Order of post meta information
+
+[Params.logo]
+  subtitle = "Just another site" # Logo subtitle
 
 [Params.sidebar]
   home = "right"   # Configure layout for home page

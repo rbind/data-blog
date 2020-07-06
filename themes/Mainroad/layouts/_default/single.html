@@ -1,5 +1,5 @@
-{{- define "main" }}
-<!--<main class="main">-->
+{{ define "main" }}
+<main class="main" role="main">
 	<article class="post">
 		<header class="post__header">
 			<h1 class="post__title">{{ .Title }}</h1>
@@ -13,27 +13,32 @@
 		{{- if .Params.thumbnail }}
             {{- $avatar := findRE "_avatar" .Params.thumbnail }}
             {{- if ge (len $avatar) 1 }}
-		    <figure class="post__thumbnail">
-			    <img src="{{ .Params.thumbnail | relURL }}" alt="{{ .Title }}">
+                   <figure class="post__thumbnail">
+                           <img src="{{ .Params.thumbnail | relURL }}" alt="{{ .Title }}">
                 {{- if .Params.thumbnailsrc}}
                     <figcaption>
                         <span>{{.Params.thumbnailsrc}}</span>
                     </figcaption>
                  {{- end }}
-		    </figure>
+                   </figure>
             {{- end }}
 		{{- end }}
 		{{- partial "post_toc.html" . -}}
         {{- if .Params.pollID }}
             {{- partial "widgets/poll.html" . }}
         {{- end }}
+
 		<div class="content post__content clearfix">
 			{{ .Content }}
 		</div>
-		{{- partial "post_tags.html" . }}
+		{{- if .Params.tags }}
+		<footer class="post__footer">
+			{{ partial "post_tags.html" . }}
+		</footer>
+		{{- end }}
 	</article>
-    <!--</main>-->
-{{- partial "authorbox.html" . }}
+</main>
+{{ partial "authorbox.html" . }}
 <div style = "text-align:right">
 {{- if isset .Params "author" }}
     <p>Author: {{.Params.author}}</p>
@@ -41,6 +46,6 @@
 {{- partial "post_download_Rmd.html" . }}
 </div>
 <br>
-{{- partial "post_nav.html" . }}
-{{- partial "comments.html" . }}
-{{- end }}
+{{ partial "pager.html" . }}
+{{ partial "comments.html" . }}
+{{ end }}

@@ -1,42 +1,32 @@
 <!DOCTYPE html>
-<html lang="{{ .Site.LanguageCode | default "en-us" }}">
+<html class="no-js" lang="{{ .Site.Language.Lang }}">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>{{ block "title" . }}{{ .Title }}{{ end }}</title>
-	<meta name="description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{else}}{{ .Params.Description }}{{end}}">
-    {{ if .Params.no_index }}
-    <meta name="robots" content="noindex">
-    {{ end }}
-	{{ .Hugo.Generator }}
-	{{ if .Site.Params.opengraph }}{{ template "_internal/opengraph.html" . }}{{ end }}
-	{{ if .Site.Params.twitter_cards }}{{ template "_internal/twitter_cards.html" . }}{{ end }}
+	<title>{{ block "title" . }}{{ if not .IsHome }}{{ .Title }} - {{ end }}{{ .Site.Title }}{{ end }}</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{ else }}{{ .Params.Description }}{{ end }}">
+	{{- if .Site.Params.opengraph }}
+		{{ template "_internal/opengraph.html" . }}
+	{{- end }}
+	{{- if .Site.Params.schema }}
+		{{ template "_internal/schema.html" . }}
+	{{- end }}
+	{{- if .Site.Params.twitter_cards }}
+		{{ template "_internal/twitter_cards.html" . }}
+	{{- end }}
 	<link rel="dns-prefetch" href="//fonts.googleapis.com">
 	<link rel="dns-prefetch" href="//fonts.gstatic.com">
 	{{ with .OutputFormats.Get "rss" -}}
 	{{ printf `<link rel="%s" type="%s" href="%s" title="%s">` .Rel .MediaType.Type .RelPermalink $.Site.Title | safeHTML }}
 	{{ end -}}
-    <link rel="stylesheet" href="{{"css/highlighting-theme.css" | absURL}}" id="theme-stylesheet">
-    <script src="{{ "js/highlight.pack.js" | absURL }}"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <!--
-    <script type="application/javascript">
-    function getIP(json) {
-        // ipify.org api
-        alert(json.ip);
-        IP = json.ip; // set ip globally
-    }
-    </script>
-    <script type="application/javascript" src="https://api.ipify.org?format=jsonp&callback=getIP"></script>
-    -->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
-	<link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
-	<link rel="stylesheet" href="{{ "css/poll.css" | relURL }}">
-    <script src="https://code.jquery.com/jquery-latest.js"> </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.1/underscore-min.js"> </script>
-	<script src="{{ "js/scripts.js" | relURL }}"></script>
-	<script src="{{ "js/polls.js" | relURL }}"></script>
+	{{ $style := resources.Get "css/style.css" | resources.ExecuteAsTemplate "css/style.css" . -}}
+	<link rel="stylesheet" href="{{ $style.RelPermalink }}">
+	{{ range .Site.Params.customCSS -}}
+	<link rel="stylesheet" href="{{ . | relURL }}">
+	{{- end }}
 	<link rel="shortcut icon" href="{{ "favicon.ico" | relURL }}">
 	{{- if not .Site.IsServer }}
 		{{ template "_internal/google_analytics_async.html" . }}
@@ -46,7 +36,7 @@
 	<div class="container container--outer">
 		{{ partial "header" . }}
 		<div class="wrapper flex">
-			<section class="primary">
+			<div class="primary">
 			{{ block "main" . }}
 				{{ with .Content }}
 				<div class="content main__content clearfix">
@@ -54,17 +44,15 @@
 				</div>
 				{{ end }}
 			{{ end }}
-			</section>
+			</div>
 			{{ partial "sidebar.html" . }}
 		</div>
 		{{ partial "footer" . }}
 	</div>
-<script>
-	var navigation = responsiveNav(".menu", {
-		navClass: "menu--collapse",
-		label: "{{ T "menu_label" }}",
-	});
-</script>
+<script async defer src="{{ "js/menu.js" | relURL }}"></script>
+{{ range .Site.Params.customJS -}}
+<script src="{{ . | relURL }}"></script>
+{{- end }}
 {{- partial "mathjax.html" . -}}
 </body>
 </html>
