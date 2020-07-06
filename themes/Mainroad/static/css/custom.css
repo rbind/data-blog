@@ -78,7 +78,7 @@
   color: #4693e6;
   text-decoration: none;
 }
-/*
+
 .dialog {
   display: none;
   position: fixed;
@@ -92,7 +92,7 @@
   text-align: center;
   z-index: 1;
 }
-*/
+
 .dialog:target {
   display: block;
 }

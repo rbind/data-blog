@@ -36,7 +36,7 @@
     <input type="hidden" name="options[reCaptcha][secret]" value="{{.Site.Params.staticman.secret_V2}}">
     <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#comment-submitted">
     <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#post-error">
-    <input type="hidden" name="options[entryId]" value="{{ .UniqueID }}">
+    <input type="hidden" name="options[entryId]" value="{{ with .File }}{{ .UniqueID }}{{ end }}">
     <input name="fields[path]" type="hidden" value="{{ .File.Path }}">
     <input name="fields[name]" type="text" class="post-comment-field" placeholder="Your name" title = "Name">
     <input name="fields[email]" type="email" class="post-comment-field" placeholder="Your email address" title = "Email">

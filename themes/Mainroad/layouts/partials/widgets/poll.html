@@ -37,8 +37,8 @@
             <input type="hidden" name="pollActive" value={{ $pollInfo.poll_active }}>
             <input type="hidden" name="options[redirect]" value="{{ .Permalink }}#poll-submitted">
             <input type="hidden" name="options[redirectError]" value="{{ .Permalink }}#poll-error">
-            <input type="hidden" name="options[entryId]" value="{{ .UniqueID }}">
-            <input name="fields[path]" type="hidden" value="{{ .File.Path }}">
+            <input type="hidden" name="options[entryId]" value="{{ with .File }}{{ .Path }}{{ end }}">
+            <input name="fields[path]" type="hidden" value="{{ with .File}} {{ .Path }} {{end}}">
             <input name="fields[pollID]" type="hidden" value="{{ $activePollID }}">
             <input name="fields[option]" type="hidden" value="">
             <input name="fields[ipAddress]" type="hidden" value="">
