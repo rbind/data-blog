@@ -32,6 +32,11 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   post_navigation = true
   postSections = ["post"]
   mathjax = true # Enable MathJax
+  pager = true # Show pager navigation (prev/next links) at the bottom of pages if true
+  post_meta = ['categories', 'comments', 'date'] # post meta info to show
+
+  customCSS = ["css/poll.css"] # Include custom CSS files
+  customJS = ["js/polls.js", "js/scripts.js"]
 
   # options for highlight.js (version, additional languages, and theme)
   highlightjsVersion = "9.11.0"
