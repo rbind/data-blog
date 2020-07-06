@@ -50,22 +50,32 @@
   width: 100%;
   background-color:#ffffff;
 }
+/*
+.btn {
+	padding: 5px 10px;
+	font-weight: 700;
+	color: #fff;
+	white-space: pre-line;
+	background: #2a2a2a;
+}
 
 .btn:hover {
   border: 2px solid #F76C5E !important;
   background-color: #d1d1d1;
   color: #F76C5E;
-
+  text-decoration: none;
+}
+*/
 .button {
-       padding: 10px 10px 10px 10px;
-       font-weight: 700;
-       color: #fff;
-       background: #4693e6;
-    text-align: center;
-    font-size: 16px;
-    text-decoration: none;
-    margin: 5px;
-    cursor: pointer;
+   padding: 10px 10px 10px 10px;
+   font-weight: 700;
+   color: #fff;
+   background: #4693e6;
+   text-align: center;
+   font-size: 16px;
+   text-decoration: none;
+   margin: 5px;
+   cursor: pointer;
 }
 
 .button:active {
@@ -80,7 +90,7 @@
 }
 
 .dialog {
-  display: none;
+  display: none !important;
   position: fixed;
   background-color: rgba(238, 238, 238, 1);
   padding: 25px;
@@ -96,6 +106,7 @@
 .dialog:target {
   display: block;
 }
+
 #copyButton {
   width: 150px;
   height: 50px;
