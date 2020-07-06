@@ -90,7 +90,7 @@
 }
 
 .dialog {
-  display: none !important;
+  display: none;
   position: fixed;
   background-color: rgba(238, 238, 238, 1);
   padding: 25px;

@@ -35,14 +35,14 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   pager = true # Show pager navigation (prev/next links) at the bottom of pages if true
   post_meta = ['categories', 'comments', 'date'] # post meta info to show
 
-  customCSS = ["css/custom.css", "css/poll.css"] # Include custom CSS files
-  customJS = ["https://code.jquery.com/jquery-latest.js", "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.1/underscore-min.js", "js/polls.js", "js/scripts.js"]
+  customCSS = ["css/highlighting-theme.css", "css/custom.css", "css/poll.css"] # Include custom CSS files
+  customJS = ["https://code.jquery.com/jquery-latest.js", "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.1/underscore-min.js", "js/highlight.pack.js", "js/polls.js", "js/scripts.js"]
 
-  # options for highlight.js (version, additional languages, and theme)
-  highlightjsVersion = "9.11.0"
-  highlightjsCDN = "//cdn.bootcss.com"
-  highlightjsLang = ["r", "yaml", "tex"]
-  highlightjsTheme = "github"
+  # options for highlight.js (version, additional languages, and theme) NOT AVAILABLE FOR MAINROAD
+  #highlightjsVersion = "10.1.1"
+  #highlightjsCDN = "//cdnjs.cloudflare.com/ajax/libs"
+  #highlightjsLang = ["r", "python", "yaml", "tex"]
+  #highlightjsTheme = "github"
 
 [Params.staticman]
   comments_api = "https://staticmanbot.herokuapp.com/v2/entry/rbind/data-blog/master/comments" # was disabled due to spam
