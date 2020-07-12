@@ -1,0 +1,92 @@
+---
+title: "Becoming an AWS Certified Cloud Solutions Architect Associate"
+lead: "Cloud computing is becoming more and more prevalent. If you are interested in becoming AWS certified, this post gives you valuable information about the exam preparation process."
+author: Matthias Döring
+date: '2020-07-12'
+description: "Cloud computing is becoming more and more prevalent and professionals with AWS certifications are in high demand. Here, I describe how I prepared for the AWS Cloud Solutions Architect Associate examination and how the online proctoring system works."
+slug: "becoming-an-aws-certified-cloud-solutions-architect-associate"
+downloadRmd: false
+categories:
+  - commentary
+tags:
+thumbnail: "/post/commentary/cloud_solutions_architect_associate_avatar.png"
+thumbnailsrc: "The AWS logo is a trademark of AWS and its use is subject to the guidelines at https://aws.amazon.com/trademark-guidelines."
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>AWS (Amazon Web Services) certifications are among the <a href="https://www.forbes.com/sites/louiscolumbus/2019/07/28/aws-certifications-increase-tech-pay-up-to-12k-a-year/">most lucrative certifications in the IT sector</a>. This is due to the <a href="https://www.networkerstechnology.com/growth-cloud-demand-infrastructure-specialists">growing demand for professionals with cloud expertise</a>, as more and more companies are adopting cloud technology. Furthermore, AWS upholds high quality standards when
+it comes to certification. So, while certification can be challenging, there is a lot to learn along the way.</p>
+<p>I only recently had my first exposure to cloud computing when I took on a DevOps role in industry in 2019. Here, I encountered AWS services such as EC2, ECR/ECS, EFS, and CloudWatch. However, since the architecture of the project was already established, I didn’t have any opportunities to learn about the motivations for these technological decisions.</p>
+<p>At that point, I had some understanding about different AWS products but I would have had a hard time choosing
+choosing between individual services and I would not have been able to architect a cloud-based system from scratch. Early 2020, when I began working on a cloud-based machine-learning model serving system, I realized that I should deepen my knowledge in order to make sound technical decisions. That’s when I decided to become certified as an AWS cloud solutions architect.</p>
+<div id="why-to-get-the-aws-cloud-solutions-architect-associate-certificate" class="section level2">
+<h2>Why to get the AWS Cloud Solutions Architect Associate certificate?</h2>
+<p>On the associate level, AWS offers three types of basic certifications: Solutions Architect, SysOps Administrator, and Developer. Once you have decided to get an AWS certification, you have to decide which one is the right fit for you.</p>
+<ul>
+<li>The <strong>Solutions Architect</strong> certification is geared towards people that want to architect cloud solutions that fulfill the five pillars of the AWS Well-Architected Framework. If you are looking for a general overview or would like to design or improve cloud solutions, this course is for you.</li>
+<li>The <strong>SysOps Administrator</strong> certification is geared towards persons that administrate systems operating in the cloud. As such, the certification will require hands-on knowledge about the AWS CLI (command line interface) and SDK (software development kit) as well as administration-related topics such as monitoring, networking, and operations.</li>
+<li>The <strong>Developer</strong> certification is geared towards software engineers that want to develop cloud-based systems. Therefore, you will need to be knowledgeable about the AWS SDK, CI/CD pipelines, and serverless applications.</li>
+</ul>
+<p>The reason why I chose the <strong>Solutions Architect</strong> certificate is that architecture is currently most relevant to my work. If you don’t know which AWS certification to choose, I would definitely go with the <strong>Solutions Architect</strong> certificate because it gives you the most general overview of the AWS services and doesn’t require coding skills.</p>
+</div>
+<div id="preparation" class="section level2">
+<h2>Preparation</h2>
+<p>In the following sections I describe the three-months routine that I used to prepare for the examination.</p>
+<p>Note that I prepared for the SAA-C01 certification, which is now being replaced by an updated version, the SAA-C02 certification. When you start preparing for the exam, please ensure that you are using resources for the appropriate version of the certification.</p>
+<div id="tecracer-cloud-solutions-architecture-course" class="section level3">
+<h3>Tecracer Cloud Solutions Architecture Course</h3>
+<p><img src="../tecracer-logo.png" /></p>
+<p>My exam preparation began with with a three-day long cloud solutions architecture training offered by <a href="https://www.tecracer.de">Tecracer</a>. While the course gave a solid overview of the basic AWS services and also included some practical sessions, I wasn’t completely satisfied for the following reasons:</p>
+<ul>
+<li><strong>Generic slides:</strong> The slides were mostly focused on individual services, so I didn’t learn much about typical solution architectures.</li>
+<li><strong>Too short:</strong> If you already have some knowledge about AWS services, three days is not sufficient to go into sufficient detail.</li>
+<li><strong>No problem solving:</strong> The practical sessions were well-prepared but didn’t leave room for creative problem solving because every step was predetermined.</li>
+</ul>
+<p>So, while the course was a good starting point, I wouldn’t recommend it if you already have some experience with AWS. Moreover, with a cost of more than 1000 EUR, the course is quite expensive and I would not have attended it if my company hadn’t paid for it because there are better and cheaper alternatives, which are introduced in the following section.</p>
+</div>
+<div id="linux-academy" class="section level3">
+<h3>Linux Academy</h3>
+<p><img src="../linux_academy_logo.png" /></p>
+<p>There are many e-learning platforms that offer cloud training. Two of the most popular platforms are <a href="https://acloud.guru">A Cloud Guru</a> and <a href="https://linuxacademy.com">Linux Academy</a>. Because I already had an account at Linux Academy, I completed their <a href="https://linuxacademy.com/cp/modules/view/id/341">AWS Certified Solutions Architect - Associate Level Course</a> by Adrian Cantrill. I can highly recommend the course for the following four reasons:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Theory:</strong> All relevant exam topics are covered in great detail.</li>
+<li><strong>Practical training:</strong> Linux Academy offers an AWS sandbox that allows you to experiment and explore AWS in various application scenarios.</li>
+<li><strong>Quizzes</strong>: There are a large number of quizzes that enable you to check your progress. There is also a final quiz that is supposed to simulate the actual exam.</li>
+<li><strong>Course delivery:</strong> The course delivery by Adrian is excellent. When you are going through more than 50 hours of videos it’s nice to listen to someone that is really enthusiastic about what he is talking about.</li>
+</ol>
+<p>Overall, I liked the Linux Academy course way better than the course from Tecracer. Moreover, the course from Linux Academy is much cheaper. Assuming that you can work through the course in three months, you’d end up paying roughly 100 EUR, which compares favorably to the 1000 EUR for the Tecracer course.</p>
+</div>
+<div id="the-study-preparation-book" class="section level3">
+<h3>The study preparation book</h3>
+<p>Having completed the Linux Academy course, I also worked through <a href="https://www.amazon.com/Certified-Solutions-Architect-Study-Guide/dp/111950421X/ref=sr_1_3?dchild=1&amp;keywords=aws+solutions+exam+preparation&amp;qid=1594546061&amp;sr=8-3">the study preparation book</a>. I liked the book because it was very concise, well-structured, and there are a bunch of quiz questions that help you prepare for the exam. There is also an online platform where you can access the quizzes and selectively test your knowledge on specific questions. Overall, I felt that the book was a nice addition to the Linux Academy course because it gives a succinct overview of all important topics and can even fill in some blind spots.</p>
+</div>
+<div id="aws-reinvent-talks" class="section level3">
+<h3>AWS re:Invent talks</h3>
+<p><img src="../aws_reinvent.png" /></p>
+<p>re:Invent is an AWS-hosted cloud computing conference that covers all kinds of topics about AWS and is particularly useful in order to get information on newly released features. Since all conference contributions are available online via <a href="https://www.youtube.com/user/AmazonWebServices">YouTube</a>, watching the videos is great for diving deeper into individual topics.</p>
+<p>Note, however, that when you are preparing for the associate exam, it can be hard to select which type of video to watch. If you are already knowledgeable, some videos will be too basic, while others will go to into too much detail than what is needed for the associate certification. So, while re:Invent talks are a nice addition to the exam preparation, I don’t think it’s required for passing the exam.</p>
+</div>
+<div id="aws-whitepapers" class="section level3">
+<h3>AWS Whitepapers</h3>
+<p>The <a href="https://aws.amazon.com/whitepapers/">AWS Whitepapers</a> are a treasure trove of information. Due to the scope and depth of whitepapers, I actually didn’t read any of the whitepapers from front to back but rather used the whitepapers when researching answers to questions that arose during the learning process. So, to pass the exam, you don’t need to fully read the whitepapers but you should definitely use them as a resource during the preparation phase.</p>
+</div>
+</div>
+<div id="taking-the-certification-exam-via-online-proctoring" class="section level2">
+<h2>Taking the certification exam via online proctoring</h2>
+<p><img src="../exam_representation.jpg" /></p>
+<p>Once I felt ready for the exam, I registered for the certification at <a href="https://aws.training">AWS Training</a>. Due to the Corona situation, I selected <a href="https://home.pearsonvue.com/">Pearson Vue</a> as an online proctor. Performing the exam online requires some additional preparations. For example, you should download the examination software and perform a systems check, which involves verifying your video and microphone signals. Note that the examination software can only be used when no other programs are running on your machine, so you may need to start the Windows task manager with administrator privileges to terminate some processes.</p>
+<p>On the day of the exam, you can log into the system where you can chat with the proctor. He will make sure that your working environment is cleaned up, so as to prevent cheating. Once the examination has started, you can input the answers to the multiple-choice questions using the examination software. If there is a technical problem, you can contact the proctor using the chat. After you have answered all questions, you can submit the exam and will immediately be informed whether you passed.</p>
+<p>During the online proctoring, I had the unpleasant experience that after about 70% of the questions, my work machine had somehow spawned an internet explorer process in the background. As a consequence, I had to shut down the examination software, kill the process, and log in again.</p>
+<p>Unfortunately, I couldn’t immediately continue the examination because there was no response from the proctor via the chat, so I had to wait for about 15 minutes without knowing whether I could continue my examination. In the end, I still passed the exam with flying colors but I was a bit flustered when I answered the remaining questions because I feared that the problem would arise once again. To prevent such a problem, I’d recommend that you use a private notebook where you are sure that no background processes are automatically spawned.</p>
+</div>
+<div id="tips-for-the-exam" class="section level2">
+<h2>Tips for the exam</h2>
+<p>Finishing off this post, I would like to give you some advice for the examination:</p>
+<ul>
+<li><strong>Know how services work together:</strong> You don’t need to know every service in all of its detail. The examination is more about knowing the circumstances under which you would select a certain service. So, it’s more important to know general concepts and AWS services can be used together rather than knowing all details by heart.</li>
+<li><strong>Read carefully:</strong> Be sure to carefully consider the constraints of each question. Usually a solution is sought that will either <em>minimize costs</em>, <em>maximize availability</em>, or be <em>most efficient</em>. If there are multiple options that make sense, always choose the one that optimizes the quality criterion in question. For example, if you are asked for the most cost-effective S3 storage class and the data do not have to retrieved quickly, you can safely go for Glacier.</li>
+<li><strong>Use the exclusion principle:</strong> Even if you don’t know the answer, you may find the answer by excluding invalid options. Sometimes the alternatives are so far-fetched that this is a valid strategy.</li>
+</ul>
+</div>
