@@ -1,0 +1,9 @@
+_id: b7a3c5a0-c6c2-11ea-8cd9-ab78109fbd02
+path: post/machine-learning/performance-measures-multi-class.html
+name: Huanfa Chen
+email: 3042d1b6ffe984168f00e5cb3a7b248c
+message: >-
+  Thanks Matthias, this post is very useful. Is it true that an unweighted
+  accuracy is always equal to the **micro-average precision** as well as the
+  **micro-average recall**? Please correct me if this wrong.
+date: '2020-07-15T17:43:39.926Z'
