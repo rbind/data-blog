@@ -1,0 +1,6 @@
+_id: 8a918690-c6d8-11ea-9cdb-6171244ae94f
+path: post/machine-learning/performance-measures-multi-class.html
+name: Matthias
+email: e90d48aac6bcd47b2bcf84b337a118d2
+message: "Dear Huanfa,\r\nLet's assume we have:\r\n\r\n* TP = number of true positives\r\n* FP = number of false positives\r\n* FN = number of false negatives\r\n* TN = number of true negatives\r\n* N = TP + FP + FN + TN = total number of predictions\r\n\r\nThen we can define the measures as\r\n\r\n* unweighted accuracy = (TP + TN) / N\r\n* micro-average precision = TP / (TP + FP)\r\n* micro-average recall = TP / (TP + FN)\r\n\r\nSo, as you can see, in general, the unweighted accuracy is not the same as the micro-average precision/recall. However, they could be the same under special circumstances. For example, for TN = FN = 0, unweighted accuracy and micro-average precision would be identical."
+date: '2020-07-15T20:19:53.159Z'
