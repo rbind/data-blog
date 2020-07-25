@@ -35,7 +35,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   pager = true # Show pager navigation (prev/next links) at the bottom of pages if true
   post_meta = ['categories', 'comments', 'date'] # post meta info to show
 
-  customCSS = ["css/highlighting-theme.css", "css/custom.css", "css/poll.css"] # Include custom CSS files
+  customCSS = ["css/custom.css", "css/poll.css"] # Include custom CSS files
   customJS = ["https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js", "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.1/underscore-min.js", "js/highlight.pack.js", "js/polls.js", "js/scripts.js"]
 
 [Params.staticman]
@@ -106,3 +106,5 @@ rssLimit = 20 # max nbr of entries shown in rss feed
     weight = 101
 
 
+[markup.goldmark.renderer]
+    unsafe= true
