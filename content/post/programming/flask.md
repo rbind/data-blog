@@ -10,7 +10,7 @@ categories:
 - programming
 tags:
 - python 
-thumbnail: "/post/programming/flask_avatar.svg"
+thumbnail: "/post/programming/flask_avatar.png"
 ---
 Flask is a lightweight Python web development framework that is becoming more and more popular, as you can see from this comparison
 against [Django](https://www.djangoproject.com/).
