@@ -11,6 +11,9 @@ thumbnail: "/post/programming/git_avatar.png"
 thumbnailsrc: "Git Logo by Jason Long is licensed under the Creative Commons Attribution 3.0 Unported License."
 downloadRmd: false
 ---
+Let's say you are currently adding new arguments to an installation script for your software. After some work, your commit history may look different than you
+would like.
+<!--more-->
 Let's say you are currently adding new arguments to an installation script for your software. After some work, your commit history may look something like this:
 
 ```plaintext

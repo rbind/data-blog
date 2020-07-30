@@ -4,7 +4,7 @@ author: Matthias Döring
 date: '2018-11-01'
 lastmod: '2018-11-10'
 downloadRmd: false
-description: "Staticman is an API that can be used to implement a commenting system for static websites. Here, I discuss how I managed to set up my own instance of the Staticman API and how it can be integrated into a Hugo site."
+description: "Are you hosting a static website and would like to have a commenting system? Look no further than Staticman!"
 thumbnail: "/post/other/staticman_comments_avatar.png"
 thumbnailsrc: "Figure: staticman.net"
 categories:

@@ -3,7 +3,7 @@ title: "Preventing Spam Using ReCAPTCHA and Staticman"
 author: Matthias Döring
 date: '2019-12-24'
 downloadRmd: false
-description: "Staticman makes it easy to implement commenting systems. However, spam can be a big problem. One way to prevent comments from bots is to integrate ReCAPTCHA and Staticman. In this post, I delineate my journey towards ReCAPTCHA verification."
+description: "Staticman makes it easy to implement commenting systems. To prevent spam, however, you should definitely set up ReCAPTCHA."
 thumbnail: "/post/other/recaptcha_v3.png"
 categories:
   - other

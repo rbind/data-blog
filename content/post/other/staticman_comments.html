@@ -4,7 +4,7 @@ author: Matthias Döring
 date: '2018-11-01'
 lastmod: '2018-11-10'
 downloadRmd: false
-description: "Staticman is an API that can be used to implement a commenting system for static websites. Here, I discuss how I managed to set up my own instance of the Staticman API and how it can be integrated into a Hugo site."
+description: "Are you hosting a static website and would like to have a commenting system? Look no further than Staticman!"
 thumbnail: "/post/other/staticman_comments_avatar.png"
 thumbnailsrc: "Figure: staticman.net"
 categories:
@@ -13,6 +13,7 @@ tags:
   - Hugo
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>Comments are an important aspect of many websites, particularly blogs, whose success depends on their ability to create communities. However, including comments is inherently more difficult for static websites than for dynamic websites (e.g. managed through Wordpress). With Hugo, comments can be easily integrated via Disqus. The disadvantage, however, is that foreign JavaScript code needs to be executed and that the comments are not part of the page itself. Here, I will
@@ -46,15 +47,15 @@ explain how comments can be integrated into a web page using Staticman.</p>
 <li>After logging into the CLI using <code>heroku login</code>, create a new Staticman app and configure it:
 <code>cd ~/staticman</code>
 <code>heroku create {nameOfYourStaticmanApp}</code>
-<code>$heroku config:set NODE_ENV=&quot;production&quot;</code>
-<code>$heroku config:set RSA_PRIVATE_KEY=&quot;$(cat key.pem)&quot;</code>
-<code>$heroku config:set GITHUB_TOKEN=&quot;Your_Token&quot;</code></li>
+<code>$heroku config:set NODE_ENV="production"</code>
+<code>$heroku config:set RSA_PRIVATE_KEY="$(cat key.pem)"</code>
+<code>$heroku config:set GITHUB_TOKEN="Your_Token"</code></li>
 <li>Create a production branch:
 <code>git checkout -b production origin/dev</code></li>
 <li>Add <code>config.production.json</code> to <code>.gitignore</code></li>
 <li>Commit the changes:
 <code>git add config.production.json Procfile .gitignore</code>
-<code>git commit -m &quot;Set up Staticman v3 for deployment to Heroku&quot;</code></li>
+<code>git commit -m "Set up Staticman v3 for deployment to Heroku"</code></li>
 <li>Deploy the API:
 <code>git push heroku production:master</code></li>
 <li>After the API has been built successfully, you should be greeted with <em>Hello from Staticman version 3.0.0!</em> when visiting your API instance at <code>https://{nameOfYourStaticmanApp}.herokuapp.com</code>.</li>

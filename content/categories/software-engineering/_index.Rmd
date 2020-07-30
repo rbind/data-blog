@@ -2,7 +2,7 @@
 title: "Software Engineering"
 thumbnail: "/categories/software-engineering/software_engineering_avatar.jpg"
 ---
-<img src="software_engineering_avatar.jpg" alt="Machine learning" width = "1000" height = "668">
+![](software_engineering_avatar.jpg)
 
 ## Posts on software engineering
 

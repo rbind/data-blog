@@ -3,7 +3,7 @@ title: "Behind the Scenes: The First Month of datascienceblog.net"
 author: Matthias Döring
 date: '2018-12-02'
 downloadRmd: false
-description: "datascienceblog.net now exists already for more than one month. In this post I offer a look behind the scenes of the blog and show the progress that has been made with respect to content, features of the blog, SEO, and search traffic."
+description: "Learn about how datascienceblog.net developed in its first months. All beginnings are tough!"
 thumbnail: "/post/other/blog-summary-month-01_cover.png"
 categories:
   - other

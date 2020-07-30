@@ -3,7 +3,7 @@ title: "Implementing Polls Using Staticman"
 author: Matthias Döring
 date: '2018-11-16'
 downloadRmd: false
-description: "With Staticman it is possible to integrate user-generated content into static sites. Here, I demonstrate how Staticman can be used to implement polls into websites that are generated with Hugo. "
+description: "Staticman is popular for commenting systems on static websites. Learn how you can use Staticman for a polling system."
 thumbnail: "/post/other/staticman_comments_avatar.png"
 thumbnailsrc: "Figure: staticman.net"
 categories:

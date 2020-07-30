@@ -1,6 +1,6 @@
 ---
 title: "How to Bypass Corporate Firewalls?"
-lead: "Corporate firewalls often prevent access to anything outside the company intranet. However, if your company is offering a proxy for accessing external resources it's a matter of minutes to establish connectivity to the outside world."
+lead: "Corporate firewalls may prevent you from using the internet. Learn how to bypass the firewall using the cntlm proxy."
 author: Matthias Döring
 date: '2020-07-30'
 downloadRmd: false
