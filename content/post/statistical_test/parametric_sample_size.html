@@ -3,7 +3,7 @@ title: "Parametric Testing: How Many Samples Do I Need?"
 author: Matthias Döring
 date: '2018-10-17'
 thumbnail: "post/statistical_test/parametric_sample_size_cover.png"
-description: "Parametric tests require that data are normally distributed. Here, you will learn how many samples are necessary to satisfy the assumptions of parametric tests."
+description: "Parametric tests require that data are normally distributed. Learn how many samples you really need!"
 categories:
   - statistical test
 tags:
@@ -11,9 +11,11 @@ tags:
   - R
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<p>Parametric tests are subject to assumptions about the properties of the data. For example, Student’s t-test is a well-known parametric test that assumes that sample means have a normal distribution. Due to the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">central limit theorem</a>, the test can be also applied to measurements that are not normally distributed if the sample size is sufficient. Here, we will investigate the approximate number of samples that are necessary for the t-test to be valid. <!--more--></p>
+<p>Parametric tests are subject to assumptions about the properties of the data. For example, Student’s t-test is a well-known parametric test that assumes that sample means have a normal distribution. Due to the <a href="https://en.wikipedia.org/wiki/Central_limit_theorem">central limit theorem</a>, the test can be also applied to measurements that are not normally distributed if the sample size is sufficient. Here, we will investigate the approximate number of samples that are necessary for the t-test to be valid.
+<!--more--></p>
 <div id="fitting-normal-distributions-to-sampled-means" class="section level2">
 <h2>Fitting normal distributions to sampled means</h2>
 <p>To investigate the number of samples that are necessary to satisfy the requirements for Student’s t-test, we iterate over various sample sizes. For each sample size, we draw samples from several distributions. Then, the means of the samples are calculated and a normal distribution is fitted to the distribution of the means. In each iteration, we record the log-likelihood describing how well the normal distribution fits the sampled means. We’ll consider sampled means to have approached the normal distribution when the log likelihood becomes positive.</p>

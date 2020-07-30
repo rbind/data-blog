@@ -3,7 +3,7 @@ title: "Type 1 vs Type 2 Errors: Significance vs Power"
 author: Matthias Döring
 date: '2018-10-22'
 thumbnail: "post/statistical_test/type1_vs_type2_cover.png"
-description: "When designing and performing statistical tests it is important to think about type 1 and type 2 errors. In this post, I investigate the impact of the two error types on significance and power, respectively."
+description: "Type 1 and type 2 errors impact significance and power. Learn why these numbers are relevant for statistical tests!"
 categories:
   - statistical test
 tags:
@@ -96,3 +96,4 @@ print(t$sig.level)
 ```
 
 Thus, for 50 samples per group, adequate power would be obtained if the significance level is set to 5%.
+

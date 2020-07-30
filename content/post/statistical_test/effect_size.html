@@ -2,7 +2,7 @@
 title: "Effect Sizes: Why Significance Alone is Not Enough"
 author: Matthias Döring
 date: '2018-10-20'
-description: "Effect sizes are often overlooked in favor of significance. Here, you will learn why effect sizes are important and how they can be computed using R."
+description: "Effect sizes are often overlooked in favor of significance. We still need them and this is why."
 thumbnail: "post/statistical_test/effect_size_cover.png"
 categories:
   - statistical test
@@ -10,12 +10,14 @@ tags:
   - R
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<p>So, you performed a test for significance and obtained a positive result. That’s great but it’s not time to celebrate yet. You may ask: <em>Why? Isn’t a significant test result sufficient to show the existence of an effect?</em> This statement, however, is not true for two reasons. First, a significant result only indicates the existence of an effect but doesn’t prove it. For example, at a significance level of 5%, an exact test will yield a false positive result in 5% of the cases. Second, a significant result does not necessarily make a statement about the magnitude of the effect. In this post, we’ll investigate the difference between statistical significance and the effect size, which describes the magnitude of an effect. <!--more--></p>
+<p>So, you performed a test for significance and obtained a positive result. That’s great but it’s not time to celebrate yet. You may ask: <em>Why? Isn’t a significant test result sufficient to show the existence of an effect?</em> This statement, however, is not true for two reasons. First, a significant result only indicates the existence of an effect but doesn’t prove it. For example, at a significance level of 5%, an exact test will yield a false positive result in 5% of the cases. Second, a significant result does not necessarily make a statement about the magnitude of the effect. In this post, we’ll investigate the difference between statistical significance and the effect size, which describes the magnitude of an effect.
+<!--more--></p>
 <div id="significance-depends-on-sample-size-and-effect-size" class="section level2">
 <h2>Significance depends on sample size and effect size</h2>
-<p>To exemplify the difference between statistical significance and effect size, let’s assume that we are conducting a study investigating two groups, <span class="math">\(G_1\)</span> and <span class="math">\(G_2\)</span>, with respect to two outcomes, <span class="math">\(Y_1\)</span> and <span class="math">\(Y_1\)</span>. For this purpose, we’ll generate artificial data and determine whether measurements are independent of the groups using the chi-squared test.</p>
+<p>To exemplify the difference between statistical significance and effect size, let’s assume that we are conducting a study investigating two groups, <span class="math inline">\(G_1\)</span> and <span class="math inline">\(G_2\)</span>, with respect to two outcomes, <span class="math inline">\(Y_1\)</span> and <span class="math inline">\(Y_1\)</span>. For this purpose, we’ll generate artificial data and determine whether measurements are independent of the groups using the chi-squared test.</p>
 <div id="generation-of-artificial-data" class="section level3">
 <h3>Generation of artificial data</h3>
 <p>To explore how significance depends on both sample size and effect size, we are going to define a function that builds contingency tables with the following properties:</p>
@@ -46,7 +48,7 @@ tags:
 <p>In the following, the results for these three data sets are described.</p>
 <div id="smallest-sample-size-largest-effect" class="section level4">
 <h4>Smallest sample size, largest effect</h4>
-<p>For the first data set, let’s assume a sample size of 40 and let the difference between the group frequencies be 60%. This means that <span class="math">\(0.6 \cdot 20 = 12\)</span> samples in <span class="math">\(G_1\)</span> will have a different outcome than in <span class="math">\(G_2\)</span>. Under this assumption, we obtain the following contingency table and significance result when testing whether the observed frequencies are independent of the groups using the <span class="math">\(\chi^2\)</span> test:</p>
+<p>For the first data set, let’s assume a sample size of 40 and let the difference between the group frequencies be 60%. This means that <span class="math inline">\(0.6 \cdot 20 = 12\)</span> samples in <span class="math inline">\(G_1\)</span> will have a different outcome than in <span class="math inline">\(G_2\)</span>. Under this assumption, we obtain the following contingency table and significance result when testing whether the observed frequencies are independent of the groups using the <span class="math inline">\(\chi^2\)</span> test:</p>
 <pre class="r"><code>data.L &lt;- build.contingency.table(40, 0.6)
 print(data.L)</code></pre>
 <pre><code>##    Y1 Y2
@@ -59,7 +61,7 @@ print(chi.result.L$p.value)</code></pre>
 </div>
 <div id="medium-sample-size-medium-effect" class="section level4">
 <h4>Medium sample size, medium effect</h4>
-<p>Let’s now assume that we’ve collected a greater number of samples than in the first study, namely a total of <span class="math">\(10\,000\)</span> samples. This time, however, the effect size is smaller: the difference between the two groups is only <span class="math">\(\frac{200}{5000} = 4\%\)</span>. What do you think, will a <span class="math">\(\chi^2\)</span> test on the corresponding contingency table be insignificant? Let’s see the result:</p>
+<p>Let’s now assume that we’ve collected a greater number of samples than in the first study, namely a total of <span class="math inline">\(10\,000\)</span> samples. This time, however, the effect size is smaller: the difference between the two groups is only <span class="math inline">\(\frac{200}{5000} = 4\%\)</span>. What do you think, will a <span class="math inline">\(\chi^2\)</span> test on the corresponding contingency table be insignificant? Let’s see the result:</p>
 <pre class="r"><code>data.M &lt;- build.contingency.table(10000, 0.04)
 print(data.M)</code></pre>
 <pre><code>##      Y1   Y2
@@ -72,7 +74,7 @@ print(chi.result.M$p.value)</code></pre>
 </div>
 <div id="largest-sample-size-smallest-effect" class="section level4">
 <h4>Largest sample size, smallest effect</h4>
-<p>To illustrate what can happen at a very large sample size, let’s generate a data set with an even larger sample size and an even smaller difference between the groups. We’ll take a sample of 1 million measurements and enforce a difference between the groups of only <span class="math">\(1\%\)</span>:</p>
+<p>To illustrate what can happen at a very large sample size, let’s generate a data set with an even larger sample size and an even smaller difference between the groups. We’ll take a sample of 1 million measurements and enforce a difference between the groups of only <span class="math inline">\(1\%\)</span>:</p>
 <pre class="r"><code>data.S &lt;- build.contingency.table(1000000, 0.01)
 print(data.S)</code></pre>
 <pre><code>##        Y1     Y2
@@ -91,7 +93,9 @@ print(chi.result.S$p.value)</code></pre>
 </div>
 <div id="determining-the-effect-size-with-cramers-v" class="section level2">
 <h2>Determining the effect size with Cramer’s V</h2>
-<p>The effect size of the <span class="math">\(\chi^2\)</span> test can be determined using Cramer’s V. Cramer’s V is a normalized version of the <span class="math">\(\chi^2\)</span> test statistic. It is defined by <span class="math">\[V = \sqrt{\frac{\chi^2}{n \cdot (c - 1)}}\]</span> where <span class="math">\(n\)</span> is the sample size and <span class="math">\(c =  \min(m,n)\)</span> is the minimum of the number of rows <span class="math">\(m\)</span> and columns <span class="math">\(n\)</span> in the contingency table. Interpretation of Cramer’s V is easy due to <span class="math">\(V \in [0,1]\)</span>. For large effects, <span class="math">\(V\)</span> will approach 1 but if there’s no effect <span class="math">\(V\)</span> will be close to 0.</p>
+<p>The effect size of the <span class="math inline">\(\chi^2\)</span> test can be determined using Cramer’s V. Cramer’s V is a normalized version of the <span class="math inline">\(\chi^2\)</span> test statistic. It is defined by
+<span class="math display">\[V = \sqrt{\frac{\chi^2}{n \cdot (c - 1)}}\]</span>
+where <span class="math inline">\(n\)</span> is the sample size and <span class="math inline">\(c = \min(m,n)\)</span> is the minimum of the number of rows <span class="math inline">\(m\)</span> and columns <span class="math inline">\(n\)</span> in the contingency table. Interpretation of Cramer’s V is easy due to <span class="math inline">\(V \in [0,1]\)</span>. For large effects, <span class="math inline">\(V\)</span> will approach 1 but if there’s no effect <span class="math inline">\(V\)</span> will be close to 0.</p>
 <div id="an-r-function-for-computing-cramers-v" class="section level3">
 <h3>An R function for computing Cramer’s V</h3>
 <p>Since there’s no function to compute Cramer’s V in base R, we’ll implement it ourselves as follows:</p>
@@ -107,9 +111,9 @@ print(chi.result.S$p.value)</code></pre>
 <h3>Interpreting Cramer’s V</h3>
 <p>To interpret Cramer’s V, the following approach is often used:</p>
 <ul>
-<li><span class="math">\(V \in [0.1, 0.3]\)</span>: weak association</li>
-<li><span class="math">\(V \in [0.4, 0.5]\)</span>: medium association</li>
-<li><span class="math">\(V &gt; 0.5\)</span>: strong association</li>
+<li><span class="math inline">\(V \in [0.1, 0.3]\)</span>: weak association</li>
+<li><span class="math inline">\(V \in [0.4, 0.5]\)</span>: medium association</li>
+<li><span class="math inline">\(V &gt; 0.5\)</span>: strong association</li>
 </ul>
 </div>
 <div id="cramers-v-for-the-three-data-sets" class="section level3">
@@ -127,6 +131,6 @@ print(Vs)</code></pre>
 </div>
 <div id="conclusions" class="section level2">
 <h2>Conclusions</h2>
-<p>If you are reporting the significance of a test, it is similarly important to report the effect size because significance alone does not allow conclusions about the magnitude of an effect.. The available measures for the effect size depend on which significance test was used. Here, we have demonstrated Cramer’s V as a measure for the effect size for the <span class="math">\(\chi^2\)</span> test.</p>
+<p>If you are reporting the significance of a test, it is similarly important to report the effect size because significance alone does not allow conclusions about the magnitude of an effect.. The available measures for the effect size depend on which significance test was used. Here, we have demonstrated Cramer’s V as a measure for the effect size for the <span class="math inline">\(\chi^2\)</span> test.</p>
 <p>What importance do you assign to effect sizes? Do you think that they are often overlooked? If so, why?</p>
 </div>

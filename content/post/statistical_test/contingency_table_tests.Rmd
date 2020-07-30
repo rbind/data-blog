@@ -3,7 +3,7 @@ title: "Testing Independence: Chi-Squared vs Fisher's Exact Test"
 author: Matthias Döring
 date: '2018-10-17'
 thumbnail: "post/statistical_test/contingency_table_tests_cover.png"
-description: "Testing whether two groups are independent of each other is a common use case for the Chi-squared and Fisher's exact test. But, under which conditions are these tests appropriate?"
+description: "Chi-squared and Fisher's exact test are two popular tests for independence. But, under which conditions are these tests appropriate?"
 categories:
   - statistical test
 tags:

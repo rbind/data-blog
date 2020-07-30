@@ -2,7 +2,7 @@
 title: "Testing Significance on Paired Measurements: What Can Go Wrong?"
 author: Matthias Döring
 date: '2018-10-19'
-description: "Measurements often come in pairs. Here I discuss what can go wrong when performing statistical tests that do not take this structure into account."
+description: "Measurements often come in pairs. Learn what can go wrong when statistical tests do not take this structure into account."
 thumbnail: "post/statistical_test/paired_vs_unpaired_tests_cover.png"
 categories:
   - statistical test
@@ -11,14 +11,16 @@ tags:
   - R
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<p>In a previous post, I’ve contrasted <a href="/post/statistical_test/signed_wilcox_rank_test/">two tests for pairs of measurements</a>. Here, I’d like to show why it is important to choose a test that appropriately accounts for such dependent measurements. <!--more--></p>
+<p>In a previous post, I’ve contrasted <a href="/post/statistical_test/signed_wilcox_rank_test/">two tests for pairs of measurements</a>. Here, I’d like to show why it is important to choose a test that appropriately accounts for such dependent measurements.
+<!--more--></p>
 <div id="what-are-pairs-of-measurements" class="section level2">
 <h2>What are pairs of measurements?</h2>
-<p>Measurement pairs of the form <span class="math">\((x_1, x_2)\)</span> arise in two scenarios:</p>
+<p>Measurement pairs of the form <span class="math inline">\((x_1, x_2)\)</span> arise in two scenarios:</p>
 <ol style="list-style-type: decimal">
-<li>Two measurements are performed for the same entity. For example, a clinical study evaluating the efficacy of a new form of insulin would measure blood glucose levels two times for every patient: before (<span class="math">\(x_1\)</span>) and after taking the drug (<span class="math">\(x_2\)</span>).</li>
+<li>Two measurements are performed for the same entity. For example, a clinical study evaluating the efficacy of a new form of insulin would measure blood glucose levels two times for every patient: before (<span class="math inline">\(x_1\)</span>) and after taking the drug (<span class="math inline">\(x_2\)</span>).</li>
 <li>Measurements are performed for different entities. However, entities are matched according to their characteristics. For example, to test the efficacy of a drug, you may want to pair study participants according to weight, age, or other characteristics in order to control for these confounding factors.</li>
 </ol>
 <p>In the first case, the pairing is a natural consequence of the data generation process. In the second case, the pairing is enforced by the design of the study.</p>

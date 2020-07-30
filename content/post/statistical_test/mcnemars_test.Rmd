@@ -1,7 +1,7 @@
 ---
 title: "Testing Symmetry on Contingency Tables from Paired Measurements: McNemar's Test"
 author: Matthias Döring
-description: "McNemar's test is a simple test for for checking whether pairwise measurements from two categories are independent. Here, I investigate the properties of the test and how it is used in R."
+description: "McNemar's test verifies whether pairwise measurements from two categories are independent. Learn how to use the test in R!"
 date: '2018-10-20'
 categories:
   - statistical test
