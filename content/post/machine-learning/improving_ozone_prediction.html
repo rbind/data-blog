@@ -3,7 +3,7 @@ title: "Finding a Suitable Linear Model for Ozone Prediction"
 author: Matthias Döring
 downloadRmd: true
 date: '2018-11-07T15:00:00Z'
-description: "Although ordinary least-squares regression is often used, it is not appropriate for all types of data. Using the airquality data set, I try to find a generalized linear model that fits the data better. For this purpose, I use the following methods: weighted regression, Poisson regression, and imputation."
+description: "Ordinary least-squares regression is not always appropriate. Discover alternatives such as Poisson regression here!"
 lastmod: '2018-11-09'
 categories:
   - machine-learning
@@ -16,6 +16,7 @@ thumbnail: "/post/machine-learning/improving_ozone_prediction_cover.png"
 
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>In a previous post, I have <a href="/post/machine-learning/linear_models/">introduced the airquality data set</a> in order to demonstrate how linear models are interpreted. In this post, I will start with a basic linear model and, from there, try to find a linear model with a better fit.</p>
@@ -96,11 +97,11 @@ plot.linear.model &lt;- function(model, test.preds = NULL, test.labels = NULL,
 model &lt;- lm(Ozone ~ Solar.R + Temp + Wind, ozone, trainset)
 # get confidence intervals
 confint(model)</code></pre>
-<pre><code>##                     2.5 %       97.5 %
-## (Intercept) -1.106457e+02 -20.88636548
-## Solar.R      7.153968e-03   0.09902534
-## Temp         1.054497e+00   2.07190804
-## Wind        -3.992315e+00  -1.24576713</code></pre>
+<pre><code>##                     2.5 %      97.5 %
+## (Intercept) -131.28099447 -17.0975815
+## Solar.R       -0.01159323   0.1017332
+## Temp           1.21843797   2.4815478
+## Wind          -4.94241076  -1.7477984</code></pre>
 <p>We see that the model does not seem to be so sure about the setting for the intercept. Let us see whether the model still performs well:</p>
 <pre class="r"><code>test.preds &lt;- predict(model, newdata = ozone[testset,])
 test.labels &lt;- ozone$Ozone[testset]
@@ -142,7 +143,7 @@ summary(ozone[idx,])</code></pre>
 ##  Mean   : 42.1   Mean   :184.8   Mean   : 9.94   Mean   :77.79  
 ##  3rd Qu.: 62.0   3rd Qu.:255.5   3rd Qu.:11.50   3rd Qu.:84.50  
 ##  Max.   :168.0   Max.   :334.0   Max.   :20.70   Max.   :97.00</code></pre>
-<p>Looking at the distributions of the two groups of observations, we cannot see a large difference between high-ozone observations and the other samples. We can, however, find the culprit using the plot of the model predictions above. In the plot, we see that most of the data points are centered around the [0, 50] ozone range. To fit these observations well, the intercept has a large negative value of -65.77, which is why the model underestimates ozone levels for larger values of ozone, which are underrepresented in the training data.</p>
+<p>Looking at the distributions of the two groups of observations, we cannot see a large difference between high-ozone observations and the other samples. We can, however, find the culprit using the plot of the model predictions above. In the plot, we see that most of the data points are centered around the [0, 50] ozone range. To fit these observations well, the intercept has a large negative value of -74.19, which is why the model underestimates ozone levels for larger values of ozone, which are underrepresented in the training data.</p>
 </div>
 <div id="the-model-predicts-negative-ozone-levels" class="section level3">
 <h3>The model predicts negative ozone levels</h3>
@@ -171,7 +172,7 @@ summary(ozone[idx,])</code></pre>
 <p>What we find is that, for low ozone levels, the average solar radiation is much lower, while the average wind speed is much higher. To understand why we have negative predictions, let us now look at the model coefficients:</p>
 <pre class="r"><code>coefficients(model)</code></pre>
 <pre><code>##  (Intercept)      Solar.R         Temp         Wind 
-## -65.76603538   0.05308965   1.56320267  -2.61904128</code></pre>
+## -74.18928801   0.04506998   1.84999289  -3.34510459</code></pre>
 <p>So, for low ozone levels, the positive coefficient for <code>Solar.R</code> cannot make up the negative pull of both the intercept and the coefficient for <code>Wind</code> because for low ozone levels, values for <code>Solar.R</code> are low, while values for <code>Wind</code> are high.</p>
 </div>
 </div>
@@ -187,12 +188,12 @@ summary(ozone[idx,])</code></pre>
    preds[preds &lt; 0] &lt;- 0
    return(preds)
 }</code></pre>
-<p>Let us now verify how this would improve our predictions on the test data. Remember, the <span class="math">\(R^2\)</span> of the initial model was was <span class="math">\(0.604\)</span>.</p>
+<p>Let us now verify how this would improve our predictions on the test data. Remember, the <span class="math inline">\(R^2\)</span> of the initial model was was <span class="math inline">\(0.604\)</span>.</p>
 <pre class="r"><code>nonnegative.preds &lt;- predict.nonnegative(model, ozone[testset,])
 # plot only the test predictions to verify the results
 plot.linear.model(model, nonnegative.preds, ozone$Ozone[testset], test.only = TRUE)</code></pre>
 <p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
-<p>As we see, this hack curbs the problem and increases <span class="math">\(R^2\)</span> to <span class="math">\(0.646\)</span>. However, correcting the negative values in this way, does not change the fact that our model is wrong because the fitting procedure did not take into consideration that negative values should be impossible.</p>
+<p>As we see, this hack curbs the problem and increases <span class="math inline">\(R^2\)</span> to <span class="math inline">\(0.646\)</span>. However, correcting the negative values in this way, does not change the fact that our model is wrong because the fitting procedure did not take into consideration that negative values should be impossible.</p>
 </div>
 <div id="poisson-regression" class="section level3">
 <h3>Poisson regression</h3>
@@ -202,7 +203,7 @@ plot.linear.model(model, nonnegative.preds, ozone$Ozone[testset], test.only = TR
 pois.preds &lt;- predict(pois.model, newdata = ozone[testset,], type = &quot;response&quot;) 
 plot.linear.model(pois.model, pois.preds, ozone$Ozone[testset])</code></pre>
 <p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<p>The <span class="math">\(R^2\)</span> value of 0.616 indicates that Poisson regression is slightly superior over ordinary least-squares (0.604). However, its performance is not superior to the model that truncates negative values to 0 (0.646). This is probably because the variance of the ozone level is much larger than what the Poisson model assumes:</p>
+<p>The <span class="math inline">\(R^2\)</span> value of 0.616 indicates that Poisson regression is slightly superior over ordinary least-squares (0.604). However, its performance is not superior to the model that truncates negative values to 0 (0.646). This is probably because the variance of the ozone level is much larger than what the Poisson model assumes:</p>
 <pre class="r"><code># mean and variance should be the same for Poisson distribution
 mean(ozone$Ozone)</code></pre>
 <pre><code>## [1] 42.0991</code></pre>
@@ -215,7 +216,7 @@ mean(ozone$Ozone)</code></pre>
 <pre class="r"><code>log.model &lt;- lm(log(Ozone) ~ Solar.R + Temp + Wind, ozone, trainset)
 log.preds &lt;- predict(pois.model, newdata = ozone[testset,], type = &quot;response&quot;) 
 print(rsquared(log.preds, test.labels))</code></pre>
-<pre><code>## [1] 0.616</code></pre>
+<pre><code>## [1] 0.704</code></pre>
 <p>Note that although the result is identical to the result via Poisson regression, the two methods are not identical in general.</p>
 </div>
 </div>
@@ -250,13 +251,13 @@ print(paste0(&quot;N (trainset before): &quot;, length(trainset)))</code></pre>
 <pre><code>## [1] &quot;N (trainset before): 78&quot;</code></pre>
 <pre class="r"><code>trainset.sampled &lt;- setdiff(trainset, discard.idx)
 print(paste0(&quot;N (trainset after): &quot;, length(trainset.sampled)))</code></pre>
-<pre><code>## [1] &quot;N (trainset after): 48&quot;</code></pre>
+<pre><code>## [1] &quot;N (trainset after): 51&quot;</code></pre>
 <p>Now, let us build a new model based on the sampled data:</p>
 <pre class="r"><code># performance is not much bettter for test set
 sampled.model &lt;- glm(Ozone ~ Solar.R + Temp + Wind, data = ozone[trainset.sampled, ])
 sampled.preds &lt;- predict(sampled.model, newdata = ozone[testset,], type = &quot;response&quot;) 
 rsquared(sampled.preds, test.labels)</code></pre>
-<pre><code>## [1] 0.612</code></pre>
+<pre><code>## [1] 0.608</code></pre>
 <p>As we can see, the model based on the sampled data does not perform better than the one using weights.</p>
 </div>
 </div>
@@ -271,10 +272,10 @@ w.pois.preds &lt;- predict(w.pois.model, newdata = ozone[testset,], type = &quot
 p.w.pois &lt;- plot.linear.model(w.pois.model, w.pois.preds, ozone$Ozone[testset])
 p.w.pois</code></pre>
 <p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
-<p>As we see, this model combines the advantages of using Poisson regression (non-negative predictions) with the use of weights (underestimation of outliers). Indeed, the <span class="math">\(R^2\)</span> of this model is the lowest yet (0.652 vs 0.646 from the truncated linear model). Let us investigate the model coefficients:</p>
+<p>As we see, this model combines the advantages of using Poisson regression (non-negative predictions) with the use of weights (underestimation of outliers). Indeed, the <span class="math inline">\(R^2\)</span> of this model is the lowest yet (0.652 vs 0.646 from the truncated linear model). Let us investigate the model coefficients:</p>
 <pre class="r"><code>coefficients(w.pois.model)</code></pre>
 <pre><code>##  (Intercept)      Solar.R         Temp         Wind 
-##  2.069357230  0.002226422  0.029252172 -0.104778731</code></pre>
+##  5.074448971  0.001987798 -0.001202156 -0.137611701</code></pre>
 <p>The model is still dominated by the intercept but now it is positive. Thus, if all other features have a value of 0, the prediction of the model will still be positive.</p>
 <p>However, what about the assumption that the mean should be equal to the variance for Poisson regression?</p>
 <pre class="r"><code>print(paste0(c(&quot;Var: &quot;, &quot;Mean: &quot;), c(round(var(ozone$Ozone), 2),
@@ -293,17 +294,17 @@ plot.linear.model(model.nb, preds.nb, test.labels)</code></pre>
 <p><img src="/post/machine-learning/improving_ozone_prediction_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <p>So, in terms of performance on the test set, the weighted negative binomial model is not better thatn the weighted Poisson model. However, when it comes to inference, the value should be superior because its assumptions are not broken. Looking at both models, it is evident that their p-values differ considerably:</p>
 <pre class="r"><code>coef(summary(w.pois.model))</code></pre>
-<pre><code>##                 Estimate   Std. Error    z value     Pr(&gt;|z|)
-## (Intercept)  2.069357230 0.2536660583   8.157801 3.411790e-16
-## Solar.R      0.002226422 0.0003373846   6.599061 4.137701e-11
-## Temp         0.029252172 0.0027619436  10.591155 3.275269e-26
-## Wind        -0.104778731 0.0064637151 -16.210295 4.265135e-59</code></pre>
+<pre><code>##                 Estimate   Std. Error     z value      Pr(&gt;|z|)
+## (Intercept)  5.074448971 0.1668873283  30.4064366 4.515679e-203
+## Solar.R      0.001987798 0.0002630893   7.5556013  4.169292e-14
+## Temp        -0.001202156 0.0017067486  -0.7043545  4.812120e-01
+## Wind        -0.137611701 0.0042937826 -32.0490610 2.262476e-225</code></pre>
 <pre class="r"><code>coef(summary(model.nb))</code></pre>
-<pre><code>##                 Estimate  Std. Error   z value     Pr(&gt;|z|)
-## (Intercept)  1.241627650 0.640878750  1.937383 5.269853e-02
-## Solar.R      0.002202194 0.000778691  2.828071 4.682941e-03
-## Temp         0.037756464 0.007139521  5.288375 1.234078e-07
-## Wind        -0.088389583 0.016333237 -5.411639 6.245051e-08</code></pre>
+<pre><code>##                 Estimate   Std. Error    z value     Pr(&gt;|z|)
+## (Intercept)  3.651242295 0.4874400886   7.490648 6.853421e-14
+## Solar.R      0.002591735 0.0006855076   3.780752 1.563551e-04
+## Temp         0.013312402 0.0052097134   2.555304 1.060950e-02
+## Wind        -0.127395396 0.0113987431 -11.176267 5.328447e-29</code></pre>
 <p>While the Poisson model claims that all coefficients are highly significant, the negative binomial model demonstrates that the intercept is not significant. As described nicely in <a href="https://www.fromthebottomoftheheap.net/2017/05/01/glm-prediction-intervals-i/">this blog</a> and at <a href="https://stackoverflow.com/questions/14423325/confidence-intervals-for-predictions-from-logistic-regression">StackExchange</a>, the confidence bands for a negative binomial can be found in the following way:</p>
 <pre class="r"><code># predict on the link level, which is more Gaussian:
 preds.nb.ci &lt;- predict(model.nb, newdata = ozone[testset, ], type = &quot;link&quot;, se.fit = TRUE) 
@@ -401,7 +402,7 @@ imputed.data &lt;- as.data.frame(impute.transcan(imputed, data = ozone,
 # inspect imputed observations with respect to the outcome 
 summary(as.numeric(imputed.data$Ozone))</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##    1.00   16.00   30.00   41.66   59.00  168.00</code></pre>
+##    1.00   18.00   31.00   41.38   63.00  168.00</code></pre>
 <p>Note that <code>aregImpute</code> makes several multiple imputations with different bootstrap samples, which can be specified using the <code>n.impute</code> parameter. Since we want to use the imputations from all runs rather than a single one, we will use the <code>fit.mult.impute</code> function to define our model:</p>
 <pre class="r"><code># compute new weights
 weights &lt;- get.weights(imputed.data)
@@ -420,23 +421,23 @@ plot.linear.model(fmi, fmi.preds, ozone$Ozone[testset])</code></pre>
 w.pois.preds.imputed &lt;- predict(w.pois.model.imputed, 
                 newdata = imputed.data[testset,], type = &quot;response&quot;) 
 rsquared(w.pois.preds.imputed, imputed.data$Ozone[testset])</code></pre>
-<pre><code>## [1] 0.431</code></pre>
+<pre><code>## [1] 0.592</code></pre>
 <p>In this case, the weighted Poisson model based on imputed data did not perform better than the model that simply excluded missing data. This indicates that imputation of the missing values rather introduces noise into the data than signal we can work with. A possible explanation would be that the samples with missing values have another distribution than the values for which all measurements are available.</p>
 </div>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
-<p>We started with an OLS regression model (<span class="math">\(R^2 = 0.604\)</span>) and tried to find a linear model with a better fit. The first idea was to truncate the predictions of the model at 0 (<span class="math">\(R^2 = 0.646\)</span>). To predict outliers more accurately, we trained a weighted linear regression model (<span class="math">\(R^2 = 0.621\)</span>). Next, to predict only positive values, we trained a weighted Poisson regression model (<span class="math">\(R^2 = 0.652\)</span>). To deal with the problem of overdispersion in the Poisson model, we formulated a weighted negative binomial model. Although this model perfomed worse than the weighted Poisson model (<span class="math">\(R^2 = 0.638\)</span>), it is likely to be superior for making inferences.</p>
-<p>Thereafter, we tried to further improve the model by imputing missing values with the <code>Hmisc</code> package. Although the resulting models were better than the initial OLS model, they did not obtain a higher performance than previously (<span class="math">\(R^2 = 0.627\)</span>).</p>
-<p>So, what is the best model in the end? In terms of correctness of the model assumptions this is the weighted negative binomial model. In terms of the coefficient of determination, <span class="math">\(R^2\)</span>, this is the weighted Poisson regression model. So, for the purpose of predicting ozone levels, I would select the weighted Poisson regression model.</p>
+<p>We started with an OLS regression model (<span class="math inline">\(R^2 = 0.604\)</span>) and tried to find a linear model with a better fit. The first idea was to truncate the predictions of the model at 0 (<span class="math inline">\(R^2 = 0.646\)</span>). To predict outliers more accurately, we trained a weighted linear regression model (<span class="math inline">\(R^2 = 0.621\)</span>). Next, to predict only positive values, we trained a weighted Poisson regression model (<span class="math inline">\(R^2 = 0.652\)</span>). To deal with the problem of overdispersion in the Poisson model, we formulated a weighted negative binomial model. Although this model perfomed worse than the weighted Poisson model (<span class="math inline">\(R^2 = 0.638\)</span>), it is likely to be superior for making inferences.</p>
+<p>Thereafter, we tried to further improve the model by imputing missing values with the <code>Hmisc</code> package. Although the resulting models were better than the initial OLS model, they did not obtain a higher performance than previously (<span class="math inline">\(R^2 = 0.627\)</span>).</p>
+<p>So, what is the best model in the end? In terms of correctness of the model assumptions this is the weighted negative binomial model. In terms of the coefficient of determination, <span class="math inline">\(R^2\)</span>, this is the weighted Poisson regression model. So, for the purpose of predicting ozone levels, I would select the weighted Poisson regression model.</p>
 <p>You may ask: was all this work worth the effort? Indeed, the the predictions of the initial model and the weighted Poisson model are significantly different at the 5% level:</p>
 <pre class="r"><code># does the new model predict significantly different values?
 wilcox.test(test.preds, w.pois.preds, paired = TRUE)</code></pre>
 <pre><code>## 
-##  Wilcoxon signed rank test
+##  Wilcoxon signed rank exact test
 ## 
 ## data:  test.preds and w.pois.preds
-## V = 57, p-value = 1.605e-05
+## V = 70, p-value = 6.212e-05
 ## alternative hypothesis: true location shift is not equal to 0</code></pre>
 <p>The difference between the models becomes obvious when we compare them side-by-side:</p>
 <pre class="r"><code>library(gridExtra) # for grid.arrange

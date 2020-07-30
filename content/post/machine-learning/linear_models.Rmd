@@ -2,7 +2,7 @@
 title: "Interpreting Linear Prediction Models"
 author: Matthias Döring
 date: '2018-11-06T15:00:00Z'
-description: "Linear machine learning models are very convenient for interpretation. This post discusses the following aspects: residuals, coefficients, standard errors, p-values, the F-statistic, and much more."
+description: "Linear models can easily be interpreted if you learn about quantities such as residuals, coefficients, and standard errors here."
 categories:
   - machine-learning
 tags:

@@ -3,7 +3,7 @@ title: "The Case Against Precision as a Model Selection Criterion"
 author: Matthias Döring
 date: '2018-11-21'
 lastMod: "2018-12-01"
-description: "Precision and recall are frequently used for model selection. However, compared to sensitivity and recall, these performance metrics are not generally valid and should only be used in certain settings."
+description: "Precision and recall are frequently used for model selection. However, sensitivity and specifity are often better options."
 thumbnail: "/post/machine-learning/sensitivity-vs-precision_cover.png"
 slug: "specificity-vs-precision"
 categories:

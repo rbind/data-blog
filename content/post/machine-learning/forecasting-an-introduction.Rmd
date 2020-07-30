@@ -4,7 +4,7 @@ author: Matthias Döring
 downloadRmd: true
 date: '2018-12-18'
 draft: false
-description: "Forecasting is a powerful technique for time-series data. Here, I investigate the most common variants of forecasting algorithms: ARMA, ARIMA, SARIMA, and ARIMAX, which are primarily based on autocorrelation and moving averages."
+description: "Forecasting is a powerful technique for time-series data. Learn about ARMA, ARIMA, SARIMA, and ARIMAX."
 categories:
   - machine-learning
 tags:
@@ -572,9 +572,9 @@ acf(ozone.ts, type = "partial")
 
 The autocorrelation plots are very unclear, suggesting that there is actually no time trend in the data. Thus, we would opt for an ARIMA(0,0,0) model. Since an ARIMAX model with the parameters (0,0,0) does not have a benefit over a conventional linear regression model, we can conclude that the temporal trend in the ozone data is not sufficient to improve the prediction of ozone levels. Let us verify this:
 
-```{r, message = FALSE}
+```{r, message = FALSE, eval=FALSE}
 # ARIMAX(0,0,0) model
-library(TSA)
+library(TSA) # warning: not available via CRAN any more
 features <- c("Solar.R", "Wind", "Temp") # exogenous features
 A <- arimax(x = ozone$Ozone[trainset], 
        xreg = ozone[trainset,features],
@@ -599,7 +599,7 @@ print(Rsquared.linear)
 print(Rsquared.temporal)
 ```
 
-As we can see the linear model with a negative binomial likelihood outperforms the ARIMAX model.
+Note that the TSA package is not available from CRAN anymore because it has been orphaned (2020-07).
 
 ### ARIMAX on the airquality data set
 
@@ -661,10 +661,11 @@ Since ```income``` explains the overall trend, we do not need a drift term. Furt
 ```{r}
 train <- 1:20
 test <- 21:30
+test.matrix = as.matrix(Icecream[train, c("income", "temp")])
 A <- Arima(window(ice.ts, c(1951,3), c(1951, 3 + (20-1))),
-        xreg = Icecream[train, c("income", "temp")],
+        xreg = test.matrix,
         order = c(1,0,0))
-preds <- forecast(A, xreg = Icecream[test, c("income", "temp")]) 
+preds <- forecast(A, xreg = test.matrix)
 plot(preds)
 lines(window(ice.ts, c(1951, 22), c(1951, 30))) # actual values in black
 # contrast ARIMAX with ARIMA

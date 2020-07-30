@@ -4,7 +4,7 @@ author: Matthias Döring
 downloadRmd: true
 date: '2018-12-18'
 draft: false
-description: "Forecasting is a powerful technique for time-series data. Here, I investigate the most common variants of forecasting algorithms: ARMA, ARIMA, SARIMA, and ARIMAX, which are primarily based on autocorrelation and moving averages."
+description: "Forecasting is a powerful technique for time-series data. Learn about ARMA, ARIMA, SARIMA, and ARIMAX."
 categories:
   - machine-learning
 tags:
@@ -13,6 +13,7 @@ tags:
 thumbnail: "/post/machine-learning/forecasting-an-introduction_cover.png"
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p><a href="/post/machine-learning/forecasting_vs_prediction/">Forecasting is concerned with making predictions about future observations by relying on past measurements</a>. In this article, I will give an introduction how ARMA, ARIMA (Box-Jenkins), SARIMA, and ARIMAX models can be used for forecasting given time-series data.</p>
@@ -49,7 +50,8 @@ message(paste0(&quot;y is: &quot;, paste(y, collapse = &quot;,&quot;), &quot;\n&
 </div>
 <div id="the-autocorrelation-function" class="section level3">
 <h3>The autocorrelation function</h3>
-<p>The autocorrelation function (ACF) defines the correlation of a variable <span class="math inline">\(y_t\)</span> to previous measurements <span class="math inline">\(y_{t-1}, \ldots, t_1\)</span> of the same variable (hence the name autocorrelation). To determine the ACF, correlations are calculated for lagged vectors of observations, <span class="math inline">\(y_t\)</span> and <span class="math inline">\(y_{t-k}\)</span>. Here, <span class="math inline">\(k \geq 0\)</span> indicates the lag. For example, for the previous vector <span class="math inline">\(y = \begin{pmatrix}1 &amp; 3 &amp; 5 &amp; 10 &amp; 20\end{pmatrix}^T\)</span>, for <span class="math inline">\(k = 1\)</span>, we would have</p>
+<p>The autocorrelation function (ACF) defines the correlation of a variable <span class="math inline">\(y_t\)</span> to previous measurements <span class="math inline">\(y_{t-1}, \ldots, t_1\)</span> of the same variable (hence the name autocorrelation). To determine the ACF, correlations are calculated for lagged vectors of observations, <span class="math inline">\(y_t\)</span> and <span class="math inline">\(y_{t-k}\)</span>. Here, <span class="math inline">\(k \geq 0\)</span> indicates the lag. For example, for the previous vector
+<span class="math inline">\(y = \begin{pmatrix}1 &amp; 3 &amp; 5 &amp; 10 &amp; 20\end{pmatrix}^T\)</span>, for <span class="math inline">\(k = 1\)</span>, we would have</p>
 <p><span class="math display">\[
 \begin{align*}
 y_t &amp;= \begin{pmatrix}3 &amp; 5 &amp; 10 &amp; 20\end{pmatrix}^T \\
@@ -147,8 +149,11 @@ plot(decomposed)</code></pre>
 <p>A process generating time-series data can be either stationary or non-stationary. A process is stationary if <a href="https://www.r-bloggers.com/stationarity/">its mean and variance are not shifting along the timeline</a>. For example, the <code>EuStockMarkets</code> and the <code>AirPassengers</code> data are both non-stationary because there is an increasing trend in the data. For a better intuition for differentiating stationary and non-stationary processes, consider the following example:</p>
 <pre class="r"><code>par(mfrow = c(1,2))
 # climate data 
-library(tseries)
-data(nino)
+library(tseries)</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre class="r"><code>data(nino)
 x &lt;- nino3.4
 plot(x, main = &quot;Stationary process&quot;)
 # aircraft passenger data
@@ -342,7 +347,8 @@ acf(nino.season, type = &quot;partial&quot;)</code></pre>
 </div>
 <div id="non-seasonal-model" class="section level4">
 <h4>Non-seasonal model</h4>
-<p>For the non-seasonal model, we still need to find <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>. For this purpose, we will plot the ACF and pACF to identify the values for the AR and MA parameters:</p>
+<p>For the non-seasonal model, we still need to find <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>.
+For this purpose, we will plot the ACF and pACF to identify the values for the AR and MA parameters:</p>
 <pre class="r"><code>par(mfrow = c(1,2))
 acfp &lt;- acf(nino3.4, main = &quot;pACF&quot;, plot = FALSE)
 # transform lag from years to months
@@ -365,13 +371,8 @@ A &lt;- Arima(nino3.4, order = order.non.seasonal,
 <p>We can now use the model to forecast how the temperatures in the Nino 3.4 region will change in the future. There are two ways to obtain predictions from a forecasting model. The first approach relies on the <code>predict</code> function, while the second approach uses the <code>forecast</code> function from the <code>forecast</code> package. Using the <code>predict</code> function, we can forecast and visualize the results in the following way:</p>
 <pre class="r"><code># to construct a custom plot, we can use the predict function:
 forecast &lt;- predict(A, n.ahead = 60) # predict 5 years into the future
-library(ggplot2)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;ggplot2&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:forecast&#39;:
-## 
-##     autolayer</code></pre>
-<pre class="r"><code>plot.df &lt;- rbind(cbind(fortify(nino3.4), sd = 0), cbind(fortify(forecast$pred), sd = as.numeric(forecast$se)))
+library(ggplot2)
+plot.df &lt;- rbind(cbind(fortify(nino3.4), sd = 0), cbind(fortify(forecast$pred), sd = as.numeric(forecast$se)))
 plot.df$upper &lt;- plot.df$y + plot.df$sd * 1.96
 plot.df$lower &lt;- plot.df$y - plot.df$sd * 1.96
 ggplot(plot.df, aes(x = x ,y = y)) + 
@@ -442,7 +443,7 @@ acf(ozone.ts, type = &quot;partial&quot;)</code></pre>
 <p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
 <p>The autocorrelation plots are very unclear, suggesting that there is actually no time trend in the data. Thus, we would opt for an ARIMA(0,0,0) model. Since an ARIMAX model with the parameters (0,0,0) does not have a benefit over a conventional linear regression model, we can conclude that the temporal trend in the ozone data is not sufficient to improve the prediction of ozone levels. Let us verify this:</p>
 <pre class="r"><code># ARIMAX(0,0,0) model
-library(TSA)
+library(TSA) # TODO: this package was orphaned
 features &lt;- c(&quot;Solar.R&quot;, &quot;Wind&quot;, &quot;Temp&quot;) # exogenous features
 A &lt;- arimax(x = ozone$Ozone[trainset], 
        xreg = ozone[trainset,features],
@@ -463,11 +464,9 @@ preds.nb &lt;- predict(model.nb, newdata = ozone[testset,], type = &quot;respons
 # Performance:
 Rsquared.linear &lt;- cor(preds.nb, ozone[testset, &quot;Ozone&quot;])^2
 Rsquared.temporal &lt;- cor(preds.temporal$pred, ozone[testset, &quot;Ozone&quot;])^2
-print(Rsquared.linear)</code></pre>
-<pre><code>## [1] 0.7676977</code></pre>
-<pre class="r"><code>print(Rsquared.temporal)</code></pre>
-<pre><code>## [1] 0.7569718</code></pre>
-<p>As we can see the linear model with a negative binomial likelihood outperforms the ARIMAX model.</p>
+print(Rsquared.linear)
+print(Rsquared.temporal)</code></pre>
+<p>Note that the TSA package is not available from CRAN anymore because it has been orphaned (2020-07).</p>
 </div>
 <div id="arimax-on-the-airquality-data-set-1" class="section level3">
 <h3>ARIMAX on the airquality data set</h3>
@@ -510,10 +509,11 @@ acf(ice.ts, type = &quot;partial&quot;)</code></pre>
 <p>Since <code>income</code> explains the overall trend, we do not need a drift term. Furthermore, since <code>temp</code> explains the seasonal trend, we do not need a seasonal model. Thus, we should use an ARIMAX(1,0,0) model for forecasting. To investigate whether these assumptions are true, we will compare the ARIMAX(1,0,0) model with an ARIMA(1,0,0)(1,0,0) model using the following code</p>
 <pre class="r"><code>train &lt;- 1:20
 test &lt;- 21:30
+test.matrix = as.matrix(Icecream[train, c(&quot;income&quot;, &quot;temp&quot;)])
 A &lt;- Arima(window(ice.ts, c(1951,3), c(1951, 3 + (20-1))),
-        xreg = Icecream[train, c(&quot;income&quot;, &quot;temp&quot;)],
+        xreg = test.matrix,
         order = c(1,0,0))
-preds &lt;- forecast(A, xreg = Icecream[test, c(&quot;income&quot;, &quot;temp&quot;)]) 
+preds &lt;- forecast(A, xreg = test.matrix)
 plot(preds)
 lines(window(ice.ts, c(1951, 22), c(1951, 30))) # actual values in black
 # contrast ARIMAX with ARIMA

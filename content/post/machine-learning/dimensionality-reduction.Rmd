@@ -11,9 +11,7 @@ tags:
     - analysis
     - R
 thumbnail: "/post/machine-learning/whiskey-twilight-zone.png"
-
 ---
-
 Dimensionality reduction has two primary use cases: data exploration and machine learning. It is useful for data exploration because dimensionality reduction to few dimensions (e.g. 2 or 3 dimensions) allows for visualizing the samples. Such a visualization can then be used to obtain insights from the data (e.g. detect clusters and identify outliers). For machine learning, dimensionality reduction is useful because oftentimes models generalize better when fewer features are used during the fitting process.
 
 In this post, we will investigate three dimensionality reduction techniques:
@@ -423,3 +421,5 @@ A whiskey that comes to lie on the lower right of the 2-dimensional PCA space wo
 This unexplored region of taste can be considered to be *the whiskey twilight zone*. Regarding the twilight zone there are two questions. First, would it be possible to produce whiskeys to fill that void and, second, and probably more important, how would these whiskeys taste? 
 
 ![Whiskey twilight zone](https://www.datascienceblog.net/post/machine-learning/whiskey-twilight-zone.png)
+
+

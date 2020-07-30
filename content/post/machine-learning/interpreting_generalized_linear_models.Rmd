@@ -2,7 +2,7 @@
 title: "Interpreting Generalized Linear Models"
 author: Matthias Döring
 date: '2018-11-09T20:00:00Z'
-description: "Generalized linear models (GLMs) are related to conventional linear models but there are some important differences. For example, GLMs are based on the deviance rather than the conventional residuals and they enable the use of different distributions and linker functions. This post investigates how these aspects influence the interpretation of GLMs."
+description: "Generalized linear models offer a lot of possibilities. However, this makes interpretation harder. Learn how to do it correctly here!"
 categories:
   - machine-learning
 tags:

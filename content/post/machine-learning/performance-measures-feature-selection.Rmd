@@ -2,7 +2,7 @@
 title: "Performance Measures for Feature Selection"
 author: Matthias Döring
 date: '2018-11-25'
-description: "Performance measures for feature selection should consider the complexity of the model in addition to the fit of the model. Popular feature selection criteria are the adjusted R squared, the Cp statistic, and the AIC."
+description: "We can reduce the number of features using quantities such as adjusted R squared, the Cp statistic, and the AIC. Learn their impact!"
 categories:
   - machine-learning
 tags:

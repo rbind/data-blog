@@ -3,7 +3,7 @@ title: "Finding a Suitable Linear Model for Ozone Prediction"
 author: Matthias Döring
 downloadRmd: true
 date: '2018-11-07T15:00:00Z'
-description: "Although ordinary least-squares regression is often used, it is not appropriate for all types of data. Using the airquality data set, I try to find a generalized linear model that fits the data better. For this purpose, I use the following methods: weighted regression, Poisson regression, and imputation."
+description: "Ordinary least-squares regression is not always appropriate. Discover alternatives such as Poisson regression here!"
 lastmod: '2018-11-09'
 categories:
   - machine-learning
@@ -15,7 +15,6 @@ tags:
 thumbnail: "/post/machine-learning/improving_ozone_prediction_cover.png"
 
 ---
-
 In a previous post, I have [introduced the airquality data set](/post/machine-learning/linear_models/) in order to demonstrate how linear models are interpreted. In this post, I will start with a basic linear model and, from there, try to find a linear model with a better fit.
 
 ## Data preprocessing

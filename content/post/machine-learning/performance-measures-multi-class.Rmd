@@ -2,7 +2,7 @@
 title: "Performance Measures for Multi-Class Problems"
 author: Matthias Döring
 date: '2018-12-04'
-description: "For multi-class prediction scenarios, we can use similar performance measures as for binary classification. Here, I explain how we can obtain the (weighted) accuracy, micro- and macro-averaged F1-scores, and a generalization of the AUC to the multi-class setting."
+description: "How to calculate performance for multi-class problems? Learn about micro- and macro-averaged F1-scores as well as a generalization of the AUC here!"
 slug: "performance-measures-multi-class-problems"
 thumbnail: "/post/machine-learning/performance-measures-multi-class_cover.png"
 categories:
