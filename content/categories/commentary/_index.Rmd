@@ -1,0 +1,10 @@
+---
+title: "Commentary"
+thumbnail: "/categories/commentary/commentary_avatar.jpeg"
+---
+![](commentary_avatar.jpeg)
+
+In this section of the blog, I discuss topics related to data science, AI, and academia.
+
+## Posts on software engineering
+

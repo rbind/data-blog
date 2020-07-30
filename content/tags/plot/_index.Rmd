@@ -1,7 +1,7 @@
 ---
 title: "Plots"
 thumbnail: "/tags/plot/plots_avatar.jpg"
-description: "Plots are the most important tool for communicating results. However, choosing the right type of plot can be challenging. Learn here, how to choose between histograms, scatter plots, box plots, and so on."
+description: "Plots are crucial for communicating data science results. Learn how to choose between histograms, scatter plots, and box plots."
 ---
 <img src="plots_avatar.jpg" alt = "Plots" width = "1000" height = "662">
 

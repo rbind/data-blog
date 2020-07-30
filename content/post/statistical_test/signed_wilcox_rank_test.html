@@ -13,9 +13,11 @@ tags:
   - R
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<p>In this post, we will explore tests for comparing two groups of dependent (i.e. paired) quantitative data: the Wilcoxon signed rank test and the paired Student’s t-test. The critical difference between these tests is that the test from Wilcoxon is a non-parametric test, while the t-test is a parametric test. In the following, we will explore the ramifications of this difference. <!--more--></p>
+<p>In this post, we will explore tests for comparing two groups of dependent (i.e. paired) quantitative data: the Wilcoxon signed rank test and the paired Student’s t-test. The critical difference between these tests is that the test from Wilcoxon is a non-parametric test, while the t-test is a parametric test. In the following, we will explore the ramifications of this difference.
+<!--more--></p>
 <div id="the-sleep-data-set" class="section level2">
 <h2>The sleep data set</h2>
 <p>Let’s consider the sleep data set. The data set contrasts the effect of two soporific drugs (aka sleeping pills) by providing the change in the number of hours slept after taking the drug compared to a baseline:</p>
@@ -59,16 +61,18 @@ print(sleep)</code></pre>
 </div>
 <div id="wilcoxon-signed-rank-test" class="section level2">
 <h2>Wilcoxon Signed Rank Test</h2>
-<p>The Wilcoxon signed rank test uses the sum of the signed ranks as the test statistic <span class="math">\(W\)</span>: <span class="math">\[W=\sum _{{i=1}}^{{N}}[\operatorname{sgn}(x_{{2,i}}-x_{{1,i}})\cdot R_{i}]\]</span> Here, the <span class="math">\(i\)</span>-th of <span class="math">\(N\)</span> measurement pairs is indicated by <span class="math">\(x_i = (x_{1,i}, x_{2,i})\)</span> and <span class="math">\(R_{i}\)</span> denotes the rank of the pair. The rank simply represents the position of an observation in an ordered list of <span class="math">\(|x_{2,i} - x_{1,i}|\)</span>. The inuition of the test statistic is that pairs with large absolute differences will have large ranks <span class="math">\(R_{i}\)</span>. Thus, these pairs are the determining factors of <span class="math">\(W\)</span>, while pairs exhibiting small absolute differences have a low <span class="math">\(R_{i}\)</span> and therefore little influence on the outcome of the test. Since the test statistic is based on ranks rather than the measurements themselves, the Wilcoxon signed rank test can be thought of as testing for shifts in median values between two groups.</p>
+<p>The Wilcoxon signed rank test uses the sum of the signed ranks as the test statistic <span class="math inline">\(W\)</span>:
+<span class="math display">\[W=\sum _{{i=1}}^{{N}}[\operatorname{sgn}(x_{{2,i}}-x_{{1,i}})\cdot R_{i}]\]</span>
+Here, the <span class="math inline">\(i\)</span>-th of <span class="math inline">\(N\)</span> measurement pairs is indicated by <span class="math inline">\(x_i = (x_{1,i}, x_{2,i})\)</span> and <span class="math inline">\(R_{i}\)</span> denotes the rank of the pair. The rank simply represents the position of an observation in an ordered list of <span class="math inline">\(|x_{2,i} - x_{1,i}|\)</span>. The inuition of the test statistic is that pairs with large absolute differences will have large ranks <span class="math inline">\(R_{i}\)</span>. Thus, these pairs are the determining factors of <span class="math inline">\(W\)</span>, while pairs exhibiting small absolute differences have a low <span class="math inline">\(R_{i}\)</span> and therefore little influence on the outcome of the test. Since the test statistic is based on ranks rather than the measurements themselves, the Wilcoxon signed rank test can be thought of as testing for shifts in median values between two groups.</p>
 <p>To perform the test in R, we can use the <code>wilcox.test</code> function. However, we have to explicitly set the <em>paired</em> argument to indicate that we are dealing with matched observations. To specify the one-tailed test, we set the <em>alternative</em> argument to <em>greater</em>. In this way, the alternative of the test is whether drug 2 is associated with larger increases in sleep duration than drug 1.</p>
 <pre class="r"><code>x &lt;- sleep$extra[sleep$drug == 2]
 y &lt;- sleep$extra[sleep$drug == 1]
 res &lt;- wilcox.test(x, y, paired = TRUE, 
                    alternative = &quot;greater&quot;)</code></pre>
-<pre><code>## Warning in wilcox.test.default(x, y, paired = TRUE, alternative =
-## &quot;greater&quot;): cannot compute exact p-value with ties</code></pre>
-<pre><code>## Warning in wilcox.test.default(x, y, paired = TRUE, alternative =
-## &quot;greater&quot;): cannot compute exact p-value with zeroes</code></pre>
+<pre><code>## Warning in wilcox.test.default(x, y, paired = TRUE, alternative = &quot;greater&quot;):
+## cannot compute exact p-value with ties</code></pre>
+<pre><code>## Warning in wilcox.test.default(x, y, paired = TRUE, alternative = &quot;greater&quot;):
+## cannot compute exact p-value with zeroes</code></pre>
 <div id="investigating-the-warnings" class="section level3">
 <h3>Investigating the warnings</h3>
 <p>Before getting to the results, we should investigate the two warnings that resulted from performing the test.</p>
@@ -94,9 +98,9 @@ res &lt;- wilcox.test(x, y, paired = TRUE,
 </div>
 <div id="paired-students-t-test" class="section level2">
 <h2>Paired Student’s t-test</h2>
-<p>The paired Student’s t-test is a parametric test on the means of paired quantitative measurements from two groups. Here, parametric means that the t-test assumes that the mean difference between samples is normally distributed. The test relies on identifying whether the mean difference of measurements from the two groups, <span class="math">\(\bar{X}_{D}\)</span> is larger than <span class="math">\(\mu_D\)</span>, where <span class="math">\(\mu_D\)</span> is typically set to 0 in order to find if there is any difference. The test-statistic,</p>
-<p><span class="math">\[\displaystyle t={\frac {{\bar {X}}_{D}-\mu _{0}}{\frac {s_{D}}{\sqrt {n}}}},\]</span></p>
-<p>is normalized using the standard deviation of differences, <span class="math">\(s_D\)</span>, and the number of pairs <span class="math">\(n\)</span>. By normalizing according to <span class="math">\(\frac{s_D}{\sqrt{n}}\)</span>, the test statistic regulates the value of the test statistic according to the number of samples (<span class="math">\(|t|\)</span> increases with more samples) and the standard deviation of differences (<span class="math">\(|t|\)</span> decreases if the deviation increases).</p>
+<p>The paired Student’s t-test is a parametric test on the means of paired quantitative measurements from two groups. Here, parametric means that the t-test assumes that the mean difference between samples is normally distributed. The test relies on identifying whether the mean difference of measurements from the two groups, <span class="math inline">\(\bar{X}_{D}\)</span> is larger than <span class="math inline">\(\mu_D\)</span>, where <span class="math inline">\(\mu_D\)</span> is typically set to 0 in order to find if there is any difference. The test-statistic,</p>
+<p><span class="math display">\[\displaystyle t={\frac {{\bar {X}}_{D}-\mu _{0}}{\frac {s_{D}}{\sqrt {n}}}},\]</span></p>
+<p>is normalized using the standard deviation of differences, <span class="math inline">\(s_D\)</span>, and the number of pairs <span class="math inline">\(n\)</span>. By normalizing according to <span class="math inline">\(\frac{s_D}{\sqrt{n}}\)</span>, the test statistic regulates the value of the test statistic according to the number of samples (<span class="math inline">\(|t|\)</span> increases with more samples) and the standard deviation of differences (<span class="math inline">\(|t|\)</span> decreases if the deviation increases).</p>
 <p>In R, we can perform the paired t-test with the <code>t.test</code> function. Note that <code>t.test</code> assumes that population variances are inequal. In this case, the test is also called <em>Welch’s t-test</em>. To obtain the original t-test, which assumes that the population variances are equal, we can just set the <code>equal.var</code> parameter to <code>TRUE</code>. Here, we will just use with the default setting:</p>
 <pre class="r"><code>t.result &lt;- t.test(x,y, paired = TRUE, alternative = &quot;greater&quot;)
 print(t.result$p.value)</code></pre>
@@ -112,8 +116,10 @@ ggplot(diff.df, aes(x = diff)) + geom_histogram()</code></pre>
 <p>Looking at the histogram, the data seem rather uniformly than normally distributed. To take a closer look, we compare the differences to the values that would be expected from a normal distribution using a <a href="https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot">Q-Q (quantile-quantile) plot</a>:</p>
 <pre class="r"><code>require(car) # load car package to use &#39;qqp&#39; rather than native &#39;qqplot&#39; function</code></pre>
 <pre><code>## Loading required package: car</code></pre>
+<pre><code>## Loading required package: carData</code></pre>
 <pre class="r"><code>qqp(diff.df$diff)</code></pre>
 <p><img src="/post/statistical_test/signed_wilcox_rank_test_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre><code>## [1] 9 5</code></pre>
 <p>The Q-Q plot shows that the differences fit the normal model quite well, except for the heavy tails. From this, we could conclude that the assumption of the t-test is sufficiently met. Still, we’re left with a feeling of uncertainty about whether the t-test was the most appropriate choice for these data.</p>
 </div>
 </div>
@@ -123,7 +129,7 @@ ggplot(diff.df, aes(x = diff)) + geom_histogram()</code></pre>
 <ul>
 <li><strong>Hypothesis:</strong> Student’s t-test is a test comparing means, while Wilcoxon’s tests the ordering of the data. For example, if you are analyzing data with many outliers such as individual wealth (where few billionaires can greatly influence the result), Wilcoxon’s test may be more appropriate.</li>
 <li><strong>Interpretation:</strong> Although confidence intervals can also be computed for Wilcoxon’s test, it may seem more natural to argue about the confidence interval of the mean in the t-test than the pseudomedian for Wilcoxon’s test.</li>
-<li><strong>Fulfillment of assumptions:</strong> The assumptions of Student’s t-test may not be met <a href="/post/statistical_test/parametric_sample_size/">for small sample sizes</a>. In this case, it is often safer to select a parametric test. However, if the assumptions of the t-test are met, it has greater <a href="https://en.wikipedia.org/wiki/Power_(statistics)">statistical power</a> than Wilcoxon’s test.</li>
+<li><strong>Fulfillment of assumptions:</strong> The assumptions of Student’s t-test may not be met <a href="/post/statistical_test/parametric_sample_size/">for small sample sizes</a>. In this case, it is often safer to select a non-parametric test. However, if the assumptions of the t-test are met, it has greater <a href="https://en.wikipedia.org/wiki/Power_(statistics)">statistical power</a> than Wilcoxon’s test.</li>
 </ul>
 <p>Due to the small sample size of the sleep data set, I’d prefer the test from Wilcoxon for these data.</p>
 <p>Which test would you use? In general, would you prefer one test over the other?</p>

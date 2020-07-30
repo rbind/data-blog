@@ -1,6 +1,6 @@
 ---
 title: "Linear Prediction Models"
-description: "Linear prediction models are among the most simple types of models. Despity their simplicity, these models can be very useful when certain conditions are met."
+description: "Linear prediction models are one of the simplest model types. Find out what they are all about!"
 thumbnail: "/tags/linear-model/linear-model_avatar.png"
 ---
 <img src="linear-model_avatar.png" alt = "Linear models" width = "1120" height = "923">

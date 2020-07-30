@@ -9,7 +9,7 @@ downloadRmd: false
 categories:
   - commentary
 tags:
-  - programming
+  - software engineering
 thumbnail: "/post/commentary/why_academic_software_sucks_avatar.jpg"
 ---
 During my time as a PhD student I have developed software in the academic setting. At that time I was already under the impression that my work would probably not meet industry standards. Having recently transitioned to an industry job, I quickly realized how coding in academia is different from coding in industry. This post summarizes the main differences between the two fields and extrapolates what coders in academia can learn from industry.

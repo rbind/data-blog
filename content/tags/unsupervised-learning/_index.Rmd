@@ -1,6 +1,6 @@
 ---
 title: "Unsupervised Learning"
-description: "Unsupervised learning is the aspect of machine learning that is concerned with approaches for learning from data where the outcomes are not available."
+description: "Unsupervised learning does not require any labels but can still structure your data. Learn how to apply methods such as k-mean in R!"
 thumbnail: "/tags/unsupervised-learning/unsupervised-learning_avatar.png"
 ---
 <img src="unsupervised-learning_avatar.png" alt = "Unsupervised learning" width = "208" height = "201">

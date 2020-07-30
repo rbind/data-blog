@@ -1,6 +1,6 @@
 ---
 title: "R for applications in data science"
-description: "R is extremely useful for data science because it is well-suited for applications in machine learning, data visualization, and statistics."
+description: "R is extremely useful for data science. Learn how it can be used in machine learning, data visualization, and statistics."
 thumbnail: "/tags/r/r_avatar.png"
 ---
 <figure>

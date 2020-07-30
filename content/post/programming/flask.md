@@ -7,7 +7,7 @@ lead: "Patterns for deploying RESTful Flask applications"
 slug: "flask-api-development"
 downloadRmd: False
 categories:
-- programming
+- software engineering
 tags:
 - python 
 thumbnail: "/post/programming/flask_avatar.png"

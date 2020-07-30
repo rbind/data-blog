@@ -6,7 +6,7 @@ description: "Git is the most widely used version control system for software. W
 lead: "Commits do not always turn out as you'd like them. However, using interactive rebases, you can craft beautiful commits by modifying your commit history."
 slug: "rewriting-history-with-git"
 categories:
-- programming
+- software engineering
 thumbnail: "/post/programming/git_avatar.png"
 thumbnailsrc: "Git Logo by Jason Long is licensed under the Creative Commons Attribution 3.0 Unported License."
 downloadRmd: false

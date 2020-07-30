@@ -6,7 +6,7 @@ description: "R's type system is known to be flexible, which, at the same time m
 lead: "The good, the bad, and the ugly of R's typing system and how environment variables can remedy the situation."
 slug: "more-robust-R-code-with-environment-variables"
 categories:
-- programming
+- software engineering
 tags:
 - R 
 thumbnail: "/post/programming/more-robust-R-code-with-environment-variables_avatar.jpeg"

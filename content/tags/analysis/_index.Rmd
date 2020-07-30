@@ -1,6 +1,6 @@
 ---
 title: "Data Analysis"
-description: "Data analysis typically involves data exploration, modeling, and presentation of the results. The posts in this series are concerned with comprehensive analyses that lead to new insights."
+description: "Data analysis involves data exploration, statistics, and modeling. Which approaches work best?"
 thumbnail: "/tags/analysis/analysis_avatar.jpg"
 ---
 <img src="analysis_avatar.jpg" alt = "Data analysis" width = "1000" height = "564">
@@ -9,7 +9,6 @@ Although all posts in this blog are somehow concerned with analyzing data, not a
 
 * The analysis of the data is comprehensive (i.e. involving multiple approaches)
 * The analysis leads to new insights
-
 
 ## Posts in the analysis series
 

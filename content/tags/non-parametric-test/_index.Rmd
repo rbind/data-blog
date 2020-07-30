@@ -1,6 +1,6 @@
 ---
 title: "Non-Parametric Significance Tests"
-description: "Parametric tests assume that the data follow a certain distribution. This page introduces how tests such as t-test, Chi-squared test, and ANOVA work in R."
+description: "Non-parametric tests do not make assumptions about the data. Learn how to use tests such as the Wilcoxon signed-rank test in R."
 thumbnail: "/tags/non-parametric-test/non_parametric_avatar.jpg"
 ---
 <img src="non_parametric_avatar.jpg" alt = "Non-parametric tests" width = "1000" height = "958">

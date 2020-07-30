@@ -3,7 +3,7 @@ title: "Studying Bioinformatics: Is it Worth it?"
 lead: "Prospects as a bioinformatics graduate"
 author: Matthias Döring
 date: '2019-11-03'
-description: "Bioinformatics is an interdisciplinary field at the junction of computer science and biology. Considering aspects such as job options, however, is it worth studying bioinformatics?"
+description: "Learn from my experiences studying Bioinformatics as a Bachelor's, Master's, and as a PhD. What kind of career opportunities exist?"
 slug: "studying-bioinformatics-is-it-worth-it"
 downloadRmd: false
 categories:

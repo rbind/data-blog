@@ -1,6 +1,6 @@
 ---
 title: "Bayesian methods"
-description: "Bayesian methods rely on Bayes' theorem to make inferences according to the posterior distribution. These methods are particularly useful for obtaining insights about the data generation process." 
+description: "Bayesian methods are often overlooked. Find out how you can apply Bayesian approaches to model the data generation process!"
 thumbnail: "/tags/bayesian/bayesian_cover.png"
 ---
 Bayesian methods make use of Bayes' theorem to perform statistical inference. Bayes' law states that a conditional probability can be decomposed in the following way:
