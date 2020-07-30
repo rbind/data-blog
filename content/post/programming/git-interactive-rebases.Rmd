@@ -2,7 +2,7 @@
 title: "Rewriting History with Git"
 author: Matthias Döring
 date: '2020-07-03'
-description: "Git is the most widely used version control system for software. When collaborating in teams, it is vital that individual commits to the central repository are easily comprehensible. Here you will learn how to manipulate your Git history using interactive rebases."
+description: "Git is the most widely used version control system. But what to do when something goes wrong? Use rebase."
 lead: "Commits do not always turn out as you'd like them. However, using interactive rebases, you can craft beautiful commits by modifying your commit history."
 slug: "rewriting-history-with-git"
 categories:

@@ -2,7 +2,7 @@
 title: "Two Environment Variables for More Robust R Code"
 author: Matthias Döring
 date: '2020-02-06'
-description: "R's type system is known to be flexible, which, at the same time makes the language very fragile. Luckily, there are environment variables that can make our code more robust. In this post, you will learn how to use two environment variables in order to prevent mistakes when dealing with conditionals and logical operators."
+description: "There are little-known environment variables that you can use to make your R code more robust. Find out what they do here!"
 lead: "The good, the bad, and the ugly of R's typing system and how environment variables can remedy the situation."
 slug: "more-robust-R-code-with-environment-variables"
 categories:
@@ -15,7 +15,12 @@ thumbnail: "/post/programming/more-robust-R-code-with-environment-variables_avat
 <script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<p>I was recently contacted because my Bioconductor package <a href="https://bioconductor.org/packages/release/bioc/html/openPrimeR.html">openPrimeR</a> was failing the automated package tests. The reason for this is that the Bioconductor team had decided to set a new environment variable when testing the packages, which is called <code>_R_CHECK_LENGTH_1_LOGIC2_</code>. I then looked into this environment variable a bit more and found that there is also <code>_R_CHECK_LENGTH_1_CONDITION_</code>. Because I really like the idea behind these environment variables, I’d like to share what you can do with them:</p>
+<p>I was recently alerted because my Bioconductor package <a href="https://bioconductor.org/packages/release/bioc/html/openPrimeR.html">openPrimeR</a> was failing the automated package tests.
+The reason for this is that the Bioconductor team has decided to set a new environment variable when testing the packages.
+<!--more-->
+I was recently alerted because my Bioconductor package <a href="https://bioconductor.org/packages/release/bioc/html/openPrimeR.html">openPrimeR</a> was failing the automated package tests.
+The reason for this is that the Bioconductor team has decided to set a new environment variable when testing the packages.
+This variable is called <code>_R_CHECK_LENGTH_1_LOGIC2_</code>. After looking into this environment variable a bit more, I found that there is also <code>_R_CHECK_LENGTH_1_CONDITION_</code>. Because I really like the idea behind these environment variables, I’d like to share what you can do with them:</p>
 <ol style="list-style-type: decimal">
 <li>Prevent non-scalar conditions using <code>_R_CHECK_LENGTH_1_CONDITION_</code></li>
 <li>Ensure that logical operators <code>&amp;&amp;</code> and <code>||</code> are applied only to scalars: <code>_R_CHECK_LENGTH_1_LOGIC2_</code></li>

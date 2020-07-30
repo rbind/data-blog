@@ -1,6 +1,6 @@
 ---
 title: "Navigating in Gridworld using Policy and Value Iteration"
-lead: "Learn how reinforcement learning algorithms such as policy evaluation, policy iteration, and value iteration can be used to find the shortest path in gridworld."
+lead: "Learn how to use policy evaluation, policy iteration, and value iteration to find the shortest path in gridworld."
 author: Matthias Döring
 downloadRmd: false
 date: '2020-01-10'

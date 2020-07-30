@@ -2,7 +2,7 @@
 title: "REST API Development with Flask"
 author: Matthias Döring
 date: '2020-07-24'
-description: "Flask is a popular Python framework for web development. Here, I describe patterns for writing a RESTful API using Flask. I focus on testing, documentation, and deployment of the application. A minimal example of a RESTful Flask API is provided via GitHub."
+description: "Flask is a popular Python framework for web development. Get your Flask RESTful API running in no time with these tips!"
 lead: "Patterns for deploying RESTful Flask applications"
 slug: "flask-api-development"
 downloadRmd: False
