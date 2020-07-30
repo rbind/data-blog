@@ -2,7 +2,7 @@
 title: "Performance Measures for Multi-Class Problems"
 author: Matthias Döring
 date: '2018-12-04'
-description: "For multi-class prediction scenarios, we can use similar performance measures as for binary classification. Here, I explain how we can obtain the (weighted) accuracy, micro- and macro-averaged F1-scores, and a generalization of the AUC to the multi-class setting."
+description: "How to calculate performance for multi-class problems? Learn about micro- and macro-averaged F1-scores as well as a generalization of the AUC here!"
 slug: "performance-measures-multi-class-problems"
 thumbnail: "/post/machine-learning/performance-measures-multi-class_cover.png"
 categories:
@@ -12,6 +12,7 @@ tags:
     - R
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>For classification problems, classifier performance is typically defined according to the confusion matrix associated with the classifier. Based on the entries of the matrix, it is possible to compute sensitivity (recall), specificity, and precision. For a single cutoff, these quantities lead to balanced accuracy (sensitivity and specificity) or to the <a href="/post/machine-learning/specificity-vs-precision/">F1-score (recall and precision)</a>. For evaluate a scoring classifier at multiple cutoffs, these quantities can be used to determine the <a href="/post/machine-learning/performance-measures-model-selection/">area under the ROC curve (AUC)</a> or the area under the precision-recall curve (AUCPR).</p>
@@ -25,7 +26,7 @@ predictions &lt;- c(rep(&quot;A&quot;, 35), rep(&quot;E&quot;, 5), rep(&quot;D&q
                  rep(&quot;C&quot;, 7), rep(&quot;B&quot;, 5), rep(&quot;C&quot;, 3),
                  rep(&quot;D&quot;, 23), rep(&quot;C&quot;, 2),
                  rep(&quot;E&quot;, 1), rep(&quot;A&quot;, 2), rep(&quot;B&quot;, 2))
-df &lt;- data.frame(&quot;Prediction&quot; = predictions, &quot;Reference&quot; = ref.labels)</code></pre>
+df &lt;- data.frame(&quot;Prediction&quot; = predictions, &quot;Reference&quot; = ref.labels, stringsAsFactors=TRUE)</code></pre>
 </div>
 <div id="accuracy-and-weighted-accuracy" class="section level2">
 <h2>Accuracy and weighted accuracy</h2>
@@ -92,7 +93,8 @@ print(paste0(&quot;Weighted accuracy is: &quot;, round(w.acc, 2)))</code></pre>
 </tbody>
 </table>
 <p>Based on this matrix, the specificity would be <span class="math inline">\(\frac{80}{80 + 10} = 88.9\%\)</span> although class 1 was only correctly predicted in 8 out of 18 instances (precision 44.4%). Thus, since the negative class is predominant, <a href="/post/machine-learning/specificity-vs-precision/">the specificity becomes inflated</a>. Thus, micro- and macro averages are only defined for the F1-score and not for the balanced accuracy, which relies on the true negative rate.</p>
-<p>In the following we will use <span class="math inline">\(TP_i\)</span>, <span class="math inline">\(FP_i\)</span>, and <span class="math inline">\(FN_i\)</span> to respectively indicate true positives, false positives, and false negatives in the confusion matrix associated with the <span class="math inline">\(i\)</span>-th class. Moreover, let precision be indicated by <span class="math inline">\(P\)</span> and recall by <span class="math inline">\(R\)</span>.</p>
+<p>In the following we will use <span class="math inline">\(TP_i\)</span>, <span class="math inline">\(FP_i\)</span>, and <span class="math inline">\(FN_i\)</span> to respectively indicate true
+positives, false positives, and false negatives in the confusion matrix associated with the <span class="math inline">\(i\)</span>-th class. Moreover, let precision be indicated by <span class="math inline">\(P\)</span> and recall by <span class="math inline">\(R\)</span>.</p>
 <div id="the-micro-average" class="section level3">
 <h3>The micro average</h3>
 <p>The micro average has its name from the fact that it pools the performance over the smallest possible unit (i.e. over all samples):</p>
@@ -239,15 +241,16 @@ legend(&quot;bottomright&quot;, levels(response), lty=1,
     bty=&quot;n&quot;, col = colors)</code></pre>
 <p><img src="/post/machine-learning/performance-measures-multi-class_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <pre class="r"><code>print(paste0(&quot;Mean AUC under the precision-recall curve is: &quot;, round(mean(aucs), 2)))</code></pre>
-<pre><code>## [1] &quot;Mean AUC under the precision-recall curve is: 0.97&quot;</code></pre>
-<p>The plot indicates that <em>setosa</em> can be predicted very well, while <em>versicolor</em> and <em>virginica</em> are harder to predict. The mean AUC of <code>0.97</code> indicates that the model separates the three classes very well.</p>
+<pre><code>## [1] &quot;Mean AUC under the precision-recall curve is: 0.99&quot;</code></pre>
+<p>The plot indicates that <em>setosa</em> can be predicted very well, while <em>versicolor</em> and <em>virginica</em> are harder to predict. The mean AUC of <code>0.99</code> indicates that the model separates the three classes very well.</p>
 </div>
 <div id="generalizations-of-the-auc-for-the-multi-class-setting" class="section level3">
 <h3>Generalizations of the AUC for the multi-class setting</h3>
 <p>There are several generalizations of the AUC for the multi-class setting. Here, I will focus on the generalization established by Hand and Till in 2001.</p>
 <div id="generalized-auc-for-a-single-decision-value" class="section level4">
 <h4>Generalized AUC for a single decision value</h4>
-<p>The <code>multiclass.roc</code> function from the <code>pROC</code> package can be used to determine the AUC when a single quantity allows for the separation of the classes. <a href="https://cran.r-project.org/web/packages/pROC/pROC.pdf">In contrast to the documentation of the function</a>, the function does not seem to implement the approach from Hand and Till because the class predictions are not considered. However, the documentation warns about this function being in <em>beta phase</em>. I am currently waiting for a response from the package authors about the <code>multiclass.roc</code> function to verify whether my understanding is correct.</p>
+<p>The <code>multiclass.roc</code> function from the <code>pROC</code> package can be used to determine the AUC when a single quantity allows for the separation of the classes. <a href="https://cran.r-project.org/web/packages/pROC/pROC.pdf">In contrast to the documentation of the function</a>, the function does not seem to implement the approach from Hand and Till
+because the class predictions are not considered. However, the documentation warns about this function being in <em>beta phase</em>. I am currently waiting for a response from the package authors about the <code>multiclass.roc</code> function to verify whether my understanding is correct.</p>
 <pre class="r"><code>library(pROC)
 data(aSAH)
 auc &lt;- multiclass.roc(aSAH$gos6, aSAH$s100b)
@@ -330,10 +333,10 @@ pred.matrix &lt;- pred$posterior
 ref.outcome &lt;- iris.test$Species
 M &lt;- multiclass.auc(pred.matrix, ref.outcome)
 print(paste0(&quot;Generalized AUC is: &quot;, round(as.numeric(M), 3)))</code></pre>
-<pre><code>## [1] &quot;Generalized AUC is: 0.988&quot;</code></pre>
+<pre><code>## [1] &quot;Generalized AUC is: 0.991&quot;</code></pre>
 <pre class="r"><code>print(attr(M, &quot;pair_AUCs&quot;)) # pairwise AUCs</code></pre>
 <pre><code>##    setosa/versicolor     setosa/virginica versicolor/virginica 
-##            1.0000000            1.0000000            0.9627329</code></pre>
+##              1.00000              1.00000              0.97254</code></pre>
 <p>Using this approach, the generalized AUC is 0.988, which is surprisingly similar to the mean value from the precision-recall curves of the binary one-vs-all classifiers. The interpretation of the resulting pairwise AUCs is also similar. While the AUCs for separating <em>setosa</em>/<em>versicolor</em> and <em>setosa</em>/<em>virginica</em> are both 1, the AUC for <em>versicolor</em>/<em>virginica</em> is slightly smaller, which is in line with our previous finding that observations from <em>versicolor</em> and <em>virginica</em> are harder to predict accurately.</p>
 </div>
 </div>

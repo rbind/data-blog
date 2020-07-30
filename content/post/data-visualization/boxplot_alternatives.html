@@ -2,7 +2,7 @@
 title: "Box Plot Alternatives: Beeswarm and Violin Plots"
 author: Matthias Döring
 date: '2018-11-04'
-description: "Box plots are limited since they only show Q1, Q2, and Q3. Box plot alternatives such as the beeswarm and violin plot, however, provide more information about the overall distribution of the data."
+description: "Box plots are limited since they only show Q1, Q2, and Q3. Alternatives such as the beeswarm and violin plot are discussed here."
 categories:
   - data-visualization
 tags:
@@ -11,6 +11,7 @@ tags:
 thumbnail: "/post/data-visualization/boxplot_alternatives_cover.png"
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p><a href="/post/data-visualization/boxplot/">Box plots</a> are great as they do not only indicate the median value but also show the variation of the measurements in terms of the 1st and 3rd quartiles. There are, however, also plots that provide a bit of additional information. Here, we take a closer look at potential alternatives to the box plot: the beeswarm and the violin plot.</p>
@@ -63,6 +64,7 @@ p.violin &lt;- ggplot(warpbreaks, aes(x = wool, y = breaks)) +
 p.box &lt;- ggplot(warpbreaks, aes(x = wool, y = breaks)) +
     geom_boxplot() + ggtitle (&quot;Box plot&quot;)
 grid.arrange(p.violin, p.box, ncol = 2)</code></pre>
-<p><img src="/post/data-visualization/boxplot_alternatives_files/figure-html/unnamed-chunk-3-1.png" width="672" /> In this case, we see the limitation of the violin plot for small sample sizes (hint: the limitation is not that the plot does not seem to show violins but vases). The violin for wool A stretches up to the outliers at a value of 65 indicating. Since the width is similar at values 40 and 60, one could think that there are many such measurements. The box plot, on the other hand, reveals that there are indeed only two measurements with a value greater than 60.</p>
+<p><img src="/post/data-visualization/boxplot_alternatives_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+In this case, we see the limitation of the violin plot for small sample sizes (hint: the limitation is not that the plot does not seem to show violins but vases). The violin for wool A stretches up to the outliers at a value of 65 indicating. Since the width is similar at values 40 and 60, one could think that there are many such measurements. The box plot, on the other hand, reveals that there are indeed only two measurements with a value greater than 60.</p>
 </div>
 </div>

@@ -443,7 +443,7 @@ acf(ozone.ts, type = &quot;partial&quot;)</code></pre>
 <p><img src="/post/machine-learning/forecasting-an-introduction_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
 <p>The autocorrelation plots are very unclear, suggesting that there is actually no time trend in the data. Thus, we would opt for an ARIMA(0,0,0) model. Since an ARIMAX model with the parameters (0,0,0) does not have a benefit over a conventional linear regression model, we can conclude that the temporal trend in the ozone data is not sufficient to improve the prediction of ozone levels. Let us verify this:</p>
 <pre class="r"><code># ARIMAX(0,0,0) model
-library(TSA) # TODO: this package was orphaned
+library(TSA) # warning: not available via CRAN any more
 features &lt;- c(&quot;Solar.R&quot;, &quot;Wind&quot;, &quot;Temp&quot;) # exogenous features
 A &lt;- arimax(x = ozone$Ozone[trainset], 
        xreg = ozone[trainset,features],

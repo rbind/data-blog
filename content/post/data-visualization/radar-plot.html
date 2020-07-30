@@ -2,7 +2,7 @@
 title: "Radar plots"
 author: Matthias Döring
 date: '2018-11-13'
-description: "Radar plots are exceptional for visualizing the properties of individual objects. Here, I demonstrate how to draw radar plots in R by plotting the properties of whiskeys from several distilleries."
+description: "Radar plots are a great tool for visualizing multiple properties at once. Learn how to draw them in R!"
 categories:
   - data-visualization
 tags:
@@ -12,6 +12,7 @@ thumbnail: "/post/data-visualization/radar-plot_cover.png"
 
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>Radar plots visualize several variables using a radial layout. This plot is most suitable for visualizing and comparing the properties associated with individual objects. In the following, we will use a radar plot for comparing the characteristics of whiskeys from different distilleries.</p>
@@ -26,20 +27,20 @@ f &lt;- getURL(&#39;https://www.datascienceblog.net/data-sets/whiskies.txt&#39;)
 df &lt;- read.csv(textConnection(f), header=T)</code></pre>
 <p>Next, we take a look at the data:</p>
 <pre class="r"><code>head(df)</code></pre>
-<pre><code>##   RowID  Distillery Body Sweetness Smoky Medicinal Tobacco Honey Spicy
-## 1     1   Aberfeldy    2         2     2         0       0     2     1
-## 2     2    Aberlour    3         3     1         0       0     4     3
-## 3     3      AnCnoc    1         3     2         0       0     2     0
-## 4     4      Ardbeg    4         1     4         4       0     0     2
-## 5     5     Ardmore    2         2     2         0       0     1     1
-## 6     6 ArranIsleOf    2         3     1         1       0     1     1
-##   Winey Nutty Malty Fruity Floral    Postcode Latitude Longitude
-## 1     2     2     2      2      2  \tPH15 2EB   286580    749680
-## 2     2     2     3      3      2  \tAB38 9PJ   326340    842570
-## 3     0     2     2      3      2   \tAB5 5LI   352960    839320
-## 4     0     1     2      1      0  \tPA42 7EB   141560    646220
-## 5     1     2     3      1      1  \tAB54 4NH   355350    829140
-## 6     1     0     1      1      2    KA27 8HJ   194050    649950</code></pre>
+<pre><code>##   RowID  Distillery Body Sweetness Smoky Medicinal Tobacco Honey Spicy Winey
+## 1     1   Aberfeldy    2         2     2         0       0     2     1     2
+## 2     2    Aberlour    3         3     1         0       0     4     3     2
+## 3     3      AnCnoc    1         3     2         0       0     2     0     0
+## 4     4      Ardbeg    4         1     4         4       0     0     2     0
+## 5     5     Ardmore    2         2     2         0       0     1     1     1
+## 6     6 ArranIsleOf    2         3     1         1       0     1     1     1
+##   Nutty Malty Fruity Floral    Postcode Latitude Longitude
+## 1     2     2      2      2  \tPH15 2EB   286580    749680
+## 2     2     3      3      2  \tAB38 9PJ   326340    842570
+## 3     2     2      3      2   \tAB5 5LI   352960    839320
+## 4     1     2      1      0  \tPA42 7EB   141560    646220
+## 5     2     3      1      1  \tAB54 4NH   355350    829140
+## 6     0     1      1      2    KA27 8HJ   194050    649950</code></pre>
 <p>The most important observation is that the caracteristics of whiskeys are identified by numbers ranging from 0 (low expression of a characteristic) to 4 (high expression of a characteristic).</p>
 <p>Next, we need to select some features for plotting. Here, we simply specify all of the whiskey characteristics stored in the data set:</p>
 <pre class="r"><code>features &lt;- c(&quot;Sweetness&quot;, &quot;Honey&quot;, &quot;Fruity&quot;,

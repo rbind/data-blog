@@ -3,7 +3,7 @@ title: "Visualizing Time-Series Data with Line Plots"
 author: Matthias Döring
 date: '2018-11-02'
 lastmod: "2018-12-03"
-description: "Line plots are ideally suited for visualizing time series data. Using some stock market data, I demonstrate how line plots can be generated using native R, the MTS package, and ggplot."
+description: "Line plots are ideally suited for visualizing time series data. Learn how to do so with R!"
 slug: "line-plot"
 categories:
   - data-visualization

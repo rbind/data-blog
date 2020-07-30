@@ -2,7 +2,7 @@
 title: "Box Plot Alternatives: Beeswarm and Violin Plots"
 author: Matthias Döring
 date: '2018-11-04'
-description: "Box plots are limited since they only show Q1, Q2, and Q3. Box plot alternatives such as the beeswarm and violin plot, however, provide more information about the overall distribution of the data."
+description: "Box plots are limited since they only show Q1, Q2, and Q3. Alternatives such as the beeswarm and violin plot are discussed here."
 categories:
   - data-visualization
 tags:

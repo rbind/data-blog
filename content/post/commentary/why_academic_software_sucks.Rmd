@@ -3,7 +3,7 @@ title: "Why Academic Software Sucks"
 lead: "What can academic coders learn from software developers in industry?"
 author: Matthias Döring
 date: '2019-07-15'
-description: "The way in which academic software is developed differs starkly from the way that software is engineered in industry. In this article, I summarize the main differences between academic and professional software development and reveal how academics can up their game."
+description: "Learn what software developers in academia can learn from their industry colleagues."
 slug: "why-academic-software-sucks"
 downloadRmd: false
 categories:

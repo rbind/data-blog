@@ -3,7 +3,7 @@ title: "Linear, Quadratic, and Regularized Discriminant Analysis"
 author: Matthias Döring
 date: '2018-11-30'
 thumbnail: "/post/machine-learning/linear-discriminant-analysis_cover.png" 
-description: "Linear discriminant analysis (LDA) is a classification and dimensionality reduction technique that is particularly useful for multi-class prediction problems. In this post I investigate the properties of LDA and the related methods of quadratic discriminant analysis and regularized discriminant analysis."
+description: "Linear discriminant analysis (LDA) is a classification and dimensionality reduction technique. Learn about LDA, QDA, and RDA here!"
 categories:
   - machine-learning
   - data-visualization
@@ -13,6 +13,7 @@ tags:
     - R
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>Discriminant analysis encompasses methods that can be used for both classification and dimensionality reduction. Linear discriminant analysis (LDA) is particularly popular because it is both a classifier and a dimensionality reduction technique. Quadratic discriminant analysis (QDA) is a variant of LDA that allows for non-linear separation of data. Finally, regularized discriminant analysis (RDA) is a compromise between LDA and QDA.</p>
@@ -29,7 +30,7 @@ tags:
 <p>because the denominator is identical for all classes.</p>
 <p>LDA assumes that the density is Gaussian:</p>
 <p><span class="math display">\[f_k(x) = {|2 \pi  \Sigma_k|}^{-1/2} \exp\left(-\frac{1}{2}(x - \mu_k)^T\Sigma_k^{-1}(x - \mu_k)\right)\]</span></p>
-<p>where <span class="math inline">\(\Sigma_k\)</span> is the covariance matrix for the samples from class <span class="math inline">\(k\)</span> and <span class="math inline">\(|.|\)</span> is the determinant. LDA assumes that all classes have the same covariance matrix, i.e. <span class="math inline">\(\Sigma_k = \Sigma\,, \forall k\)</span>.</p>
+<p>where <span class="math inline">\(\Sigma_k\)</span> is the covariance matrix for the samples from class <span class="math inline">\(k\)</span> and <span class="math inline">\(|.|\)</span> is the determinant. LDA assumes that all classes have the same covariance matrix, i.e. <span class="math inline">\(\Sigma_k = \Sigma\,, \forall k\)</span>.</p>
 <p>Plugging <span class="math inline">\(f_k\)</span> into the classification function, <a href="https://onlinecourses.science.psu.edu/stat857/node/75/">we arrive at the classification function</a>:</p>
 <p><span class="math display">\[G(x) = \arg \max_k \delta_k(x)\]</span></p>
 <p>where</p>
@@ -56,7 +57,8 @@ tags:
 <div id="the-interpretation-of-fisher" class="section level3">
 <h3>The interpretation of Fisher</h3>
 <p>Fisher’s LDA optimization criterion states that the centroids of the groups should be spread out as far as possible. This amounts to finding a linear combination <span class="math inline">\(Z = a^T X\)</span> such that <span class="math inline">\(a^T\)</span> maximizes the between-class variance relative to the within-class variance.</p>
-<p>As before, the within-class variance is <span class="math inline">\(W\)</span> is the pooled covariance matrix, <span class="math inline">\(\hat{\Sigma}\)</span>, which indicates the deviation of all observations from their class centroids. The between-class variance is defined according to the deviation of the centroids from the overall mean, as defined earlier. For <span class="math inline">\(Z\)</span>, the between class variance is <span class="math inline">\(a^T B a\)</span> and the within-class variance is <span class="math inline">\(A^T W a\)</span>. Thus, LDA can be optimized through the Rayleigh quotient</p>
+<p>As before, the within-class variance is <span class="math inline">\(W\)</span> is the pooled covariance matrix, <span class="math inline">\(\hat{\Sigma}\)</span>, which indicates the deviation of all observations from their class centroids. The between-class variance is defined according to the deviation of the centroids from the overall mean, as defined earlier.
+For <span class="math inline">\(Z\)</span>, the between class variance is <span class="math inline">\(a^T B a\)</span> and the within-class variance is <span class="math inline">\(A^T W a\)</span>. Thus, LDA can be optimized through the Rayleigh quotient</p>
 <p><span class="math display">\[\max_a \frac{a^T B a}{a^T W a}\,, \]</span></p>
 <p>which defines an optimal mapping of <span class="math inline">\(X\)</span> to the new space <span class="math inline">\(Z\)</span>. Note that <span class="math inline">\(Z \in \mathbb{R}^{1 \times p}\)</span>, that is, the observations are mapped to a single dimension. To obtain additional dimensions, we need to solve the optimization problem for <span class="math inline">\(a_1, \ldots, a_{K-1}\)</span> where each successive <span class="math inline">\(a_k\)</span> is constructed to be orthogonal in <span class="math inline">\(W\)</span> to the previous discriminant coordinates. This leads to the linear transformation <span class="math inline">\(G = (Z_1^T, Z_2^T, \ldots, Z_{K-1}^T) \in \mathbb{R}^{p \times q}\)</span> with which we can map from <span class="math inline">\(p\)</span> to <span class="math inline">\(q\)</span> dimension via <span class="math inline">\(X G\)</span>. Why do we consider <span class="math inline">\(K-1\)</span> projections? This is because the affine subspace that is spanned by the <span class="math inline">\(K\)</span> centroids has a rank of at most <span class="math inline">\(K-1\)</span>.</p>
 <p>Using Fisher’s formulation of LDA, classification involves two steps:</p>
@@ -71,7 +73,8 @@ tags:
 </div>
 <div id="complexity-of-the-lda-model" class="section level3">
 <h3>Complexity of the LDA model</h3>
-<p>The number of effective parameters of LDA can be derived in the following way. There are <span class="math inline">\(K\)</span> means, <span class="math inline">\(\hat{\mu}_k\)</span> that are estimated. The covariance matrix does not require additional parameters because it is already defined by the centroids. Since we need to estimate <span class="math inline">\(K\)</span> discriminant functions (to obtain the decision boundaries), this gives rise to <span class="math inline">\(K\)</span> calculations involving the <span class="math inline">\(p\)</span> elements. Additionally, we have <span class="math inline">\(K-1\)</span> free parameters for the <span class="math inline">\(K\)</span> priors. Thus, the number of effective LDA parameters is <span class="math inline">\(Kp + (K-1)\)</span>.</p>
+<p>The number of effective parameters of LDA can be derived in the following way.
+There are <span class="math inline">\(K\)</span> means, <span class="math inline">\(\hat{\mu}_k\)</span> that are estimated. The covariance matrix does not require additional parameters because it is already defined by the centroids. Since we need to estimate <span class="math inline">\(K\)</span> discriminant functions (to obtain the decision boundaries), this gives rise to <span class="math inline">\(K\)</span> calculations involving the <span class="math inline">\(p\)</span> elements. Additionally, we have <span class="math inline">\(K-1\)</span> free parameters for the <span class="math inline">\(K\)</span> priors. Thus, the number of effective LDA parameters is <span class="math inline">\(Kp + (K-1)\)</span>.</p>
 </div>
 <div id="summary-of-lda" class="section level3">
 <h3>Summary of LDA</h3>
@@ -79,7 +82,8 @@ tags:
 </div>
 <div id="probabilistic-view" class="section level3">
 <h3>Probabilistic view</h3>
-<p>LDA uses Bayes’ rule to determine the posterior probability that an observation <span class="math inline">\(x\)</span> belongs to class <span class="math inline">\(k\)</span>. Due to the normal assumption of LDA, the posterior is defined by a multivariate Gaussian whose covariance matrix is assumed to be identical for all classes. New points are classified by computing the discriminant function <span class="math inline">\(\delta_k\)</span> (the enumerator of the posterior probability) and returning the class <span class="math inline">\(k\)</span> with maximal <span class="math inline">\(\delta_k\)</span>. The discriminant variables can be obtained through eigen-decompositions of the within-class and between-class variance.</p>
+<p>LDA uses Bayes’ rule to determine the posterior probability that an observation <span class="math inline">\(x\)</span> belongs to class <span class="math inline">\(k\)</span>. Due to the normal assumption of LDA, the posterior is defined by a multivariate Gaussian whose covariance matrix is assumed to be identical for all classes. New points are classified by computing the discriminant function <span class="math inline">\(\delta_k\)</span> (the enumerator of the posterior probability) and returning the class <span class="math inline">\(k\)</span> with maximal <span class="math inline">\(\delta_k\)</span>. The discriminant variables
+can be obtained through eigen-decompositions of the within-class and between-class variance.</p>
 <div id="fishers-view" class="section level4">
 <h4>Fisher’s view</h4>
 <p>According to Fisher, LDA can be understood as a dimensionality reduction technique where each successive transformation is orthogonal and maximizes the between-class variance relative to the within-class variance. This procedure transforms the feature space to an affine space with <span class="math inline">\(K-1\)</span> dimensions. After sphering the input data, new points can be classified by determining the closest centroid in the affine space under consideration of the class priors.</p>
@@ -166,7 +170,7 @@ plot(lda.model, dimen = 4, col = my.cols)</code></pre>
     colors &lt;- brewer.pal(8, &quot;Accent&quot;)
     my.cols &lt;- colors[match(lda.prediction.train$class, levels(df$g))]
     my.points &lt;- predict(lda.model, train.set)$x
-    no.classes &lt;- length(levels(response))
+    no.classes &lt;- length(unique(response))
     par(mfrow=c(no.classes -1, no.classes -1), mar=c(1,1,1,1), oma=c(1,1,1,10))
     for (i in 1:(no.classes - 1)) {
         for (j in 1:(no.classes - 1)) {
@@ -206,8 +210,9 @@ print(paste0(&quot;Posterior of predicted class &#39;&quot;, pred.class,
     &quot;&#39; is: &quot;, round(posteriors[1,pred.class], 2)))</code></pre>
 <pre><code>## [1] &quot;Posterior of predicted class &#39;sh&#39; is: 1&quot;</code></pre>
 <pre class="r"><code># what are the mean posteriors for individual groups?
-res &lt;- do.call(rbind, (lapply(levels(train.responses), function(x) apply(posteriors[train.responses == x, ], 2, mean))))
-rownames(res) &lt;- levels(train.responses)
+classes &lt;- colnames(posteriors)
+res &lt;- do.call(rbind, (lapply(classes, function(x) apply(posteriors[train.responses == x, ], 2, mean))))
+rownames(res) &lt;- classes
 print(round(res, 3)) </code></pre>
 <pre><code>##        aa    ao   dcl    iy    sh
 ## aa  0.797 0.203 0.000 0.000 0.000
@@ -283,7 +288,7 @@ print(paste0(&quot;Accuracy of QDA is: &quot; , round(acc, 2)))</code></pre>
 <p>Since RDA is a regularization technique, it is particularly useful when there are many features that are potentially correlated. Let us now evaluate RDA on the phoneme data set.</p>
 <div id="rda-in-r" class="section level3">
 <h3>RDA in R</h3>
-<p>To perform RDA, we need to load the <code>rda</code> package. A regularized discriminant analysis model can be fit using the <code>rda</code> function, which has two main parameters: <span class="math inline">\(\alpha\)</span> as introduced before and <span class="math inline">\(\delta\)</span>, <a href="https://www.mathworks.com/help/stats/classificationdiscriminant.cvshrink.html">which defines the threshold for values</a>.</p>
+<p>To perform RDA, we need to load the <code>rda</code> package. Note that <code>rda</code> was removed from CRAN, so you need to install it manually now (2020-07). A regularized discriminant analysis model can be fit using the <code>rda</code> function, which has two main parameters: <span class="math inline">\(\alpha\)</span> as introduced before and <span class="math inline">\(\delta\)</span>, <a href="https://www.mathworks.com/help/stats/classificationdiscriminant.cvshrink.html">which defines the threshold for values</a>.</p>
 <pre class="r"><code>library(rda)
 # note: optimization is time-intensive, especially if many alpha/gammas are used
 alphas &lt;- c(0.1, 0.25, 0.5, 0.75, 0.9)

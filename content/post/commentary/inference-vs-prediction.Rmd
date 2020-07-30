@@ -3,7 +3,7 @@ title: "Inference vs Prediction"
 lead: "Generative modeling or predictive modeling?"
 author: Matthias Döring
 date: '2018-12-07'
-description: "Inference is concerned with learning about the data generation process, while prediction is concerned with estimating the outcome for new observations. These contrasting principles are associated with the the generative modeling and machine learning communities. Here, I showcase the differences and similarities between the two concepts and offer insights about what the practitioners from both fields can learn from each other."
+description: "Many people use prediction and inference synonymously although there is a subtle difference. Learn what it is here!"
 slug: "inference-vs-prediction"
 thumbnail: "/post/commentary/inference-vs-prediction_cover.png"
 downloadRmd: false

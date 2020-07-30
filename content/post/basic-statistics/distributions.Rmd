@@ -2,7 +2,7 @@
 title: "Using probability distributions in R: dnorm, pnorm, qnorm, and rnorm"
 author: Matthias Döring
 thumbnail: "/post/basic-statistics/distributions_cover.png"
-description: "Since R was made for statistical computations, it is very easy to deal with distributions in R. Since there are multiple functions for each distribution, I exemplify their application using the normal distribution."
+description: "R is made for working with distributions. Learn how to work with the density function and more here!"
 date: '2018-10-29'
 categories:
   - basic-statistics

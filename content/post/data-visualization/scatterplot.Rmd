@@ -2,7 +2,7 @@
 title: "Visualizing Individual Data Points Using Scatter Plots"
 author: Matthias Döring
 date: '2018-10-29'
-description: "Scatter plots are a great tool for learning about individual data points. Here, I demonstrate the use of scatter plots for visualizing the correlation between two variables."
+description: "Scatter plots are great for learning about individual data points. Learn how to plot in R!"
 categories:
   - data-visualization
 tags:

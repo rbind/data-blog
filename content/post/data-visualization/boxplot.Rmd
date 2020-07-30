@@ -2,7 +2,7 @@
 title: "Comparing Medians and Inter-Quartile Ranges Using the Box Plot"
 author: Matthias Döring
 date: '2018-10-31'
-description: "Box plots are ideal for showing the variation of measurements because they do not only visualize the first, second, and third quartile, but also outliers."
+description: "Box plots are ideal for showing the variation of measurements. Learn how they make use of the median here."
 categories:
   - data-visualization
 tags:

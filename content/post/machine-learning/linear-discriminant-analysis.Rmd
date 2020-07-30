@@ -220,7 +220,7 @@ plot_lda_centroids <- function(lda.model, train.set, response) {
     colors <- brewer.pal(8, "Accent")
     my.cols <- colors[match(lda.prediction.train$class, levels(df$g))]
     my.points <- predict(lda.model, train.set)$x
-    no.classes <- length(levels(response))
+    no.classes <- length(unique(response))
     par(mfrow=c(no.classes -1, no.classes -1), mar=c(1,1,1,1), oma=c(1,1,1,10))
     for (i in 1:(no.classes - 1)) {
         for (j in 1:(no.classes - 1)) {
@@ -261,8 +261,9 @@ pred.class <- names(which.max(posteriors[1,])) # <=> lda.prediction.train$class[
 print(paste0("Posterior of predicted class '", pred.class, 
     "' is: ", round(posteriors[1,pred.class], 2)))
 # what are the mean posteriors for individual groups?
-res <- do.call(rbind, (lapply(levels(train.responses), function(x) apply(posteriors[train.responses == x, ], 2, mean))))
-rownames(res) <- levels(train.responses)
+classes <- colnames(posteriors)
+res <- do.call(rbind, (lapply(classes, function(x) apply(posteriors[train.responses == x, ], 2, mean))))
+rownames(res) <- classes
 print(round(res, 3)) 
 ```
 
@@ -354,7 +355,7 @@ Since RDA is a regularization technique, it is particularly useful when there ar
 
 ### RDA in R
 
-To perform RDA, we need to load the ```rda``` package. A regularized discriminant analysis model can be fit using the ```rda``` function, which has two main parameters: $\alpha$ as introduced before and $\delta$, [which defines the threshold for values](https://www.mathworks.com/help/stats/classificationdiscriminant.cvshrink.html).
+To perform RDA, we need to load the ```rda``` package. Note that `rda` was removed from CRAN, so you need to install it manually now (2020-07). A regularized discriminant analysis model can be fit using the ```rda``` function, which has two main parameters: $\alpha$ as introduced before and $\delta$, [which defines the threshold for values](https://www.mathworks.com/help/stats/classificationdiscriminant.cvshrink.html).
 
 ```{r, eval = FALSE}
 library(rda)

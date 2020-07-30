@@ -3,7 +3,7 @@ title: "Transitioning from Academia to Industry"
 lead: "Learn about the greatest differences between a data science role in academia and a software engineering role in industry. How to prepare for the transition?"
 author: Matthias Döring
 date: '2019-12-02'
-description: "Transitioning from academia to industry can be challenging. Based on working as a data scientist in research and as a DevOps engineer in industry, I share what I find are the greatest differences between working in academia vs industry. Finally, I offer some tips on how to prepare for an industry job."
+description: "What happens when you transition from academia to industry? Learn from my experiences."
 slug: "transitioning-from-academia-to-industry"
 downloadRmd: false
 categories:

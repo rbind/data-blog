@@ -2,7 +2,7 @@
 title: "Bar Plots and Error Bars"
 author: Matthias Döring
 date: '2018-10-31'
-description: "Bar plots are frequently used due to their simplicity. However, they also do not convey a lot of information. Here, I discuss how error bars can be used to visualize variance and under which circumstances bar charts should not be used."
+description: "Bar plots are popular due to their simplicity. Learn how to add error bars and find out about alternatives to the bar plot!"
 categories:
   - data-visualization
 tags:

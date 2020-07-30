@@ -2,7 +2,7 @@
 title: "Radar plots"
 author: Matthias Döring
 date: '2018-11-13'
-description: "Radar plots are exceptional for visualizing the properties of individual objects. Here, I demonstrate how to draw radar plots in R by plotting the properties of whiskeys from several distilleries."
+description: "Radar plots are a great tool for visualizing multiple properties at once. Learn how to draw them in R!"
 categories:
   - data-visualization
 tags:

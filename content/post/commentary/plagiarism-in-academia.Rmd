@@ -3,8 +3,7 @@ title: "Plagiarism in Academia"
 lead: "In the last years, several public figures have lost their PhDs on grounds of plagiarism. Here, I want to find answers to the following questions. 1. Is plagiarism becoming more and more common? 2. How does the academic system contribute to fraudulent behavior? 3. Are specific people more prone to plagiarize than others?"
 author: Matthias Döring
 date: '2020-07-10'
-description: "The Cambridge Dictionary defines plagiarism as 'the process or practice of using another person's ideas or work and pretending that it is your own'. Plagiarism is bad because it inflates the plagiarists contribution while diminishing the contribution of others. It is particularly frowned upon to use plagiarized work in order to obtain academic degrees such as doctorates. Since plagiarism reflects negatively on the trustworthiness of a person, there are quite a few public
-figures whose careers took a turn for the worse once they were found out. Here, I want to explore the motivations and psychology behind plagiarism."
+description: "Is academic plagiarism becoming more common or are we just identifying more cases?"
 slug: "plagiarism-in-academia"
 downloadRmd: false
 categories:
@@ -13,7 +12,7 @@ tags:
 thumbnail: "/post/commentary/plagiarism-in-academia_avatar.png"
 thumbnailsrc: "Exemplary result for running the plagiarism detection software iThenticate (http://www.ithenticate.com) on my doctoral thesis. In this case, the software correctly detected that I recycled a passage from one of my publications. Note that this is not a case of self-plagiarism because I explicitly declared that the chapter is based on the highlighted publication in a previous section."
 ---
-In the last years, there have been several famous Germans who lost their PhD titles due to plagiarizing their doctoral theses. In Germany, [VroniPlag](https://vroniplag.wikia.org/de/wiki/Home) is the largest open community that analyzes scientific work with respect to plagiarism. Most notably, in 2011, Guttenplag (a specific group of plagiarism hunters) published [a detailed analysis of the doctoral thesis](https://guttenplag.wikia.org/de/wiki/GuttenPlag_Wiki) by [Karl-Theodor zu Guttenberg](https://en.wikipedia.org/wiki/Karl-Theodor_zu_Guttenberg), the German defense minister at that time.
+The Cambridge Dictionary defines plagiarism as 'the process or practice of using another person's ideas or work and pretending that it is your own'. In the last years, there have been several famous Germans who lost their PhD titles due to plagiarizing their doctoral theses. In Germany, [VroniPlag](https://vroniplag.wikia.org/de/wiki/Home) is the largest open community that analyzes scientific work with respect to plagiarism. Most notably, in 2011, Guttenplag (a specific group of plagiarism hunters) published [a detailed analysis of the doctoral thesis](https://guttenplag.wikia.org/de/wiki/GuttenPlag_Wiki) by [Karl-Theodor zu Guttenberg](https://en.wikipedia.org/wiki/Karl-Theodor_zu_Guttenberg), the German defense minister at that time.
 
 In their analysis, they found evidence of plagiarism on 94.4% of the 475-pages long thesis. Initially, Mr Guttenberg declined all of the allegations stating that the claims were absurd. After more and more evidence came to light, however, he admitted his scientific misconduct. Finally, after an investigation by his alma mater, he was deprived of his title, and, due to the public outrage caused by his scientific misconduct, he also lost his ministry position.
 
