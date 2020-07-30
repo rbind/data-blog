@@ -1,0 +1,62 @@
+---
+title: "Improving the whiskey distillery data set"
+author: Matthias Döring
+date: '2018-11-13T18:00:00Z'
+description: "In this post, I clean up and augment a data set that provides their taste characteristics. The improved data set is augmented with the regions where the distilleries are situated, as well as their geological location in terms of longitude and latitude."
+categories:
+  - Other
+tags:
+ - R
+---
+
+I have previously used a data set describing the characteristics of whiskeys to [draw radar plots](/post/data-visualization/radar-plot/). Here, I present how I cleaned and augmented [the original data from the University of Strathclyde](http://outreach.mathstat.strath.ac.uk/outreach/nessie/datasets/whiskies.txt), resulting in an [improved version of the whiskey data set](https://www.datascienceblog.net/data-sets/whiskies.csv).
+
+## Loading the whiskey data set
+
+The original data set can be loaded from the web in the following way:
+
+```{r, message = FALSE}
+library(RCurl)
+# load data as character
+f <- getURL('https://www.datascienceblog.net/data-sets/whiskies.txt')
+# read table from text connection
+df <- read.csv(textConnection(f), header=T)
+```
+
+## Fixing the post codes
+
+Since there are tab characters and spaces in the post codes, we will clean those up:
+
+```{r}
+head(df)
+df$Postcode <- gsub(" *\t*", "", df$Postcode)
+```
+
+## Annotating the locations of the distilleries
+
+A blog post by Koki Ando gives a nice [overview of how UTM data can be handled](https://rstudio-pubs-static.s3.amazonaws.com/375481_d2605e8726364d30a5b20c6974710cf5.html). In the following code snippet, we use the ```raster``` and ```sp``` packages to create a ```SpatialPoints``` object from latitude/longitude coordinates in UTM format. Then, we add UK as a reference point system by specifying *+init=epsg:27700"* ([see epsg.io for other reference coordinates](https://epsg.io)). Finally, we call ```spTransform``` with WGS84 (*+init=epsg:4326*) in order to set the [world geodetic system, which is used for GPS](https://epsg.io/4326).
+
+```{r, message = FALSE, fig.width = 10, fig.height = 10}
+# transform UTM coordinates to longitude/latitude in degrees
+geo.df <- df[, c("Latitude", "Longitude")]
+colnames(geo.df) <- c("lat", "long") # switch for plotting
+library(raster)
+# create 'SpatialPoints' object
+coordinates(geo.df) <-  ~lat + long
+# add coordinate reference system (CRS) for UK
+proj4string(geo.df) <- CRS("+init=epsg:27700")
+# transform to new coordinate system
+# NB: getting rgdal working on old systems is tough due to libgdal dependency
+library(rgdal)
+geo.df <- spTransform(geo.df, CRS("+init=epsg:4326"))
+map.df <- data.frame("Distillery" = df[, "Distillery"], geo.df)
+df <- cbind(df, map.df[, c("lat", "long")])
+```
+
+## Other annotations
+
+To annotate the regions in which the distilleries are situated, I manually assigned regions by relying on a [list of Scottisch distilleries available at Wikipedia](https://en.wikipedia.org/wiki/List_of_whisky_distilleries_in_Scotland). I also fixed some spelling errors in the distillery names.
+
+## The improved whiskey data set
+
+The improved whiskey data set is [available here](https://www.datascienceblog.net/data-sets/whiskies.csv).
