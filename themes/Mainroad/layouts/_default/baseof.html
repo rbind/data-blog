@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html class="no-js" lang="{{ .Site.Language.Lang }}">
 <head>
+
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -50,6 +51,9 @@
 		{{ partial "footer" . }}
 	</div>
 <script async defer src="{{ "js/menu.js" | relURL }}"></script>
+<!--ZC Popup Code Starts-->
+<script type="text/javascript" id="ZC_Forms_Popup" src="https://campaigns.zoho.eu/js/optin.min.js" onload="loadZCPopup('270d03e7086d236fba5ec42ea580cbb603d2af3e628508ae6','ZCFORMVIEW','284e19868ac2005832bb3b22b0b798a78')" onreadystatechange="loadZCPopup('270d03e7086d236fba5ec42ea580cbb603d2af3e628508ae6','ZCFORMVIEW','284e19868ac2005832bb3b22b0b798a78')"></script>
+<!--ZC Popup Code Ends-->
 {{ range .Site.Params.customJS -}}
 <script src="{{ . | relURL }}"></script>
 {{- end }}
