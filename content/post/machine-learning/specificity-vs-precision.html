@@ -3,7 +3,7 @@ title: "The Case Against Precision as a Model Selection Criterion"
 author: Matthias Döring
 date: '2018-11-21'
 lastMod: "2018-12-01"
-description: "Precision and recall are frequently used for model selection. However, compared to sensitivity and recall, these performance metrics are not generally valid and should only be used in certain settings."
+description: "Precision and recall are frequently used for model selection. However, sensitivity and specifity are often better options."
 thumbnail: "/post/machine-learning/sensitivity-vs-precision_cover.png"
 slug: "specificity-vs-precision"
 categories:
@@ -13,6 +13,7 @@ tags:
     - R
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>Recently, I have introduced <a href="/post/machine-learning/performance-measures-model-selection/">sensitivity and specificity as performance measures for model selection</a>. Besides these measures, there is also the notion of recall and precision. Precision and recall originate from information retrieval but are also used in machine learning settings. However, the use of precision and recall can be problematic in some situations. In this post, I discuss the shortcomings of recall and precision and show why sensitivity and specificity are generally more useful.</p>
@@ -72,7 +73,7 @@ tags:
 <p>Precision is a particularly bad measure when there are few observations that belong to the positive class. Let us assume a clinical data set in which <span class="math inline">\(90\%\)</span> of persons are diseased (positive class) and only <span class="math inline">\(10\%\)</span> are healthy (negative class). Let us assume we have developed two tests for classifying whether a patient is diseased or healthy. Both tests have an accuracy of 80% but make different types of errors.</p>
 <pre class="r"><code># to use waffle, you need 
 #   o FontAwesome
-#   o register the fonts using extrafonts::font_import()
+#   o register the fonts using extrafont::font_import()
 library(waffle)
 ref.colors &lt;- c(&quot;#c14141&quot;, &quot;#1853b2&quot;)
 false.colors &lt;- c(&quot;#9b3636&quot;, &quot;#0e3168&quot;)

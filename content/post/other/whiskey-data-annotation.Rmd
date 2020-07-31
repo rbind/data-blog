@@ -11,6 +11,9 @@ tags:
 
 I have previously used a data set describing the characteristics of whiskeys to [draw radar plots](/post/data-visualization/radar-plot/). Here, I present how I cleaned and augmented [the original data from the University of Strathclyde](http://outreach.mathstat.strath.ac.uk/outreach/nessie/datasets/whiskies.txt), resulting in an [improved version of the whiskey data set](https://www.datascienceblog.net/data-sets/whiskies.csv).
 
+<!--more-->
+I have previously used a data set describing the characteristics of whiskeys to [draw radar plots](/post/data-visualization/radar-plot/). Here, I present how I cleaned and augmented [the original data from the University of Strathclyde](http://outreach.mathstat.strath.ac.uk/outreach/nessie/datasets/whiskies.txt), resulting in an [improved version of the whiskey data set](https://www.datascienceblog.net/data-sets/whiskies.csv).
+
 ## Loading the whiskey data set
 
 The original data set can be loaded from the web in the following way:
@@ -36,7 +39,7 @@ df$Postcode <- gsub(" *\t*", "", df$Postcode)
 
 A blog post by Koki Ando gives a nice [overview of how UTM data can be handled](https://rstudio-pubs-static.s3.amazonaws.com/375481_d2605e8726364d30a5b20c6974710cf5.html). In the following code snippet, we use the ```raster``` and ```sp``` packages to create a ```SpatialPoints``` object from latitude/longitude coordinates in UTM format. Then, we add UK as a reference point system by specifying *+init=epsg:27700"* ([see epsg.io for other reference coordinates](https://epsg.io)). Finally, we call ```spTransform``` with WGS84 (*+init=epsg:4326*) in order to set the [world geodetic system, which is used for GPS](https://epsg.io/4326).
 
-```{r, message = FALSE, fig.width = 10, fig.height = 10}
+```{r, message = FALSE, fig.width = 10, fig.height = 10, warning = FALSE}
 # transform UTM coordinates to longitude/latitude in degrees
 geo.df <- df[, c("Latitude", "Longitude")]
 colnames(geo.df) <- c("lat", "long") # switch for plotting

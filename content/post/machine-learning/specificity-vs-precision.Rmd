@@ -68,7 +68,7 @@ Precision is a particularly bad measure when there are few observations that bel
 ```{r, message = FALSE}
 # to use waffle, you need 
 #   o FontAwesome
-#   o register the fonts using extrafonts::font_import()
+#   o register the fonts using extrafont::font_import()
 library(waffle)
 ref.colors <- c("#c14141", "#1853b2")
 false.colors <- c("#9b3636", "#0e3168")
