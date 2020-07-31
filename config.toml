@@ -85,7 +85,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
     name = "About"
     identifier = "about"
     url = "/about-data-science-with-R/"
-    weight = 100
+    weight = 101
 
     [[menu.main]]
     name = "Resources"
@@ -93,6 +93,11 @@ rssLimit = 20 # max nbr of entries shown in rss feed
     url = "/recommended-resources-data-science-and-R/"
     weight = 99
 
+    [[menu.main]]
+    name = "Glossary"
+    identifier = "glossary"
+    url = "/data-science-glossary/"
+    weight = 100
     [[menu.main]]
     name = "Contribute!"
     identifier = "contribute"
@@ -103,7 +108,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
     name = "RSS Feed"
     identifier = "RSS"
     url = "/post/index.xml"
-    weight = 101
+    weight = 102
 
 
 [markup.goldmark.renderer]
