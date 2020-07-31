@@ -53,7 +53,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   list = "right"   # Configure layout for list pages
   single = "right" # Configure layout for single pages
   # Enable widgets in given order
-  widgets = ["search", "mailing_list", "recent", "categories", "taglist", "social", "poll"]
+  widgets = ["search", "recent", "categories", "taglist", "social", "poll"]
 
 [Params.widgets]
   recent_num = 5 # Set the number of articles in the "Recent articles" widget
