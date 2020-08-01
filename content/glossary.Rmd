@@ -14,7 +14,7 @@ library(kableExtra)
 options(kableExtra.html.bsTable = TRUE) # show bootstrap styling
 options(knitr.kable.NA = '') # hide NAs in table
 
-terms_to_table <- function(terms, ncol=4) {
+terms_to_table <- function(terms, ncol=3) {
     # add markdown refs to anchor elements
     tagged_terms = c()
     for (term in terms) {
