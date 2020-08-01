@@ -41,7 +41,8 @@ terms_to_table <- function(terms, ncol=3) {
 
 ```{r gen_ml_terms, warning=FALSE, echo=FALSE}
 terms <- c("Data Point", "Machine Learning", "Model", "Model Complexity",
-           "Supervised Learning", "Reinforcement Learning", "Unsupervised Learning"
+           "Supervised Learning", "Reinforcement Learning", "Unsupervised Learning",
+           "Data Wrangling"
          )
 terms_to_table(terms)
 ```
@@ -65,10 +66,13 @@ terms <- c("Confusion Matrix", "Dependent Variable",
            "Independent Variable", "Inference",
            "Interpretability", "Linear Model",
            "Non-Linear Model", "Outcome", 
-           "Observations", "Prediction", "Inference",
+           "Observation", "Prediction", "Inference",
            "Sensitivity", "Specificity", "True Positive Rate",
            "False Positive Rate", "AUC", "Classifier",
-           "Regressor", "Performance"
+           "Regressor", "Performance", "Class", "Categorical Outcome",
+           "Label", "Quantitative Outcome", "Model Validation",
+           "Cross-Validation", "Training Data", "Test Data",
+           "Validation Data"
          )
 terms_to_table(terms)
 ```
@@ -76,7 +80,7 @@ terms_to_table(terms)
 **Unsupervised Learning**
 
 ```{r ul_terms, warning=FALSE, echo=FALSE}
-terms <- c('Clustering', "k-means")
+terms <- c('Clustering', "Dimensionality Reduction", "k-means", "PCA")
 terms_to_table(terms)
 ```
 
@@ -93,14 +97,22 @@ The [policy](#policy) of an agent determines the actions that should be executed
 
 ### AUC {#auc}
 
-AUC means *area under the curve*. When evaluating [scoring classifiers](#classifier), the term *AUC* usually refers to the AUC of the
-ROC (receiver operating characteristic) curve. This curve determines the [true positive rate](#true-positive-rate) and
-[false positive rate](#false-positive-rate) for all cutoffs on the scores. When available, the AUC is [preferable to other measures such as
-sensitivity and specificity](../post/machine-learning/interpreting-roc-curves-auc/).
+AUC means *area under the curve*. When evaluating [scoring classifiers](#classifier), the term *AUC* usually refers to the
+ROC (receiver operating characteristic)-AUC. The ROC curve determines the [true positive rate](#true-positive-rate) and
+[false positive rate](#false-positive-rate) for all cutoffs on the scores. When available, the ROC-AUC is [preferable to other measures such as
+sensitivity and specificity](/post/machine-learning/interpreting-roc-curves-auc/).
+
+### Categorical Outcome {#categorical-outcome}
+
+See [Outcome](#outcome).
+
+### Class {#class}
+
+See [categorical outcomes](#categorical-outcome]).
 
 ### Classifier {#classifier}
 
-Classifiers (classification models) are used for the [prediction](#prediction) of [categorical outcomes](#outcomes).
+Classifiers (classification models) are used for the [prediction](#prediction) of [categorical outcomes](#categorical-outcomes).
 Classifiers that ouput [quantitative outcomes](#outcomes) are called *scoring classifiers* and are
 more [interpretable](#interpretability) than non-scoring classifiers.
 
@@ -140,13 +152,34 @@ The entries are defined as follows:
 From the confusion matrix, one can determine performance metrics such as [sensitivity](#sensitivity), [specificity](#specificity),
 and the [AUC](#auc).
 
+### Cross-Validation {#cross-validation}
+
+Cross-validation is a strategy for evaluating the [predictive performance](#performance) of a model.
+In *k-fold cross-validation*, the data set is split into k-folds such that each fold is used for training once,
+while the remaining data are used for testing. *Nested cross-validation* introduces another layer by introducing
+an additional fold that is used for selecting the model that is evaluated on the test fold.
+
 ### Data Point {#data-point}
 
-See [Observations](#observations).
+See [Observation](#observation).
+
+### Data Wrangling {#data-wrangling}
+
+Data wrangling describes the unpopular task of transforming data into a machine-readable format. For example,
+data wrangling could entail transforming semi-structured data (e.g. from spreadsheets) to the CSV (comma-separated values) format.
+Data wrangling is often performed via automated scripts but may also involve manual steps.
+Note that data wrangling does not involve [feature engineering](#feature-engineering).
 
 ### Dependent Variable {#dependent-variable}
 
 See [Feature](#feature).
+
+### Dimensionality Reduction {#dimensionality-reduction}
+
+In [dimensionality reduction](/post/machine-learning/dimensionality-reduction/), data are projected to a low-dimensional subspace.
+This is either done in order to obtain better data visualizations or during [feature engineering](#feature-engineering) in the context
+of [supervised learning](#supervised-learning).
+Dimensionality reduction techniques such as [PCA](#pca) are [unsupervised](#unsupervised-learning) methods.
 
 ### Environment {#environment}
 
@@ -201,7 +234,7 @@ to the wrong values, aka *garbage in, garbage out*.
 
 ### Independent Variable {#independent-variable}
 
-See [Outcomes](#outcomes).
+See [Outcome](#outcome).
 
 ### Inference {#inference}
 
@@ -222,6 +255,12 @@ decision support systems, it is key that human operators can understand the inte
 
 k-means is a simple yet powerful [clustering](#clustering) algorithm that identifies *k* cluster centers in the data.
 The algorithm terminates when the cluster centers have converged.
+
+### Label {#label}
+
+In [classification](#classification), labels are the values that are used to differentiate between individual [classes](#class).
+For example, one could use `Sunny` and `Cloudy` as labels for observations that have been made on sunny and cloudy days, respectively.
+However, to apply supervised learning algorithms, numeric labels such as `+1` and `-1` would be necessary.
 
 ### Linear Model {#linear-model}
 
@@ -244,7 +283,7 @@ pairs of input data and observed [outcomes](#outcomes). In [unsupervised learnin
 of the data is modeled. In [reinforcement learning](#reinforcement-learning), models are constructed according to [states](#state), [actions](#action), and [rewards](#reward).
 
 Besides these machine learning approaches, which use optimization algorithms to fit models to data, there is a host of
-other models that are useful for specific tasks, for example, hidden Markov models, epidemiological models, and [Bayesian models](../tags/bayesian/).
+other models that are useful for specific tasks, for example, hidden Markov models, epidemiological models, and [Bayesian models](/tags/bayesian/).
 
 It is possible to differentiate between linear and non-linear models. While linear models assume linear relationship between the
 [features](#features), non-linear models assume non-linear relationships.
@@ -259,25 +298,43 @@ Model complexity is defined by the effective numbers of parameters that make up 
 For example, deep learning models with many parameters are more complex than simple models, such
 as linear models. Complex models should be avoided if there are not sufficient training data available.
 
+### Model Validation {#model-validation}
+
+Model validation entails the following steps:
+
+1. Fitting the model to a set of training data
+2. Tuning the hyperparameters of the model using a set of validation data
+3. Evaluating [predictive performance](#performance) on an independent test data set
+
+The two most popular approaches for validation are:
+
+1. Splitting the data into a training, validation, and test set
+2. Using [cross-validation](#cross-validation), in which the model is trained on various subsets of the data.
+
 ### Non-Linear Model {#non-linear-model}
 
 See [Model](#model).
 
-### Outcome {#outcomes}
+### Outcome {#outcome}
 
 In [supervised learning](#supervised-learning), the outcome is a measurement of the [ground truth](#ground-truth).
-Principal types of outcomes are categorical outcomes (class labels) and quantitative outcomes. For example,
+Principal types of outcomes are *categorical outcomes* (class labels) and *quantitative outcomes*. For example,
 when predicting the weather, `Sunny` and `Cloudy` would be categorical outcomes, while the amount of precipitation
 would be a quantitative outcome.
 
 The underlying variable associated with the outcome is called the *independent variable*.
 
-### Observations {#observations}
+### Observation {#observation}
 
 In [supervised learning](#supervised-learning), observations are the rows of the [feature matrix](#feature-matrix).
 Observations are also called *data points* or *samples*. The number of observations is usually denoted by *N*.
 
 For the use of the term *observation* in [reinforcement learning](#reinforcement-learning), see [State](#state).
+
+### PCA {#pca}
+
+[Principal component analysis](/post/machine-learning/dimensionality-reduction/) (PCA) is a standard [dimensionality reduction](#dimensionality-reduction) technique.
+It is based on finding a projection to orthogonal coordinates that maintain as much variance as possible.
 
 ### Policy {#policy}
 
@@ -293,24 +350,28 @@ To quantify predictive performance, metrics such as the [AUC](#auc) can be utili
 ### Prediction {#prediction}
 
 Prediction is the act of applying a [model](#model) on a new data point in order to determine the estimated [outcome](#outcomes).
-Inference is often used synonymously, although [inference is geared towards learning about the data generation process](../post/commentary/inference-vs-prediction/). [Forecasting](../post/machine-learning/forecasting_vs_prediction/) is a special form of prediction in which time-series are used as the input.
+Inference is often used synonymously, although [inference is geared towards learning about the data generation process](/post/commentary/inference-vs-prediction/). [Forecasting](/post/machine-learning/forecasting_vs_prediction/) is a special form of prediction in which time-series are used as the input.
 
 The term *estimate* is a synonym for *prediction* that is popular in the statistical community because it underlines the fact
 that predictions are only approximations of reality.
 
-### Reinforcement Learning {#reinforcement-learning}
+### Quantitative Outcome {#quantitative-outcome}
 
-[Reinforcement learning](../tags/reinforcement-learning) (RL) is an area of machine learning in which one or multiple agents perform *actions* in an [environment](#environment),
-after observing the *state*. Once an action has been performed, the agent receives a *reward*. By balancing exploration (finding novel states) and
-exploitation (reaping rewards), RL agents can learn an optimal [policy](#policy), which identifies the best action to take for every state.
-
-In recent years, reinforcement learning has gained in popularity due to the emergence of deep RL, in which deep neural networks are used
-to learn which states are associated with the greatest rewards.
+See [Outcome](#outcome).
 
 ### Regressor {#regressor}
 
 Regressors (regression models) are used to predict the outcomes for [quantitative variables](#outcomes).
 Compared to [classifiers](#classifier), they allow for fine-grained predictions.
+
+### Reinforcement Learning {#reinforcement-learning}
+
+[Reinforcement learning](/tags/reinforcement-learning) (RL) is an area of machine learning in which one or multiple agents perform *actions* in an [environment](#environment),
+after observing the *state*. Once an action has been performed, the agent receives a *reward*. By balancing exploration (finding novel states) and
+exploitation (reaping rewards), RL agents can learn an optimal [policy](#policy), which identifies the best action to take for every state.
+
+In recent years, reinforcement learning has gained in popularity due to the emergence of deep RL, in which deep neural networks are used
+to learn which states are associated with the greatest rewards.
 
 ### Reward {#reward}
 
@@ -323,7 +384,7 @@ For its use in [supervised learning](#supervised-learning), see [Observation](#o
 
 ### Sensitivity {#sensitivity}
 
-The [sensitivity](..//post/machine-learning/specificity-vs-precision/) of a [classifier](#classifier) is defined by its [true positive rate](#true-positive-rate): 
+The [sensitivity](/post/machine-learning/specificity-vs-precision/) of a [classifier](#classifier) is defined by its [true positive rate](#true-positive-rate): 
 
 ```
 sensitivity = TPR = TP/(TP+FN).
@@ -333,7 +394,7 @@ See also [Confusion Matrix](#confusion-matrix).
 
 ### Specificity {#specificity}
 
-[Specificity](../post/machine-learning/specificity-vs-precision/) indicates the [true negative rate](#true-negative-rate) of a [classifier](#classifier):
+[Specificity](/post/machine-learning/specificity-vs-precision/) indicates the [true negative rate](#true-negative-rate) of a [classifier](#classifier):
 
 ```
 specificity = 1 - TP / (TP + FP) = 1 - FPR
@@ -349,12 +410,20 @@ States are usually represented by numeric vectors or matrices. Crafting appropri
 
 ### Supervised Learning {#supervised-learning}
 
-[Supervised learning](../tags/supervised-learning/) is an area of machine learning that is concerned with learning from pairs of input data and associated
+[Supervised learning](/tags/supervised-learning/) is an area of machine learning that is concerned with learning from pairs of input data and associated
 [outcomes](#outcomes). Once a [model](#model) has been trained on a set of training data, it is tuned using a validation data set, and, finally, evaluated on an independent test data set.
 The application of a supervised learning model on new data is called [prediction](#prediction), [inference](#inference), or [forecasting](#forecasting).
 
 Models that are trained on labeled data (i.e. categorical outcomes) are called [classifiers](#classifier).
 Models that are trained on quantitative outcomes are called [regressors](#regression models).
+
+### Test Data {#test-data}
+
+*Test data* refers to the set of data that is used for evaluating the [predictive performance](#performance) of a [model](#model).
+
+### Training Data {#training-data}
+
+*Training data* refers to the set of data that is used for fitting a [model](#model).
 
 ### True Positive Rate {#true-positive-rate}
 
@@ -362,10 +431,14 @@ See [Sensitivity](#sensitivity).
 
 ### Unsupervised Learning {#unsupervised-learning}
 
-[Unsupervised learning](../tags/unsupervised-learning/) is an area of machine learning that is concerned with the identification of [models](#model)
+[Unsupervised learning](/tags/unsupervised-learning/) is an area of machine learning that is concerned with the identification of [models](#model)
 that are capable to represent the properties of the data in a condensed manner, which allows for greater [interpretability](#interpretability).
 
 Evaluating the performance of unsupervised learning methods is more challenging than for supervised learning because there are no outcomes
 that provide the [ground truth](#ground-truth). Popular unsupervised methods include [k-means](#k-means) and *PCA*.
+
+### Validation Data {#validation-data}
+
+*Validation data* refers to the set of data that is used for tuning the hyperparameters of a [model](#model).
 
 <!--## Software Engineering Glossary-->

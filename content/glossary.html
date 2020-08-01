@@ -24,28 +24,29 @@ thumbnail: /img/glossary_avatar.png
 <a href="#data-point">Data Point</a>
 </td>
 <td style="text-align:center;">
-<a href="#machine-learning">Machine Learning</a>
+<a href="#data-wrangling">Data Wrangling</a>
 </td>
 <td style="text-align:center;">
-<a href="#model-complexity">Model Complexity</a>
+<a href="#machine-learning">Machine Learning</a>
 </td>
 </tr>
 <tr>
+<td style="text-align:center;">
+<a href="#model-complexity">Model Complexity</a>
+</td>
 <td style="text-align:center;">
 <a href="#model">Model</a>
 </td>
 <td style="text-align:center;">
 <a href="#reinforcement-learning">Reinforcement Learning</a>
 </td>
-<td style="text-align:center;">
-<a href="#supervised-learning">Supervised Learning</a>
-</td>
 </tr>
 <tr>
 <td style="text-align:center;">
-<a href="#unsupervised-learning">Unsupervised Learning</a>
+<a href="#supervised-learning">Supervised Learning</a>
 </td>
 <td style="text-align:center;">
+<a href="#unsupervised-learning">Unsupervised Learning</a>
 </td>
 <td style="text-align:center;">
 </td>
@@ -96,10 +97,21 @@ thumbnail: /img/glossary_avatar.png
 <a href="#auc">AUC</a>
 </td>
 <td style="text-align:center;">
+<a href="#categorical-outcome">Categorical Outcome</a>
+</td>
+<td style="text-align:center;">
+<a href="#class">Class</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
 <a href="#classifier">Classifier</a>
 </td>
 <td style="text-align:center;">
 <a href="#confusion-matrix">Confusion Matrix</a>
+</td>
+<td style="text-align:center;">
+<a href="#cross-validation">Cross-Validation</a>
 </td>
 </tr>
 <tr>
@@ -143,26 +155,37 @@ thumbnail: /img/glossary_avatar.png
 <a href="#interpretability">Interpretability</a>
 </td>
 <td style="text-align:center;">
-<a href="#linear-model">Linear Model</a>
+<a href="#label">Label</a>
 </td>
 </tr>
 <tr>
 <td style="text-align:center;">
-<a href="#non-linear-model">Non-Linear Model</a>
+<a href="#linear-model">Linear Model</a>
 </td>
 <td style="text-align:center;">
-<a href="#observations">Observations</a>
+<a href="#model-validation">Model Validation</a>
+</td>
+<td style="text-align:center;">
+<a href="#non-linear-model">Non-Linear Model</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+<a href="#observation">Observation</a>
 </td>
 <td style="text-align:center;">
 <a href="#outcome">Outcome</a>
 </td>
-</tr>
-<tr>
 <td style="text-align:center;">
 <a href="#performance">Performance</a>
 </td>
+</tr>
+<tr>
 <td style="text-align:center;">
 <a href="#prediction">Prediction</a>
+</td>
+<td style="text-align:center;">
+<a href="#quantitative-outcome">Quantitative Outcome</a>
 </td>
 <td style="text-align:center;">
 <a href="#regressor">Regressor</a>
@@ -176,7 +199,18 @@ thumbnail: /img/glossary_avatar.png
 <a href="#specificity">Specificity</a>
 </td>
 <td style="text-align:center;">
+<a href="#test-data">Test Data</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+<a href="#training-data">Training Data</a>
+</td>
+<td style="text-align:center;">
 <a href="#true-positive-rate">True Positive Rate</a>
+</td>
+<td style="text-align:center;">
+<a href="#validation-data">Validation Data</a>
 </td>
 </tr>
 </tbody>
@@ -189,7 +223,17 @@ thumbnail: /img/glossary_avatar.png
 <a href="#clustering">Clustering</a>
 </td>
 <td style="text-align:center;">
+<a href="#dimensionality-reduction">Dimensionality Reduction</a>
+</td>
+<td style="text-align:center;">
 <a href="#k-means">k-means</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+<a href="#pca">PCA</a>
+</td>
+<td style="text-align:center;">
 </td>
 <td style="text-align:center;">
 </td>
@@ -209,14 +253,22 @@ The <a href="#policy">policy</a> of an agent determines the actions that should 
 </div>
 <div id="auc" class="section level3">
 <h3>AUC</h3>
-<p>AUC means <em>area under the curve</em>. When evaluating <a href="#classifier">scoring classifiers</a>, the term <em>AUC</em> usually refers to the AUC of the
-ROC (receiver operating characteristic) curve. This curve determines the <a href="#true-positive-rate">true positive rate</a> and
-<a href="#false-positive-rate">false positive rate</a> for all cutoffs on the scores. When available, the AUC is <a href="../post/machine-learning/interpreting-roc-curves-auc/">preferable to other measures such as
+<p>AUC means <em>area under the curve</em>. When evaluating <a href="#classifier">scoring classifiers</a>, the term <em>AUC</em> usually refers to the
+ROC (receiver operating characteristic)-AUC. The ROC curve determines the <a href="#true-positive-rate">true positive rate</a> and
+<a href="#false-positive-rate">false positive rate</a> for all cutoffs on the scores. When available, the ROC-AUC is <a href="/post/machine-learning/interpreting-roc-curves-auc/">preferable to other measures such as
 sensitivity and specificity</a>.</p>
+</div>
+<div id="categorical-outcome" class="section level3">
+<h3>Categorical Outcome</h3>
+<p>See <a href="#outcome">Outcome</a>.</p>
+</div>
+<div id="class" class="section level3">
+<h3>Class</h3>
+<p>See <a href="#categorical-outcome%5D">categorical outcomes</a>.</p>
 </div>
 <div id="classifier" class="section level3">
 <h3>Classifier</h3>
-<p>Classifiers (classification models) are used for the <a href="#prediction">prediction</a> of <a href="#outcomes">categorical outcomes</a>.
+<p>Classifiers (classification models) are used for the <a href="#prediction">prediction</a> of <a href="#categorical-outcomes">categorical outcomes</a>.
 Classifiers that ouput <a href="#outcomes">quantitative outcomes</a> are called <em>scoring classifiers</em> and are
 more <a href="#interpretability">interpretable</a> than non-scoring classifiers.</p>
 </div>
@@ -299,13 +351,34 @@ TN
 <p>From the confusion matrix, one can determine performance metrics such as <a href="#sensitivity">sensitivity</a>, <a href="#specificity">specificity</a>,
 and the <a href="#auc">AUC</a>.</p>
 </div>
+<div id="cross-validation" class="section level3">
+<h3>Cross-Validation</h3>
+<p>Cross-validation is a strategy for evaluating the <a href="#performance">predictive performance</a> of a model.
+In <em>k-fold cross-validation</em>, the data set is split into k-folds such that each fold is used for training once,
+while the remaining data are used for testing. <em>Nested cross-validation</em> introduces another layer by introducing
+an additional fold that is used for selecting the model that is evaluated on the test fold.</p>
+</div>
 <div id="data-point" class="section level3">
 <h3>Data Point</h3>
-<p>See <a href="#observations">Observations</a>.</p>
+<p>See <a href="#observation">Observation</a>.</p>
+</div>
+<div id="data-wrangling" class="section level3">
+<h3>Data Wrangling</h3>
+<p>Data wrangling describes the unpopular task of transforming data into a machine-readable format. For example,
+data wrangling could entail transforming semi-structured data (e.g. from spreadsheets) to the CSV (comma-separated values) format.
+Data wrangling is often performed via automated scripts but may also involve manual steps.
+Note that data wrangling does not involve <a href="#feature-engineering">feature engineering</a>.</p>
 </div>
 <div id="dependent-variable" class="section level3">
 <h3>Dependent Variable</h3>
 <p>See <a href="#feature">Feature</a>.</p>
+</div>
+<div id="dimensionality-reduction" class="section level3">
+<h3>Dimensionality Reduction</h3>
+<p>In <a href="/post/machine-learning/dimensionality-reduction/">dimensionality reduction</a>, data are projected to a low-dimensional subspace.
+This is either done in order to obtain better data visualizations or during <a href="#feature-engineering">feature engineering</a> in the context
+of <a href="#supervised-learning">supervised learning</a>.
+Dimensionality reduction techniques such as <a href="#pca">PCA</a> are <a href="#unsupervised-learning">unsupervised</a> methods.</p>
 </div>
 <div id="environment" class="section level3">
 <h3>Environment</h3>
@@ -356,7 +429,7 @@ to the wrong values, aka <em>garbage in, garbage out</em>.</p>
 </div>
 <div id="independent-variable" class="section level3">
 <h3>Independent Variable</h3>
-<p>See <a href="#outcomes">Outcomes</a>.</p>
+<p>See <a href="#outcome">Outcome</a>.</p>
 </div>
 <div id="inference" class="section level3">
 <h3>Inference</h3>
@@ -377,6 +450,12 @@ decision support systems, it is key that human operators can understand the inte
 <p>k-means is a simple yet powerful <a href="#clustering">clustering</a> algorithm that identifies <em>k</em> cluster centers in the data.
 The algorithm terminates when the cluster centers have converged.</p>
 </div>
+<div id="label" class="section level3">
+<h3>Label</h3>
+<p>In <a href="#classification">classification</a>, labels are the values that are used to differentiate between individual <a href="#class">classes</a>.
+For example, one could use <code>Sunny</code> and <code>Cloudy</code> as labels for observations that have been made on sunny and cloudy days, respectively.
+However, to apply supervised learning algorithms, numeric labels such as <code>+1</code> and <code>-1</code> would be necessary.</p>
+</div>
 <div id="linear-model" class="section level3">
 <h3>Linear Model</h3>
 <p>See <a href="#model">Model</a>.</p>
@@ -396,7 +475,7 @@ or select optimal <a href="#action">actions</a> in a dynamic <a href="#environme
 pairs of input data and observed <a href="#outcomes">outcomes</a>. In <a href="#unsupervised-learning">unsupervised learning</a>, the outcomes are not available such that only the structure
 of the data is modeled. In <a href="#reinforcement-learning">reinforcement learning</a>, models are constructed according to <a href="#state">states</a>, <a href="#action">actions</a>, and <a href="#reward">rewards</a>.</p>
 <p>Besides these machine learning approaches, which use optimization algorithms to fit models to data, there is a host of
-other models that are useful for specific tasks, for example, hidden Markov models, epidemiological models, and <a href="../tags/bayesian/">Bayesian models</a>.</p>
+other models that are useful for specific tasks, for example, hidden Markov models, epidemiological models, and <a href="/tags/bayesian/">Bayesian models</a>.</p>
 <p>It is possible to differentiate between linear and non-linear models. While linear models assume linear relationship between the
 <a href="#features">features</a>, non-linear models assume non-linear relationships.</p>
 <p>One should always remember the following famous quote from British statistican <a href="https://en.wikipedia.org/wiki/George_E._P._Box">George E.P. Box</a>:</p>
@@ -410,23 +489,42 @@ other models that are useful for specific tasks, for example, hidden Markov mode
 For example, deep learning models with many parameters are more complex than simple models, such
 as linear models. Complex models should be avoided if there are not sufficient training data available.</p>
 </div>
+<div id="model-validation" class="section level3">
+<h3>Model Validation</h3>
+<p>Model validation entails the following steps:</p>
+<ol style="list-style-type: decimal">
+<li>Fitting the model to a set of training data</li>
+<li>Tuning the hyperparameters of the model using a set of validation data</li>
+<li>Evaluating <a href="#performance">predictive performance</a> on an independent test data set</li>
+</ol>
+<p>The two most popular approaches for validation are:</p>
+<ol style="list-style-type: decimal">
+<li>Splitting the data into a training, validation, and test set</li>
+<li>Using <a href="#cross-validation">cross-validation</a>, in which the model is trained on various subsets of the data.</li>
+</ol>
+</div>
 <div id="non-linear-model" class="section level3">
 <h3>Non-Linear Model</h3>
 <p>See <a href="#model">Model</a>.</p>
 </div>
-<div id="outcomes" class="section level3">
+<div id="outcome" class="section level3">
 <h3>Outcome</h3>
 <p>In <a href="#supervised-learning">supervised learning</a>, the outcome is a measurement of the <a href="#ground-truth">ground truth</a>.
-Principal types of outcomes are categorical outcomes (class labels) and quantitative outcomes. For example,
+Principal types of outcomes are <em>categorical outcomes</em> (class labels) and <em>quantitative outcomes</em>. For example,
 when predicting the weather, <code>Sunny</code> and <code>Cloudy</code> would be categorical outcomes, while the amount of precipitation
 would be a quantitative outcome.</p>
 <p>The underlying variable associated with the outcome is called the <em>independent variable</em>.</p>
 </div>
-<div id="observations" class="section level3">
-<h3>Observations</h3>
+<div id="observation" class="section level3">
+<h3>Observation</h3>
 <p>In <a href="#supervised-learning">supervised learning</a>, observations are the rows of the <a href="#feature-matrix">feature matrix</a>.
 Observations are also called <em>data points</em> or <em>samples</em>. The number of observations is usually denoted by <em>N</em>.</p>
 <p>For the use of the term <em>observation</em> in <a href="#reinforcement-learning">reinforcement learning</a>, see <a href="#state">State</a>.</p>
+</div>
+<div id="pca" class="section level3">
+<h3>PCA</h3>
+<p><a href="/post/machine-learning/dimensionality-reduction/">Principal component analysis</a> (PCA) is a standard <a href="#dimensionality-reduction">dimensionality reduction</a> technique.
+It is based on finding a projection to orthogonal coordinates that maintain as much variance as possible.</p>
 </div>
 <div id="policy" class="section level3">
 <h3>Policy</h3>
@@ -442,22 +540,26 @@ To quantify predictive performance, metrics such as the <a href="#auc">AUC</a> c
 <div id="prediction" class="section level3">
 <h3>Prediction</h3>
 <p>Prediction is the act of applying a <a href="#model">model</a> on a new data point in order to determine the estimated <a href="#outcomes">outcome</a>.
-Inference is often used synonymously, although <a href="../post/commentary/inference-vs-prediction/">inference is geared towards learning about the data generation process</a>. <a href="../post/machine-learning/forecasting_vs_prediction/">Forecasting</a> is a special form of prediction in which time-series are used as the input.</p>
+Inference is often used synonymously, although <a href="/post/commentary/inference-vs-prediction/">inference is geared towards learning about the data generation process</a>. <a href="/post/machine-learning/forecasting_vs_prediction/">Forecasting</a> is a special form of prediction in which time-series are used as the input.</p>
 <p>The term <em>estimate</em> is a synonym for <em>prediction</em> that is popular in the statistical community because it underlines the fact
 that predictions are only approximations of reality.</p>
 </div>
-<div id="reinforcement-learning" class="section level3">
-<h3>Reinforcement Learning</h3>
-<p><a href="../tags/reinforcement-learning">Reinforcement learning</a> (RL) is an area of machine learning in which one or multiple agents perform <em>actions</em> in an <a href="#environment">environment</a>,
-after observing the <em>state</em>. Once an action has been performed, the agent receives a <em>reward</em>. By balancing exploration (finding novel states) and
-exploitation (reaping rewards), RL agents can learn an optimal <a href="#policy">policy</a>, which identifies the best action to take for every state.</p>
-<p>In recent years, reinforcement learning has gained in popularity due to the emergence of deep RL, in which deep neural networks are used
-to learn which states are associated with the greatest rewards.</p>
+<div id="quantitative-outcome" class="section level3">
+<h3>Quantitative Outcome</h3>
+<p>See <a href="#outcome">Outcome</a>.</p>
 </div>
 <div id="regressor" class="section level3">
 <h3>Regressor</h3>
 <p>Regressors (regression models) are used to predict the outcomes for <a href="#outcomes">quantitative variables</a>.
 Compared to <a href="#classifier">classifiers</a>, they allow for fine-grained predictions.</p>
+</div>
+<div id="reinforcement-learning" class="section level3">
+<h3>Reinforcement Learning</h3>
+<p><a href="/tags/reinforcement-learning">Reinforcement learning</a> (RL) is an area of machine learning in which one or multiple agents perform <em>actions</em> in an <a href="#environment">environment</a>,
+after observing the <em>state</em>. Once an action has been performed, the agent receives a <em>reward</em>. By balancing exploration (finding novel states) and
+exploitation (reaping rewards), RL agents can learn an optimal <a href="#policy">policy</a>, which identifies the best action to take for every state.</p>
+<p>In recent years, reinforcement learning has gained in popularity due to the emergence of deep RL, in which deep neural networks are used
+to learn which states are associated with the greatest rewards.</p>
 </div>
 <div id="reward" class="section level3">
 <h3>Reward</h3>
@@ -470,13 +572,13 @@ Agents adjust their <a href="#policy">policy</a> in order to maximize the reward
 </div>
 <div id="sensitivity" class="section level3">
 <h3>Sensitivity</h3>
-<p>The <a href="..//post/machine-learning/specificity-vs-precision/">sensitivity</a> of a <a href="#classifier">classifier</a> is defined by its <a href="#true-positive-rate">true positive rate</a>:</p>
+<p>The <a href="/post/machine-learning/specificity-vs-precision/">sensitivity</a> of a <a href="#classifier">classifier</a> is defined by its <a href="#true-positive-rate">true positive rate</a>:</p>
 <pre><code>sensitivity = TPR = TP/(TP+FN).</code></pre>
 <p>See also <a href="#confusion-matrix">Confusion Matrix</a>.</p>
 </div>
 <div id="specificity" class="section level3">
 <h3>Specificity</h3>
-<p><a href="../post/machine-learning/specificity-vs-precision/">Specificity</a> indicates the <a href="#true-negative-rate">true negative rate</a> of a <a href="#classifier">classifier</a>:</p>
+<p><a href="/post/machine-learning/specificity-vs-precision/">Specificity</a> indicates the <a href="#true-negative-rate">true negative rate</a> of a <a href="#classifier">classifier</a>:</p>
 <pre><code>specificity = 1 - TP / (TP + FP) = 1 - FPR</code></pre>
 <p>Since specificty considers the number of false positives (FP), it allows for conclusions about the <a href="#false-positive-rate">false positive rate (FPR)</a>.
 See also <a href="#confusion-matrix">Confusion Matrix</a>.</p>
@@ -488,11 +590,19 @@ States are usually represented by numeric vectors or matrices. Crafting appropri
 </div>
 <div id="supervised-learning" class="section level3">
 <h3>Supervised Learning</h3>
-<p><a href="../tags/supervised-learning/">Supervised learning</a> is an area of machine learning that is concerned with learning from pairs of input data and associated
+<p><a href="/tags/supervised-learning/">Supervised learning</a> is an area of machine learning that is concerned with learning from pairs of input data and associated
 <a href="#outcomes">outcomes</a>. Once a <a href="#model">model</a> has been trained on a set of training data, it is tuned using a validation data set, and, finally, evaluated on an independent test data set.
 The application of a supervised learning model on new data is called <a href="#prediction">prediction</a>, <a href="#inference">inference</a>, or <a href="#forecasting">forecasting</a>.</p>
 <p>Models that are trained on labeled data (i.e. categorical outcomes) are called <a href="#classifier">classifiers</a>.
 Models that are trained on quantitative outcomes are called <a href="#regression%20models">regressors</a>.</p>
+</div>
+<div id="test-data" class="section level3">
+<h3>Test Data</h3>
+<p><em>Test data</em> refers to the set of data that is used for evaluating the <a href="#performance">predictive performance</a> of a <a href="#model">model</a>.</p>
+</div>
+<div id="training-data" class="section level3">
+<h3>Training Data</h3>
+<p><em>Training data</em> refers to the set of data that is used for fitting a <a href="#model">model</a>.</p>
 </div>
 <div id="true-positive-rate" class="section level3">
 <h3>True Positive Rate</h3>
@@ -500,10 +610,14 @@ Models that are trained on quantitative outcomes are called <a href="#regression
 </div>
 <div id="unsupervised-learning" class="section level3">
 <h3>Unsupervised Learning</h3>
-<p><a href="../tags/unsupervised-learning/">Unsupervised learning</a> is an area of machine learning that is concerned with the identification of <a href="#model">models</a>
+<p><a href="/tags/unsupervised-learning/">Unsupervised learning</a> is an area of machine learning that is concerned with the identification of <a href="#model">models</a>
 that are capable to represent the properties of the data in a condensed manner, which allows for greater <a href="#interpretability">interpretability</a>.</p>
 <p>Evaluating the performance of unsupervised learning methods is more challenging than for supervised learning because there are no outcomes
 that provide the <a href="#ground-truth">ground truth</a>. Popular unsupervised methods include <a href="#k-means">k-means</a> and <em>PCA</em>.</p>
+</div>
+<div id="validation-data" class="section level3">
+<h3>Validation Data</h3>
+<p><em>Validation data</em> refers to the set of data that is used for tuning the hyperparameters of a <a href="#model">model</a>.</p>
 <!--## Software Engineering Glossary-->
 </div>
 </div>
