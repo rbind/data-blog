@@ -6,11 +6,10 @@
 
 <section class="post-comments">
   <h2>Comments</h2>
+  <!-- assumes that 'hasComments' was filled earlier -->
   {{- $mycomments := .Site.Data.comments }}
-  {{- $.Scratch.Add "hasComments" 0 }}
   {{- range $mycomments }}
     {{- if in .path $.File.Path }}
-        {{- $.Scratch.Add "hasComments" 1 }}
         <div class="post-comment">
           <div class="post-comment-header">
             <img class="post-comment-avatar" src="https://www.gravatar.com/avatar/{{ .email }}?s=40">

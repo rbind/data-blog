@@ -3,6 +3,15 @@
 <script src="/js/highlight.pack.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 <!--END CODE HIGHLIGHTING-->
+<!--FIND NBR OF COMMENTS-->
+{{- $mycomments := .Site.Data.comments }}
+{{- $.Scratch.Add "hasComments" 0 }}
+{{- range $mycomments }}
+    {{- if in .path $.File.Path }}
+        {{- $.Scratch.Add "hasComments" 1 }}
+    {{- end }}
+{{- end }}
+<!--FIND NBR OF COMMENTS END -->
 <main class="main" role="main">
 	<article class="post">
 		<header class="post__header">
