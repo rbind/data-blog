@@ -84,7 +84,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
     [[menu.main]]
     name = "About"
     identifier = "about"
-    url = "/about-data-science-with-R/"
+    url = "https://www.matthias-doering.net"
     weight = 101
 
     [[menu.main]]
