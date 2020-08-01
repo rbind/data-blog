@@ -11,8 +11,8 @@ Unsupervised learning is the aspect of machine learning that is concerned with a
 
 The goal of clustering is to assign each observation in a data set to a group based on the observed values associated with each observation. Different clustering approaches rely on different target functions and therefore lead to different cluster assignments. The following clustering algorithms are frequently used:
 
-* $k$-means: assigns samples to $k$ clusters such that the distance to the mean value of the cluster is minimized.
-* $k$-medoids: a clustering algorithm that is related to $k$-means that is more robust by relying on medoids rather than means.
+* k-means: assigns samples to *k* clusters such that the distance to the mean value of the cluster is minimized.
+* k-medoids: a clustering algorithm that is related to k-means that is more robust by relying on medoids rather than means.
 * Spectral clustering: a clustering algorithm that represents samples as a graph.
 
 ## Dimensionality reduction

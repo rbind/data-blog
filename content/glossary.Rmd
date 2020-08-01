@@ -8,46 +8,181 @@ sidebar: true
 thumbnail: /img/glossary_avatar.png
 ---
 
+```{r helper, warning=FALSE, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(kableExtra)
+options(kableExtra.html.bsTable = TRUE) # show bootstrap styling
+options(knitr.kable.NA = '') # hide NAs in table
+
+terms_to_table <- function(terms, ncol=4) {
+    # add markdown refs to anchor elements
+    tagged_terms = c()
+    for (term in terms) {
+        tag_id <- gsub(" ", "-", tolower(term))
+        tag <- paste0("[", term, "](#", tag_id, ")")
+        tagged_terms <- c(tagged_terms, tag)
+    }
+    o <- order(tagged_terms)
+    ordered.terms = tagged_terms[o]
+    # fill up the vector with blanks such that elements are not recycled
+    nrow <- ceiling(length(ordered.terms) / ncol)
+    length(ordered.terms) <- nrow*ncol
+    # output with kable
+    df <- data.frame(matrix(ordered.terms, ncol=ncol, byrow=TRUE))
+    df %>% knitr::kable(col.names = NULL, align = "c")%>% kable_styling(bootstrap_options=c("striped", "responsive"))
+}
+```
+
 <!--## Statistics Glossary-->
 
 ## Machine Learning Glossary
 
-### Action {#estimate}
+**General Terms**
+
+```{r gen_ml_terms, warning=FALSE, echo=FALSE}
+terms <- c("Data Point", "Machine Learning", "Model", "Model Complexity",
+           "Supervised Learning", "Reinforcement Learning", "Unsupervised Learning"
+         )
+terms_to_table(terms)
+```
+
+**Reinforcement Learning**
+
+```{r rl_terms, warning=FALSE, echo=FALSE}
+terms <- c("Action", "Agent", "Observation", "Policy",
+           "Reward", "State", "Environment")
+terms_to_table(terms)
+```
+
+**Supervised Learning**
+
+
+```{r sl_terms, warning=FALSE, echo=FALSE}
+terms <- c("Confusion Matrix", "Dependent Variable", 
+           "Estimate", "Feature Engineering",
+           "Forecasting",
+           "Gold Standard", "Ground Truth",
+           "Independent Variable", "Inference",
+           "Interpretability", "Linear Model",
+           "Non-Linear Model", "Outcome", 
+           "Observations", "Prediction", "Inference",
+           "Sensitivity", "Specificity", "True Positive Rate",
+           "False Positive Rate", "AUC", "Classifier",
+           "Regressor", "Performance"
+         )
+terms_to_table(terms)
+```
+
+**Unsupervised Learning**
+
+```{r ul_terms, warning=FALSE, echo=FALSE}
+terms <- c('Clustering', "k-means")
+terms_to_table(terms)
+```
+
+### Action {#action}
 
 In [reinforcement learning](#reinforcement-learning), agents try to perform actions that maximize the [reward](#reward).
-Each action changes the learning environment and thus yields a new [state](#state).
+Each action changes the learning [environment](#environment) and thus yields a new [state](#state).
+
+### Agent {#agent}
+
+In [reinforcement learning](#reinforcement-learning), an agent is the learner that interacts with the [environment](#enviroment).
+Based on a given [state](#state), the agent selects an appropriate [action](#action) by considering past earned [rewards](#reward).
+The [policy](#policy) of an agent determines the actions that should be executed for each state.
+
+### AUC {#auc}
+
+AUC means *area under the curve*. When evaluating [scoring classifiers](#classifier), the term *AUC* usually refers to the AUC of the
+ROC (receiver operating characteristic) curve. This curve determines the [true positive rate](#true-positive-rate) and
+[false positive rate](#false-positive-rate) for all cutoffs on the scores. When available, the AUC is [preferable to other measures such as
+sensitivity and specificity](../post/machine-learning/interpreting-roc-curves-auc/).
+
+### Classifier {#classifier}
+
+Classifiers (classification models) are used for the [prediction](#prediction) of [categorical outcomes](#outcomes).
+Classifiers that ouput [quantitative outcomes](#outcomes) are called *scoring classifiers* and are
+more [interpretable](#interpretability) than non-scoring classifiers.
+
+### Clustering {#clustering}
+
+Clustering, one of the main applications of [unsupervised learning](#unsupervised-learning), is used to assign each [sample](#sample)
+to a group of samples. These groups of samples are called *clusters*. Clustering can be used for the visual exploration of data or
+for the automated identification of outliers. One of the simplest and most well-known clustering algorithms is [k-means](#k-means).
+
+### Confusion Matrix {#confusion-matrix}
+
+The confusion matrix is used to evaluate the [predictive performance](#performance) of a [classifier](#classifier). The name *confusion matrix* stems from the fact
+that the table illustrates which predictions are confused among the two classes. For binary classifiers, which differentiate
+between a positive (`+1`) and a negative (`-1`) class, the confusion matrix is a 2x2 table of the following form:
+
+```{r, confusion_matrix, echo = FALSE}
+entries <- c("", "**+1**", "**-1**",
+             "**+1**", "TP", "FP", 
+             "**-1**", "FN", "TN")
+df <- data.frame(matrix(entries, nrow = 3, byrow = TRUE))
+colnames(df) <- NULL
+rownames(df) <- NULL
+#df %>% knitr::kable(col.names = NULL, align = "c")%>% kable_styling(bootstrap_options=c("striped", "responsive"), full_width=FALSE)
+library(htmlTable)
+htmlTable(df, cgroup = c("Predicted Class", "Ground Truth"),
+          n.cgroup = c(1, 2),
+          rnames = FALSE, cnames = FALSE)
+```
+
+The entries are defined as follows:
+
+* **TP:** The number of [samples](#sample) from the positive class that were correctly predicted
+* **FP:** The number of samples from the negative class that were falsely predicted
+* **FN:** The number of samples from the positive class that were falsely predicted
+* **TN:** The number of samples from the negative class that were correctly predicted
+
+From the confusion matrix, one can determine performance metrics such as [sensitivity](#sensitivity), [specificity](#specificity),
+and the [AUC](#auc).
 
 ### Data Point {#data-point}
 
 See [Observations](#observations).
 
-### Dependent Variable {#estimate}
+### Dependent Variable {#dependent-variable}
 
 See [Feature](#feature).
+
+### Environment {#environment}
+
+In [reinforcement learning](#reinforcement-learning), the environment determines the observable [states](#state) and the [actions](#action)
+that an agent can perform. A popular framework for specifying environments is [OpenAI's Gym](https://gym.openai.com/).
 
 ### Estimate {#estimate}
 
 See [Prediction](#prediction).
 
-### Feature matrix
+### False Positive Rate {#false-positive-rate}
+
+Given a [classifier](#classifier), the false positive rate represents the ratio of false positive predictions among all [samples](#sample) from the negative class:
+
+```
+FPR = FP / (FP + TN)
+```
+
+See also [Confusion Matrix](#confusion-matrix).
+
+### Feature matrix {#feature-matrix}
 
 See [Features](#features).
 
 ### Features {#features}
 
-Features are the dependent variables in a supervised learning scenario. The columns of a feature matrix,
+Features are the *dependent variables* in the [supervised learning](#supervised-learning) scenario. The columns of a *feature matrix*,
 $$X \in \mathbb{R}^{n \times p}\,$$
 represent the values of the p features. For example, to predict the weather, two possible features are the level of precipitation
 and the cloudiness.
-
-The term *dependent variable* is synonymous to *feature* but more
-frequently used in the statistical community.
 
 ### Feature Engineering {#feature-engineering}
 
 [Supervised learning](#supervised-learning) aims at learning the general associations betwen [features](#features)
 and [outcomes](#outcomes). However, in their original form, the input data are often not well-suited for this purpose.
-Feature engineering is concerned with transforming the data such that machine learning models can easily
+Feature engineering is concerned with transforming the data such that machine learning [models](#model) can easily
 learn from the data.
 
 ### Forecasting {#forecasting}
@@ -64,6 +199,10 @@ In order to perform supervised learning, it is necesary that the [outcome](#outc
 The measured outcome should reflect the ground truth. Otherwise, [models](#model) are optimized with respect
 to the wrong values, aka *garbage in, garbage out*.
 
+### Independent Variable {#independent-variable}
+
+See [Outcomes](#outcomes).
+
 ### Inference {#inference}
 
 See [Prediction](#prediction).
@@ -75,9 +214,14 @@ Interpretability is closely tied to [model complexity](#model-complexity) (i.e. 
 such as linear models have few parameters and can easily be understood and interpreted. Complex models such as
 deep neural networks have large numbers of parameters, which makes them hard to understand and interpret.
 
-There are many application scenarios in which it is acceptable to sacrifice some predictive performance in
+There are many application scenarios in which it is acceptable to sacrifice some [predictive performance](#predictive-performance) in
 favor of greater interpretability. This is because in machine learning applications such as
 decision support systems, it is key that human operators can understand the intentions of the model.
+
+### k-means
+
+k-means is a simple yet powerful [clustering](#clustering) algorithm that identifies *k* cluster centers in the data.
+The algorithm terminates when the cluster centers have converged.
 
 ### Linear Model {#linear-model}
 
@@ -90,14 +234,14 @@ There are three machine learning areas: [supervised learning](#supervised-learni
 and [reinforcement learning](#reinforcement-learning).
 
 Once a [model](#model) has been fitted to the data,
-it is possible to make [predictions](#prediction) given new data points (supervised learning), structure data (unsupervised learning),
-or select optimal actions in a dynamic environment (reinforcement learning).
+it is possible to make [predictions](#prediction) given new [data points](#data-point) (supervised learning), structure data (unsupervised learning),
+or select optimal [actions](#action) in a dynamic [environment](#environment) (reinforcement learning).
 
 ### Model {#model}
 
 Models are the mathematical approximation of real-world phenomena. In [supervised learning](#supervised-learning), models are constructed using
-pairs of input data and observed outcomes. In [unsupervised learning](#unsupervised-learning), the outcomes are not available such that only the structure
-of the data is modeled. In [reinforcement learning](#reinforcement-learning), models are constructed according to states, actions, and rewards.
+pairs of input data and observed [outcomes](#outcomes). In [unsupervised learning](#unsupervised-learning), the outcomes are not available such that only the structure
+of the data is modeled. In [reinforcement learning](#reinforcement-learning), models are constructed according to [states](#state), [actions](#action), and [rewards](#reward).
 
 Besides these machine learning approaches, which use optimization algorithms to fit models to data, there is a host of
 other models that are useful for specific tasks, for example, hidden Markov models, epidemiological models, and [Bayesian models](../tags/bayesian/).
@@ -126,18 +270,25 @@ Principal types of outcomes are categorical outcomes (class labels) and quantita
 when predicting the weather, `Sunny` and `Cloudy` would be categorical outcomes, while the amount of precipitation
 would be a quantitative outcome.
 
+The underlying variable associated with the outcome is called the *independent variable*.
+
 ### Observations {#observations}
 
 In [supervised learning](#supervised-learning), observations are the rows of the [feature matrix](#feature-matrix).
-Observations are also called `data points` or `samples`. The number of observations is usually denoted by *N*.
+Observations are also called *data points* or *samples*. The number of observations is usually denoted by *N*.
 
 For the use of the term *observation* in [reinforcement learning](#reinforcement-learning), see [State](#state).
 
 ### Policy {#policy}
 
 In [reinforcement learning](#reinforcement-learning), the policy of an agent is a mapping from states to actions. This means
-that the policy defines the behavior of the agent in the environment. There are *on-policy* and *off-policy* reinforcement learning
+that the policy defines the behavior of the agent in the [environment](#environment). There are *on-policy* and *off-policy* reinforcement learning
 algorithms.
+
+### Performance {#performance}
+
+In [supervised learning](#supervised-learning), predictive performance is the ability of a model to correctly classify observations.
+To quantify predictive performance, metrics such as the [AUC](#auc) can be utilized.
 
 ### Prediction {#prediction}
 
@@ -149,17 +300,47 @@ that predictions are only approximations of reality.
 
 ### Reinforcement Learning {#reinforcement-learning}
 
-[Reinforcement learning](../tags/reinforcement-learning) (RL) is an area of machine learning in which one or multiple agents perform *actions* in an environment,
+[Reinforcement learning](../tags/reinforcement-learning) (RL) is an area of machine learning in which one or multiple agents perform *actions* in an [environment](#environment),
 after observing the *state*. Once an action has been performed, the agent receives a *reward*. By balancing exploration (finding novel states) and
 exploitation (reaping rewards), RL agents can learn an optimal [policy](#policy), which identifies the best action to take for every state.
 
 In recent years, reinforcement learning has gained in popularity due to the emergence of deep RL, in which deep neural networks are used
 to learn which states are associated with the greatest rewards.
 
+### Regressor {#regressor}
+
+Regressors (regression models) are used to predict the outcomes for [quantitative variables](#outcomes).
+Compared to [classifiers](#classifier), they allow for fine-grained predictions.
+
 ### Reward {#reward}
 
 In [reinforcement learning](#reinforcement-learning), agents obtain rewards after performing an [action](#action).
 Agents adjust their [policy](#policy) in order to maximize the reward.
+
+### Sample {#sample}
+
+For its use in [supervised learning](#supervised-learning), see [Observation](#observation).
+
+### Sensitivity {#sensitivity}
+
+The [sensitivity](..//post/machine-learning/specificity-vs-precision/) of a [classifier](#classifier) is defined by its [true positive rate](#true-positive-rate): 
+
+```
+sensitivity = TPR = TP/(TP+FN).
+```
+
+See also [Confusion Matrix](#confusion-matrix).
+
+### Specificity {#specificity}
+
+[Specificity](../post/machine-learning/specificity-vs-precision/) indicates the [true negative rate](#true-negative-rate) of a [classifier](#classifier):
+
+```
+specificity = 1 - TP / (TP + FP) = 1 - FPR
+```
+
+Since specificty considers the number of false positives (FP), it allows for conclusions about the [false positive rate (FPR)](#false-positive-rate).
+See also [Confusion Matrix](#confusion-matrix).
 
 ### State {#state}
 
@@ -172,8 +353,12 @@ States are usually represented by numeric vectors or matrices. Crafting appropri
 [outcomes](#outcomes). Once a [model](#model) has been trained on a set of training data, it is tuned using a validation data set, and, finally, evaluated on an independent test data set.
 The application of a supervised learning model on new data is called [prediction](#prediction), [inference](#inference), or [forecasting](#forecasting).
 
-Models that are trained on labeled data (i.e. categorical outcomes) are called *classifiers* or *classification models*.
-Models that are trained on quantitative outcomes are called *regressors* or *regression models*.
+Models that are trained on labeled data (i.e. categorical outcomes) are called [classifiers](#classifier).
+Models that are trained on quantitative outcomes are called [regressors](#regression models).
+
+### True Positive Rate {#true-positive-rate}
+
+See [Sensitivity](#sensitivity).
 
 ### Unsupervised Learning {#unsupervised-learning}
 
@@ -181,6 +366,6 @@ Models that are trained on quantitative outcomes are called *regressors* or *reg
 that are capable to represent the properties of the data in a condensed manner, which allows for greater [interpretability](#interpretability).
 
 Evaluating the performance of unsupervised learning methods is more challenging than for supervised learning because there are no outcomes
-that provide the [ground truth](#ground-truth). Popular unsupervised methods include *k-means* and *PCA*.
+that provide the [ground truth](#ground-truth). Popular unsupervised methods include [k-means](#k-means) and *PCA*.
 
 <!--## Software Engineering Glossary-->
