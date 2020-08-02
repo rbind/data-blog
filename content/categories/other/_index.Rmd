@@ -1,6 +1,8 @@
 ---
 title: "Other"
 thumbnail: "/categories/other/other_avatar.jpg"
+slug: "other"
+description: "Here I write about various topics such as static websites and Staticman."
 ---
 <img src="other_avatar.jpg" alt = "Other topics" width = "1000" height = "667">
 

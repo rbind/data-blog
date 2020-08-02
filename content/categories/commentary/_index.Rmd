@@ -1,6 +1,8 @@
 ---
 title: "Commentary"
 thumbnail: "/categories/commentary/commentary_avatar.jpeg"
+slug: "commentary"
+description: "Here I discuss topics related to data science, AI, and academia."
 ---
 ![](commentary_avatar.jpeg)
 

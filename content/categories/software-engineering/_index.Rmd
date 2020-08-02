@@ -1,6 +1,8 @@
 ---
 title: "Software Engineering"
 thumbnail: "/categories/software-engineering/software_engineering_avatar.jpg"
+description: "To bring data science approaches to production, software engineering skills are necesary. Learn about best practices!"
+slug: "software-engineering"
 ---
 ![](software_engineering_avatar.jpg)
 

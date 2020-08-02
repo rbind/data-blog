@@ -1,6 +1,8 @@
 ---
 title: "Statistical Significance Tests"
 thumbnail: "/categories/statistical-test/roulette-roulette-wheel-ball-turn_avatar.jpg"
+slug: "statistical-test"
+description: "Statistical hypothesis testing is required to make objective statements about effects in data science projects."
 ---
 <img src="roulette-roulette-wheel-ball-turn_avatar.jpg"/ alt = "Statistical tests" width = "1125" height = "750">
 

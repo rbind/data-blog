@@ -1,6 +1,8 @@
 ---
 title: "Basic Statistical Concepts for Data Science"
 thumbnail: "/categories/basic-statistics/basic-statistics_avatar.jpg"
+slug: "basic-statistics"
+description: "Data science requires a good understanding of basic statistical concepts. Learn about statistics here!"
 ---
 <img src="basic-statistics_avatar.jpg" alt="Basic statistics" width = "1000" height = "667">
 
