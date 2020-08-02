@@ -64,7 +64,12 @@
 # Footer
 - id: footer_credits
   translation:
-    "<a href=\"/colophon\">Colophon</a> |"
+    "<!--LICENSE--> \
+    <a rel=\"license\" href=\"http://creativecommons.org/licenses/by-nc-sa/4.0/\"><img alt=\"Creative Commons License\" style=\"border-width:0\" src=\"https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png\" /></a> \
+     <!--LICENSE_END--> \
+    <a href=\"/colophon\">Colophon</a> | \
+     <a href=\"/impressum\">Impressum</a> |  \
+     <a href=\"/datenschutz\">Datenschutzerklärung</a>"
 
 # 404
 - id: 404_title
