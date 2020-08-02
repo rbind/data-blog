@@ -58,9 +58,9 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   tags_counter = false # Enable counter for each tag in "Tags" widget (disabled by default)
 
 [Params.widgets.social]
-  github = "matdoering"
-  twitter = "matzedoering"
   linkedin = "matthias-doering"
+  github = "matdoering"
+  #twitter = "matzedoering"  # i dont really use twitter, so comment it out 
 
 #[taxonomies]
   #category = ""
