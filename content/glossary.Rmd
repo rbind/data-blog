@@ -8,7 +8,7 @@ sidebar: true
 thumbnail: /img/glossary_avatar.png
 ---
 
-```{r helper, warning=FALSE, echo=FALSE, message=FALSE}
+```{r create_glossary_table, warning=FALSE, echo=FALSE, message=FALSE}
 library(tidyverse)
 library(kableExtra)
 options(kableExtra.html.bsTable = TRUE) # show bootstrap styling
@@ -33,33 +33,13 @@ terms_to_table <- function(terms, ncol=3) {
 }
 ```
 
-<!--## Statistics Glossary-->
-
-## Machine Learning Glossary
-
-**General Terms**
-
-```{r gen_ml_terms, warning=FALSE, echo=FALSE}
-terms <- c("Data Point", "Machine Learning", "Model", "Model Complexity",
+```{r define_terms, mesage = FALSE, echo = FALSE, warning = FALSE}
+general.ml.terms <- c("Data Point", "Machine Learning", "Model", "Model Complexity",
            "Supervised Learning", "Reinforcement Learning", "Unsupervised Learning",
            "Data Wrangling"
          )
-terms_to_table(terms)
-```
-
-**Reinforcement Learning**
-
-```{r rl_terms, warning=FALSE, echo=FALSE}
-terms <- c("Action", "Agent", "Observation", "Policy",
-           "Reward", "State", "Environment")
-terms_to_table(terms)
-```
-
-**Supervised Learning**
-
-
-```{r sl_terms, warning=FALSE, echo=FALSE}
-terms <- c("Confusion Matrix", "Dependent Variable", 
+unsupervised.terms <- c('Clustering', "Dimensionality Reduction", "k-means", "PCA")
+supervised.terms <- c("Confusion Matrix", "Dependent Variable", 
            "Estimate", "Feature Engineering",
            "Forecasting",
            "Gold Standard", "Ground Truth",
@@ -74,14 +54,68 @@ terms <- c("Confusion Matrix", "Dependent Variable",
            "Cross-Validation", "Training Data", "Test Data",
            "Validation Data"
          )
-terms_to_table(terms)
+rl.terms <- c("Action", "Agent", "Observation", "Policy",
+           "Reward", "State", "Environment")
+
+all.terms <- c(general.ml.terms, unsupervised.terms, supervised.terms, rl.terms)
+```
+
+```{r create_word_cloud, warning=FALSE, echo=FALSE, message=FALSE, eval = FALSE }
+# eval = FALSE because cloud has to be adapted manually (whitespace)
+SHOULD_PLOT = FALSE
+# Load
+library("RColorBrewer")
+library("quanteda")
+# read this file
+text <- readLines('glossary.Rmd')
+##############
+# quanteda
+###########
+require(quanteda)
+# split all my names of interest:
+all.terms <- unlist(strsplit(all.terms, split = " "))
+# convert to document-feature matrix
+toks1 <- tokens(char_tolower(text), remove_punct = TRUE)
+toks2 <- tokens_select(toks1, paste0("*", tolower(all.terms), "*"))
+toks2 <- tokens_remove(toks2, "#*")
+
+toks3 <- tokens_ngrams(toks2, 1:2, concatenator = " ")
+freq.df <- dfm(toks3)
+#set.seed(1234)
+textplot_wordcloud(freq.df,
+    min_count = 6, random_order = FALSE, rotation = 0.20,
+    #max_words = 100,
+    color = RColorBrewer::brewer.pal(8, "Dark2"))
+```
+
+
+<!--## Statistics Glossary-->
+
+## Machine Learning Glossary
+
+**General Terms**
+
+```{r gen_ml_terms, warning=FALSE, echo=FALSE}
+terms_to_table(general.ml.terms)
+```
+
+**Reinforcement Learning**
+
+```{r rl_terms, warning=FALSE, echo=FALSE}
+terms_to_table(rl.terms)
+```
+
+**Supervised Learning**
+
+
+```{r sl_terms, warning=FALSE, echo=FALSE}
+terms_to_table(supervised.terms)
 ```
 
 **Unsupervised Learning**
 
 ```{r ul_terms, warning=FALSE, echo=FALSE}
-terms <- c('Clustering', "Dimensionality Reduction", "k-means", "PCA")
-terms_to_table(terms)
+terms_to_table(unsupervised.terms)
 ```
 
 ### Action {#action}
