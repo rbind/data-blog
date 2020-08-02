@@ -18,6 +18,7 @@ disable_comments: false
 * [Data Camp](https://www.datacamp.com): a great resource for training in data science
 * [Data Science Reader](https://rushter.com/dsreader/): an aggregator for data science content
 * [DataTau](http://www.datatau.com/): a data science forum
+* [Data Science Hiring Guide](https://www.toptal.com/data-science#hiring-guide): a practical guide on what to consider when hiring data scientists
 
 ## R
 
