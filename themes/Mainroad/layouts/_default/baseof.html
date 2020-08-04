@@ -39,6 +39,14 @@
     <script type="text/javascript">
     cookieValue = document.cookie.match(/(;)?cookiebar=([^;]*);?/)[2];
     if (cookieValue == 'CookieAllowed') {
+        window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+        ga('create', 'UA-174459384-1', 'auto');
+        ga('send', 'pageview');
+        </script>
+    }
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!--
         var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
         ga.src = "https://www.googletagmanager.com/gtag/js?id=UA-174459384-1"
         window.dataLayer = window.dataLayer || [];
@@ -46,8 +54,6 @@
         gtag('js', new Date());
         gtag('config', 'UA-174459384-1');
     }
-    </script>
-    <!--
     {{- if (not .Site.IsServer) }}
 		{{ template "_internal/google_analytics_async.html" . }}
 	{{- end }}
