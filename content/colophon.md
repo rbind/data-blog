@@ -19,5 +19,7 @@ Here is a current overview of the technology behind this data science blog:
 |  Hosting/Deployment/DNS  |                              [Netlify](https://www.netlify.com)                             |
 |           Forms          |           [Netlify](https://www.netlify.com) and [Google](https://www.google.com)           |
 |        Blog Posts        |                       [Blogdown](https://bookdown.org/yihui/blogdown/)                      |
-|  Cookie Bar              | [cookieBAR: a free and easy cookie law plugin](https://cookie-bar.eu)
+|  Cookie Bar              | [cookieBAR: a free and easy cookie law plugin](https://cookie-bar.eu)                       |
+| Mailing List             | [Zoho](https://www.zoho.com)                                                                |
+
 
