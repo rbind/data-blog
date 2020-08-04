@@ -29,9 +29,17 @@
 	<link rel="stylesheet" href="{{ . | relURL }}">
 	{{- end }}
 	<link rel="shortcut icon" href="{{ "favicon.ico" | relURL }}">
-	{{- if not .Site.IsServer }}
+    <!--COOKIE ACCEPTANCE-->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/cookie-bar/cookiebar-latest.min.js?theme=flying&always=1&showNoConsent=1"></script>
+    <!--COOKIE ACCEPTANCE END-->
+    <!--CONDITIONALLY LOAD SERVICES BASED ON COOKIES-->
+    <script type="text/javascript">
+    cookieValue = document.cookie.match(/(;)?cookiebar=([^;]*);?/)[2];
+    </script>
+	{{- if and (not .Site.IsServer) (cookieValue == 'CookieAllowed') }}
 		{{ template "_internal/google_analytics_async.html" . }}
 	{{- end }}
+    <!-- COOKIE STUFF ENDS -->
 </head>
 <body class="body">
 	<div class="container container--outer">
@@ -59,23 +67,6 @@
 <script type="text/javascript" id="ZC_Forms_Popup" src="https://campaigns.zoho.eu/js/optin.min.js" onload="loadZCPopup('270d03e7086d236fba5ec42ea580cbb603d2af3e628508ae6','ZCFORMVIEW','284e19868ac2005832bb3b22b0b798a78')" onreadystatechange="loadZCPopup('270d03e7086d236fba5ec42ea580cbb603d2af3e628508ae6','ZCFORMVIEW','284e19868ac2005832bb3b22b0b798a78')"></script>
 -->
 <!--ZC Popup Code Ends-->
-<!--COOKIE ACCEPTANCE-->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/cookie-bar/cookiebar-latest.min.js?theme=flying&always=1&showNoConsent=1"></script>
-<!--COOKIE ACCEPTANCE END-->
-<!--CONDITIONALLY LOAD SERVICES BASED ON COOKIES-->
-<script type="text/javascript">
-cookieValue = document.cookie.match(/(;)?cookiebar=([^;]*);?/)[2];
-if (cookieValue == 'CookieAllowed') {
-    // The user has allowed cookies, let's load external tracking services
-    // Global site tag (gtag.js) - Google Analytics //
-    document.write('script async src="https://www.googletagmanager.com/gtag/js?id=UA-174459384-1"></sc' + 'ipt>')
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-174459384-1');
-}
-</script>
-<!--LOADING COOKIE SERVICES END-->
 {{ range .Site.Params.customJS -}}
 <script src="{{ . | relURL }}"></script>
 {{- end }}
