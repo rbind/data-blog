@@ -36,10 +36,22 @@
     <script type="text/javascript">
     cookieValue = document.cookie.match(/(;)?cookiebar=([^;]*);?/)[2];
     </script>
-	{{- if and (not .Site.IsServer) (cookieValue == 'CookieAllowed') }}
+    <script type="text/javascript">
+    cookieValue = document.cookie.match(/(;)?cookiebar=([^;]*);?/)[2];
+    if (cookieValue == 'CookieAllowed') {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = "https://www.googletagmanager.com/gtag/js?id=UA-174459384-1"
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-174459384-1');
+    }
+    </script>
+    <!--
+    {{- if (not .Site.IsServer) }}
 		{{ template "_internal/google_analytics_async.html" . }}
 	{{- end }}
-    <!-- COOKIE STUFF ENDS -->
+    -->
 </head>
 <body class="body">
 	<div class="container container--outer">

@@ -9,7 +9,7 @@ StaticmanComments = "true"
 disqusShortname = ""
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 rssLimit = 20 # max nbr of entries shown in rss feed
-googleAnalytics = "UA-174459384-1"
+#googleAnalytics = "UA-174459384-1"
 
 [Author]
   name = "Matthias Döring"
