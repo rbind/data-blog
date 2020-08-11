@@ -53,10 +53,11 @@
 </main>
 {{ partial "authorbox.html" . }}
 <div style = "text-align:right">
-<!--CUSTOM AUTHOR ENTRY-->
+<!--CUSTOM AUTHOR ENTRY
 {{- if isset .Params "author" }}
     <p>Author: {{.Params.author}}</p>
 {{- end }}
+-->
 <!--CUSTOM AUTHOR ENTRY END-->
 {{- partial "post_download_Rmd.html" . }}
 </div>
