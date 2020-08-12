@@ -13,11 +13,12 @@ rssLimit = 20 # max nbr of entries shown in rss feed
 
 [Author]
   name = "Matthias Döring"
-  bio = "I am currently working as a data scientist and AI architect at DB Systel where I'm supporting the digitalization of the German railway system. Previously, I completed my PhD at the Max Planck Institute for Informatics where I researched computational methods for improving treatment and prevention of viral infections."
+  bio = "Matthias Döring is a data scientist and AI architect. He is currently driving the digitization of the German railway system at DB Systel. Previously, he completed a PhD at the Max Planck Institute for Informatics in which he researched computational methods for improving treatment and prevention of viral infections."
   avatar = "img/matthias_doering.jpg"
   url = "https://www.matthias-doering.net"
 
 [Params]
+  socialshare = true  # show social sharing links on all sites by default
   downloadRmd = true
   contentPath = "https://www.github.com/rbind/data-blog/raw/master/content/"
   logoPath = "/img/datascienceblog_logo_wide_alt.png"
@@ -33,7 +34,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
   pager = true # Show pager navigation (prev/next links) at the bottom of pages if true
   post_meta = ['categories', 'comments', 'date'] # post meta info to show
 
-  customCSS = ["css/custom.css", "css/poll.css"] # Include custom CSS files
+  customCSS = ["css/custom.css", "css/poll.css", "css/social_share.css"] # Include custom CSS files
   customJS = ["https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js", "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.1/underscore-min.js", "js/highlight.pack.js", "js/polls.js", "js/scripts.js"]
 
 [Params.staticman]
@@ -111,3 +112,10 @@ rssLimit = 20 # max nbr of entries shown in rss feed
 
 [markup.goldmark.renderer]
     unsafe= true
+
+[Params.social.share]
+  facebook = true
+  linkedin = true
+  twitter = true
+  whatsapp = true
+  email = true
