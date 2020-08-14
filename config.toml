@@ -84,19 +84,26 @@ rssLimit = 20 # max nbr of entries shown in rss feed
     name = "About"
     identifier = "about"
     url = "https://www.matthias-doering.net"
-    weight = 101
+    weight = 103
 
     [[menu.main]]
     name = "Resources"
     identifier = "blogroll"
     url = "/recommended-resources-data-science-and-R/"
-    weight = 99
+    weight = 106
+
+    [[menu.main]]
+    name = "Tech Radar"
+    identifier = "tech-radar"
+    url = "http://tech.datascienceblog.net"
+    weight = 100 
 
     [[menu.main]]
     name = "Glossary"
     identifier = "glossary"
     url = "/data-science-glossary/"
-    weight = 100
+    weight = 101
+
     [[menu.main]]
     name = "Contribute!"
     identifier = "contribute"
@@ -107,7 +114,7 @@ rssLimit = 20 # max nbr of entries shown in rss feed
     name = "RSS Feed"
     identifier = "RSS"
     url = "/post/index.xml"
-    weight = 102
+    weight = 107
 
 
 [markup.goldmark.renderer]
