@@ -1,0 +1,11 @@
+_id: 7316e440-1045-11eb-8951-ddedeb7d0381
+path: post/commentary/inference-vs-prediction.html
+name: Oliver Faust
+email: ffd431a3912d621e898e048a808b4739
+message: >-
+  The interpretation of inference seems to be a bit narrow. For engineering
+  tasks, we use inference to determine the system state. For example, we want to
+  know if a machine is faulty or if there is a disease present in the human
+  body. Therefore, we use the methods, which, in the article, were referred to
+  as being used for prediction, for inference.
+date: '2020-10-17T06:53:23.661Z'
