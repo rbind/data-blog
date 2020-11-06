@@ -1,0 +1,8 @@
+_id: f23ef800-2069-11eb-819d-af1df1be2f7b
+path: post/machine-learning/performance-measures.html
+name: Greig
+email: 976eeedd06cb840d92446d472997032b
+message: >-
+  I believe your mean square error formula is incorrect. It should have 1/n
+  preceding it to calculate the mean.
+date: '2020-11-06T19:54:57.584Z'
