@@ -1,0 +1,6 @@
+_id: 39273d40-2290-11eb-8d3e-63e0ffa7a398
+path: post/programming/protobuf.md
+name: Paul Smith
+email: 20c444258d6d3b3845e894d7f357d4d0
+message: "Your serialisation snippet only supports data for a single person. A significant challenge with protobuf is the handling of multiple messages which is compounded in the Python implementation by lack of  access to core libraries.  Remembering that the consumer of your data may not be a python program, how do you delineate records so that nay protobuf program can read them? \r\nfor person in persons:\r\n    raw = person.SerializeToString()\r\n    f.write( ???? (len(raw)) )  # how to do this so others can read it ?\r\n    f.write(raw)"
+date: '2020-11-09T13:33:59.680Z'
