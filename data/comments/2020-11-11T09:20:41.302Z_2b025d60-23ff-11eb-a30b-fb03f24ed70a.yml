@@ -1,0 +1,6 @@
+_id: 2b025d60-23ff-11eb-a30b-fb03f24ed70a
+path: post/machine-learning/interpreting_roc_curves.html
+name: David
+email: 2b4706b7c6fd5284412f7ddcb63d4404
+message: "Thanks for this article however the AUC-PR part have some incorrect statements which would be great to correct (Unless I'm missing something)\r\n\"A random classifier has an AUC-PR close to 0.5\". This is generally wrong as AUC-PR is influenced by class imbalance. A random classifier should have an AUC-PR equal to the proportion of positives in the dataset. E.g. if a dataset has 1% positives and 99% negatives, a random binary classifier will have a precision of 1% regardless of recall, so its AUC-PR will be 0.01.  \r\n\r\nAlso the AUC-PR plots seem to have errors too. Axis names should be \"precision\", \"recall\", and it seems labels like \"Curve (AUC: 0.56)\" have the wrong values and display AUC-ROC instead of AUC-PR? E.g. the plot for \"AUC-PR of a bad classifier\" looks like it has an area under the curve closer to 0.3 (which is proportion of positives), instead of 0.68."
+date: '2020-11-11T09:20:41.302Z'
