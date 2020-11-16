@@ -1,0 +1,6 @@
+_id: df554db0-2826-11eb-8ca3-2338788d9398
+path: post/machine-learning/performance-measures-multi-class.html
+name: Pascal Salazar
+email: faf0326b29652bbbbb380da364d067ba
+message: "Very informative and useful. \r\nNotice tiny typo in ,line 6 of the get.conf.stats() definition: \r\nfn <- sum(x$table[colnames(x$table) != x$positie, x$positive])\r\nread: != x$positive"
+date: '2020-11-16T16:14:58.919Z'
