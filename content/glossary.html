@@ -13,9 +13,22 @@ thumbnail: /img/glossary_avatar.png
 <link href="/rmarkdown-libs/bsTable/bootstrapTable.min.css" rel="stylesheet" />
 
 
+<p>This data science glossary contains the most important terms, structured into three categories:</p>
+<ul>
+<li><a href="#ml-glossary">Machine Learning</a></li>
+<li><a href="#software-engineering-glossary">Software Engineering</a></li>
+<li>Statistics/Data Visualization</li>
+</ul>
 <!--## Statistics Glossary-->
-<div id="machine-learning-glossary" class="section level2">
+<div id="ml-glossary" class="section level2">
 <h2>Machine Learning Glossary</h2>
+<p>The machine learning glossary is structured into:</p>
+<ul>
+<li>General terms</li>
+<li>Reinforcement-learning terms</li>
+<li>Supervised-learning terms</li>
+<li>Unsupervised-learning terms</li>
+</ul>
 <p><strong>General Terms</strong></p>
 <table class="table table-striped table-responsive" style="margin-left: auto; margin-right: auto;">
 <tbody>
@@ -249,10 +262,8 @@ Each action changes the learning <a href="#environment">environment</a> and thus
 <h3>Agent</h3>
 <p>In <a href="#reinforcement-learning">reinforcement learning</a>, an agent is the learner that interacts with the <a href="#enviroment">environment</a>.
 Based on a given <a href="#state">state</a>, the agent selects an appropriate <a href="#action">action</a> by considering past earned <a href="#reward">rewards</a>.
-The <a href="#policy">policy</a> of an agent determines the actions that should be executed for each state.</p>
-</div>
-<div id="auc" class="section level3">
-<h3>AUC</h3>
+The <a href="#policy">policy</a> of an agent determines the actions that should be executed for each state.
+### AUC {#auc}</p>
 <p>AUC means <em>area under the curve</em>. When evaluating <a href="#classifier">scoring classifiers</a>, the term <em>AUC</em> usually refers to the
 ROC (receiver operating characteristic)-AUC. The ROC curve determines the <a href="#true-positive-rate">true positive rate</a> and
 <a href="#false-positive-rate">false positive rate</a> for all cutoffs on the scores. When available, the ROC-AUC is <a href="/post/machine-learning/interpreting-roc-curves-auc/">preferable to other measures such as
@@ -618,6 +629,294 @@ that provide the <a href="#ground-truth">ground truth</a>. Popular unsupervised 
 <div id="validation-data" class="section level3">
 <h3>Validation Data</h3>
 <p><em>Validation data</em> refers to the set of data that is used for tuning the hyperparameters of a <a href="#model">model</a>.</p>
-<!--## Software Engineering Glossary-->
+</div>
+</div>
+<div id="software-engineering-glossary" class="section level2">
+<h2>Software Engineering Glossary</h2>
+<p>The software engineering glossary is structured into:</p>
+<ul>
+<li>DevOps terms</li>
+<li>General terms</li>
+<li>Scrum terms</li>
+<li>Testing terms</li>
+</ul>
+<p><strong>DevOps Terms</strong></p>
+<table class="table table-striped table-responsive" style="margin-left: auto; margin-right: auto;">
+<tbody>
+<tr>
+<td style="text-align:center;">
+<a href="#ci/cd">CI/CD</a>
+</td>
+<td style="text-align:center;">
+<a href="#continuous-delivery">Continuous Delivery</a>
+</td>
+<td style="text-align:center;">
+<a href="#continuous-integration">Continuous Integration</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+<a href="#deployment">Deployment</a>
+</td>
+<td style="text-align:center;">
+<a href="#infrastructure-as-code">Infrastructure as Code</a>
+</td>
+<td style="text-align:center;">
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>General Terms</strong></p>
+<table class="table table-striped table-responsive" style="margin-left: auto; margin-right: auto;">
+<tbody>
+<tr>
+<td style="text-align:center;">
+<a href="#acceptance-test-driven-development">Acceptance-Test-Driven Development</a>
+</td>
+<td style="text-align:center;">
+<a href="#behavior-driven-development">Behavior-Driven Development</a>
+</td>
+<td style="text-align:center;">
+<a href="#extreme-programming">Extreme Programming</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+<a href="#mob-programming">Mob Programming</a>
+</td>
+<td style="text-align:center;">
+<a href="#pair-programming">Pair Programming</a>
+</td>
+<td style="text-align:center;">
+<a href="#test-driven-development">Test-Driven Development</a>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Scrum Terms</strong></p>
+<table class="table table-striped table-responsive" style="margin-left: auto; margin-right: auto;">
+<tbody>
+<tr>
+<td style="text-align:center;">
+<a href="#backlog-item">Backlog Item</a>
+</td>
+<td style="text-align:center;">
+<a href="#backlog">Backlog</a>
+</td>
+<td style="text-align:center;">
+<a href="#daily">Daily</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+<a href="#development-team">Development Team</a>
+</td>
+<td style="text-align:center;">
+<a href="#product-owner">Product Owner</a>
+</td>
+<td style="text-align:center;">
+<a href="#refinement">Refinement</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+<a href="#scrum-master">Scrum Master</a>
+</td>
+<td style="text-align:center;">
+<a href="#sprint-planning">Sprint Planning</a>
+</td>
+<td style="text-align:center;">
+<a href="#sprint-retrospective">Sprint Retrospective</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+<a href="#sprint-review">Sprint Review</a>
+</td>
+<td style="text-align:center;">
+</td>
+<td style="text-align:center;">
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Testing Terms</strong></p>
+<table class="table table-striped table-responsive" style="margin-left: auto; margin-right: auto;">
+<tbody>
+<tr>
+<td style="text-align:center;">
+<a href="#end-to-end-test">End-to-End Test</a>
+</td>
+<td style="text-align:center;">
+<a href="#integration-test">Integration Test</a>
+</td>
+<td style="text-align:center;">
+<a href="#types-of-test">Types of Test</a>
+</td>
+</tr>
+<tr>
+<td style="text-align:center;">
+<a href="#unit-test">Unit Test</a>
+</td>
+<td style="text-align:center;">
+</td>
+<td style="text-align:center;">
+</td>
+</tr>
+</tbody>
+</table>
+<p>c(“Product Owner”, “Development Team”, “Scrum Master”, “Daily”,
+“Sprint Planning”, “Sprint Retrospective”, “Refinement”,
+“Backlog”, “Backlog Item”)</p>
+<div id="acceptance-test-driven-development" class="section level3">
+<h3>Acceptance-Test-Driven Development</h3>
+<p>Acceptance-test-driven development (ATDD) is based on the idea that automated acceptance tests
+should be specified before starting with the implementation of a new feature. Since the acceptance
+criteria typically reflect the requirements of the business stakeholders, these tests are typically
+formulated in such a way that they are understandable in layman’s terms, for example, using
+<a href="https://cucumber.io">Cucumber</a>.</p>
+</div>
+<div id="backlog-item" class="section level3">
+<h3>Backlog Item</h3>
+<p>TODO</p>
+</div>
+<div id="behavior-driven-development" class="section level3">
+<h3>Behavior-Driven Development</h3>
+<p>Behavior-driven development (BDD) is related to acceptance-test-driven development (ATDD).
+BDD places a focus on the fact that the required behavior of the software is made explicit and is available
+in an easily understood manner, e.g. via <a href="https://cucumber.io">Cucumber</a>.</p>
+</div>
+<div id="backlog" class="section level3">
+<h3>Backlog</h3>
+<p>The backlog is a collection of backlog items (e.g. features, bugs, enablers) that are planned to be implemented
+by the development team. The <em>product backlog</em> contains all the backlog items that are relevant for the product,
+while the <em>sprint backlog</em> contains only those backlog items that are relevant for the current <a href="#sprint">sprint</a>.</p>
+</div>
+<div id="cicd" class="section level3">
+<h3>CI/CD</h3>
+<p>CI/CD is the shorthand for <a href="#continuous-integration">continuous integration</a> and
+<a href="#continuous-delivery">continuous delivery</a>. CI/CD is realized through automated pipelines that trigger on
+code changes in the <a href="#version-control-system">version control system</a>. Such a pipeline implements CI
+through automated tests. If the tests are successful, CD is performed by deploying the software on a
+staging area or even on production instances.</p>
+</div>
+<div id="continuous-delivery" class="section level3">
+<h3>Continuous Delivery</h3>
+<p>Continuous delivery (CD) refers to the ability to automatically deploy increments of software to a staging area.
+CD should not be confused with continuous deployment, which goes one step further by automatically deploying
+the software to the production instances.</p>
+</div>
+<div id="deployment" class="section level3">
+<h3>Deployment</h3>
+<p>Deployment refers to the release of a software in a non-local environment. Software is typically developed
+in the following environment:</p>
+<ol style="list-style-type: decimal">
+<li>Development environment (e.g. local machines of developers)</li>
+<li>Staging area (a server similar to the production environment)</li>
+<li>The prouction instances running the software that is available to the customers</li>
+</ol>
+<p>In complex systems, multiple staging areas may be used.</p>
+</div>
+<div id="development-team" class="section level3">
+<h3>Development Team</h3>
+<p>The development team engineers the software according to the <a href="#backlog">product backlog</a>.</p>
+</div>
+<div id="end-to-end-test" class="section level3">
+<h3>End-to-End Test</h3>
+<p>End-to-end tests validate the functionality of full application workflows from a user perspective.</p>
+<p>For example, an end-to-end test for an e-commerce business could consist of the following steps:</p>
+<ol style="list-style-type: decimal">
+<li>User login</li>
+<li>Adding products to the shopping basket</li>
+<li>Ordering the selected items</li>
+<li>Receiving the invoice through a confirmation email</li>
+</ol>
+<p>Ideally, end-to-end tests are implemented using a <a href="#behavior-driven-development">behavior-driven development</a> approach.</p>
+</div>
+<div id="extreme-programming" class="section level3">
+<h3>Extreme Programming</h3>
+<p>Extreme programming (XP) refers to a collection of software engineering practices, most notably
+<a href="#pair-programming">pair programming</a>. Since its inception, many of these practices have become an integral part
+of what is considered agile software development today.</p>
+</div>
+<div id="infrastructure-as-code" class="section level3">
+<h3>Infrastructure as Code</h3>
+<p>Infrastructure as code (IaC) is a practice in which a technical
+infrastructure is defined in terms of code such that the infrastructure can be maintained
+(e.g. reconfigured) by executing the code instead of manual interventions.</p>
+<p>Examples of IaC frameworks include <a href="https://www.ansible.com/">Ansible</a>, <a href="https://www.chef.io/">Chef</a>,
+and <a href="https://puppet.com/">Puppet</a>.</p>
+</div>
+<div id="integration-test" class="section level3">
+<h3>Integration Test</h3>
+<p>An integration test validates functional correctness across multiple
+application modules. See <a href="#types-of-tests">Types of Tests</a> for a listing of all types of tests.</p>
+</div>
+<div id="mob-programming" class="section level3">
+<h3>Mob Programming</h3>
+<p>Mob programming extends the concept of <a href="#pair-programming">pair programming</a> from pairs of developers to the entire team.
+This means that the entire team collaboratively works on the same piece of code. This coding practice
+is particularly useful when implementing complex program logic that requires the knowledge from various team members.</p>
+</div>
+<div id="pair-programming" class="section level3">
+<h3>Pair Programming</h3>
+<p>Pair programming is an <a href="#extreme-programming">extreme programming</a> technique in which two developers
+collaboratively work on the same piece of code. One developer assumes the role of the <em>driver</em>, while
+the other assumes the role of the <em>navigator</em>.</p>
+<p>The developer acting as the driver writes the code,
+while the developer acting as the navigator guides the implementation efforts. Typically,
+the roles are switched continually (e.g. all thirty minutes).</p>
+</div>
+<div id="product-owner" class="section level3">
+<h3>Product Owner</h3>
+<p>In <a href="#scrum">Scrum</a>, the product owner (PO) is responsible for maximizing the value that is delivered
+by the development team. To achieve this goal, he has to prioritize backlog items by considering
+the value they offer to the customer as well as the technical complexity of the implementation.
+The development team informs the PO about new software features in the <a href="#sprint-review">sprint review meeting</a>.</p>
+</div>
+<div id="scrum" class="section level3">
+<h3>Scrum</h3>
+<p>TODO</p>
+</div>
+<div id="sprint" class="section level3">
+<h3>Sprint</h3>
+<p>In <a href="#scrum">Scrum</a>, a sprint refers to the period of time after which a new increment of software is produced.
+The duration of a sprint defines the interval in which the majority of Scrum meetings take place
+(e.g. <a href="#sprint-planning">planning</a>, <a href="#sprint-review">review</a>, <a href="#sprint-retrospective">retrospective</a>) and determines the rhythm according to which
+software is developed. Typically, sprints have a length of two weeks.</p>
+</div>
+<div id="sprint-review" class="section level3">
+<h3>Sprint Review</h3>
+<p>In <a href="#scrum">Scrum</a>, the sprint review is a meeting in which the development team
+presents its progress on the <a href="#backlog">sprint backlog</a> to the <a href="#product-owner">product owner</a>.</p>
+</div>
+<div id="test-driven-development" class="section level3">
+<h3>Test-Driven Development</h3>
+<p>Test-driven development (TDD) is a development practice that ensures that
+a sufficient number of varied unit tests are implemented during the development
+of a new functionality. The following pattern can be used for TDD:</p>
+<ol style="list-style-type: decimal">
+<li>Write up the boilerplate for the functionality you want to test (e.g. class, function) but do not
+implement the functionality yet.</li>
+<li>Write a failing test.</li>
+<li>Adapt the implementation such that the test is passed successfully.</li>
+<li>Continue with Step 2. Terminate the TDD process if you cannot think of any
+additional tests that would demonstrate a failure in your implementation.</li>
+</ol>
+</div>
+<div id="types-of-test" class="section level3">
+<h3>Types of Tests</h3>
+<p>Software testing can be tested using the following types of tests:</p>
+<ul>
+<li><a href="#unit-test">Unit tests</a></li>
+<li><a href="#integration-test">Integration tests</a></li>
+<li><a href="#end-to-end-test">End-to-end tests</a></li>
+</ul>
+<p>These types of tests form the <em>test pyramid</em>. Most application tests are made up of
+a large number of unit tests, a small number of integration tests, and just a few end-to-end-tests.</p>
+</div>
+<div id="unit-test" class="section level3">
+<h3>Unit Test</h3>
+<p>Unit tests validate the functionality of a unit of application code. The term <em>unit</em> is not formally defined and could be a single, independent function, multiple functions, or a complete software module. A single unit test should test only a single type of functionality, if possible. This allows the precise identification of errors in the application. See <a href="#types-of-tests">Types of Tests</a> for a listing of all types of tests.</p>
 </div>
 </div>

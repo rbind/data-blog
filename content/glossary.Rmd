@@ -8,6 +8,13 @@ sidebar: true
 thumbnail: /img/glossary_avatar.png
 ---
 
+This data science glossary contains the most important terms, structured into three categories:
+
+* [Machine Learning](#ml-glossary)
+* [Software Engineering](#software-engineering-glossary)
+* Statistics/Data Visualization
+
+
 ```{r create_glossary_table, warning=FALSE, echo=FALSE, message=FALSE}
 library(tidyverse)
 library(kableExtra)
@@ -33,7 +40,7 @@ terms_to_table <- function(terms, ncol=3) {
 }
 ```
 
-```{r define_terms, mesage = FALSE, echo = FALSE, warning = FALSE}
+```{r define_ml_terms, mesage = FALSE, echo = FALSE, warning = FALSE}
 general.ml.terms <- c("Data Point", "Machine Learning", "Model", "Model Complexity",
            "Supervised Learning", "Reinforcement Learning", "Unsupervised Learning",
            "Data Wrangling"
@@ -57,7 +64,25 @@ supervised.terms <- c("Confusion Matrix", "Dependent Variable",
 rl.terms <- c("Action", "Agent", "Observation", "Policy",
            "Reward", "State", "Environment")
 
-all.terms <- c(general.ml.terms, unsupervised.terms, supervised.terms, rl.terms)
+all.ml.terms <- c(general.ml.terms, unsupervised.terms, supervised.terms, rl.terms)
+```
+
+```{r define_software_terms, mesage = FALSE, echo = FALSE, warning = FALSE}
+devops.terms <- c("Continuous Delivery", "CI/CD", "Continuous Integration", "Deployment",
+                  "Infrastructure as Code")
+scrum.terms <- c("Product Owner", "Development Team", "Scrum Master", "Daily",
+                 "Sprint Planning", "Sprint Retrospective", "Sprint Review", "Refinement",
+                 "Backlog", "Backlog Item")
+testing.terms <- c("Unit Test", "Integration Test", "End-to-End Test", "Types of Test")
+general.software.terms <- c("Behavior-Driven Development", "Test-Driven Development", 
+                            "Acceptance-Test-Driven Development", "Extreme Programming",
+                            "Pair Programming", "Mob Programming")
+all.software.terms <- c(testing.terms, general.software.terms)
+```
+
+
+```{r define_all_terms, mesage = FALSE, echo = FALSE, warning = FALSE}
+all.terms <- c(all.ml.terms, all.software.terms)  # TODO: extend
 ```
 
 ```{r create_word_cloud, warning=FALSE, echo=FALSE, message=FALSE, eval = FALSE }
@@ -91,7 +116,14 @@ textplot_wordcloud(freq.df,
 
 <!--## Statistics Glossary-->
 
-## Machine Learning Glossary
+## Machine Learning Glossary {#ml-glossary}
+
+The machine learning glossary is structured into:
+
+* General terms
+* Reinforcement-learning terms
+* Supervised-learning terms
+* Unsupervised-learning terms
 
 **General Terms**
 
@@ -128,7 +160,6 @@ Each action changes the learning [environment](#environment) and thus yields a n
 In [reinforcement learning](#reinforcement-learning), an agent is the learner that interacts with the [environment](#enviroment).
 Based on a given [state](#state), the agent selects an appropriate [action](#action) by considering past earned [rewards](#reward).
 The [policy](#policy) of an agent determines the actions that should be executed for each state.
-
 ### AUC {#auc}
 
 AUC means *area under the curve*. When evaluating [scoring classifiers](#classifier), the term *AUC* usually refers to the
@@ -475,4 +506,194 @@ that provide the [ground truth](#ground-truth). Popular unsupervised methods inc
 
 *Validation data* refers to the set of data that is used for tuning the hyperparameters of a [model](#model).
 
-<!--## Software Engineering Glossary-->
+## Software Engineering Glossary {#software-engineering-glossary}
+
+The software engineering glossary is structured into:
+
+* DevOps terms
+* General terms
+* Scrum terms
+* Testing terms
+
+**DevOps Terms**
+
+```{r gen_devops_terms, warning=FALSE, echo=FALSE}
+terms_to_table(devops.terms)
+```
+
+**General Terms**
+
+```{r gen_general_software_terms, warning=FALSE, echo=FALSE}
+terms_to_table(general.software.terms)
+```
+
+**Scrum Terms**
+
+```{r gen_scrum_terms, warning=FALSE, echo=FALSE}
+terms_to_table(scrum.terms)
+```
+
+**Testing Terms**
+
+```{r gen_testing_terms, warning=FALSE, echo=FALSE}
+terms_to_table(testing.terms)
+```
+
+c("Product Owner", "Development Team", "Scrum Master", "Daily",
+                 "Sprint Planning", "Sprint Retrospective", "Refinement",
+                 "Backlog", "Backlog Item")
+
+### Acceptance-Test-Driven Development {#acceptance-test-driven-development}
+
+Acceptance-test-driven development (ATDD) is based on the idea that automated acceptance tests
+should be specified before starting with the implementation of a new feature. Since the acceptance
+criteria typically reflect the requirements of the business stakeholders, these tests are typically
+formulated in such a way that they are understandable in layman's terms, for example, using
+[Cucumber](https://cucumber.io).
+
+### Backlog Item {#backlog-item}
+
+TODO
+
+### Behavior-Driven Development {#behavior-driven-development}
+
+Behavior-driven development (BDD) is related to acceptance-test-driven development (ATDD).
+BDD places a focus on the fact that the required behavior of the software is made explicit and is available
+in an easily understood manner, e.g. via [Cucumber](https://cucumber.io).
+
+### Backlog {#backlog}
+
+The backlog is a collection of backlog items (e.g. features, bugs, enablers) that are planned to be implemented
+by the development team. The *product backlog* contains all the backlog items that are relevant for the product,
+while the *sprint backlog* contains only those backlog items that are relevant for the current [sprint](#sprint).
+
+### CI/CD
+
+CI/CD is the shorthand for [continuous integration](#continuous-integration) and
+[continuous delivery](#continuous-delivery). CI/CD is realized through automated pipelines that trigger on
+code changes in the [version control system](#version-control-system). Such a pipeline implements CI
+through automated tests. If the tests are successful, CD is performed by deploying the software on a 
+staging area or even on production instances.
+
+### Continuous Delivery {#continuous-delivery}
+
+Continuous delivery (CD) refers to the ability to automatically deploy increments of software to a staging area.
+CD should not be confused with continuous deployment, which goes one step further by automatically deploying
+the software to the production instances.
+
+### Deployment {#deployment}
+
+Deployment refers to the release of a software in a non-local environment. Software is typically developed
+in the following environment:
+
+1. Development environment (e.g. local machines of developers)
+2. Staging area (a server similar to the production environment)
+3. The prouction instances running the software that is available to the customers
+
+In complex systems, multiple staging areas may be used.
+
+### Development Team {#development-team}
+
+The development team engineers the software according to the [product backlog](#backlog).
+
+### End-to-End Test {#end-to-end-test}
+
+End-to-end tests validate the functionality of full application workflows from a user perspective.
+
+For example, an end-to-end test for an e-commerce business could consist of the following steps:
+
+1. User login
+2. Adding products to the shopping basket
+3. Ordering the selected items
+4. Receiving the invoice through a confirmation email
+
+Ideally, end-to-end tests are implemented using a [behavior-driven development](#behavior-driven-development) approach.
+
+### Extreme Programming {#extreme-programming}
+
+Extreme programming (XP) refers to a collection of software engineering practices, most notably 
+[pair programming](#pair-programming). Since its inception, many of these practices have become an integral part
+of what is considered agile software development today.
+
+### Infrastructure as Code {#infrastructure-as-code}
+
+Infrastructure as code (IaC) is a practice in which a technical
+infrastructure is defined in terms of code such that the infrastructure can be maintained
+(e.g. reconfigured) by executing the code instead of manual interventions.
+
+Examples of IaC frameworks include [Ansible](https://www.ansible.com/), [Chef](https://www.chef.io/),
+and [Puppet](https://puppet.com/).
+
+### Integration Test {#integration-test}
+
+An integration test validates functional correctness across multiple
+application modules. See [Types of Tests](#types-of-tests) for a listing of all types of tests.
+
+### Mob Programming {#mob-programming}
+
+Mob programming extends the concept of [pair programming](#pair-programming) from pairs of developers to the entire team.
+This means that the entire team collaboratively works on the same piece of code. This coding practice
+is particularly useful when implementing complex program logic that requires the knowledge from various team members.
+
+### Pair Programming {#pair-programming}
+
+Pair programming is an [extreme programming](#extreme-programming) technique in which two developers
+collaboratively work on the same piece of code. One developer assumes the role of the *driver*, while
+the other assumes the role of the *navigator*.
+
+The developer acting as the driver writes the code,
+while the developer acting as the navigator guides the implementation efforts. Typically,
+the roles are switched continually (e.g. all thirty minutes).
+
+### Product Owner {#product-owner}
+
+In [Scrum](#scrum), the product owner (PO) is responsible for maximizing the value that is delivered
+by the development team. To achieve this goal, he has to prioritize backlog items by considering
+the value they offer to the customer as well as the technical complexity of the implementation.
+The development team informs the PO about new software features in the [sprint review meeting](#sprint-review).
+
+### Scrum {#scrum}
+
+TODO
+
+### Sprint {#sprint}
+
+In [Scrum](#scrum), a sprint refers to the period of time after which a new increment of software is produced.
+The duration of a sprint defines the interval in which the majority of Scrum meetings take place
+(e.g. [planning](#sprint-planning), [review](#sprint-review), [retrospective](#sprint-retrospective)) and determines the rhythm according to which
+software is developed. Typically, sprints have a length of two weeks.
+
+### Sprint Review {#sprint-review}
+
+In [Scrum](#scrum), the sprint review is a meeting in which the development team
+presents its progress on the [sprint backlog](#backlog) to the [product owner](#product-owner).
+
+### Test-Driven Development {#test-driven-development}
+
+Test-driven development (TDD) is a development practice that ensures that
+a sufficient number of varied unit tests are implemented during the development
+of a new functionality. The following pattern can be used for TDD:
+
+1. Write up the boilerplate for the functionality you want to test (e.g. class, function) but do not
+   implement the functionality yet.
+2. Write a failing test.
+3. Adapt the implementation such that the test is passed successfully.
+4. Continue with Step 2. Terminate the TDD process if you cannot think of any
+   additional tests that would demonstrate a failure in your implementation.
+
+### Types of Tests {#types-of-test}
+
+Software testing can be tested using the following types of tests:
+
+* [Unit tests](#unit-test)
+* [Integration tests](#integration-test)
+* [End-to-end tests](#end-to-end-test)
+
+These types of tests form the *test pyramid*. Most application tests are made up of
+a large number of unit tests, a small number of integration tests, and just a few end-to-end-tests.
+
+### Unit Test {#unit-test}
+
+Unit tests validate the functionality of a unit of application code. The term *unit* is not formally defined and could be a single, independent function, multiple functions, or a complete software module. A single unit test should test only a single type of functionality, if possible. This allows the precise identification of errors in the application. See [Types of Tests](#types-of-tests) for a listing of all types of tests.
+
+
