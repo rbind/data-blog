@@ -1,0 +1,6 @@
+_id: c6cb2610-086a-11eb-8fe1-dfac60905dbf
+path: post/basic-statistics/distributions.html
+name: Sam
+email: 09d9bd1dcb19fd58b6488fe4e38fe98a
+message: "Perhaps I'm wrong, but it seems to me that there is a mistake in the **interpretation** of the density function. With continuous random variables, the probability of having an IQ of 140 is **not** the value of the density function at 140.   Technically, the probability of having a specific value with a continuous r.v. is always zero. If one wants to makes an approximation, then he would write \r\n\r\n    pnorm(140.1, mean=100,sd=15)-pnorm(139.9,mean=100,sd=15)\r\n    0.0001519534\r\n\r\nWhich is not identical to \r\n    dnorm(140,mean=100,sd=15)\r\n    0.0007597324\r\n\r\nThe small interval around 140 which we use to make our calculations with, will depend on the level of precision with which we make our measurements, I believe."
+date: '2020-10-07T07:00:26.268Z'
