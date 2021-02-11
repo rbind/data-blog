@@ -1,0 +1,10 @@
+_id: 7a94a130-6c70-11eb-b1c4-0b1b7e9ad54f
+path: post/machine-learning/forecasting_vs_prediction.html
+name: Alan
+email: e0aea9f882dae42dcab97b869d11dc02
+message: >-
+  This is mostly wrong. Prediction is a deterministic exercise of assigning an
+  event to the future. Forecasting is about the assignment of probabilities to
+  future events. This is why predictive tasks talk about accuracy and
+  forecasting tasks talk about calibration.
+date: '2021-02-11T13:53:11.605Z'
