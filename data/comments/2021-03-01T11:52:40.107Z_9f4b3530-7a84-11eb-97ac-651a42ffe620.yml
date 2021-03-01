@@ -1,0 +1,6 @@
+_id: 9f4b3530-7a84-11eb-97ac-651a42ffe620
+path: post/other/how-to-bypass-corporate-firewall.md
+name: Johannes Stamminger
+email: 9200ab9c3ea4e9fb17691f61801d405a
+message: "Hi,\r\n\r\nyour title for this article is absolutely mis-leading: in the way you describe the cntlm usage in the following, there is no bypassing of the company proxy at all. Instead you place another proxy in front of it,. All requests still arrive the same way at the company proxy, except that the cntlm handles the authentication towards the company proxy. This way the authentication challenge is delegated from the application (that may not support the authentication scheme of the company proxy) to the cntlm. But no security mechanism of the company proxy is overcome or by-passed.\r\nI would call it a proxy-in-te-middle/proxy-chaining instead.\r\n\r\nWith such title the cntlm becomes discredited to company proxy responsibles/IT security officers which it does not deserve - at least not with the usage that is described here in the article.\r\n\r\nI would highly appreciate, if you could make this aspect more clear in the article itself. And update the title to something that reflects the proxy-chaining mechanism more accurately.\r\n\r\n\r\nThanks and kind regards,\r\nJohannes"
+date: '2021-03-01T11:52:40.107Z'
