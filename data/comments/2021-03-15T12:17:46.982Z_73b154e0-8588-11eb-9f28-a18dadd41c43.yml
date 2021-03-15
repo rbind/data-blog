@@ -1,0 +1,6 @@
+_id: 73b154e0-8588-11eb-9f28-a18dadd41c43
+path: post/data-visualization/barplot.html
+name: Yarp
+email: 681f57b53db25a4f693212663ecf2b56
+message: "--> geom_errorbar(aes(ymin = Mean - 1.96 * SD, ymax = Mean + 1.96 * SD)\r\n\r\nAccording to  margin of error --> Xbar +- z(alpha/2) * sigma/sqrt(n), isn't sqrt(n) missing here or am I missing something?"
+date: '2021-03-15T12:17:46.982Z'
