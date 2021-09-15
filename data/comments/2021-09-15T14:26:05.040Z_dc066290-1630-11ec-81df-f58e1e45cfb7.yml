@@ -1,0 +1,6 @@
+_id: dc066290-1630-11ec-81df-f58e1e45cfb7
+path: post/statistical_test/contingency_table_tests.html
+name: Nabin
+email: 52f8f86deafe1a924b37c63c86ed63f0
+message: "Hi Matt,\r\nThe following 2x2 table has p-value =1 using the Fisher's test. However, the same table has p-value = 0.338 using chisq test. I more likely prefer to chisq test rather than fisher's test, since p-value =1 means there is  no difference et all at any significance level.  But we see there are some differences in the ratios. Can I get your opinion about which you would prefer and why?\r\n> chisq.test(matrix(c(1,23,3,35), nrow=2, byrow=T), correct=F)\r\n> fisher.test(matrix(c(1,23,3,35), nrow=2, byrow=T))\r\nThanks"
+date: '2021-09-15T14:26:05.040Z'
