@@ -1,0 +1,6 @@
+_id: 9a336f00-5722-11ed-951d-6753f2b9de56
+path: post/machine-learning/interpreting_roc_curves.html
+name: Juan
+email: d6550112f6a27da8c4596d6a2e63bc6c
+message: "Hello.\r\n\r\nWhat if we are using weights or a cost matrix to compensate the imbalance?\r\nWill it be still be preferred to use the AUC PR metric?\r\nOr using weights or cost matrix it’s enough and then we can use the AUC ROC curve or even the Accuracy as a metric to optimize our model?\r\n\r\nAnd vice versa, if you use the AUC PR as our metric...   do we need to also use weights or cost matrices?"
+date: '2022-10-29T00:42:44.779Z'
